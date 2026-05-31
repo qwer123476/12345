@@ -4821,7 +4821,7 @@ function AntiBoxF()
     end)
 end
 function AntiJukeboxF()
-    local targetNames = {"JukeboxBule", "JukeboxOrange"}
+    local targetNames = {"JukeboxOrange", "JukeboxBule"}
 
     task.spawn(function()
         while _G.AntiJukeboxT and task.wait(0.1) do
@@ -4835,19 +4835,20 @@ function AntiJukeboxF()
                 if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
                     if folder.Name ~= (plr.Name .. "SpawnedInToys") then
                         for _, item in ipairs(folder:GetChildren()) do
-                            if table.find(targetNames, item.Name) and item:FindFirstChild("SoundPart") then
-                                local Spart = item.Button
+                            if table.find(targetNames, item.Name) then
+                                local Spart = item:FindFirstChild("Button") or item:FindFirstChild("SoundPart") or item.PrimaryPart
                                 if not Spart then continue end
 
                                 local basePart = item.PrimaryPart or Spart
                                 local PartOwner = Spart:FindFirstChild("PartOwner")
                                 local dist = (basePart.Position - hrp.Position).Magnitude
 
-                                FallenY = workspace.FallenPartsDestroyHeight
-                                targetY = (FallenY <= -50000 and -49999) or (FallenY <= -100 and -99) or -100
-
-                                if dist <= 30 and not PartOwner then rs.GrabEvents.SetNetworkOwner:FireServer(Spart, CFrame.lookAt(hrp.Position, Spart.Position)) end
-                                if PartOwner then Spart.CFrame = CFrame.new(0, targetY, 9999) end
+                                if dist <= 30 and not PartOwner then 
+                                    rs.GrabEvents.SetNetworkOwner:FireServer(Spart, CFrame.lookAt(hrp.Position, Spart.Position)) 
+                                end
+                                if PartOwner then 
+                                    Spart.CFrame = CFrame.new(9999, 10000, 9999) 
+                                end
                             end
                         end
                     end
@@ -4872,19 +4873,20 @@ function AntiPalletF()
                 if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
                     if folder.Name ~= (plr.Name .. "SpawnedInToys") then
                         for _, item in ipairs(folder:GetChildren()) do
-                            if table.find(targetNames, item.Name) and item:FindFirstChild("SoundPart") then
-                                local Spart = item.Button
+                            if table.find(targetNames, item.Name) then
+                                local Spart = item:FindFirstChild("Button") or item.PrimaryPart
                                 if not Spart then continue end
 
                                 local basePart = item.PrimaryPart or Spart
                                 local PartOwner = Spart:FindFirstChild("PartOwner")
                                 local dist = (basePart.Position - hrp.Position).Magnitude
 
-                                FallenY = workspace.FallenPartsDestroyHeight
-                                targetY = (FallenY <= -50000 and -49999) or (FallenY <= -100 and -99) or -100
-
-                                if dist <= 30 and not PartOwner then rs.GrabEvents.SetNetworkOwner:FireServer(Spart, CFrame.lookAt(hrp.Position, Spart.Position)) end
-                                if PartOwner then Spart.CFrame = CFrame.new(0, targetY, 9999) end
+                                if dist <= 30 and not PartOwner then 
+                                    rs.GrabEvents.SetNetworkOwner:FireServer(Spart, CFrame.lookAt(hrp.Position, Spart.Position)) 
+                                end
+                                if PartOwner then 
+                                    Spart.CFrame = CFrame.new(9999, 10000, 9999) 
+                                end
                             end
                         end
                     end
