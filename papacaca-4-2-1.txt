@@ -8010,6 +8010,118 @@ LoopTab:CreateButton({
         end
     end
 })
+local ToggleState = false
+
+function Fire()
+    if not ToggleState then
+        return
+    end
+
+    while ToggleState do
+        local char = plr.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then 
+            task.wait(0.1)
+            continue
+        end
+
+        local desk = inv:FindFirstChild("Campfire")
+
+        if not desk then
+            local spawnRemote = rs:FindFirstChild("MenuToys") and rs.MenuToys:FindFirstChild("SpawnToyRemoteFunction")
+            if spawnRemote then
+                local offset = hrp.CFrame.LookVector * -24
+                local spawnCF = hrp.CFrame + Vector3.new(0, 0, 0) + offset
+                task.spawn(function()
+                    pcall(function()
+                        spawnRemote:InvokeServer("Campfire", spawnCF, spawnCF.Position)
+                    end)
+                end)
+                task.wait(0.001)
+
+                for _, item in pairs(inv:GetChildren()) do
+                    if item.Name == "Campfire" then
+                        item.Name = "Campfire"
+                        desk = item
+                        break
+                    end
+                end
+            end
+
+            if not desk then
+                task.wait(0.1)
+                continue
+            end
+        end
+
+        local main = desk:FindFirstChild("Main")
+        if main then
+            local bp = main:FindFirstChildOfClass("BodyPosition")
+            if not bp then
+                bp = Instance.new("BodyPosition")
+                bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bp.Position = Vector3.new(hrp.CFrame.X, 600, hrp.CFrame.Z)
+                bp.Parent = main
+            else
+                bp.Position = Vector3.new(hrp.CFrame.X, 600, hrp.CFrame.Z)
+            end
+        end
+
+        local hitbox = desk:FindFirstChild("Hitbox")
+        if not hitbox then
+            task.wait(0.1)
+            continue
+        end
+
+        local partOwner = hitbox:FindFirstChild("PartOwner")
+        if not partOwner or partOwner.Value ~= plr.Name then
+            rs.GrabEvents.SetNetworkOwner:FireServer(hitbox, hitbox.CFrame)
+            task.wait(0.01)
+            partOwner = hitbox:FindFirstChild("PartOwner")
+            if not partOwner or partOwner.Value ~= plr.Name then
+                task.wait(0.1)
+                continue
+            end
+        end
+
+        local hitbox2 = desk:FindFirstChild("StickyRemoverPart")
+        if not hitbox2 then
+            task.wait(0.01)
+            continue
+        end
+
+        local validRoots = {}
+        for _, name in ipairs(playersInLoop1V) do
+            local player = game.Players:FindFirstChild(name)
+            if player and player.Character then
+                local root = player.Character:FindFirstChild("HumanoidRootPart") 
+                if root and not playersInPlotsFolder:FindFirstChild(name) then
+                    table.insert(validRoots, root)
+                end
+            end
+        end
+
+        if #validRoots > 0 then
+            for _, targetRoot in ipairs(validRoots) do
+                if targetRoot then
+                    local behindCFrame = targetRoot.CFrame * CFrame.new(1,0,3)
+                    hitbox2.CFrame = behindCFrame
+                    task.wait()
+                end
+            end
+        end
+
+        task.wait(0.05)
+    end
+end
+
+local Button = LoopTab:CreateButton({
+   Name = "Fire",
+   Callback = function()
+      ToggleState = true
+      task.spawn(Fire)
+   end,
+})
 
 antiTab:CreateSection("Teleport | Toggle")
 local AntiGrabV1 = antiTab:CreateToggle({
