@@ -7575,27 +7575,7 @@ LoopTab:CreateButton({
         end
     end
 })
-LoopTab:CreateSection("paca Owner Kick")
 
-local TokraOwnerKickToggle = LoopTab:CreateToggle({
-    Name = "paca Owner Loop Kick ((파카용)블롭 없이)",
-    CurrentValue = false,
-    Flag = "TokraOwnerKick",
-    Callback = function(Value)
-        TokraOwnerKickT = Value
-        TokraOwnerKickF()
-    end
-})
-
-local OwnerLoopKickToggle = LoopTab:CreateToggle({
-    Name = "paca Owner Loop KickV2 ((파카용)블롭맨 없이)",
-    CurrentValue = false,
-    Flag = "OwnerLoopKick",
-    Callback = function(Value)
-        OwnerLoopKickT = Value
-        OwnerLoopKickF()
-    end
-})
     LoopTab:CreateSection("Owner Kick")
     
     local OLTPInput = LoopTab:CreateInput({
@@ -7707,43 +7687,8 @@ local blobLoop4Toggle = LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateLabel("스팸킥의 경우 렉이걸릴시 잘 되지않습니다.")
-LoopTab:CreateToggle({
-    Name = "[ 고정 ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        SkipOL = Value
-    end
-})
 
-LoopTab:CreateToggle({
-    Name = "[ 데스토리그랩 제거 ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        OnlyOwner = Value
-    end
-})
 
-LoopTab:CreateToggle({
-    Name = "[ Original ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        OwnerKickMODED = Value
-    end
-})
-
-LoopTab:CreateToggle({
-    Name = "[ 앉기 ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        SitMODED = Value
-    end
-})
-
-LoopTab:CreateSection("Blobman")
 LoopTab:CreateButton({
     Name = "무질량 끄기",
     Callback = function()
@@ -7837,25 +7782,7 @@ local blobLoop2Toggle = LoopTab:CreateToggle({
     end
 })
 
-LoopTab:CreateToggle({
-    Name = "[ 앉기 ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        LoopBringMODED = Value
-    end
-})
 
-LoopTab:CreateToggle({
-    Name = "[ 집들어가는거 막기 ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        LoopReleaseMODED = Value
-    end
-})
-
-LoopTab:CreateSection("Owner")
 local Loop1 = LoopTab:CreateToggle({
     Name = "루프킬 [ Owner ]",
     CurrentValue = false,
@@ -7896,9 +7823,9 @@ local Loop2 = LoopTab:CreateToggle({
     end
 })
 
-LoopTab:CreateSection("Ragdoll")
+LoopTab:CreateSection("스팸")
 LoopTab:CreateToggle({
-    Name = "스팸 [ SnowBall ]",
+    Name = "스팸",
     CurrentValue = false,
     Flag = "27",
     Callback = function(Value)
@@ -8186,7 +8113,7 @@ local AntiGrabV1 = antiTab:CreateToggle({
     end
 })
 antiTab:CreateLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
-antiTab:CreateSection("Grab | Toggle")
+antiTab:CreateSection("그랩 | 토클")
 local AntiGrab = antiTab:CreateToggle({
     Name = "안티 그랩",
     CurrentValue = false,
@@ -8223,7 +8150,7 @@ local AntiRelease = antiTab:CreateToggle({
 })
 AntiRelease:Set(true)
 
-antiTab:CreateSection("Blob | Toggle")
+antiTab:CreateSection("블롭")
 local AntiBlob = antiTab:CreateToggle({
 	Name = "안티 블롭맨",
 	CurrentValue = false,
@@ -8248,21 +8175,8 @@ local AntiMassless = antiTab:CreateToggle({
 })
 AntiMassless:Set(true)
 
-antiTab:CreateSection("Plot | Toggle")
+antiTab:CreateSection("플롯")
 
-local TEST= false
-
-if TEST then
-local dddddd Toggle = antiTab:CreateToggle({
-    Name = "ddddddddddd",
-    CurrentValue = false,
-    Flag = "ddddddd Flag",
-    Callback = function(Value)
-        ddddddd = Value
-        ddddddd()
-    end
-})
-end
 
 local AntiInPlots = antiTab:CreateToggle({
     Name = "안티 인플레이스",
@@ -8276,7 +8190,7 @@ local AntiInPlots = antiTab:CreateToggle({
 })
 AntiInPlots:Set(true)
 
-antiTab:CreateSection("Game | Toggle")
+
 local AntiVoid = antiTab:CreateToggle({
     Name = "안티 보이드",
     CurrentValue = false,
@@ -8339,7 +8253,7 @@ local AntiLag = antiTab:CreateToggle({
 AntiLag:Set(true)
 
 local AutoAttack  antiTab:CreateToggle({
-    Name = "오토어택 | 잡으면 뒤짐",
+    Name = "오토어택 | 킬",
     CurrentValue = false,
     Flag = "AutoAttack",
     Callback = function(Value)
@@ -8369,8 +8283,8 @@ local AntiBlobUse = antiTab:CreateToggle({
     end
 })
 
-antiTab:CreateSection("Kick | Toggle")
--- ================== Kick Reset + Auto Protection ==================
+antiTab:CreateSection("킥")
+
 local flyingResetConn = nil
 local resetProtectionConn = nil
 
@@ -8402,7 +8316,7 @@ local FlyingReset = antiTab:CreateToggle({
     end
 })
 
--- Reset after protection (1 second delay)
+
 resetProtectionConn = plr.CharacterAdded:Connect(function(char)
     task.wait(1)
     
@@ -8541,7 +8455,7 @@ local AntiPCLD = antiTab:CreateToggle({
 })
 if not TESTPP then AntiPCLD:Set(true) end
 
-antiTab:CreateSection("Ragdoll | Toggle")
+
 local PermRag = antiTab:CreateToggle({
     Name = "래그돌",
     CurrentValue = false,
@@ -8558,7 +8472,7 @@ local PermRag = antiTab:CreateToggle({
 
 
 
-antiTab:CreateSection("Gucci | Toggle")
+antiTab:CreateSection("구찌")
 local AutoGucci = antiTab:CreateToggle({
     Name = "오토구찌(킥위험 약간 있음!)",
     CurrentValue = false,
@@ -8652,7 +8566,7 @@ local Dropdown = antiTab:CreateDropdown({
     end,
 })
 
-playerTab:CreateSection("Humanoid")
+playerTab:CreateSection("플레이어")
 playerTab:CreateToggle({
     Name = "이동 속도",
     CurrentValue = false,
@@ -8679,7 +8593,7 @@ walkSpeedInput:Set(80)
 
 
 
-playerTab:CreateSection("")
+
 playerTab:CreateToggle({
     Name = "점프 높이",
     CurrentValue = false,
@@ -8757,7 +8671,7 @@ playerTab:CreateToggle({
         end
     end
 })
-playerTab:CreateSection("Other")
+playerTab:CreateSection("나머지")
 local NoClipToggle = playerTab:CreateToggle({
     Name = "노클립",
     CurrentValue = false,
@@ -8768,15 +8682,6 @@ local NoClipToggle = playerTab:CreateToggle({
     end
 })
 
-local infJumpToggle = playerTab:CreateToggle({
-    Name = "무한 점프",
-    CurrentValue = false,
-    Flag = "32",
-    Callback = function(Value)
-        infJumpT = Value
-        updateInfJumpF()
-    end
-})
 
 local Fly = playerTab:CreateToggle({ 
     Name = "플라이(모바일불가)", 
@@ -8801,7 +8706,7 @@ local flyInput = playerTab:CreateInput({
 flyInput:Set(80)
 
 
-playerTab:CreateSection("Extra")
+playerTab:CreateSection("엑스트라")
 
 -- 1. Server Hop
 playerTab:CreateButton({
@@ -8912,7 +8817,7 @@ playerTab:CreateToggle({
         end)
     end
 })
-
+AuraTab:CreateSection("안티 아우라들")
 AuraTab:CreateToggle({
     Name = "안티 붐박스 아우라 [ all ]", -- Boombox
     CurrentValue = false,
@@ -9076,7 +8981,7 @@ local Button = funTab:CreateButton({
     end,
 })
 
-funTab:CreateSection("Lag")
+funTab:CreateSection("렉")
 funTab:CreateToggle({
     Name = "렉(섭폭)",
     CurrentValue = false,
@@ -9088,7 +8993,7 @@ funTab:CreateToggle({
 })
 
 funTab:CreateInput({
-    Name = "줄들",
+    Name = "줄",
     CurrentValue = 50,
     PlaceholderText = "Lines",
     RemoveTextAfterFocusLost = false,
@@ -9264,7 +9169,7 @@ end
    end
 })
 
-funTab:CreateSection("StickyEvent")
+funTab:CreateSection("떠있는것들 무력화")
 local Inputt = funTab:CreateInput({
    Name = "쿠나이",
    CurrentValue = "",
@@ -9275,8 +9180,9 @@ local Inputt = funTab:CreateInput({
    end
 })
 
+funTab:CreateSection("UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요.")
 local Ctratee = funTab:CreateButton({
-   Name = "만들기 [ 그랩 파트 ]",
+   Name = "무력화",
    Callback = function()
        local ReplicatedStorage = game:GetService("ReplicatedStorage")
        local Players = game:GetService("Players")
@@ -9440,7 +9346,7 @@ local Ctratee = funTab:CreateButton({
    end
 })
 
-keybindTab:CreateSection("Shader")
+keybindTab:CreateSection("배경")
 keybindTab:CreateButton({
     Name = "기본값",
     Callback = function()
@@ -9536,7 +9442,7 @@ keybindTab:CreateButton({
 })
 
 keybindTab:CreateButton({
-    Name = "슈어",
+    Name = "새벽",
     Callback = function()
         local Lighting = game:GetService("Lighting")
 
@@ -9841,7 +9747,7 @@ keybindTab:CreateKeybind({
     end
 })
 
-keybindTab:CreateSection("Owner")
+keybindTab:CreateSection("앵커")
 keybindTab:CreateKeybind({
     Name = "고정",
     CurrentKeybind = "H",
