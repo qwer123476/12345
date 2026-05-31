@@ -8080,7 +8080,7 @@ local function Fire()
     end
 end
 
-local Toggle = LoopTab:CreateToggle({
+local Toggle = LoopTab:CreateButton({
    Name = "불테러",
    CurrentValue = false,
    Flag = "FireToggle",
