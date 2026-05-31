@@ -4832,11 +4832,11 @@ function AntiDeathF()
         local Character = plr.Character
         if not Character then return end
 
-        local donut = inv:FindFirstChild("FoodHamburger")
+        local donut = inv:FindFirstChild("InstrumentGuitarUkulele")
 
         if not donut then
             pcall(function()
-                rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", CFrame.new(0,0,0), Vector3.new(0,0,0))
+                rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("InstrumentGuitarUkulele", CFrame.new(0,0,0), Vector3.new(0,0,0))
             end)
             return
         end
