@@ -3940,8 +3940,8 @@ function AntiGrabStickyF()
 end
 
 -- Snowball Loop Function
-function LoopSnowBallF()
-    if SnowballLoopThread and coroutine.status(SnowballLoopThread) ~= "dead" then
+function LoopfireF()
+    if fireLoopThread and coroutine.status(fireLoopThread) ~= "dead" then
         return
     end
 
@@ -3957,7 +3957,7 @@ function LoopSnowBallF()
     }
 
     SnowballLoopThread = coroutine.create(function()
-        while LoopSnowBallT do
+        while LoopfireT do
             task.wait(0.2)
 
             local myHrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
@@ -3966,7 +3966,7 @@ function LoopSnowBallF()
             end
 
             local ball = inv and inv:FindFirstChild("Campfire")
-            if not ball then
+            if not fire then
                 task.spawn(function()
                     Remotes.Spawn:InvokeServer("Campfire", myHrp.CFrame * CFrame.new(0, 10, 20), Vector3.new(0, 0, 0))
                 end)
@@ -4005,13 +4005,13 @@ function LoopSnowBallF()
                 TARGET_INDEX = 1
             end
 
-            local ballSPart = ball:FindFirstChild("SoundPart")
+            local firePart = ball:FindFirstChild("SoundPart")
             if not ballSPart then
                 task.wait(0.1)
                 continue
             end
 
-            Remotes.SetOwner:FireServer(ballSPart, ballSPart.CFrame)
+            Remotes.SetOwner:FireServer(firePart, firePart.CFrame)
             task.wait(0.05)
             ballSPart.CFrame = targetHrp.CFrame
 
@@ -4020,24 +4020,24 @@ function LoopSnowBallF()
                 Radius = 0, 
                 Color = Color3.new(0, 0, 0), 
                 TimeLength = 0, 
-                Model = ball, 
-                Type = "SnowPoof", 
+                Model = fire, 
+                Type = "Campfire", 
                 ExplodesByFire = false, 
                 MaxForcePerStudSquared = 0, 
-                Hitbox = ballSPart, 
+                Hitbox = firePart, 
                 ImpactSpeed = 0, 
                 ExplodesByPointy = false, 
                 DestroysModel = true, 
-                PositionPart = ballSPart
+                PositionPart = firePart
             }, Vector3.new(0, 0, 0))
 
             task.wait(0.15)
         end
 
-        SnowballLoopThread = nil
+        CampfireLoopThread = nil
     end)
 
-    coroutine.resume(SnowballLoopThread)
+    coroutine.resume(CampfireLoopThread)
 end
 
 -- ESP System (LoopFireESP)
@@ -7657,9 +7657,9 @@ LoopTab:CreateToggle({
    Name = "루프 파이어",
    CurrentValue = false,
    Callback = function(Value)
-      LoopSnowBallT = Value
+      LoopfireT = Value
       if Value then
-          LoopSnowBallF()
+     LoopfireF()
       end
    end,
 })
