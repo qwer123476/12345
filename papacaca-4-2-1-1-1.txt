@@ -7860,32 +7860,32 @@ LoopTab:CreateButton({
             task.wait()
         end
     end
--- =============================================================================
--- [ LoopTab: 진짜 순수 텔레포트 루프킬 기능 ]
+ -- =============================================================================
+-- [ LoopTab: 테이블 누락 방지 및 레이필드 문법 수정본 ]
 -- =============================================================================
 
--- 제어용 전역 변수
+-- 1. 기존 변수 및 테이블 안전성 확보 (nil 에러 방지)
+if not playersInLoop2V then playersInLoop2V = {} end
+if not OldCFrame22V then OldCFrame22V = {} end
+
 _G.TeleportLoopKill = false
-local loopKillDelay = 0.2 -- 킬하고 복귀하기까지의 대기 시간 (너무 빠르면 딜이 안 들어감)
+local loopKillDelay = 0.2 -- 기본 딜레이 설정
 
--- 루프킬 핵심 메커니즘 함수
+-- 2. 루프킬 메커니즘 함수 (안전 검증 추가)
 local function startTeleportLoopKill()
     task.spawn(function()
         local LocalPlayer = game:GetService("Players").LocalPlayer
         
         while _G.TeleportLoopKill do
-            -- 명단(playersInLoop2V)에 사람이 없으면 대기
-            if not playersInLoop2V or #playersInLoop2V == 0 then
+            -- 테이블이 nil이거나 비어있으면 대기
+            if type(playersInLoop2V) ~= "table" or #playersInLoop2V == 0 then
                 task.wait(0.5)
             else
-                -- 명단에 있는 모든 타겟을 순회
                 for _, targetName in ipairs(playersInLoop2V) do
-                    -- 루프 도중에 토글을 껐다면 즉시 중단
                     if not _G.TeleportLoopKill then break end
                     
                     local targetPlayer = game:GetService("Players"):FindFirstChild(targetName)
                     
-                    -- 내 캐릭터와 타겟 캐릭터가 모두 유효한지 검증
                     if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
                         local myChar = LocalPlayer.Character
                         if myChar and myChar:FindFirstChild("HumanoidRootPart") then
@@ -7894,36 +7894,34 @@ local function startTeleportLoopKill()
                             local targetHRP = targetPlayer.Character.HumanoidRootPart
                             local targetHum = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
                             
-                            -- 타겟이 살아있는 상태일 때만 공격 전개
                             if targetHum and targetHum.Health > 0 then
-                                -- 1. 원래 내 위치 기억하기
+                                -- 원래 위치 백업 (배열 상태 확인 후 삽입)
+                                if type(OldCFrame22V) ~= "table" then OldCFrame22V = {} end
                                 table.insert(OldCFrame22V, myHRP.CFrame)
                                 
-                                -- 2. 상대방 밑(또는 뒤)으로 텔레포트 (Y축 -3 정도로 발밑 고정)
+                                -- 타겟 발밑으로 순간이동
                                 myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, -3, 0)
                                 
-                                -- 3. 킬을 따기 위한 미세 대기 (이 타이밍에 킬 이벤트를 넣거나, 검/도구를 들고있으면 자동으로 썰림)
                                 task.wait(loopKillDelay)
                                 
-                                -- 4. 원래 자리로 복귀 (Bring Back)
+                                -- 본래 위치로 복귀
                                 if #OldCFrame22V > 0 then
                                     myHRP.CFrame = OldCFrame22V[#OldCFrame22V]
-                                    table.remove(OldCFrame22V, #OldCFrame22V) -- 사용한 좌표 메모리 해제
+                                    table.remove(OldCFrame22V, #OldCFrame22V)
                                 end
                                 
-                                -- 다음 타겟으로 넘어가기 전 안전 딜레이
-                                task.wait(0.1)
+                                task.wait(0.05)
                             end
                         end
                     end
                 end
             end
-            task.wait(0.1) -- 서버 과부하 방지용 미세 딜레이
+            task.wait(0.1)
         end
     end)
 end
 
--- UI 컴포넌트 생성
+-- 3. UI 생성 섹션
 LoopTab:CreateSection("【 하이퍼 텔레포트 루프킬 】")
 
 LoopTab:CreateToggle({
@@ -7933,30 +7931,34 @@ LoopTab:CreateToggle({
     Callback = function(Value)
         _G.TeleportLoopKill = Value
         if Value then
-            Rayfield:Notify({Title = "[ LOOP KILL ]", Content = "루프킬 가동! 명단의 유저를 추적합니다.", Duration = 2})
+            Rayfield:Notify({Title = "[ LOOP KILL ]", Content = "루프킬 활성화! 명단을 추적합니다.", Duration = 2})
             startTeleportLoopKill()
         else
             Rayfield:Notify({Title = "[ LOOP KILL ]", Content = "루프킬 비활성화", Duration = 2})
-            -- 토글 껐을 때 최종적으로 안전하게 원래 자리 복귀 시도
+            -- 종료 시 위치 복귀 예외처리
             local LocalPlayer = game:GetService("Players").LocalPlayer
-            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and #OldCFrame22V > 0 then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = OldCFrame22V[#OldCFrame22V]
-                OldCFrame22V = {} -- 좌표 초기화
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                if type(OldCFrame22V) == "table" and #OldCFrame22V > 0 then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = OldCFrame22V[#OldCFrame22V]
+                    OldCFrame22V = {}
+                end
             end
         end
     end,
 })
 
+-- 슬라이더 문법 에러 방지를 위해 테이블 형식을 올바르게 수정
 LoopTab:CreateSlider({
     Name = "킬 타격 대기 딜레이 (초)",
-    Min = 0.05,
-    Max = 1,
-    CurrentValue = 0.2,
-    Flag = "LoopKillDelaySlider",
+    Min = 5,       -- 레이필드 슬라이더는 소수점 인식이 불안정할 수 있으므로
+    Max = 100,     -- 정수로 받은 뒤 100으로 나누어 계산합니다.
+    CurrentValue = 20,
+    Flag = "LoopKillDelaySliderFix",
     Callback = function(Value)
-        loopKillDelay = Value
+        loopKillDelay = Value / 100
     end,
 })
+
 
 LoopTab:CreateSection("Owner Kick")
 local OLTPInput = LoopTab:CreateInput({
