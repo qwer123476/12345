@@ -9628,34 +9628,121 @@ AuraTab:CreateToggle({
     end,
 })
 AuraTab:CreateSection("킬,플링")
-local runningAura = false
+local runningFtapKillAura = false
+
+AuraTab:CreateToggle({
+    Name = "킬아우라(오너쉽)",
+    Default = false,
+    Save = false,
+    Flag = "FtapKillAura",
+    Callback = function(enabled)
+        runningFtapKillAura = enabled
+        if enabled then
+            task.spawn(function()
+                local Players = game:GetService("Players")
+                local localPlayer = game.Players.LocalPlayer
+                local rs = game:GetService("ReplicatedStorage")
+                
+               
+                local GrabEvents = rs:FindFirstChild("GrabEvents")
+                local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+                
+                
+                local DamageEvent = rs:FindFirstChild("DamageEvent") or (GrabEvents and GrabEvents:FindFirstChild("Struggle"))
+
+                while runningFtapKillAura do
+                    pcall(function()
+                        local character = localPlayer.Character
+                        local root = character and character:FindFirstChild("HumanoidRootPart")
+                        if root then
+                            
+                            local currentRadius = tonumber(auraRadius) or 30
+                            
+                            for _, player in pairs(Players:GetPlayers()) do
+                                if player ~= localPlayer and player.Character then
+                                    
+                                    local isFriend = _G.Aurahowait and localPlayer:IsFriendsWith(player.UserId)
+                                    if not isFriend then
+                                        local targetChar = player.Character
+                                        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+                                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+                                        local humanoid = targetChar:FindFirstChildOfClass("Humanoid")
+                                        
+                                        if torso and targetRoot and humanoid then
+                                            local distance = (torso.Position - root.Position).Magnitude
+                                            if distance <= currentRadius then
+                                                
+                                                
+                                                if SetNetworkOwner and SetNetworkOwner.FireServer then
+                                                    SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+                                                end
+                                                
+                                                
+                                                if DamageEvent and DamageEvent.FireServer then
+                                                    
+                                                    DamageEvent:FireServer(humanoid, 0)
+                                                else
+                                                    
+                                                    humanoid.Health = 0
+                                                end
+                                                
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait() 
+                end
+            end)
+        end
+    end
+})
+local runningCombinedAura = false
+
+AuraTab:CreateInput({
+    Name = "아우라지름[반경]인풋",
+    PlaceholderText = "기본값: 30",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local num = tonumber(Text)
+        if num then
+            if num < 5 then
+                auraRadius = 5
+            else
+                auraRadius = num
+            end
+        else
+            auraRadius = 30
+        end
+    end
+})
 
 AuraTab:CreateToggle({
     Name = "필링 아우라",
     Default = false,
     Save = false,
-    Flag = "FlingAura",
+    Flag = "CombinedFlingAura",
     Callback = function(enabled)
-        runningAura = enabled
+        runningCombinedAura = enabled
         if enabled then
             task.spawn(function()
-                -- 필요한 서비스 및 오브젝트 강제 재로드
                 local Players = game:GetService("Players")
                 local localPlayer = game.Players.LocalPlayer
+                local Debris = game:GetService("Debris")
                 local rs = game:GetService("ReplicatedStorage")
                 local SetNetworkOwner = rs:FindFirstChild("GrabEvents") and rs.GrabEvents:FindFirstChild("SetNetworkOwner")
                 
-                while runningAura do
+                while runningCombinedAura do
                     pcall(function()
                         local character = localPlayer.Character
                         local root = character and character:FindFirstChild("HumanoidRootPart")
                         if root then
-                            -- 현재 설정된 아우라 반지름 숫자로 강제 변환 (없으면 기본값 15)
-                            local currentRadius = tonumber(auraRadius) or 15
+                            local currentRadius = tonumber(auraRadius) or 30
                             
                             for _, player in pairs(Players:GetPlayers()) do
                                 if player ~= localPlayer and player.Character then
-                                    -- 친구 제외 옵션 체크
                                     local isFriend = _G.Aurahowait and localPlayer:IsFriendsWith(player.UserId)
                                     if not isFriend then
                                         local targetChar = player.Character
@@ -9668,6 +9755,16 @@ AuraTab:CreateToggle({
                                                 if SetNetworkOwner and SetNetworkOwner.FireServer then
                                                     SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
                                                 end
+                                                
+                                                local velocity = torso:FindFirstChild("l")
+                                                if not velocity then
+                                                    velocity = Instance.new("BodyVelocity")
+                                                    velocity.Name = "l"
+                                                    velocity.Parent = torso
+                                                end
+                                                velocity.Velocity = Vector3.new(5e10, 5e15, 5e10)
+                                                velocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                                Debris:AddItem(velocity, 0.05) 
                                             end
                                         end
                                     end
@@ -9675,33 +9772,36 @@ AuraTab:CreateToggle({
                             end
                         end
                     end)
-                    task.wait(0.1) -- 서버 과부하 및 튕김 방지 딜레이
+                    task.wait()
                 end
             end)
         end
     end
 })
-local runningFlingAura = false
+local runningFtapVoidKill = false
 
 AuraTab:CreateToggle({
-    Name = "플링아우라V2",
+    Name = "낙사 아우라",
     Default = false,
     Save = false,
-    Flag = "FlingAuraV2",
+    Flag = "FtapVoidKill",
     Callback = function(enabled)
-        runningFlingAura = enabled
+        runningFtapVoidKill = enabled
         if enabled then
             task.spawn(function()
                 local Players = game:GetService("Players")
                 local localPlayer = game.Players.LocalPlayer
-                local Debris = game:GetService("Debris")
+                local rs = game:GetService("ReplicatedStorage")
                 
-                while runningFlingAura do
+                local GrabEvents = rs:FindFirstChild("GrabEvents")
+                local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+
+                while runningFtapVoidKill do
                     pcall(function()
                         local character = localPlayer.Character
                         local root = character and character:FindFirstChild("HumanoidRootPart")
                         if root then
-                            local currentRadius = tonumber(auraRadius) or 15
+                            local currentRadius = tonumber(auraRadius) or 30
                             
                             for _, player in pairs(Players:GetPlayers()) do
                                 if player ~= localPlayer and player.Character then
@@ -9714,16 +9814,15 @@ AuraTab:CreateToggle({
                                         if torso and targetRoot then
                                             local distance = (torso.Position - root.Position).Magnitude
                                             if distance <= currentRadius then
-                                                -- 기존에 박혀있는 벨로시티 무효화 및 새로 생성
-                                                local velocity = torso:FindFirstChild("l")
-                                                if not velocity then
-                                                    velocity = Instance.new("BodyVelocity")
-                                                    velocity.Name = "l"
-                                                    velocity.Parent = torso
+                                                
+                                                -- 1단계: 물리 오너십 박탈
+                                                if SetNetworkOwner and SetNetworkOwner.FireServer then
+                                                    SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
                                                 end
-                                                velocity.Velocity = Vector3.new(5e10, 5e15, 5e10)
-                                                velocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                                                Debris:AddItem(velocity, 0.1) -- 상시 적용을 위해 빠르게 삭제 후 루프 재생성
+                                                
+                                                -- 2단계: 딜레이 없이 Y축 -10000 낭떠러지로 강제 사출 (시스템 즉사 유도)
+                                                targetRoot.CFrame = CFrame.new(targetRoot.Position.X, -10000, targetRoot.Position.Z)
+                                                
                                             end
                                         end
                                     end
@@ -9731,12 +9830,13 @@ AuraTab:CreateToggle({
                             end
                         end
                     end)
-                    task.wait() -- 최대 속도로 감지 루프 실행
+                    task.wait()
                 end
             end)
         end
     end
 })
+
 
 funTab:CreateSection("텔포")
 local VoidInput = funTab:CreateInput({
