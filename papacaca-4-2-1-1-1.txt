@@ -7178,7 +7178,7 @@ local RDButton = DevTab:CreateButton({
 
 grabTab:CreateSection("Fling")
 local flingToggle = grabTab:CreateToggle({
-    Name = "필링",
+    Name = "던지기 V1",
     CurrentValue = false,
     Flag = "1",
     Callback = function(Value)
@@ -7188,7 +7188,7 @@ local flingToggle = grabTab:CreateToggle({
 })
 
 local strengthInput = grabTab:CreateInput({
-    Name = "힘",
+    Name = "던지는 힘 V1",
     CurrentValue = 0,
     PlaceholderText = "Value",
     RemoveTextAfterFocusLost = false,
@@ -7199,6 +7199,81 @@ local strengthInput = grabTab:CreateInput({
 })
 strengthInput:Set(9999)
 grabTab:CreateLabel("모바일의경우 작동하지 않습니다.")
+local strengthConnection = nil
+local nageru = 800
+local lastThrowTime = 0
+
+grabTab:CreateToggle({
+    Name = "던지기 V2",
+    Default = false,
+    Save = true,
+    Flag = "SuperThrow",
+    Callback = function(enabled)
+        if enabled then
+            if strengthConnection then strengthConnection:Disconnect() end
+
+            strengthConnection = workspace.ChildAdded:Connect(function(model)
+                if model.Name == "GrabParts" then
+                    local grabPart = model:FindFirstChild("GrabPart")
+                    if grabPart and grabPart:FindFirstChild("WeldConstraint") then
+                        local targetPart = grabPart.WeldConstraint.Part1
+                        if targetPart then
+                            
+                            local bv = Instance.new("BodyVelocity")
+                            bv.Name = "SuperThrowBV"
+                            bv.MaxForce = Vector3.new(0, 0, 0)
+                            bv.Velocity = Vector3.new(0, 0, 0)
+                            bv.Parent = targetPart
+
+                            local throwConn
+                            throwConn = model:GetPropertyChangedSignal("Parent"):Connect(function()
+                                if not model.Parent then
+                                    local currentTime = tick()
+                                    
+                                    if currentTime - lastThrowTime < 1.4 then
+                                        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                        bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * nageru
+                                        game:GetService("Debris"):AddItem(bv, 2)
+                                    else
+                                        bv:Destroy()
+                                    end
+                                    
+                                    if throwConn then throwConn:Disconnect() end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end)
+        else
+            if strengthConnection then
+                strengthConnection:Disconnect()
+                strengthConnection = nil
+            end
+        end
+    end
+})
+
+grabTab:CreateInput({
+    Name = "던지는 힘 V2",
+    PlaceholderText = "숫자 입력 (기본값: 800)",
+    Default = "800",
+    Save = false,
+    Callback = function(value)
+        local num = tonumber(value)
+        if num and num >= 0 then
+            nageru = num
+        end
+    end
+})
+grabTab:CreateLabel("모바일,컴퓨터 모두 지원하며 가장좋은 슈퍼 쓰로우 입니다.")
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton2 or input.UserInputType == Enum.UserInputType.Touch then
+        lastThrowTime = tick()
+    end
+end)
 grabTab:CreateSection("Line")
 local extendLineToggle = grabTab:CreateToggle({
     Name = "줄길이",
