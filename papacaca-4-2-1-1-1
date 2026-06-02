@@ -7497,7 +7497,7 @@ ListTab:CreateInput({
     end
 })
 
-ListTab:CreateSection("List")
+ListTab:CreateSection("명단")
 local DropdownV1 = ListTab:CreateDropdown({
     Name = "족칠 새끼 고르기",
     Options = playersInLoop1V,
@@ -7526,19 +7526,26 @@ ListTab:CreateInput({
         removeFromList(playersInLoop1V, DropdownV1, Value)
     end
 })
+ListTab:CreateSection("염탐 조지기")
 ListTab:CreateToggle({
-    Name = "관전하기",
+    Name = "선택 유저 관전하기",
     CurrentValue = false,
     Flag = "ListSpectateToggle",
     Callback = function(Value)
         if Value then
-            if #playersInLoop1V > 0 then
-                local selectedName = playersInLoop1V[1]:match("^(.-) %(") or playersInLoop1V[1]
-                local targetPlayer = game.Players:FindFirstChild(selectedName)
-                
-                if targetPlayer then
-                    startSpectating(targetPlayer)
+            local targetPlayer = nil
+            
+            for _, rawName in pairs(playersInLoop1V) do
+                local nameOnly = tostring(rawName):match("^(.-) %(") or tostring(rawName)
+                local found = game.Players:FindFirstChild(nameOnly)
+                if found then
+                    targetPlayer = found
+                    break
                 end
+            end
+            
+            if targetPlayer then
+                startSpectating(targetPlayer)
             end
         else
             stopSpectating()
@@ -7621,18 +7628,6 @@ local function startSpectating(targetPlayer)
     end)
 end
 
---[[
-LoopTab:CreateSection("TP")
-local HRPMODE = LoopTab:CreateToggle({
-    Name = "HRP MODE TP",
-    CurrentValue = true,
-    Flag = "21",
-    Callback = function(Value)
-        HRPMOD = Value
-    end
-})
-HRPMODE:Set(true)
-]]--
 LoopTab:CreateToggle({
    Name = "루프 파이어",
    CurrentValue = false,
