@@ -6870,29 +6870,34 @@ passTab:CreateSection("게임패스 잠금해제")
 passTab:CreateButton({
 	Name = "긴줄 잠금해제",
 	Callback = function()
-		local success, err = pcall(function()
-			local Reach = Instance.new("BoolValue")
-			Reach.Name = "FartherReach"
-			Reach.Parent = Players.LocalPlayer
-			Reach.Value = true
+		local Reach = Instance.new("BoolValue")
+		Reach.Name = "FartherReach"
+		Reach.Parent = Players.LocalPlayer
+		Reach.Value = true
 
-			local Notifier = ReplicatedStorage:WaitForChild("GamepassEvents", 5):FindFirstChild("FurtherReachBoughtNotifier")
-			if Notifier and getconnections then
-				for _, connection in ipairs(getconnections(Notifier.OnClientEvent)) do
-					pcall(connection.Function)
-				end
-			else
-				error("Notifier or getconnections missing")
+		local Notifier = ReplicatedStorage.GamepassEvents:FindFirstChild("FurtherReachBoughtNotifier")
+		if Notifier and getconnections then
+			local connected = false
+			for _, connection in ipairs(getconnections(Notifier.OnClientEvent)) do
+				pcall(connection.Function)
+				connected = true
 			end
-		end)
-
-		if success then
-			Rayfield:Notify({
-				Name = "Success",
-				Content = "긴줄잠금해제완료!",
-				Duration = 4,
-				Image = 10734951437
-			})
+			
+			if connected then
+				Rayfield:Notify({
+					Name = "Success",
+					Content = "긴줄잠금해제완료!",
+					Duration = 4,
+					Image = 10734951437
+				})
+			else
+				Rayfield:Notify({
+					Name = "Failed",
+					Content = "긴줄잠금해제실패!",
+					Duration = 4,
+					Image = 10734925828
+				})
+			end
 		else
 			Rayfield:Notify({
 				Name = "Failed",
