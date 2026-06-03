@@ -12094,12 +12094,3 @@ local membershipLabel = HubTab:CreateLabel("프리미엄 여부: 로딩중...")
 
 
 
-local Reach = Instance.new("BoolValue")
-Reach.Name = "FartherReach"
-Reach.Parent = game.Players.LocalPlayer
-Reach.Value = true
-
-local Notifier = game.ReplicatedStorage.GamepassEvents:FindFirstChild("FurtherReachBoughtNotifier")
-for _, connection in ipairs(getconnections(Notifier.OnClientEvent)) do
-	pcall(connection.Function)
-end
