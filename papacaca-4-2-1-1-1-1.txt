@@ -32,7 +32,7 @@ local passTab = Window:CreateTab("패스잠금해제")
 local grabTab = Window:CreateTab("컴뱃", 6026568198)               
 local UtilityTab = Window:CreateTab("유틸리티", 6031094678)        
 local antiTab = Window:CreateTab("안전", 6034831332)    
-local 1Tab = Window:CreateTab("집관련",0)
+local HATab = Window:CreateTab("집관련",0)
 local ListTab = Window:CreateTab("명단", 3572491301)              
 local LoopTab = Window:CreateTab("조지기", 6023426923)             
 local AuraTab = Window:CreateTab("아우라", 6031068423)            
@@ -11556,7 +11556,7 @@ local function runAnchorLogic()
 end
 
 
-1Tab:CreateButton({
+HATab:CreateButton({
     Name = "장벽 무력화",
     Callback = function()
         PlotBarrierDelete()
@@ -11564,7 +11564,7 @@ end
 })
 
 local rayAnchorToggle = nil
-rayAnchorToggle = 1Tab:CreateToggle({
+rayAnchorToggle = HATab:CreateToggle({
     Name = "고정",
     CurrentValue = false,
     Flag = "AnchoredToggle",
@@ -11583,7 +11583,7 @@ mAnchorBtn.MouseButton1Click:Connect(function()
 end)
 
 local rayHouseToggle = nil
-rayHouseToggle = 1Tab:CreateToggle({
+rayHouseToggle = HATab:CreateToggle({
     Name = "하우스그랩",
     CurrentValue = false,
     Flag = "HouseGrabToggle",
