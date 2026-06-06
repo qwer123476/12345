@@ -1,4 +1,4 @@
--- [[ 서비스 및 기본 변수 정의 ]]
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -366,7 +366,7 @@ local AntiMacroEnabled = false
 
 MainTab:AddToggle({
     Name = "매크로 방지 자동 우회",
-    Default = false,
+    Default = true,
     Callback = function(Value)
         AntiMacroEnabled = Value
         if Value then
