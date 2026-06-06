@@ -292,7 +292,7 @@ local UI_Registry = {}
 local MainTab = Window:MakeTab({
     Name = "오토팜",
     Icon = "rbxassetid://4483362458",
-    PremiumOnly = true
+    PremiumOnly = flase
 })
 
 MainTab:AddSection({ Name = "메인 설정" })
