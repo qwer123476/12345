@@ -243,15 +243,16 @@ OrionLib:MakeNotification({
     Time = 3
 })
 
-local Window = OrionLib:MakeWindow({
+Local Window = OrionLib:MakeWindow({
     Name = "파카허브 제없알 모바일",
-    HidePremium = flase,
+    HidePremium = false,
     SaveConfig = false,
-    IntroEnabled = true
-IntroText = "로드중 입니노 이기",
+    IntroEnabled = true, 
+    IntroText = "로드중 입니노 이기",
     IntroIcon = "4483345998",
     Icon = "4483345998"
 })
+
 
 pcall(function()
     CoreGui.OrionReOpen:Destroy()
@@ -291,7 +292,7 @@ local UI_Registry = {}
 local MainTab = Window:MakeTab({
     Name = "오토팜",
     Icon = "rbxassetid://4483362458",
-    PremiumOnly = false
+    PremiumOnly = true
 })
 
 MainTab:AddSection({ Name = "메인 설정" })
