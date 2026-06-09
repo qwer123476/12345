@@ -12327,6 +12327,47 @@ task.spawn(function()
     
     countryLabel:Set("서버 국가: " .. emoji .. name)
 end)
+local houseStatusLabel = UtilityTab:CreateLabel("내 집 상태: 확인 중...")
+local outsidePlayersLabel = UtilityTab:CreateLabel("집 밖에 있는 유저: 로딩중...")
+
+task.spawn(function()
+    local Players = game:GetService("Players")
+    local plotItems = workspace:WaitForChild("PlotItems")
+    local playersInPlots = plotItems:WaitForChild("PlayersInPlots")
+
+    while task.wait(1) do
+        local insideMyPlot = false
+        local outsideNames = {}
+
+        
+        if plr.Character and plr.Character.Parent == playersInPlots then
+            insideMyPlot = true
+        end
+
+        if insideMyPlot then
+            houseStatusLabel:Set("나의 상태: 🏠 집 안에 있음")
+        else
+            houseStatusLabel:Set("나의 상태: 🌲 집 밖에 있음")
+        end
+
+        
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= plr and p.Character then
+                
+                if p.Character.Parent ~= playersInPlots then
+                    table.insert(outsideNames, p.DisplayName)
+                end
+            end
+        end
+
+        
+        if #outsideNames > 0 then
+            outsidePlayersLabel:Set("집 밖의 유저들: " .. table.concat(outsideNames, ", "))
+        else
+            outsidePlayersLabel:Set("집 밖의 유저들: 모두 집 안에 있음 🏠")
+        end
+    end
+end)
 
 local playerNameLabel = HubTab:CreateLabel("플레이어: 로딩중...")
 
