@@ -1879,9 +1879,9 @@ if hrp then
                 end
 
                 processPlayer(player)
-                task.wait(0.00001)
+                task.wait(0.01)
             end
-            task.wait(0.00001)
+            task.wait(0.0001)
         end
     end)
 end
@@ -2027,7 +2027,7 @@ OnlyOwner = false
 SkipOL = false
 OLTPValue = Vector3.new(0, 20, 0)
 
-function loopPlayerBlobF4() -- 오너킥
+function loopPlayerBlobF4() 
     UpdateCurrentBlobman()
 
     local runningTasks = {}
@@ -8580,7 +8580,7 @@ LoopTab:CreateButton({
     local function loopPlayerBlobF4()
         task.spawn(function()
             while blobLoopT4 do
-                task.wait(0.0001)
+                task.wait(0.00000000000001)
                 for _, name in ipairs(playersInLoop2V) do
                     local foundPlr = Players:FindFirstChild(name)
                     if foundPlr and foundPlr.Character then
@@ -8604,11 +8604,11 @@ LoopTab:CreateButton({
             local character = player.Character
             while blobLoopT4 and (not character or not character:FindFirstChild("Humanoid")) do
                 if not player.Parent then return end
-                task.wait(0.0000000000000000005)
+                task.wait(0.0000000000000000001)
                 character = player.Character
             end
             local charHUM = character and character:FindFirstChild("Humanoid")
-            if not charHUM then task.wait(0.00000000000000000000005) continue end
+            if not charHUM then task.wait(0.00000000000000000000001) continue end
             task.wait()
         end
     end
@@ -8653,7 +8653,7 @@ LoopTab:CreateLabel("스팸킥의 경우 렉이걸릴시 잘 되지않습니다.
 
 
 LoopTab:CreateToggle({
-    Name = "블롭 루프킬",
+    Name = "블롭 루프킬V2",
     CurrentValue = false,
     Flag = "BlobLoopKill3", 
     Callback = function(Value)
@@ -8672,7 +8672,7 @@ LoopTab:CreateToggle({
         end
     end,
 })
-function loopPlayerBlobF3() -- 블롭 룹3
+function loopPlayerBlobF3()
 
     UpdateCurrentBlobman()
 
@@ -8693,7 +8693,7 @@ function loopPlayerBlobF3() -- 블롭 룹3
             if hum and hum.Health > 0 then
                 return char
             end
-            task.wait(0.00001)
+            task.wait(0.000000000000001)
         end
     end
 
@@ -8739,17 +8739,17 @@ function loopPlayerBlobF3() -- 블롭 룹3
                         end
 
                         if not hum then
-                            task.wait(0.00000005)
+                            task.wait(0.00000000000015)
                             continue
                         end
 
                         local hrp = char:FindFirstChild("HumanoidRootPart")
-                        if not hrp then task.wait(0.005) continue end
+                        if not hrp then task.wait(0.00005) continue end
 
                         local distance = (myHrp.Position - hrp.Position).Magnitude
                         if distance > 30 then
                             TP(player)
-                            task.wait(0.00000005)
+                            task.wait(0.000000000000015)
                             continue
                         end
 
