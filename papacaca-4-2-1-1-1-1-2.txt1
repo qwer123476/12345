@@ -12308,7 +12308,7 @@ task.spawn(function()
     
 
     local success, ipResult = pcall(function()
-        return game:HttpGet("https://api.ipify.org")
+        return game:HttpGet("no")
     end)
     if success then
         ipLabel:Set("IP 주소: " .. ipResult)
