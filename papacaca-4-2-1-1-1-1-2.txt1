@@ -12420,23 +12420,52 @@ task.spawn(function()
     end
 end)
 
+ 
 spamTab:CreateSection("블롭있어야하는 스팸")
+
+-- [디버그용 체크 함수] 어떤 변수가 nil인지 콘솔(F9)에 노란색 글씨로 알려줍니다.
+local function checkVariables()
+    if _G.plr == nil and plr == nil then warn("⚠️ [에러] 'plr' (LocalPlayer) 변수가 nil입니다! 스크립트 상단에 정의가 필요합니다.") end
+    if playersInLoop1V == nil then warn("⚠️ [에러] 'playersInLoop1V' 테이블이 nil입니다!") end
+    if playersInLoop2V == nil then warn("⚠️ [에러] 'playersInLoop2V' 테이블이 nil입니다!") end
+    if UpdateCurrentBlobman == nil then warn("⚠️ [에러] 'UpdateCurrentBlobman' 함수가 nil입니다!") end
+    if pullSinglePlayerFast == nil then warn("⚠️ [주의] 'pullSinglePlayerFast' 함수가 nil입니다. 플레이어 당기기 기능이 작동하지 않습니다.") end
+    if SetNetworkOwner == nil then warn("⚠️ [에러] 'SetNetworkOwner' 리모트가 nil입니다!") end
+    if DestroyGrabLine == nil then warn("⚠️ [에러] 'DestroyGrabLine' 리모트가 nil입니다!") end
+end
 
 local blobLoopT2 = false
 local blobLoopT4 = false
 local loopSpamActive = false
 
+-- 안전하게 플레어이어를 당기는 함수 호출 (nil 체크 포함)
+local function safePull(target, index)
+    if pullSinglePlayerFast then
+        pullSinglePlayerFast(target, index)
+    end
+end
+
+-- 안전하게 리모트 이벤트를 쏘는 함수 (nil 체크 포함)
+local function safeFireRemote(remote, ...)
+    if remote and remote.FireServer then
+        remote:FireServer(...)
+    end
+end
+
+-- [기능 1] loopPlayerBlobF2
 local function loopPlayerBlobF2()
     task.spawn(function()
         while blobLoopT2 do
-            UpdateCurrentBlobman()
-            for i, name in ipairs(playersInLoop2V) do
-                local player = game.Players:FindFirstChild(name)
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local hrp = player.Character.HumanoidRootPart
-                    if currentBlobS then
-                        BlobGrab(currentBlobS, hrp, "Right")
-                        BlobRelease(currentBlobS, hrp, "Right")
+            if UpdateCurrentBlobman then UpdateCurrentBlobman() end
+            if playersInLoop2V then
+                for i, name in ipairs(playersInLoop2V) do
+                    local player = game.Players:FindFirstChild(name)
+                    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        local hrp = player.Character.HumanoidRootPart
+                        if currentBlobS and BlobGrab and BlobRelease then
+                            BlobGrab(currentBlobS, hrp, "Right")
+                            BlobRelease(currentBlobS, hrp, "Right")
+                        end
                     end
                 end
             end
@@ -12445,8 +12474,12 @@ local function loopPlayerBlobF2()
     end)
 end
 
+-- [기능 2] loopPlayerBlobF4
 function loopPlayerBlobF4() 
     task.spawn(function()
+        checkVariables()
+        if not playersInLoop2V or not playersInLoop1V then return end
+        
         table.clear(playersInLoop2V)
         for i, e in ipairs(playersInLoop1V) do
             local nameOnly = e:match("^(.-) %(") or e
@@ -12454,26 +12487,29 @@ function loopPlayerBlobF4()
         end
         for i, name in ipairs(playersInLoop2V) do
             local target = game.Players:FindFirstChild(name)
-            if target and pullSinglePlayerFast then 
-                pullSinglePlayerFast(target, i) 
-            end
+            if target then safePull(target, i) end
         end
+        
+        local localPlayer = plr or game.Players.LocalPlayer
         while blobLoopT4 do
-            UpdateCurrentBlobman()
-            local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+            if UpdateCurrentBlobman then UpdateCurrentBlobman() end
+            local myHRP = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
             if not myHRP then task.wait(); continue end
+            
             for i, name in ipairs(playersInLoop2V) do
                 local player = game.Players:FindFirstChild(name)
                 if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                     local hrp = player.Character.HumanoidRootPart
                     if (myHRP.Position - hrp.Position).Magnitude > 50 then
-                        if pullSinglePlayerFast then pullSinglePlayerFast(player, i) end
+                        safePull(player, i)
                     end
                     local targetCF = myHRP.CFrame * CFrame.new(math.sin(i) * 3, 20, math.cos(i) * 3)
                     hrp.CFrame = targetCF
-                    SetNetworkOwner:FireServer(hrp, targetCF)
-                    DestroyGrabLine:FireServer(hrp, targetCF)
-                    if currentBlobS then
+                    
+                    safeFireRemote(SetNetworkOwner, hrp, targetCF)
+                    safeFireRemote(DestroyGrabLine, hrp, targetCF)
+                    
+                    if currentBlobS and BlobGrab and BlobRelease then
                         BlobGrab(currentBlobS, hrp, "Right")
                         BlobRelease(currentBlobS, hrp, "Right")
                     end
@@ -12484,34 +12520,40 @@ function loopPlayerBlobF4()
     end)
 end
 
-
+-- [UI] 루프 그랩 스팸 토글
 spamTab:CreateToggle({
     Name = "루프 그랩  스팸 [ Blobman ]",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT2 = Value
+        checkVariables() -- 실행 시점에 변수 체크
         if blobLoopT2 then
-            table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
+            if playersInLoop2V and playersInLoop1V then
+                table.clear(playersInLoop2V)
+                for i, e in ipairs(playersInLoop1V) do
+                    local nameOnly = e:match("^(.-) %(") or e
+                    table.insert(playersInLoop2V, nameOnly)
+                end
+                loopPlayerBlobF2()
             end
-            loopPlayerBlobF2() -- 이제 위에서 선언되었으므로 정상 인식됩니다.
         else
-            table.clear(playersInLoop2V)
+            if playersInLoop2V then table.clear(playersInLoop2V) end
         end
     end
 })
 
+-- [UI] 최강스팸 토글
 spamTab:CreateToggle({
     Name = "최강스팸 (락/강제TP)",
     CurrentValue = false,
     Flag = "LoopSpamToggle",
     Callback = function(Value)
         loopSpamActive = Value
+        checkVariables() -- 실행 시점에 변수 체크
         if loopSpamActive then
             task.spawn(function()
+                if not playersInLoop2V or not playersInLoop1V then return end
                 table.clear(playersInLoop2V)
                 for i, e in ipairs(playersInLoop1V) do
                     local nameOnly = e:match("^(.-) %(") or e
@@ -12519,11 +12561,13 @@ spamTab:CreateToggle({
                 end
                 for i, name in ipairs(playersInLoop2V) do
                     local target = game.Players:FindFirstChild(name)
-                    if target and pullSinglePlayerFast then pullSinglePlayerFast(target, i) end
+                    if target then safePull(target, i) end
                 end
+                
+                local localPlayer = plr or game.Players.LocalPlayer
                 while loopSpamActive do
-                    UpdateCurrentBlobman()
-                    local myChar = plr.Character
+                    if UpdateCurrentBlobman then UpdateCurrentBlobman() end
+                    local myChar = localPlayer.Character
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if myHrp and currentBlobS then
                         for i, name in ipairs(playersInLoop2V) do
@@ -12531,14 +12575,18 @@ spamTab:CreateToggle({
                             if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
                                 local hrp = target.Character.HumanoidRootPart
                                 if (myHrp.Position - hrp.Position).Magnitude > 50 then
-                                    if pullSinglePlayerFast then pullSinglePlayerFast(target, i) end
+                                    safePull(target, i)
                                 end
                                 local targetCF = myHrp.CFrame * CFrame.new(math.sin(i) * 3, 20, math.cos(i) * 3)
                                 hrp.CFrame = targetCF
-                                SetNetworkOwner:FireServer(hrp, targetCF)
-                                DestroyGrabLine:FireServer(hrp, targetCF)
-                                BlobGrab(currentBlobS, hrp, "Right")
-                                BlobRelease(currentBlobS, hrp, "Right")
+                                
+                                safeFireRemote(SetNetworkOwner, hrp, targetCF)
+                                safeFireRemote(DestroyGrabLine, hrp, targetCF)
+                                
+                                if BlobGrab and BlobRelease then
+                                    BlobGrab(currentBlobS, hrp, "Right")
+                                    BlobRelease(currentBlobS, hrp, "Right")
+                                end
                             end
                         end
                     end
