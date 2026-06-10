@@ -12421,5 +12421,4 @@ task.spawn(function()
 end)
 
  
-spamTab:CreateSection("개발중..")
 
