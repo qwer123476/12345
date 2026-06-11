@@ -44,6 +44,7 @@ local combatTab = Window:CreateTab("전투 확장", 6026568198)
 local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
 local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
 local TargetTab = Window:CreateTab("ui설정(현재 불가)")
+local CreditsTab = Window:CreateTab("제작자 한정")
 
 
 
@@ -11625,21 +11626,20 @@ local ViewTool = keybindTab:CreateToggle({
 })
 ViewTool:Set(true)
 
---[[
+
 CreditsTab:CreateLabel("@Defiant", 96897864871400, Color3.fromRGB(255, 255, 255), false)
 CreditsTab:CreateParagraph({Title = "dsc savior.liberty", Content = ":>"})
 
-CreditsTab:CreateLabel("NetherLandson_Ontop ( Dungi )", 113854105043977, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "dsc netherlandson_top0", Content = ":>"})
+CreditsTab:CreateLabel("0110rim( 누나 )", 113854105043977, Color3.fromRGB(255, 255, 255), false)
+CreditsTab:CreateParagraph({Title = "0110rim", Content = ":>"})
 
 CreditsTab:CreateLabel("NoPe", 0, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "dsc ftap.np", Content = "Owner"})
+CreditsTab:CreateParagraph({Title = "알파", Content = "Owner"})
 
 CreditsTab:CreateLabel("Diro", 78390276296494, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "dsc l1l1l1l1l1l1l1l1l1l1l1_", Content = "Co-Owner"})
-]]--
+CreditsTab:CreateParagraph({Title = "AI_AIPACA", Content = "Co-Owner"})
 
-if plr.UserId ~= 9078065998 then
+if plr.UserId ~= 2932138780 then
     task.spawn(function()
         while task.wait() do
             local CoreGui = game:GetService("CoreGui")
