@@ -5233,7 +5233,7 @@ function AntiDeathF()
 
         if not donut then
             pcall(function()
-                rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("InstrumentGuitarUkulele", CFrame.new(0,0,0), Vector3.new(0,0,0))
+                rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodBread", CFrame.new(0,0,0), Vector3.new(0,0,0))
             end)
             return
         end
