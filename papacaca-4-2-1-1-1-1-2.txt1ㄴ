@@ -8823,6 +8823,204 @@ local blobLoopToggle = LoopTab:CreateToggle({
         end
     end
 })
+function UpdateCurrentBlobman()
+	char = plr.Character
+	hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	for _, blobs in workspace:GetDescendants() do
+		if blobs.Name ~= "CreatureBlobman" then continue end
+		 seat = blobs:FindFirstChild("VehicleSeat")
+		if not seat then continue end
+		 weld = seat:FindFirstChild("SeatWeld")
+		if not weld then continue end
+		if weld.Part1 == hrp then
+			currentBlobS = blobs
+		end
+	end
+end
+
+function BlobRelease(blob, target, side)
+     args = {
+        [1] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
+        [2] = target,
+        }
+        blob.BlobmanSeatAndOwnerScript.CreatureRelease:FireServer(unpack(args))
+end
+
+function BlobGrab(blob, target, side)
+     args = {
+        [1] = blob:FindFirstChild(side.."Detector"),
+        [2] = target,
+        [3] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
+        }
+        blob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(unpack(args))
+end
+
+function BlobDrop(blob, target, side)
+     args = {
+        [1] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
+        [2] = target,
+        }
+        blob.BlobmanSeatAndOwnerScript.CreatureDrop:FireServer(unpack(args))
+end
+
+function BlobMassless(blob, target, side)
+     args = {
+        [1] = blob:FindFirstChild(side.."Detector"),
+        [2] = target,
+        [3] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
+        }
+
+		 args2 = {
+        [1] = blob:FindFirstChild(side.."Detector"),
+        [2] = hrp,
+        [3] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
+        }
+
+     args3 = {
+        [1] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
+        [2] = target,
+        }
+
+        blob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(unpack(args2))
+		blob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(unpack(args))
+		blob.BlobmanSeatAndOwnerScript.CreatureDrop:FireServer(unpack(args3))
+end
+
+function loopPlayerBlobF13()
+
+    UpdateCurrentBlobman()
+
+    local seat = plr.Character
+        and plr.Character:FindFirstChildOfClass("Humanoid")
+        and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
+
+    if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
+        return false
+    end
+
+    local runningTasks = {}
+
+    local function waitForRespawn(player)
+        while blobLoopT13 do
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                return char
+            end
+            task.wait(0.00001)
+        end
+    end
+
+    task.spawn(function()
+        while blobLoopT13 do
+            for _, name in ipairs(playersInLoop2V) do
+                if not blobLoopT13 then break end
+
+                local player = game.Players:FindFirstChild(name)
+                if not player then continue end
+                if PPs and PPs:FindFirstChild(name) then continue end
+                if runningTasks[player] then continue end
+
+                runningTasks[player] = task.spawn(function()
+                    local beforeTP
+
+                    while blobLoopT13 do
+                        local myChar = plr.Character
+                        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                        if not myHrp then task.wait(0.1) continue end
+
+                        if not beforeTP then
+                            beforeTP = myHrp.CFrame
+                        end
+
+                        local char = player.Character
+                        local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+                        if hum and hum.Health <= 0 then
+                            if beforeTP then
+                                BACK(beforeTP)
+                            end
+
+                            waitForRespawn(player)
+
+                            local myChar2 = plr.Character
+                            local myHrp2 = myChar2 and myChar2:FindFirstChild("HumanoidRootPart")
+                            if myHrp2 then
+                                beforeTP = myHrp2.CFrame
+                            end
+
+                            continue
+                        end
+
+                        if not hum then
+                            task.wait(0.00000005)
+                            continue
+                        end
+
+                        local hrp = char:FindFirstChild("HumanoidRootPart")
+                        if not hrp then task.wait(0.005) continue end
+
+                        local distance = (myHrp.Position - hrp.Position).Magnitude
+                        if distance > 30 then
+                            TP(player)
+                            task.wait(0.00000005)
+                            continue
+                        end
+
+                        hum.BreakJointsOnDeath = false
+                        hum.WalkSpeed = 0
+                        hum.JumpPower = 0
+
+                        for i = 0, 0 do
+                            if hum.SeatPart == nil then
+                                if hum.RigType ~= Enum.HumanoidRigType.R15 then
+                                    hum.RigType = Enum.HumanoidRigType.R15
+                                end
+
+                                if hum.RigType ~= Enum.HumanoidRigType.R6 then
+                                    hum.RigType = Enum.HumanoidRigType.R6
+                                end
+
+                                if hum.RigType ~= Enum.HumanoidRigType.R15 then
+                                    hum.RigType = Enum.HumanoidRigType.R15
+                                end
+
+                            end
+                            task.wait()
+                        end
+
+                        for i = 1, 3 do
+                            if not blobLoopT13 then break end
+                            BlobGrab(currentBlobS, hrp, "Right")
+                            BlobRelease(currentBlobS, hrp, "Right")
+                            task.wait()
+                        end
+
+                        task.wait()
+                    end
+
+                    if beforeTP then
+                        BACK(beforeTP)
+                    end
+
+                    runningTasks[player] = nil
+                end)
+
+                task.wait()
+            end
+
+            task.wait()
+        end
+
+        for _, t in pairs(runningTasks) do
+            task.cancel(t)
+        end
+        runningTasks = {}
+    end)
+end
+
 function loopPlayerF12()
     UpdateCurrentBlobman()
 
@@ -8970,7 +9168,7 @@ function loopPlayerF12()
 end
 
 local blobLoop13Toggle = LoopTab:CreateToggle({
-    Name = "루프킬 [ 미작동 ]",
+    Name = "루프킬 [ Blobman ]",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -8990,7 +9188,7 @@ local blobLoop13Toggle = LoopTab:CreateToggle({
 })
 
 local toolLoop12Toggle = LoopTab:CreateToggle({
-    Name = "루프킬 [ 블롭없음 ]",
+    Name = "루프킬 [ 툴 / 룹2 ]",
     CurrentValue = false,
     Flag = "22",
     Callback = function(Value)
