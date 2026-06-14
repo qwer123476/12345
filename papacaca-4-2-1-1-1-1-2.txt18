@@ -8823,6 +8823,191 @@ local blobLoopToggle = LoopTab:CreateToggle({
         end
     end
 })
+function loopPlayerF12()
+    UpdateCurrentBlobman()
+
+    local processedHumanoids = {}
+
+    local function processPlayer(player)
+        if not player then return false end
+
+        local character, hrp, head = safeGetCharacterParts(player)
+        if not hrp or not head then return false end
+
+        local myChar = plr and plr.Character
+        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        if not myHrp then return false end
+        local originCF = myHrp.CFrame
+
+        local tpRunning = true
+        task.spawn(function()
+            while tpRunning do
+                local ok, cf = TP(player)
+                if ok and cf then
+                    CF = cf
+                end
+                task.wait()
+            end
+        end)
+
+        while loopPlayerT12 do
+            rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+            local ownerTag = head:FindFirstChild("PartOwner")
+            if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+                break
+            end
+            task.wait()
+        end
+
+        tpRunning = false
+
+        local targetNames = {
+            "NinjaKunai", "NinjaShuriken", "NinjaKatana",
+            "ToolCleaver", "ToolDiggingForkRusty",
+            "ToolPencil", "ToolPickaxe"
+        }
+
+        for _, child in ipairs(workspace:GetChildren()) do
+            if child:IsA("Folder") and child.Name:match("SpawnedInToys$") then
+                for _, item in ipairs(child:GetChildren()) do
+                    if table.find(targetNames, item.Name) and item:FindFirstChild("StickyPart") then
+                        local sticky = item.StickyPart
+                        local weld = sticky:FindFirstChild("StickyWeld")
+
+                        if weld and weld:IsA("WeldConstraint") and weld.Part1 then
+                            local targetParts = {
+                                character:FindFirstChild("Head"),
+                                character:FindFirstChild("Torso"),
+                                character:FindFirstChild("Left Arm"),
+                                character:FindFirstChild("Left Leg"),
+                                character:FindFirstChild("Right Arm"),
+                                character:FindFirstChild("Right Leg"),
+                                hrp:FindFirstChild("RagdollTouchedHitbox"),
+                                hrp:FindFirstChild("FirePlayerPart"),
+                            }
+
+                            for _, tPart in ipairs(targetParts) do
+                                if tPart and weld.Part1 == tPart then
+                                    local basePart = item.PrimaryPart or sticky
+                                    if basePart and (basePart.Position - hrp.Position).Magnitude <= 10 then
+                                        rs.GrabEvents.SetNetworkOwner:FireServer(sticky, sticky.CFrame)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
+
+        hrp.CFrame = CFrame.new(99999999, 99999999, 99999999)
+
+        task.spawn(function()
+            while loopPlayerT12 do
+                if hrp and hrp.Parent and hrp.Position.Y < 99999 then
+                    local innerTP = true
+                    task.spawn(function()
+                        while innerTP do
+                            local ok, cf = TP(player)
+                            if ok and cf then
+                                CF = cf
+                            end
+                            task.wait()
+                        end
+                    end)
+
+                    while loopPlayerT12 do
+                        rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                        local ownerTag = head:FindFirstChild("PartOwner")
+                        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+                            break
+                        end
+                        task.wait()
+                    end
+
+                    innerTP = false
+                    rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
+                    hrp.CFrame = CFrame.new(99999999, 99999999, 99999999)
+                end
+                task.wait(0.02)
+            end
+        end)
+
+        if originCF then
+            BACK(originCF)
+        end
+
+        return true
+    end
+
+    task.spawn(function()
+        while loopPlayerT12 do
+            for _, name in ipairs(playersInLoop2V) do
+                local player = game.Players:FindFirstChild(name)
+                if player and not table.find(Whitelist, player.Name) then
+                    local character = player.Character
+                    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                    if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
+
+                    if humanoid and humanoid.Health > 0 then
+                        if processedHumanoids[player] ~= humanoid then
+                            local success = processPlayer(player)
+                            if success then
+                                processedHumanoids[player] = humanoid
+                            end
+                        end
+                    else
+                        processedHumanoids[player] = nil
+                    end
+                    task.wait(0.00000000005)
+                end
+            end
+            task.wait(0.00000000005)
+        end
+    end)
+end
+
+local blobLoop13Toggle = LoopTab:CreateToggle({
+    Name = "루프킬 [ 미작동 ]",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        blobLoopT13 = Value
+        if blobLoopT13 then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
+            end
+            loopPlayerBlobF13()
+        else
+            blobLoopT13 = false
+            table.clear(playersInLoop2V)
+        end
+    end
+})
+
+local toolLoop12Toggle = LoopTab:CreateToggle({
+    Name = "루프킬 [ 블롭없음 ]",
+    CurrentValue = false,
+    Flag = "22",
+    Callback = function(Value)
+        loopPlayerT12 = Value
+        if loopPlayerT12 then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
+            end
+            loopPlayerF12()
+        else
+            loopPlayerT12 = false
+            table.clear(playersInLoop2V)
+        end
+    end
+})
 
 local blobLoop3Toggle = LoopTab:CreateToggle({
     Name = "루프킬 [ Blobman ]",
