@@ -200,7 +200,7 @@ t1Desc.Parent = cont1
 local tab2, cont2 = createTab("Info", 2, "점검 완료시간")
 local t2MainText = Instance.new("TextLabel")
 t2MainText.Size = UDim2.new(1, 0, 0, 60)
-t2MainText.Text = "업데이트(점검)중입니다.\n아래 버튼을 눌러 예상 시간을 확인하세요."
+t2MainText.Text = "점검중입니다.\n아래 버튼을 눌러 예상 시간을 확인하세요."
 t2MainText.TextColor3 = Color3.fromRGB(255, 255, 255)
 t2MainText.TextSize = 15
 t2MainText.Font = Enum.Font.GothamBold
@@ -226,7 +226,7 @@ mtStroke.Thickness = 1
 local tab3, cont3 = createTab("Sorry", 3, "이용 불편")
 local t3Title = Instance.new("TextLabel")
 t3Title.Size = UDim2.new(1, 0, 1, 0)
-t3Title.Text = "이용에 불편을 드려 죄송합니다.\n\n더 좋은 기능을 위해 점검을 진행하게 되었습니다.\n최대한 빠르게 해결 하겠습니다."
+t3Title.Text = "이용에 불편을 드려 죄송합니다.\n\n현재 문제밑 컴플레인이 많아수정중입니다.\n최대한 빠르게 해결 하겠습니다."
 t3Title.TextColor3 = Color3.fromRGB(255, 165, 165)
 t3Title.TextSize = 14
 t3Title.Font = Enum.Font.GothamBold
@@ -327,7 +327,7 @@ end)
 
 mtBtn.MouseButton1Click:Connect(function()
 	task.spawn(playClickEffect, mtBtn)
-	mtBtn.Text = "점검 시각은 약 6월14일 오후 2시 까지입니다."
+	mtBtn.Text = "점검 시각은 아직 미정입니다."
 	TweenService:Create(mtBtn, TweenInfo.new(0.25), {BackgroundColor3 = Color3.fromRGB(28, 52, 38), TextColor3 = Color3.fromRGB(140, 255, 160)}):Play()
 	TweenService:Create(mtStroke, TweenInfo.new(0.25), {Color = Color3.fromRGB(55, 115, 75)}):Play()
 end)
