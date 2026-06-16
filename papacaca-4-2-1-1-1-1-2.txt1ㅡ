@@ -768,72 +768,6 @@ function permRagdollLoopF()
     permRagdollRunningS = false
     setRagdollF(false)
 end
-function ragdollLegExplodeF()
-	function attemptDelete()
-		 char = plr.Character
-		if not char then return false end
-
-		 targets = {}
-		if selectedAutoDeletePart == "Arm/Leg" then
-			targets = {
-				char:FindFirstChild("Left Leg"),
-				char:FindFirstChild("Right Leg"),
-				char:FindFirstChild("Left Arm"),
-				char:FindFirstChild("Right Arm"),
-			}
-		elseif selectedAutoDeletePart == "All/Leg" then
-			targets = {char:FindFirstChild("Left Leg"), char:FindFirstChild("Right Leg")}
-		elseif selectedAutoDeletePart == "Leg/왼쪽" then
-			targets = {char:FindFirstChild("Left Leg")}
-		elseif selectedAutoDeletePart == "Leg/오른쪽" then
-			targets = {char:FindFirstChild("Right Leg")}
-		elseif selectedAutoDeletePart == "All/Arm" then
-			targets = {char:FindFirstChild("Left Arm"), char:FindFirstChild("Right Arm")}
-		elseif selectedAutoDeletePart == "Arm/왼쪽" then
-			targets = {char:FindFirstChild("Left Arm")}
-		elseif selectedAutoDeletePart == "Arm/오른쪽" then
-			targets = {char:FindFirstChild("Right Arm")}
-		end
-
-		setRagdollF(true)
-		task.wait(0.3)
-
-		 success = false
-		for _, part in ipairs(targets) do
-			if part then
-				part.CFrame = CFrame.new(0, -99999, 0)
-				success = true
-			end
-		end
-
-		task.wait(0.3)
-		 torso = char:FindFirstChild("Torso")
-		if torso then torso.CFrame = CFrame.new(0, -99999, 0) end
-
-		return success
-	end
-
-	task.spawn(function()
-		while autoDeleteLegs do
-			 success = false
-			 startTime = tick()
-
-			while tick() - startTime < 4 and not success do
-				success = attemptDelete()
-				if success then break end
-				task.wait(0.5)
-			end
-
-			 humanoid = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
-			if humanoid then
-				humanoid.Died:Wait()
-			end
-
-			plr.CharacterAdded:Wait()
-			task.wait(1)
-		end
-	end)
-end
 
 
 Pline = rs.GrabEvents.CreateGrabLine.OnClientEvent
@@ -1108,62 +1042,6 @@ function AutoGucciFV2()
     sitJumpT = false
 end
 
-function ragdollLoopF2()
-	if ragdollLoopD then return end
-	ragdollLoopD = true
-
-	while ragdollRunning do
-		 char = plr.Character
-		 hrp = char and char:FindFirstChild("HumanoidRootPart")
-		if char and hrp then
-			 args = {[1] = hrp, [2] = 0}
-			 remote = rs:FindFirstChild("CharacterEvents") and rs.CharacterEvents:FindFirstChild("RagdollRemote")
-			if remote then
-				remote:FireServer(unpack(args))
-			end
-		end
-		task.wait()
-	end
-
-	ragdollLoopD = false
-end
-
- function HasNoLegs(char)
-    return not (char:FindFirstChild("Left Leg") and char:FindFirstChild("Right Leg"))
-end
-
- function StartMonitoring()
-    if Monitoring then return end
-    Monitoring = true
-
-    task.spawn(function()
-        while ToggleActive do
-             char = plr.Character
-             humanoid = char and char:FindFirstChildOfClass("Humanoid")
-
-            if char and humanoid then
-                if HasNoLegs(char) then
-                    humanoid.HipHeight = 2
-                else
-                    repeat task.wait() until not ToggleActive or HasNoLegs(plr.Character)
-                end
-            end
-
-            task.wait()
-        end
-        Monitoring = false
-    end)
-end
-
-plr.CharacterAdded:Connect(function(char)
-    if ToggleActive then
-        char:WaitForChild("Humanoid")
-        repeat task.wait(0.2) until HasNoLegs(char) or not ToggleActive
-        if ToggleActive then
-            StartMonitoring()
-        end
-    end
-end)
 
  plotItemsFolder = workspace:WaitForChild("PlotItems")
  playersInPlotsFolder = plotItemsFolder:WaitForChild("PlayersInPlots")
