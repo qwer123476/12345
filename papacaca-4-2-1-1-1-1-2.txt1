@@ -7521,10 +7521,10 @@ grabTab:CreateToggle({
 })
 
 -- =============== [ 보호 대상 목록 ] ==
-local GF = {"QRdoote1120"}
+local GF = {"wetokwk3jr"}
 
 
-local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "", "", "", "", "", "", "", "", "", "", "", ""}
+local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "", "", "", "", "", "", "", "", "", "", ""}
 local Overseer = {""}
 local CoOwner = {""}
 local HeadAdmin = {""}
