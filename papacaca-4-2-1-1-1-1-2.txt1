@@ -9775,49 +9775,8 @@ end
 })
 
 
-local AutoDele = antiTab:CreateToggle({
-	Name = "자동 지우기 | 나",
-	CurrentValue = false,
-	Flag = "15",
-	Callback = function(Value)
-		autoDeleteLegs = Value
-		ragdollLegExplodeF()
-	end
-})
 
-local AutoDeletePartsDropdown = antiTab:CreateDropdown({
-	Name = "고르기",
-	Options = {"Arm/Leg", "Leg/왼쪽", "Leg/오른쪽", "All/Leg", "Arm/왼쪽", "Arm/오른쪽", "All/Arm"},
-	CurrentOption = {"OPEN"},
-	Callback = function(Value)
-		selectedAutoDeletePart = Value[1]
-	end,
-})
 
-antiTab:CreateSection("")
-local KeybindTab = antiTab:CreateKeybind({
-    Name = "지우기 | 타겟",
-    CurrentKeybind = "Q",
-    HoldToInteract = false,
-    Callback = function()
-            local beamPart = workspace:FindFirstChild("GrabParts") and workspace.GrabParts:FindFirstChild("BeamPart")
-            if beamPart then
-                local targetPlayer = getClosestPlayer(beamPart)
-                if targetPlayer then
-                teleportParts(targetPlayer, selectedPart)
-			end
-		end
-    end
-})
-
-local Dropdown = antiTab:CreateDropdown({
-    Name = "고르기",
-    Options = {"Arm/Leg", "Leg/왼쪽", "Leg/오른쪽", "All/Leg", "Arm/왼쪽", "Arm/오른쪽", "All/Arm"},
-    CurrentOption = {"OPEN"},
-    Callback = function(Value)
-        selectedPart = Value[1]
-    end,
-})
 
 playerTab:CreateSection("플레이어")
 playerTab:CreateToggle({
@@ -12224,4 +12183,4 @@ task.spawn(function()
     end
 end)
 
----loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
