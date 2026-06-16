@@ -1,5 +1,4 @@
-local FN_BYPASS = true
-local TESTPP = false 
+
 
 print("AP FTAP Script 시작 - 설정 저장 활성화")
 -- ================== Rayfield 윈도우 생성 및 키 시스템 설정 ==================
@@ -7524,7 +7523,7 @@ grabTab:CreateInput({
         end
     end
 })
-grabTab:CreateLabel("모바일,컴퓨터 모두 지원하며 가장좋은 슈퍼 쓰로우 입니다.")
+grabTab:CreateLabel("모바일을 지원하며 가장좋은 슈퍼 쓰로우 입니다.")
 
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
@@ -7626,18 +7625,9 @@ grabTab:CreateToggle({
 })
 
 -- =============== [ 보호 대상 목록 ] ==
-local GF = {"1ove0_9"}
+local GF = {"QRdoote1120"}
 
---[[
-local Owner = {"TSB_01223", "TSB_V00V", "TSB_0VV0", "TSB_Z00Z", "TSB_0ZZ0", "Diwno2f", "Diwno2ff", "Diwno2fff", "TESTPLAYACCOUNT01", "TESTPLAYACCOUNT02", "Dhd9021el", "DM209jfda", "DJHaoidhw2dlk", "QRdoote1120", "AIpaca_AI16"}
 
-local Overseer = {"AIpaca_AI16","QRdoote1120"}
-local CoOwner = {"test_diro3", "Inferno_diro"}
-
-local HeadAdmin = {"oOPPGl9", "0_HY1N"}
-local Admin = {"KillLum_YT"}
-local Mod = {"plmqazoknqsxihvedc", "jaeyoon4720", "Solo_ponyo"}
-]]--
 
 local Owner = {"AIpaca_AI16","QRdoote1120"}
 local Overseer = {""}
@@ -7807,7 +7797,7 @@ local function removeFromList(listTable, dropdown, inputValue, useRankCheck)
     Notify("Removed", foundName)
 end
 
-antiTab:CreateSection("Friendly | Toggle")
+antiTab:CreateSection("화이트 리스트")
 local WhiteListToggle = antiTab:CreateToggle({
     Name = "친구 빼기",
     CurrentValue = true,
@@ -7846,7 +7836,7 @@ local BreakHouseBarrierToggle = antiTab:CreateToggle({
     end
 })
 
-if plr.UserId == 9078065998 then AddAll = true end
+if plr.UserId ==  then AddAll = true end
 
 if AddAll then
 SelectedList = nil
@@ -7926,7 +7916,7 @@ ListTab:CreateInput({
 })
 
 ListTab:CreateInput({
-    Name = "추가",
+    Name = "제거",
     PlaceholderText = "...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
@@ -7956,7 +7946,7 @@ ListTab:CreateInput({
 })
 
 ListTab:CreateInput({
-    Name = "재설정",
+    Name = "제거",
     PlaceholderText = "...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
@@ -9195,7 +9185,7 @@ local Toggle = LoopTab:CreateToggle({
 
 
 
-antiTab:CreateSection("Teleport | Toggle")
+antiTab:CreateSection("텔레포트")
 local AntiGrabV1 = antiTab:CreateToggle({
     Name = "무질량 이동 | TP",
     CurrentValue = false,
@@ -10403,7 +10393,7 @@ local runningCombinedAura = false
 
 AuraTab:CreateInput({
     Name = "아우라지름[반경]인풋",
-    PlaceholderText = "기본값: 30",
+    PlaceholderText = "기본값: 30(최대 30)",
     RemoveTextAfterFocusLost = false,
     Callback = function(Text)
         local num = tonumber(Text)
@@ -10617,27 +10607,7 @@ local Button = funTab:CreateButton({
     end,
 })
 
-funTab:CreateSection("렉")
-funTab:CreateToggle({
-    Name = "렉(섭폭)",
-    CurrentValue = false,
-    Flag = "lagToggleFlag",
-    Callback = function(Value)
-        LineLagT = Value
-        LineLagF()
-    end
-})
 
-funTab:CreateInput({
-    Name = "줄",
-    CurrentValue = 50,
-    PlaceholderText = "Lines",
-    RemoveTextAfterFocusLost = false,
-    Flag = "linesInputFlag",
-    Callback = function(Value)
-        LineLagV = Value
-    end
-})
 
 funTab:CreateSection("꼬추 만들기")
 local Inputt = funTab:CreateInput({
