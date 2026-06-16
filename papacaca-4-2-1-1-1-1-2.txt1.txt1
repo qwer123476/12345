@@ -10616,27 +10616,6 @@ local Button = funTab:CreateButton({
     end,
 })
 
-funTab:CreateSection("렉")
-funTab:CreateToggle({
-    Name = "렉(섭폭)",
-    CurrentValue = false,
-    Flag = "lagToggleFlag",
-    Callback = function(Value)
-        LineLagT = Value
-        LineLagF()
-    end
-})
-
-funTab:CreateInput({
-    Name = "줄",
-    CurrentValue = 50,
-    PlaceholderText = "Lines",
-    RemoveTextAfterFocusLost = false,
-    Flag = "linesInputFlag",
-    Callback = function(Value)
-        LineLagV = Value
-    end
-})
 
 funTab:CreateSection("꼬추 만들기")
 local Inputt = funTab:CreateInput({
