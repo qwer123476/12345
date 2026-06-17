@@ -11136,7 +11136,7 @@ local BarrierNoclip = keybindTab:CreateToggle({
 BarrierNoclip:Set(true)
 
 plotTab:CreateButton({
-    Name = "장벽 삭제 | 음식빵",
+    Name = "장벽 삭제 | 햄버거",
     Callback = function()
         PlotBarrierDelete()
     end,
@@ -11164,49 +11164,50 @@ local function getMyPlot()
 end
 
 function PlotBarrierDelete()
-    if PBDrun then return end
-    PBDrun = true
-    local char = plr.Character
-    if not char then PBDrun = false return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then PBDrun = false return end
-    local metal = workspace.Plots.Plot1.TeslaCoil.Metal
-    if not metal then PBDrun = false return end
-    local TP = metal.CFrame
-    local OCF = hrp.CFrame
-    task.spawn(function()
-        for i = 1, 5 do
-            pcall(function()
-                local plot = workspace.Plots:FindFirstChild("Plot" .. i)
-                if plot then
-                    local sign = plot:FindFirstChild("PlotSign")
-                    if sign then
-                        local owners = sign:FindFirstChild("ThisPlotsOwners")
-                        if owners then
-                            for _, v in ipairs(owners:GetChildren()) do
-                                if v:IsA("StringValue") and v.Value == plr.Name then
-                                    local b1 = plot:FindFirstChild("Barrier")
-                                    local b2 = plot:FindFirstChild("Barrier2")
-                                    if b1 or b2 then
-                                        hrp.CFrame = TP
-                                        task.wait(0.25)
-                                        if b1 then b1:Destroy() end
-                                        if b2 then b2:Destroy() end
-                                        task.wait(0.1)
-                                        hrp.CFrame = OCF
-                                    end
-                                    break
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-        PBDrun = false
-    end)
+if PBDrun then return end
+PBDrun = true
+
+local char = plr.Character
+if not char then PBDrun = false return end
+
+local hrp = char:FindFirstChild("HumanoidRootPart")
+if not hrp then PBDrun = false return end
+
+local metal = workspace.Plots.Plot1.TeslaCoil.Metal
+if not metal then PBDrun = false return end
+
+local TP = metal.CFrame
+local OCF = hrp.CFrame
+
+task.spawn(function()
+rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodBread", hrp.CFrame, Vector3.new(0,0,0))
+end)
+
+task.wait(0.9)
+
+local FoodHamburger = inv:FindFirstChild("FoodHamburger")
+if not FoodHamburger then PBDrun = false return end
+
+if foodBread then
+task.spawn(function()
+FoodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
+end)
 end
 
+task.wait(0.1)
+
+hrp.CFrame = TP
+task.wait(0.5)
+
+if FoodHamburger then
+rs.MenuToys.DestroyToy:FireServer(FoodHamburger)
+end
+
+hrp.CFrame = OCF
+task.wait(0.4)
+
+PBDrun = false
+end
 keybindTab:CreateKeybind({
     Name = "하우스 그랩",
     CurrentKeybind = "G",
