@@ -9174,6 +9174,127 @@ local AntiGrabV1 = antiTab:CreateToggle({
         end)
     end
 })
+local speedCheckActive = false
+local isVelocityFrozen = false
+
+local function startSpeedCheck()
+    task.spawn(function()
+        local lastPosition = nil
+        local lastCheckTime = os.clock()
+        local localPlayer = game.Players.LocalPlayer
+
+        while speedCheckActive do
+            local character = localPlayer.Character
+            local root = character and character:FindFirstChild("HumanoidRootPart")
+            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+            if root and humanoid and not isVelocityFrozen then
+                local currentPosition = root.Position
+                local currentTime = os.clock()
+
+                if lastPosition then
+                    local distance = (currentPosition - lastPosition).Magnitude
+                    local timeDiff = currentTime - lastCheckTime
+
+                    if timeDiff >= 1.5 then
+                        if distance >= 1000 then
+                            isVelocityFrozen = true
+                            
+                            root.CFrame = CFrame.new(0, -7, 0)
+                            
+                            local originalWalkSpeed = humanoid.WalkSpeed
+                            humanoid.WalkSpeed = 4
+                            
+                            local bodyVelocity = Instance.new("BodyVelocity")
+                            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+                            bodyVelocity.MaxForce = Vector3.new(100000, math.huge, 100000)
+                            bodyVelocity.Name = "AntiFlitVelocity"
+                            bodyVelocity.Parent = root
+
+                            local bodyAngular = Instance.new("BodyAngularVelocity")
+                            bodyAngular.AngularVelocity = Vector3.new(0, 0, 0)
+                            bodyAngular.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                            bodyAngular.Name = "AntiFlitAngular"
+                            bodyAngular.Parent = root
+
+                            task.spawn(function()
+                                local endTime = os.clock() + 1.5
+                                while os.clock() < endTime and isVelocityFrozen and speedCheckActive do
+                                    if humanoid and root then
+                                        local moveDir = humanoid.MoveDirection
+                                        bodyVelocity.Velocity = Vector3.new(moveDir.X * humanoid.WalkSpeed, 0, moveDir.Z * humanoid.WalkSpeed)
+                                    end
+                                    task.wait()
+                                end
+                            end)
+
+                            for _, part in ipairs(character:GetChildren()) do
+                                if part:IsA("BasePart") then
+                                    part.CustomPhysicalProperties = PhysicalProperties.new(100, 0.3, 0.5, 1, 1)
+                                end
+                            end
+                            
+                            task.delay(1.5, function()
+                                if bodyVelocity then bodyVelocity:Destroy() end
+                                if bodyAngular then bodyAngular:Destroy() end
+                                
+                                if humanoid then
+                                    humanoid.WalkSpeed = originalWalkSpeed
+                                end
+                                
+                                if character and character:IsDescendantOf(workspace) then
+                                    for _, part in ipairs(character:GetChildren()) do
+                                        if part:IsA("BasePart") then
+                                            part.CustomPhysicalProperties = nil
+                                        end
+                                    end
+                                end
+                                isVelocityFrozen = false
+                            end)
+                        end
+                        lastPosition = currentPosition
+                        lastCheckTime = currentTime
+                    end
+                else
+                    lastPosition = currentPosition
+                    lastCheckTime = currentTime
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end
+antiTab:CreateLabel("날라가는것과 킬방지")
+local antiTeleportToggle = antiTab:CreateToggle({
+    Name = "안티플링",
+    CurrentValue = false,
+    Flag = "SpeedCheckAntiCheatFlagV3",
+    Callback = function(Value)
+        speedCheckActive = Value
+        if speedCheckActive then
+            isVelocityFrozen = false
+            startSpeedCheck()
+        else
+            isVelocityFrozen = false
+            local character = game.Players.LocalPlayer.Character
+            local root = character and character:FindFirstChild("HumanoidRootPart")
+            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+            
+            if root then
+                if root:FindFirstChild("AntiFlitVelocity") then root.AntiFlitVelocity:Destroy() end
+                if root:FindFirstChild("AntiFlitAngular") then root.AntiFlitAngular:Destroy() end
+            end
+            if character then
+                for _, part in ipairs(character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CustomPhysicalProperties = nil
+                    end
+                end
+            end
+        end
+    end
+})
+
 antiTab:CreateLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
 antiTab:CreateSection("그랩 | 토클")
 local AntiGrab = antiTab:CreateToggle({
