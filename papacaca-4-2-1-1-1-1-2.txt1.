@@ -5067,13 +5067,22 @@ function AntiPalletF()
     end)
 end
 
+local AntiDeathConnection = nil
+
 function AntiDeathF()
-    local connection
-    connection = rs2.Heartbeat:Connect(function()
+    if AntiDeathConnection then 
+        AntiDeathConnection:Disconnect() 
+        AntiDeathConnection = nil 
+    end
+    
+    AntiDeathConnection = rs2.Heartbeat:Connect(function()
         if not AntiDeathT then
             local donut = inv:FindFirstChild("FoodBread")
             if donut then donut:Destroy() end
-            if connection then connection:Disconnect() end
+            if AntiDeathConnection then 
+                AntiDeathConnection:Disconnect() 
+                AntiDeathConnection = nil 
+            end
             return
         end
 
@@ -5102,6 +5111,7 @@ function AntiDeathF()
         end
     end)
 end
+
 
 
 RunService = game:GetService("RunService")
@@ -9271,6 +9281,10 @@ local AntiRelease = antiTab:CreateToggle({
         if AntiDeathT then
             task.spawn(AntiDeathF)
         else
+            if AntiDeathConnection then 
+                AntiDeathConnection:Disconnect() 
+                AntiDeathConnection = nil 
+            end
             local donut = inv:FindFirstChild("FoodBread")
             if donut then donut:Destroy() end
         end
