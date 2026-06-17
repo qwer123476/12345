@@ -11188,7 +11188,7 @@ task.wait(0.9)
 local FoodHamburger = inv:FindFirstChild("FoodHamburger")
 if not FoodHamburger then PBDrun = false return end
 
-if FoodHamburger then
+if foodHamburger then
 task.spawn(function()
 FoodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodhamburger, char)
 end)
