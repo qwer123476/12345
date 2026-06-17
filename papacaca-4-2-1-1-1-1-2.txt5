@@ -11190,7 +11190,7 @@ if not FoodHamburger then PBDrun = false return end
 
 if FoodHamburger then
 task.spawn(function()
-FoodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
+FoodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodhamburger, char)
 end)
 end
 
