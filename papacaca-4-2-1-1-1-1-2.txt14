@@ -10381,7 +10381,7 @@ local VoidInput = funTab:CreateInput({
    end,
 })
 
-local VoidToggle = plotTab:CreateButton({
+local VoidToggle = funTab:CreateButton({
    Name = "텔포",
    Callback = function()
       if not Value then return end
@@ -10409,6 +10409,11 @@ local teleportLocations = {
     ["(보라집)"] = {249, -7, 461},
     ["(파랑집)"] = {513, 83, -341},
     ["(빨강집)"] = {551, 123, -73},
+    ["슬롯1"] = {51, 11, -118},
+    ["슬롯2"] = {-543, 11, -40},
+    ["슬롯3"] = {169, 11, 530},
+    ["슬롯4"] = {-214, 102, 423},
+    ["슬롯1"] = {563, 102, -218},
 }
 
 local selectedLocation = "스폰"
