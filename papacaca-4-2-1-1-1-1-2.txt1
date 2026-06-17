@@ -9,7 +9,7 @@ print("AP FTAP Script 시작 - 설정 저장 활성화")
 -- ================== Rayfield 윈도우 생성 및 키 시스템 설정 ==================
 local Rayfield =   loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "누나용 V105",
+    Name = "파카허브",
     LoadingTitle = "로딩중",
     LoadingSubtitle = "by JIUO",
     ConfigurationSaving = {
@@ -12219,6 +12219,6 @@ task.spawn(function()
     end
 end)
 
----loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
