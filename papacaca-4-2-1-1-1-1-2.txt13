@@ -5071,6 +5071,8 @@ function AntiDeathF()
     local connection
     connection = rs2.Heartbeat:Connect(function()
         if not AntiDeathT then
+            local donut = inv:FindFirstChild("FoodBread")
+            if donut then donut:Destroy() end
             if connection then connection:Disconnect() end
             return
         end
@@ -5100,6 +5102,7 @@ function AntiDeathF()
         end
     end)
 end
+
 
 RunService = game:GetService("RunService")
 Camera = workspace.CurrentCamera
