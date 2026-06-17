@@ -9270,6 +9270,9 @@ local AntiRelease = antiTab:CreateToggle({
         AntiDeathT = Value
         if AntiDeathT then
             task.spawn(AntiDeathF)
+        else
+            local donut = inv:FindFirstChild("FoodBread")
+            if donut then donut:Destroy() end
         end
     end,
 })
