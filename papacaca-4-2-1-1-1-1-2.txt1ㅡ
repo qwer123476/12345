@@ -616,7 +616,7 @@ function updateJumpPowerF()
                 end
             end)
         else
-            hum.JumpPower = 60
+            hum.JumpPower = 26
         end
     end
 
