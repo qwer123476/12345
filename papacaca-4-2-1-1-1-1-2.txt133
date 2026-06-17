@@ -5071,7 +5071,7 @@ function AntiDeathF()
     local connection
     connection = rs2.Heartbeat:Connect(function()
         if not AntiDeathT then
-            connection:Disconnect()
+            if connection then connection:Disconnect() end
             return
         end
 
@@ -5081,7 +5081,7 @@ function AntiDeathF()
         local donut = inv:FindFirstChild("FoodBread")
 
         if not donut then
-            pcall(function()
+            task.spawn(pcall, function()
                 rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodBread", CFrame.new(0,0,0), Vector3.new(0,0,0))
             end)
             return
@@ -5093,8 +5093,10 @@ function AntiDeathF()
         local DropItemRemoteFunction = donut.HoldPart:FindFirstChild("DropItemRemoteFunction")
 
         if HoldItemRemoteFunction and DropItemRemoteFunction then
-            HoldItemRemoteFunction:InvokeServer(donut, Character)
-            DropItemRemoteFunction:InvokeServer(donut, CFrame.new(99999, 99999, 99999), Vector3.new(99999, 99999, 99999))
+            task.spawn(pcall, function()
+                HoldItemRemoteFunction:InvokeServer(donut, Character)
+                DropItemRemoteFunction:InvokeServer(donut, CFrame.new(99999, 99999, 99999), Vector3.new(99999, 99999, 99999))
+            end)
         end
     end)
 end
