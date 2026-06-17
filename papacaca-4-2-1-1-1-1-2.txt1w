@@ -10381,7 +10381,7 @@ local VoidInput = funTab:CreateInput({
    end,
 })
 
-local VoidToggle = funTab:CreateButton({
+local VoidToggle = plotTab:CreateButton({
    Name = "텔포",
    Callback = function()
       if not Value then return end
@@ -10391,7 +10391,7 @@ local VoidToggle = funTab:CreateButton({
    end,
 })
 
-funTab:CreateSection("")
+funTab:CreateSection("이동할곳")
 local teleportLocations = {
     ["스폰"] = {0, -7, 0},
     ["스폰산"] = {494, 163, 175},
@@ -10413,7 +10413,7 @@ local teleportLocations = {
 
 local selectedLocation = "스폰"
 
-local Dropdown = funTab:CreateDropdown({
+local Dropdown = plotTab:CreateDropdown({
     Name = "위치 고르기",
     Options = {"스폰","스폰산","광산","큰동굴","작은동굴","열차동굴","위험구역","설산","헛간(농지)","하늘섬","초록집","(초록집)","(분홍집)","(보라집)","(파랑집)","(빨강집)"},
     CurrentOption = "스폰",
@@ -10427,7 +10427,7 @@ local Dropdown = funTab:CreateDropdown({
     end,
 })
 
-local Button = funTab:CreateButton({
+local Button = plotTab:CreateButton({
     Name = "텔포",
     Callback = function()
         local plr = game.Players.LocalPlayer
