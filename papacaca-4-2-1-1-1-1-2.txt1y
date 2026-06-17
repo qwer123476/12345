@@ -3369,7 +3369,7 @@ function AntiGrabF(enable)
             hum.AutoRotate = true
         end
 
-        if not hrp or hum.Health <= 0 then
+        if not hrp or hum.Health <= 100 then
             hum:ChangeState(Enum.HumanoidStateType.Dead)
             char:BreakJoints()
             --rs.CharacterEvents.Struggle:FireServer()
