@@ -11180,7 +11180,7 @@ local TP = metal.CFrame
 local OCF = hrp.CFrame
 
 task.spawn(function()
-rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodBread", hrp.CFrame, Vector3.new(0,0,0))
+rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", hrp.CFrame, Vector3.new(0,0,0))
 end)
 
 task.wait(0.2)
