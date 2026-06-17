@@ -11183,24 +11183,24 @@ task.spawn(function()
 rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", hrp.CFrame, Vector3.new(0,0,0))
 end)
 
-task.wait(0.9)
+task.wait(0.2)
 
-local FoodHamburger = inv:FindFirstChild("FoodHamburger")
-if not FoodHamburger then PBDrun = false return end
+local foodHamburger = inv:FindFirstChild("FoodHamburger")
+if not foodHamburger then PBDrun = false return end
 
 if foodHamburger then
 task.spawn(function()
-FoodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodhamburger, char)
+foodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
 end)
 end
 
-task.wait(0.3)
+task.wait(0.1)
 
 hrp.CFrame = TP
 task.wait(0.17)
 
-if FoodHamburger then
-rs.MenuToys.DestroyToy:FireServer(FoodHamburger)
+if foodHamburger then
+rs.MenuToys.DestroyToy:FireServer(foodHamburger)
 end
 
 hrp.CFrame = OCF
@@ -11208,6 +11208,7 @@ task.wait(0.4)
 
 PBDrun = false
 end
+
 keybindTab:CreateKeybind({
     Name = "하우스 그랩",
     CurrentKeybind = "G",
