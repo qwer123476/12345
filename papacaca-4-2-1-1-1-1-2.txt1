@@ -11110,7 +11110,7 @@ task.spawn(function()
     Tper:Set(true)
 end)
 
-keybindTab:CreateSection("Sit")
+LoopTab:CreateSection("오토블롭")
 
 
 keybindTab:CreateKeybind({
@@ -11123,9 +11123,9 @@ keybindTab:CreateKeybind({
     end,
 })
 
-keybindTab:CreateSection("Plot")
-local BarrierNoclip = keybindTab:CreateToggle({
-    Name = "집 베리어 뚫기",
+plotTab:CreateSection("집")
+local BarrierNoclip = plotTab:CreateToggle({
+    Name = "집 베리어 삭제",
     CurrentValue = false,
     Flag = "BarrierNoclipToggle",
     Callback = function(Value)
@@ -11136,7 +11136,7 @@ local BarrierNoclip = keybindTab:CreateToggle({
 BarrierNoclip:Set(true)
 
 plotTab:CreateButton({
-    Name = "장벽 삭제 | 햄버거",
+    Name = "집 베리어 완전삭제 | 햄버거",
     Callback = function()
         PlotBarrierDelete()
     end,
@@ -11183,7 +11183,7 @@ task.spawn(function()
 rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", hrp.CFrame, Vector3.new(0,0,0))
 end)
 
-task.wait(0.2)
+task.wait(1)
 
 local foodHamburger = inv:FindFirstChild("FoodHamburger")
 if not foodHamburger then PBDrun = false return end
@@ -11194,7 +11194,7 @@ foodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
 end)
 end
 
-task.wait(0.1)
+task.wait(0.4)
 
 hrp.CFrame = TP
 task.wait(0.17)
