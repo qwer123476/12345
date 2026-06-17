@@ -11194,7 +11194,7 @@ FoodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
 end)
 end
 
-task.wait(0.1)
+task.wait(0.3)
 
 hrp.CFrame = TP
 task.wait(0.17)
