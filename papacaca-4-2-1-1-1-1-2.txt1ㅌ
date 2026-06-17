@@ -8161,8 +8161,16 @@ LoopTab:CreateToggle({
       end
    end,
 })
-
-
+LoopTab:CreateSection("자동블롭앉기")
+local AutoSit = LoopTab:CreateToggle({
+    Name = "자동블롭앉기",
+    CurrentValue = false,
+    Flag = "AutoSitBlobman",
+    Callback = function(Value)
+        AutoSitT = Value
+        AutoSitF()
+    end
+})
 LoopTab:CreateSection("Bring")
 LoopTab:CreateButton({
     Name = "끌고오기 [ Blobman ]",
@@ -11146,15 +11154,7 @@ task.spawn(function()
 end)
 
 keybindTab:CreateSection("Sit")
-local AutoSit = keybindTab:CreateToggle({
-    Name = "앉기 [블롭맨]",
-    CurrentValue = false,
-    Flag = "AutoSitBlobman",
-    Callback = function(Value)
-        AutoSitT = Value
-        AutoSitF()
-    end
-})
+
 
 keybindTab:CreateKeybind({
     Name = "앉기 [블롭맨]",
