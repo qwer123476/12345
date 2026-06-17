@@ -11183,7 +11183,7 @@ task.spawn(function()
 rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodBread", hrp.CFrame, Vector3.new(0,0,0))
 end)
 
-task.wait(0.9)
+task.wait(0.2)
 
 local FoodHamburger = inv:FindFirstChild("FoodHamburger")
 if not FoodHamburger then PBDrun = false return end
@@ -11197,14 +11197,14 @@ end
 task.wait(0.1)
 
 hrp.CFrame = TP
-task.wait(0.5)
+task.wait(0.17)
 
 if FoodHamburger then
 rs.MenuToys.DestroyToy:FireServer(FoodHamburger)
 end
 
 hrp.CFrame = OCF
-task.wait(0.4)
+task.wait(0.3)
 
 PBDrun = false
 end
