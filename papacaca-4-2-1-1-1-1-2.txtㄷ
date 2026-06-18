@@ -2490,7 +2490,7 @@ function loopPlayerF() -- 룹1
     end)
 end
 
-function loopPlayerF2() -- 룹2
+function loopPlayerF2() -- 猷�2
     UpdateCurrentBlobman()
 
     local processedHumanoids = {}
@@ -2598,7 +2598,7 @@ function loopPlayerF2() -- 룹2
                     rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
                     hrp.CFrame = CFrame.new(99999999, 99999999, 99999999)
                 end
-                task.wait(0.02)
+                task.wait(0.2)
             end
         end)
 
@@ -2628,14 +2628,13 @@ function loopPlayerF2() -- 룹2
                     else
                         processedHumanoids[player] = nil
                     end
-                    task.wait(0.005)
+                    task.wait(0.05)
                 end
             end
-            task.wait(0.005)
+            task.wait(0.05)
         end
     end)
 end
-
 function loopPlayerF3() -- 룹3
     UpdateCurrentBlobman()
 
