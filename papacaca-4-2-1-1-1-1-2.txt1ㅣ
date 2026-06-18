@@ -2218,20 +2218,39 @@ end
                         break 
                     end
 
-                    local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
-                    if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
-                        BlobGrab(currentBlobS, charHRP, "Right")
-                        task.wait()
-                         BlobGrab(currentBlobS, charHRP, "Left")
-                        task.wait()
-                        BlobRelease(currentBlobS, charHRP, "Left")
-                        task.wait()
-                        BlobRelease(currentBlobS, charHRP, "Right")
-                        charHUM.Sit = true
-                        task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
-                    end
-                    task.wait()
+                    
+local character = plr.Character
+local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+if humanoid then
+    local currentSeat = humanoid.SeatPart
+    
+
+    if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
+        
+        BlobGrab(currentBlobS, charHRP, "Right")
+        task.wait()
+        BlobGrab(currentBlobS, charHRP, "Left")
+        task.wait()
+        
+        
+        if charHRP and charHRP.Parent then
+            BlobRelease(currentBlobS, charHRP, "Left")
+            task.wait()
+            BlobRelease(currentBlobS, charHRP, "Right")
+            
+        
+            humanoid.Sit = true
+            task.defer(function()
+                if humanoid and humanoid.Parent then
+                    humanoid.Sit = false
                 end
+            end)
+        end
+    end
+end
+task.wait()
+
 
                 if independentHoldConnections[player] then 
                     independentHoldConnections[player]:Disconnect()
