@@ -1783,7 +1783,7 @@ if hrp then
     end)
 end
 
-function loopPlayerBlobF3() -- 블롭 룹3
+function loopPlayerBlobF3() -- 블롭뤂3
 
     UpdateCurrentBlobman()
 
@@ -1804,7 +1804,7 @@ function loopPlayerBlobF3() -- 블롭 룹3
             if hum and hum.Health > 0 then
                 return char
             end
-            task.wait(0.005)
+            task.wait(0.1)
         end
     end
 
@@ -1850,17 +1850,17 @@ function loopPlayerBlobF3() -- 블롭 룹3
                         end
 
                         if not hum then
-                            task.wait(0.004)
+                            task.wait(0.05)
                             continue
                         end
 
                         local hrp = char:FindFirstChild("HumanoidRootPart")
-                        if not hrp then task.wait(0.005) continue end
+                        if not hrp then task.wait(0.05) continue end
 
                         local distance = (myHrp.Position - hrp.Position).Magnitude
                         if distance > 30 then
                             TP(player)
-                              task.wait(0.0001)
+                            task.wait(0.05)
                             continue
                         end
 
@@ -1890,10 +1890,10 @@ function loopPlayerBlobF3() -- 블롭 룹3
                             if not blobLoopT3 then break end
                             BlobGrab(currentBlobS, hrp, "Right")
                             BlobRelease(currentBlobS, hrp, "Right")
-                            task.wait(0.005)
+                            task.wait()
                         end
 
-                        task.wait(0.05)
+                        task.wait()
                     end
 
                     if beforeTP then
@@ -1923,6 +1923,7 @@ SitMODED = false
 OnlyOwner = false
 SkipOL = false
 OLTPValue = Vector3.new(0, 20, 0)
+
 
 function loopPlayerBlobF4() 
     UpdateCurrentBlobman()
