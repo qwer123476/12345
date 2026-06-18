@@ -2027,7 +2027,7 @@ function loopPlayerBlobF4()
             local charHRP = character:FindFirstChild("HumanoidRootPart")
             local charTOR = character:FindFirstChild("Torso")
             if not charHRP then
-                task.wait(0.005)
+                task.wait(0.0005)
                 continue
             end
 
@@ -2490,7 +2490,7 @@ function loopPlayerF() -- 룹1
     end)
 end
 
-function loopPlayerF2() -- 猷�2
+function loopPlayerF2() -- 뤂2
     UpdateCurrentBlobman()
 
     local processedHumanoids = {}
@@ -2598,7 +2598,7 @@ function loopPlayerF2() -- 猷�2
                     rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
                     hrp.CFrame = CFrame.new(99999999, 99999999, 99999999)
                 end
-                task.wait(0.2)
+                task.wait()
             end
         end)
 
@@ -8381,11 +8381,11 @@ LoopTab:CreateButton({
     end
 })
 
-    LoopTab:CreateSection("Owner Kick")
+    LoopTab:CreateSection("오너킥")
     
     local OLTPInput = LoopTab:CreateInput({
         Name = "X Y Z",
-        CurrentValue = "0,30,0",
+        CurrentValue = "0,40,0",
         PlaceholderText = "",
         RemoveTextAfterFocusLost = false,
         Flag = "",
@@ -8397,7 +8397,7 @@ LoopTab:CreateButton({
             end
         end
     })
-    OLTPInput:Set("0,30,0")
+    OLTPInput:Set("0,40,0")
     
     local blobLoop4Toggle = LoopTab:CreateToggle({
         Name = "스팸킥v25 [ 더빠른속도 ]",
@@ -8438,7 +8438,7 @@ local OLTPInput = LoopTab:CreateInput({
 OLTPInput:Set("0,20,0")
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
-    Name = "구버전 킥  [ 지원종료 (미지원) ]",
+    Name = "구버전킥",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
