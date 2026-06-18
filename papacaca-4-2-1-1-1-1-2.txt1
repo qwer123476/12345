@@ -4749,8 +4749,7 @@ function NoClipGrabF()
         end
     end
 end
-local activeHighlights = {}
-Function ViewToolF()
+function ViewToolF()
     local Tools = {
         "NinjaKunai",
         "NinjaShuriken",
@@ -4764,7 +4763,6 @@ Function ViewToolF()
 
     local Cpf = { "Campfire" }
     local AG = { "AG" }
-    local rainbowHighlights = {}
 
     local function addView(item, partName, multiple, onlyView1, highTransparency)
         if onlyView1 then return end
@@ -4774,16 +4772,15 @@ Function ViewToolF()
                 local highlight = Instance.new("Highlight")
                 highlight.Name = "Highlight_" .. index
                 highlight.Adornee = item
-                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.FillColor = Color3.fromRGB(0, 255, 127​)
                 highlight.FillTransparency = 1
 
                 if item.Name == "Campfire" then
-                    highlight.OutlineColor = Color3.fromRGB(105, 102, 92)
+                    highlight.OutlineColor = Color3.fromRGB(255, 117, 24)
                 elseif item.Name == "AG" then
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+                    highlight.OutlineColor = Color3.fromRGB(138, 43, 226)
                 else
-                    highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
-                    table.insert(rainbowHighlights, highlight)
+                    highlight.OutlineColor = Color3.fromRGB(0, 255, 127)
                 end
 
                 highlight.FillTransparency = 1
@@ -4820,23 +4817,6 @@ Function ViewToolF()
             end
         end
     end
-
-    task.spawn(function()
-        local hue = 0
-        while ViewToolT do
-            hue = (hue + 0.01) % 1
-            local color = Color3.fromHSV(hue, 1, 1)
-            for i = #rainbowHighlights, 1, -1 do
-                local hl = rainbowHighlights[i]
-                if hl and hl.Parent then
-                    hl.OutlineColor = color
-                else
-                    table.remove(rainbowHighlights, i)
-                end
-            end
-            task.wait(0.03)
-        end
-    end)
 
     task.spawn(function()
         while ViewToolT and task.wait(0.2) do
@@ -4892,6 +4872,7 @@ Function ViewToolF()
         end
     end)
 end
+
 
 function ViewAuraF()
     local targetNames = { 
