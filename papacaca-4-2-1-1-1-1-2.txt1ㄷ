@@ -4750,7 +4750,7 @@ function NoClipGrabF()
     end
 end
 
-function ViewToolF()
+Function ViewToolF()
     local Tools = {
         "NinjaKunai",
         "NinjaShuriken",
@@ -4775,15 +4775,7 @@ function ViewToolF()
                 highlight.Adornee = item
                 highlight.FillColor = Color3.fromRGB(255, 0, 0)
                 highlight.FillTransparency = 1
-
-                if item.Name == "Campfire" then
-                    highlight.OutlineColor = Color3.fromRGB(105, 102, 92)
-                elseif item.Name == "AG" then
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
-                else
-                    highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
-                end
-
+                highlight.OutlineColor = Color3.fromHSV(0, 1, 1)
                 highlight.FillTransparency = 1
                 highlight.OutlineTransparency = 0
                 highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
@@ -4819,12 +4811,24 @@ function ViewToolF()
         end
     end
 
+    local function updateRainbowColor(item, hue)
+        for _, v in ipairs(item:GetChildren()) do
+            if v.Name:match("^Highlight_") and v:IsA("Highlight") then
+                v.OutlineColor = Color3.fromHSV(hue, 1, 1)
+            end
+        end
+    end
+
     task.spawn(function()
-        while ViewToolT and task.wait(0.2) do
+        local hue = 0
+        while ViewToolT and task.wait(0.03) do
+            hue = (hue + 0.02) % 1
+            
             for _, folder in ipairs(workspace:GetChildren()) do
                 if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
                     for _, item in ipairs(folder:GetChildren()) do
                         checkAndHighlightItem(item)
+                        updateRainbowColor(item, hue)
                     end
                 end
             end
@@ -4837,6 +4841,7 @@ function ViewToolF()
                     if plot then
                         for _, item in ipairs(plot:GetChildren()) do
                             checkAndHighlightItem(item)
+                            updateRainbowColor(item, hue)
                         end
                     end
                 end
