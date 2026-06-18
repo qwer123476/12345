@@ -1804,7 +1804,7 @@ function loopPlayerBlobF3() -- 블롭 룹3
             if hum and hum.Health > 0 then
                 return char
             end
-            task.wait(0.000005)
+            task.wait(0.005)
         end
     end
 
@@ -1850,7 +1850,7 @@ function loopPlayerBlobF3() -- 블롭 룹3
                         end
 
                         if not hum then
-                            task.wait()
+                            task.wait(0.004)
                             continue
                         end
 
@@ -1860,7 +1860,7 @@ function loopPlayerBlobF3() -- 블롭 룹3
                         local distance = (myHrp.Position - hrp.Position).Magnitude
                         if distance > 30 then
                             TP(player)
-                              task.wait(0.0000000001)
+                              task.wait(0.0001)
                             continue
                         end
 
@@ -1890,10 +1890,10 @@ function loopPlayerBlobF3() -- 블롭 룹3
                             if not blobLoopT3 then break end
                             BlobGrab(currentBlobS, hrp, "Right")
                             BlobRelease(currentBlobS, hrp, "Right")
-                            task.wait()
+                            task.wait(0.005)
                         end
 
-                        task.wait()
+                        task.wait(0.05)
                     end
 
                     if beforeTP then
