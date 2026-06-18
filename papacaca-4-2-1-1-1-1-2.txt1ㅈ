@@ -402,22 +402,22 @@ local playerAddedConnection
 local playerRemovingConnection
 local alertEnabled = false
 
-local ServerAlertToggle = getTab:CreateToggle({
-   Name = "출입,퇴장로그 알림",
+ getTab:CreateToggle({
+   Name = "씨발",
    CurrentValue = false,
-   Callback = function(Value)
-      alertEnabled = Value
+   Callback = function(serverAlertValue)
+      alertEnabled = serverAlertValue
       
       if alertEnabled then
-         playerAddedConnection = Players.PlayerAdded:Connect(function(player)
+         playerAddedConnection = Players.PlayerAdded:Connect(function(joinedPlayer)
             if alertEnabled then
-               createCustomNotification("Player Joined", player.DisplayName, player.Name)
+               createCustomNotification("Player Joined", joinedPlayer.DisplayName, joinedPlayer.Name)
             end
          end)
          
-         playerRemovingConnection = Players.PlayerRemoving:Connect(function(player)
+         playerRemovingConnection = Players.PlayerRemoving:Connect(function(leftPlayer)
             if alertEnabled then
-               createCustomNotification("Player Left", player.DisplayName, player.Name)
+               createCustomNotification("Player Left", leftPlayer.DisplayName, leftPlayer.Name)
             end
          end)
       else
@@ -426,6 +426,7 @@ local ServerAlertToggle = getTab:CreateToggle({
       end
    end,
 })
+
 
 
 
