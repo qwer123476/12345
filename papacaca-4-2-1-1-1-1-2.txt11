@@ -12390,8 +12390,8 @@ local playerAddedConnection
 local playerRemovingConnection
 local alertEnabled = false
 
-local Toggle = getTab:CreateToggle({
-   Name = "출,퇴 로그알림",
+local ServerAlertToggle = getTab:CreateToggle({
+   Name = "출입,퇴장로그 알림",
    CurrentValue = false,
    Callback = function(Value)
       alertEnabled = Value
