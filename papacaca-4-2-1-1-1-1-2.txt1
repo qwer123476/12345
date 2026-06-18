@@ -11817,7 +11817,6 @@ game.Players.LocalPlayer.Chatted:Connect(function(msg)
         ShowKickLogs()
     end
 end)
-TargetTab:CreateLabel("맨위에 왼쪽에 돋보기 옆을 누르고 쭉 내리면 ui설정하는곳이 있습니다.")
 
 
 
