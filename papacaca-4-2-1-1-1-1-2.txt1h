@@ -2229,6 +2229,9 @@ local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Human
 
                          BlobRelease(currentBlobS, charHRP, "Left")
                         task.wait()
+                           BlobMassless(currentBlobS, charHRP, "Right")
+
+                            BlobMassless(currentBlobS, charHRP, "Left")
                         charHUM.Sit = true
                         task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
                     end
