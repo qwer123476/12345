@@ -1890,10 +1890,10 @@ function loopPlayerBlobF3() -- 블롭뤂3
                             if not blobLoopT3 then break end
                             BlobGrab(currentBlobS, hrp, "Right")
                             BlobRelease(currentBlobS, hrp, "Right")
-                            task.wait()
+                            task.wait(0.05)
                         end
 
-                        task.wait()
+                        task.wait(0.05)
                     end
 
                     if beforeTP then
