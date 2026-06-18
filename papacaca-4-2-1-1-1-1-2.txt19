@@ -2222,11 +2222,11 @@ end
 local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         BlobGrab(currentBlobS, charHRP, "Right")
-                        task.wait()
+                        
                          BlobRelease(currentBlobS, charHRP, "Right")
                         task.wait()
                         BlobRelease(currentBlobS, charHRP, "Left")
-                        task.wait()
+                        
                         BlobGrab(currentBlobS, charHRP, "Left")
                         charHUM.Sit = true
                         task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
@@ -2264,7 +2264,7 @@ local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Human
                 originPositions[player] = nil
             end
             
-            task.wait(0.005)
+            task.wait(0.0005)
         end
     end
 
