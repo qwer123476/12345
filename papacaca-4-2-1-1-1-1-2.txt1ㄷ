@@ -12387,10 +12387,6 @@ local createCustomNotification = function(titleText, descText, originalName)
     end)
 end
 
-local Players = game:GetService("Players")
-local playerAddedConnection = nil
-local playerRemovingConnection = nil
-local alertEnabled = false
 
 local ServerAlertToggle = playerTab:CreateToggle({
    Name = "Server Alert",
