@@ -304,133 +304,6 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
  
 ----------------------------------------------------------------------------------------- [ 기능들 ]
-local function createCustomNotification(titleText, descText, originalName)
-    local sg = Instance.new("ScreenGui")
-    sg.Name = "CustomNotificationGui"
-    sg.ResetOnSpawn = false
-    sg.DisplayOrder = 999
-    
-    if syn and syn.protect_gui then
-        syn.protect_gui(sg)
-        sg.Parent = game:GetService("CoreGui")
-    elseif gethui then
-        sg.Parent = gethui()
-    else
-        sg.Parent = game:GetService("CoreGui")
-    end
-
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Name = "NotificationFrame"
-    mainFrame.Size = UDim2.new(0, 300, 0, 65)
-    mainFrame.Position = UDim2.new(1, 40, 1, -75)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    mainFrame.BorderSizePixel = 0
-    mainFrame.ClipsDescendants = true
-    mainFrame.Parent = sg
-
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(45, 45, 45)
-    stroke.Thickness = 1
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    stroke.Parent = mainFrame
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = mainFrame
-
-    local icon = Instance.new("ImageLabel")
-    icon.Name = "Icon"
-    icon.Size = UDim2.new(0, 24, 0, 24)
-    icon.Position = UDim2.new(0, 15, 0, 20)
-    icon.BackgroundTransparency = 1
-    icon.Image = "rbxassetid://7734056608"
-    icon.ImageColor3 = Color3.fromRGB(0, 125, 255)
-    icon.Parent = mainFrame
-
-    local title = Instance.new("TextLabel")
-    title.Name = "Title"
-    title.Size = UDim2.new(1, -60, 0, 14)
-    title.Position = UDim2.new(0, 50, 0, 10)
-    title.BackgroundTransparency = 1
-    title.Text = titleText
-    title.TextColor3 = Color3.fromRGB(180, 180, 180)
-    title.TextSize = 11
-    title.Font = Enum.Font.GothamBold
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = mainFrame
-
-    local desc = Instance.new("TextLabel")
-    desc.Name = "Description"
-    desc.Size = UDim2.new(1, -60, 0, 22)
-    desc.Position = UDim2.new(0, 50, 0, 24)
-    desc.BackgroundTransparency = 1
-    desc.Text = descText
-    desc.TextColor3 = Color3.fromRGB(255, 255, 255)
-    desc.TextSize = 16
-    desc.Font = Enum.Font.GothamBold
-    desc.TextXAlignment = Enum.TextXAlignment.Left
-    desc.Parent = mainFrame
-
-    local subDesc = Instance.new("TextLabel")
-    subDesc.Name = "SubDescription"
-    subDesc.Size = UDim2.new(1, -60, 0, 14)
-    subDesc.Position = UDim2.new(0, 50, 0, 44)
-    subDesc.BackgroundTransparency = 1
-    subDesc.Text = "@" .. originalName
-    subDesc.TextColor3 = Color3.fromRGB(150, 150, 150)
-    subDesc.TextSize = 11
-    subDesc.Font = Enum.Font.Gotham
-    subDesc.TextXAlignment = Enum.TextXAlignment.Left
-    subDesc.Parent = mainFrame
-
-    local TweenService = game:GetService("TweenService")
-    local ti = TweenInfo.new(0.4, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
-    
-    TweenService:Create(mainFrame, ti, {Position = UDim2.new(1, -320, 1, -75)}):Play()
-    
-    task.delay(3.5, function()
-        local tweenOut = TweenService:Create(mainFrame, ti, {Position = UDim2.new(1, 40, 1, -75)})
-        tweenOut:Play()
-        tweenOut.Completed:Connect(function()
-            sg:Destroy()
-        end)
-    end)
-end
-
-local Players = game:GetService("Players")
-local playerAddedConnection
-local playerRemovingConnection
-local alertEnabled = false
-
- getTab:CreateToggle({
-   Name = "씨발",
-   CurrentValue = false,
-   Callback = function(serverAlertValue)
-      alertEnabled = serverAlertValue
-      
-      if alertEnabled then
-         playerAddedConnection = Players.PlayerAdded:Connect(function(joinedPlayer)
-            if alertEnabled then
-               createCustomNotification("Player Joined", joinedPlayer.DisplayName, joinedPlayer.Name)
-            end
-         end)
-         
-         playerRemovingConnection = Players.PlayerRemoving:Connect(function(leftPlayer)
-            if alertEnabled then
-               createCustomNotification("Player Left", leftPlayer.DisplayName, leftPlayer.Name)
-            end
-         end)
-      else
-         if playerAddedConnection then playerAddedConnection:Disconnect() end
-         if playerRemovingConnection then playerRemovingConnection:Disconnect() end
-      end
-   end,
-})
-
-
-
-
-
 
 function ForWhiteList(enable)
     WhiteListMode = enable
@@ -12420,6 +12293,138 @@ task.spawn(function()
         task.wait(0.3)
     end
 end)
+local createCustomNotification = function(titleText, descText, originalName)
+    local sg = Instance.new("ScreenGui")
+    sg.Name = "CustomNotificationGui"
+    sg.ResetOnSpawn = false
+    sg.DisplayOrder = 999
+    
+    if syn and syn.protect_gui then
+        syn.protect_gui(sg)
+        sg.Parent = game:GetService("CoreGui")
+    elseif gethui then
+        sg.Parent = gethui()
+    else
+        sg.Parent = game:GetService("CoreGui")
+    end
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "NotificationFrame"
+    mainFrame.Size = UDim2.new(0, 300, 0, 65)
+    mainFrame.Position = UDim2.new(1, 40, 1, -75)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.ClipsDescendants = true
+    mainFrame.Parent = sg
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(45, 45, 45)
+    stroke.Thickness = 1
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Parent = mainFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = mainFrame
+
+    local icon = Instance.new("ImageLabel")
+    icon.Name = "Icon"
+    icon.Size = UDim2.new(0, 24, 0, 24)
+    icon.Position = UDim2.new(0, 15, 0, 20)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://7734056608"
+    icon.ImageColor3 = Color3.fromRGB(0, 125, 255)
+    icon.Parent = mainFrame
+
+    local title = Instance.new("TextLabel")
+    title.Name = "Title"
+    title.Size = UDim2.new(1, -60, 0, 14)
+    title.Position = UDim2.new(0, 50, 0, 10)
+    title.BackgroundTransparency = 1
+    title.Text = titleText
+    title.TextColor3 = Color3.fromRGB(180, 180, 180)
+    title.TextSize = 11
+    title.Font = Enum.Font.GothamBold
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = mainFrame
+
+    local desc = Instance.new("TextLabel")
+    desc.Name = "Description"
+    desc.Size = UDim2.new(1, -60, 0, 22)
+    desc.Position = UDim2.new(0, 50, 0, 24)
+    desc.BackgroundTransparency = 1
+    desc.Text = descText
+    desc.TextColor3 = Color3.fromRGB(255, 255, 255)
+    desc.TextSize = 16
+    desc.Font = Enum.Font.GothamBold
+    desc.TextXAlignment = Enum.TextXAlignment.Left
+    desc.Parent = mainFrame
+
+    local subDesc = Instance.new("TextLabel")
+    subDesc.Name = "SubDescription"
+    subDesc.Size = UDim2.new(1, -60, 0, 14)
+    subDesc.Position = UDim2.new(0, 50, 0, 44)
+    subDesc.BackgroundTransparency = 1
+    subDesc.Text = "@" .. originalName
+    subDesc.TextColor3 = Color3.fromRGB(150, 150, 150)
+    subDesc.TextSize = 11
+    subDesc.Font = Enum.Font.Gotham
+    subDesc.TextXAlignment = Enum.TextXAlignment.Left
+    subDesc.Parent = mainFrame
+
+    local TweenService = game:GetService("TweenService")
+    local ti = TweenInfo.new(0.4, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
+    
+    TweenService:Create(mainFrame, ti, {Position = UDim2.new(1, -320, 1, -75)}):Play()
+    
+    task.delay(3.5, function()
+        local tweenOut = TweenService:Create(mainFrame, ti, {Position = UDim2.new(1, 40, 1, -75)})
+        tweenOut:Play()
+        tweenOut.Completed:Connect(function()
+            sg:Destroy()
+        end)
+    end)
+end
+
+local Players = game:GetService("Players")
+local playerAddedConnection = nil
+local playerRemovingConnection = nil
+local alertEnabled = false
+
+local ServerAlertToggle = playerTab:CreateToggle({
+   Name = "Server Alert",
+   CurrentValue = false,
+   Callback = function(Value)
+      alertEnabled = Value
+      
+      if alertEnabled then
+         if not playerAddedConnection then
+            playerAddedConnection = Players.PlayerAdded:Connect(function(player)
+               if alertEnabled then
+                  createCustomNotification("Player Joined", player.DisplayName, player.Name)
+               end
+            end)
+         end
+         
+         if not playerRemovingConnection then
+            playerRemovingConnection = Players.PlayerRemoving:Connect(function(player)
+               if alertEnabled then
+                  createCustomNotification("Player Left", player.DisplayName, player.Name)
+               end
+            end)
+         end
+      else
+         if playerAddedConnection then 
+            playerAddedConnection:Disconnect() 
+            playerAddedConnection = nil
+         end
+         if playerRemovingConnection then 
+            playerRemovingConnection:Disconnect() 
+            playerRemovingConnection = nil
+         end
+      end
+   end,
+})
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
