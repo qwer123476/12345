@@ -8419,42 +8419,7 @@ LoopTab:CreateButton({
         end
     })
 
-    local function loopPlayerBlobF4()
-        task.spawn(function()
-            while blobLoopT4 do
-                task.wait(0.000000000000000000000000000000000000000000001)
-                for _, name in ipairs(playersInLoop2V) do
-                    local foundPlr = Players:FindFirstChild(name)
-                    if foundPlr and foundPlr.Character then
-                        local char = foundPlr.Character
-                        local hrp = char:FindFirstChild("HumanoidRootPart")
-                        if hrp then
-                            hrp.CFrame = CFrame.new(cam.CFrame.p + OLTPValue)
-                        end
-                    end
-                end
-            end
-        end)
-    end
-
-    local function processPlayer(player)
-        if not player then return end
-        while blobLoopT4 do
-            if not player.Parent then
-                return
-            end
-            local character = player.Character
-            while blobLoopT4 and (not character or not character:FindFirstChild("Humanoid")) do
-                if not player.Parent then return end
-                task.wait(0.0000000000000000000000000000000000000000000000000000000000001)
-                character = player.Character
-            end
-            local charHUM = character and character:FindFirstChild("Humanoid")
-            if not charHUM then task.wait(0.00000000000000000000000000000000000000000000000000000000000000001) continue end
-            task.wait()
-        end
-    end
-
+    
 LoopTab:CreateSection("Owner Kick")
 local OLTPInput = LoopTab:CreateInput({
     Name = "X Y Z",
@@ -9801,33 +9766,6 @@ playerTab:CreateToggle({
     end
 })
 
--- 4. 
-playerTab:CreateButton({
-    Name = "R15 강제 변경",
-    Callback = function()
-        pcall(function()
-            local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum:ChangeState(Enum.HumanoidStateType.Ragdoll)
-                task.wait(0.3)
-                hum.RigType = Enum.HumanoidRigType.R15
-            end
-        end)
-    end
-})
-
--- 5. 
-playerTab:CreateToggle({
-    Name = "카메라 흔들림 끄기",
-    CurrentValue = false,
-    Callback = function(Value)
-        pcall(function()
-            if Value then
-                workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-            end
-        end)
-    end
-})
 AuraTab:CreateSection("안티 아우라들")
 AuraTab:CreateToggle({
     Name = "안티 붐박스 아우라 [ all ]",
@@ -9861,9 +9799,6 @@ AuraTab:CreateToggle({
 
 
 
-G = rs.GrabEvents
-G:WaitForChild("EndGrabEarly"):Destroy()
-Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
 local AntiJukebox = AuraTab:CreateToggle({
 	Name = "주크박스 고정 아우라",
@@ -9890,67 +9825,6 @@ local AntiPallet = AuraTab:CreateToggle({
 	end
 })
 
-function AntiDeathF()
-    local connection
-    local lastTpTime = 0
-    local targetIndex = 1
-
-    connection = rs2.Heartbeat:Connect(function()
-        if not _G.AntiDeathT then
-            connection:Disconnect()
-            return
-        end
-
-        local Character = plr.Character
-        if not Character then return end
-
-        local campfire = inv:FindFirstChild("Campfire")
-
-        if not campfire then
-            pcall(function()
-                local aimPosition = cam.CFrame.Position + (cam.CFrame.LookVector * 10)
-                local spawnCFrame = CFrame.new(aimPosition)
-                
-                rs.MenuToys.SpawnToyRemoteFunction:InvokeServer(
-                    "Campfire",
-                    spawnCFrame,
-                    Vector3.new(0,0,0)
-                )
-            end)
-        else
-            local currentTime = tick()
-            if currentTime - lastTpTime >= 0.15 then
-                lastTpTime = currentTime
-                
-                local allPlayers = Players:GetPlayers()
-                local validTargets = {}
-
-                for _, player in pairs(allPlayers) do
-                    if player ~= plr and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                        table.insert(validTargets, player.Character.HumanoidRootPart)
-                    end
-                end
-
-                if #validTargets > 0 then
-                    if targetIndex > #validTargets then
-                        targetIndex = 1
-                    end
-                    
-                    local currentTarget = validTargets[targetIndex]
-                    if currentTarget and campfire:FindFirstChild("Hitbox") then
-                        pcall(function()
-                            campfire.Hitbox.CFrame = currentTarget.CFrame
-                        end)
-                        targetIndex = targetIndex + 1
-                    end
-                end
-            end
-        end
-    end)
-end
-
-RunService = game:GetService("RunService")
-Camera = workspace.CurrentCamera
 
 AuraTab:CreateToggle({
     Name = "뒤쪽에 불 상시소환",
@@ -10174,7 +10048,6 @@ AuraTab:CreateToggle({
 })
 
 
-funTab:CreateSection("텔포")
 local VoidInput = funTab:CreateInput({
    Name = "Y좌표 설정",
    CurrentValue = "",
@@ -12116,8 +11989,8 @@ local createCustomNotification = function(titleText, descText, originalName)
 end
 
 
-local ServerAlertToggle = playerTab:CreateToggle({
-   Name = "Server Alert",
+local ServerAlertToggle = getTab:CreateToggle({
+   Name = "출입,퇴장알림",
    CurrentValue = false,
    Callback = function(Value)
       alertEnabled = Value
