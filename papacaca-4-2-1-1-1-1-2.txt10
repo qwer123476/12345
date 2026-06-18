@@ -2012,7 +2012,7 @@ function loopPlayerBlobF4()
 
             local _, safeHRP, head = safeGetCharacterParts(player)
             if not safeHRP or not head then
-                task.wait(0.05)
+                task.wait(0.0005)
                 continue
             end
 
@@ -2072,11 +2072,11 @@ function loopPlayerBlobF4()
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
-                        task.wait(0.0005)
+                        task.wait()
                         charHUM.Sit = false
                     end
                 end
-                task.wait(0.0005)
+                task.wait()
             end
 
             if not shouldContinue then
@@ -2220,12 +2220,12 @@ end
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         BlobGrab(currentBlobS, charHRP, "Right")
-                        task.wait(0.03)
+                        task.wait()
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
                         task.delay(0.002, function() if charHUM then charHUM.Sit = false end end)
                     end
-                    task.wait(0.01)
+                    task.wait(0.00000000001)
                 end
 
                 if independentHoldConnections[player] then 
