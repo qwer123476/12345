@@ -2220,31 +2220,20 @@ end
 
                     
 local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
+                    if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
+                        BlobGrab(currentBlobS, charHRP, "Right")
+                        
+                         BlobRelease(currentBlobS, charHRP, "Right")
+                        task.wait()
+                        BlobGrab(currentBlobS, charHRP, "Left")
 
-if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
-    -- [오른쪽 스팸 스레드]
-    task.spawn(function()
-        BlobGrab(currentBlobS, charHRP, "Right")
-        task.wait() -- 서버/클라이언트 동기화를 위한 미세한 딜레이 (필요 없으면 제거 가능)
-        BlobRelease(currentBlobS, charHRP, "Right")
-    end)
-    
-    -- [왼쪽 스팸 스레드] 바로 이어서 실행
-    task.spawn(function()
-        BlobGrab(currentBlobS, charHRP, "Left")
-        task.wait()
-        BlobRelease(currentBlobS, charHRP, "Left")
-    end)
-    
-    -- 앉기 해제 스팸 (거의 동시에 처리)
-    charHUM.Sit = true
-    task.delay(0.00001, function() 
-        if charHUM then 
-            charHUM.Sit = false 
-        end 
-    end)
-end
-task.wait()
+                         BlobRelease(currentBlobS, charHRP, "Left")
+                        task.wait()
+                        charHUM.Sit = true
+                        task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
+                    end
+                    task.wait()
+                end
 
                 if independentHoldConnections[player] then 
                     independentHoldConnections[player]:Disconnect()
