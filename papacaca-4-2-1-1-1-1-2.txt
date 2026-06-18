@@ -4829,10 +4829,10 @@ function ViewToolF()
             for i = #activeHighlights, 1, -1 do
                 local hl = activeHighlights[i]
                 if hl and hl.Parent then
-                    hl.OutlineColor = color
-                else
-                    table.remove(activeHighlights, i)
-                end
+    hl.FillTransparency = 0.3
+    hl.FillColor = color
+    hl.OutlineColor = color
+end
             end
             task.wait(0.01) -- 아주 빠르게 색상 변환
         end
