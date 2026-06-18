@@ -2628,10 +2628,10 @@ function loopPlayerF2() -- 룹2
                     else
                         processedHumanoids[player] = nil
                     end
-                    task.wait(0.00000000005)
+                    task.wait(0.005)
                 end
             end
-            task.wait(0.00000000005)
+            task.wait(0.005)
         end
     end)
 end
