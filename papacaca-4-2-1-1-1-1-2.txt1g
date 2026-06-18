@@ -4772,7 +4772,7 @@ function ViewToolF()
                 local highlight = Instance.new("Highlight")
                 highlight.Name = "Highlight_" .. index
                 highlight.Adornee = item
-                highlight.FillColor = Color3.fromRGB(0, 255, 127​)
+                highlight.FillColor = Color3.fromRGB(255,0,0)
                 highlight.FillTransparency = 1
 
                 if item.Name == "Campfire" then
