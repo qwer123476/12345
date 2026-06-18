@@ -4764,23 +4764,30 @@ function ViewToolF()
 
     local Cpf = { "Campfire" }
     local AG = { "AG" }
+    
+    -- 전역 춤추는 색상(Hue) 변수
+    local currentHue = 0
 
     local function addView(item, partName, multiple, onlyView1, highTransparency)
         if onlyView1 then return end
 
         local function createHighlight(part, index)
-            if not item:FindFirstChild("Highlight_" .. index) then
-                local highlight = Instance.new("Highlight")
-                highlight.Name = "Highlight_" .. index
+            local highlightName = "Highlight_" .. index
+            local highlight = item:FindFirstChild(highlightName)
+            
+            -- 없으면 새로 만들고 기본 설정
+            if not highlight then
+                highlight = Instance.new("Highlight")
+                highlight.Name = highlightName
                 highlight.Adornee = item
-                highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                highlight.FillTransparency = 1
-                highlight.OutlineColor = Color3.fromHSV(0, 1, 1)
                 highlight.FillTransparency = 1
                 highlight.OutlineTransparency = 0
                 highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
                 highlight.Parent = item
             end
+            
+            -- 매 프레임 실시간으로 무지개색 변경 적용
+            highlight.OutlineColor = Color3.fromHSV(currentHue, 1, 1)
         end
 
         if multiple and partName then
@@ -4796,6 +4803,9 @@ function ViewToolF()
             if part and part:IsA("BasePart") then
                 createHighlight(part, partName)
             end
+        else
+            -- AG처럼 파트 지정 없는 경우 전체 모델 타겟팅
+            createHighlight(item, "Model")
         end
     end
 
@@ -4811,24 +4821,15 @@ function ViewToolF()
         end
     end
 
-    local function updateRainbowColor(item, hue)
-        for _, v in ipairs(item:GetChildren()) do
-            if v.Name:match("^Highlight_") and v:IsA("Highlight") then
-                v.OutlineColor = Color3.fromHSV(hue, 1, 1)
-            end
-        end
-    end
-
     task.spawn(function()
-        local hue = 0
         while ViewToolT and task.wait(0.03) do
-            hue = (hue + 0.02) % 1
+            -- 색상 값을 계속 회전시킴 (무지개 효과)
+            currentHue = (currentHue + 0.02) % 1
             
             for _, folder in ipairs(workspace:GetChildren()) do
                 if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
                     for _, item in ipairs(folder:GetChildren()) do
                         checkAndHighlightItem(item)
-                        updateRainbowColor(item, hue)
                     end
                 end
             end
@@ -4841,13 +4842,13 @@ function ViewToolF()
                     if plot then
                         for _, item in ipairs(plot:GetChildren()) do
                             checkAndHighlightItem(item)
-                            updateRainbowColor(item, hue)
                         end
                     end
                 end
             end
         end
 
+        -- 종료 시 클린업
         for _, folder in ipairs(workspace:GetChildren()) do
             if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
                 for _, item in ipairs(folder:GetChildren()) do
@@ -4878,6 +4879,7 @@ function ViewToolF()
         end
     end)
 end
+
 
 function ViewAuraF()
     local targetNames = { 
