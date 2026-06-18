@@ -34,6 +34,7 @@ local Window = Rayfield:CreateWindow({
 local HubTab = Window:CreateTab("파카허브란",0)
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
+local getTab = Window:CreateTab("출입,퇴장알림",649498361)
 local grabTab = Window:CreateTab("컴뱃", 6026568198)               
 local UtilityTab = Window:CreateTab("유틸리티", 6031094678) 
 local plotTab = Window:CreateTab("집")
@@ -49,7 +50,6 @@ local environmentTab = Window:CreateTab("환경 설정", 6023426923)
 local combatTab = Window:CreateTab("전투 확장", 6026568198)        
 local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
 local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
-local getTab = Window:CreateTab("출입,퇴장알림",649498361)
 local CreditsTab = Window:CreateTab("제작자 한정")
 
 
