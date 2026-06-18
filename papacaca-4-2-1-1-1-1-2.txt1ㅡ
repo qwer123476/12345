@@ -2222,6 +2222,10 @@ end
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         BlobGrab(currentBlobS, charHRP, "Right")
                         task.wait()
+                         BlobGrab(currentBlobS, charHRP, "Left")
+                        task.wait()
+                        BlobRelease(currentBlobS, charHRP, "Left")
+                        task.wait()
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
                         task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
