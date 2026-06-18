@@ -4780,7 +4780,7 @@ function ViewToolF()
                 elseif item.Name == "AG" then
                     highlight.OutlineColor = Color3.fromRGB(138, 43, 226)
                 else
-                    highlight.OutlineColor = Color3.fromRGB(0, 255, 127)
+                    highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
                 end
 
                 highlight.FillTransparency = 1
