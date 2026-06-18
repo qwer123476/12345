@@ -6882,7 +6882,7 @@ DevTab:CreateToggle({
 })
 
 DevTab:CreateSection("Gam")
-DevTab:CreateToggle({
+getTab:CreateToggle({
     Name = "킥알림!",
     CurrentValue = true,
     Flag = "5",
@@ -7075,8 +7075,8 @@ DevTab:CreateButton({
     Callback = TrSw
 })
 
-DevTab:CreateSection("OWNER")
-local Loop1 = DevTab:CreateToggle({
+LoopTab:CreateSection("특별기능")
+local Loop1 = LoopTab:CreateToggle({
     Name = "PTM",
     CurrentValue = false,
     Flag = "21",
@@ -7096,7 +7096,7 @@ local Loop1 = DevTab:CreateToggle({
     end
 })
 
-DevTab:CreateButton({
+LoopTab:CreateButton({
     Name = "킬 [ Owner ]",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -7153,7 +7153,7 @@ DevTab:CreateButton({
     end
 })
 
-DevTab:CreateButton({
+LoopTab:CreateButton({
     Name = "날리기 [ Owner ]",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -7260,7 +7260,7 @@ DevTab:CreateToggle({
     end
 })
 
-local RRButton = DevTab:CreateButton({
+local RRButton = LoopTab:CreateButton({
     Name = "릴리즈 [ Blobman ]",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -7272,8 +7272,8 @@ local RRButton = DevTab:CreateButton({
     end
 })
 
-local LGButton = DevTab:CreateButton({
-    Name = "질량0 [ Blobman ]",
+local LGButton = LoopTab:CreateButton({
+    Name = "메슬리즈 [ Blobman ]",
     Callback = function()
         table.clear(playersInLoop2V)
 	for i, e in ipairs(playersInLoop1V) do
@@ -7284,7 +7284,7 @@ local LGButton = DevTab:CreateButton({
     end
 })
 
-local RGButton = DevTab:CreateButton({
+local RGButton = LoopTab:CreateButton({
     Name = "잡기 [ Blobman ]",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -7296,7 +7296,7 @@ local RGButton = DevTab:CreateButton({
     end
 })
 
-local RDButton = DevTab:CreateButton({
+local RDButton = LoopTab:CreateButton({
     Name = "놓기 [ Blobman ]",
     Callback = function()
         table.clear(playersInLoop2V)
