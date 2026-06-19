@@ -11713,7 +11713,7 @@ local ServerAlertToggle = getTab:CreateToggle({
 })
 
 NTTab:CreateButton({
-   Name = "네트워크 오너 (셀프'",
+   Name = "네트워크 오너 (셀프)",
    Callback = function()
        local rs = game:GetService("ReplicatedStorage")
        local localPlayer = game:GetService("Players").LocalPlayer
