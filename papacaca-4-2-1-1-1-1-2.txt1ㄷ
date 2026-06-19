@@ -12159,8 +12159,7 @@ NTTab:CreateButton({
        local rootPart = character:FindFirstChild("HumanoidRootPart")
        if not rootPart then return end
 
-              local setNetworkOwnerRemote = rs: somePath => GrabEvents.SetNetworkOwner 
-       
+              local setNetworkOwnerRemote = rs:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
        local count = 0
               for _, part in ipairs(workspace:GetDescendants()) do
            if part:IsA("BasePart") and not part:IsAnchored() and not part.Parent:FindFirstChildWhichIsA("Humanoid") then
