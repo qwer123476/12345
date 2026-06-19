@@ -12159,7 +12159,7 @@ NTTab:CreateButton({
        local rootPart = character:FindFirstChild("HumanoidRootPart")
        if not rootPart then return end
 
-              local setNetworkOwnerRemote = rs: somePath -> GrabEvents.SetNetworkOwner -- (기존 스크립트 내부 rs.GrabEvents.SetNetworkOwner 참고)
+              local setNetworkOwnerRemote = rs: somePath => GrabEvents.SetNetworkOwner 
        
        local count = 0
               for _, part in ipairs(workspace:GetDescendants()) do
