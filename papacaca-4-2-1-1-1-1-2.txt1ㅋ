@@ -11713,90 +11713,64 @@ local ServerAlertToggle = getTab:CreateToggle({
 })
 
 NTTab:CreateButton({
-   Name = "네트워크 오너 (셀프)",
-   Callback = function()
-       local rs = game:GetService("ReplicatedStorage")
-       local localPlayer = game:GetService("Players").LocalPlayer
-       local character = localPlayer.Character
-       
-       if not character then return end
-       local rootPart = character:FindFirstChild("HumanoidRootPart")
-       if not rootPart then return end
+    Name = "네트워크 오너 (셀프)",
+    Callback = function()
+        local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
 
-              local setNetworkOwnerRemote = rs:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
-       local count = 0
-              for _, part in ipairs(workspace:GetDescendants()) do
-           if part:IsA("BasePart") and not part:IsAnchored() and not part.Parent:FindFirstChildWhichIsA("Humanoid") then
-               
-               local distance = (part.Position - rootPart.Position).Magnitude
-               if distance < 50 then
-                        rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
-                   count = count + 1
-               end
-           end
-       end
+        local count = 0
 
-       
-       Rayfield:Notify({
-          Title = "네트워크 오너 변경 완료",
-          Content = "주변 " .. tostring(count) .. "개 오브젝트의 소유권을 가져왔습니다.",
-          Duration = 3,
-          Image = 4483362458,
-       })
-   end,
+        for _, part in ipairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart")
+            and not part.Anchored
+            and not part.Parent:FindFirstChildWhichIsA("Humanoid")
+            and (part.Position - hrp.Position).Magnitude < 50 then
+
+                SetNetworkOwner:FireServer(part, part.CFrame)
+                count += 1
+            end
+        end
+
+        Rayfield:Notify({
+            Title = "네트워크 오너 변경 완료",
+            Content = "주변 " .. count .. "개 오브젝트의 소유권을 가져왔습니다.",
+            Duration = 3
+        })
+    end
 })
+
 local autoNetOwnerLoop = false
 
 NTTab:CreateToggle({
-   Name = "오토 네트워크 오너",
-   CurrentValue = false,
-   Flag = "AutoNetOwnerLoop",
-   Callback = function(Value)
-       autoNetOwnerLoop = Value
-       
-       if autoNetOwnerLoop then
-        
-           task.spawn(function()
-               local rs = game:GetService("ReplicatedStorage")
-               local localPlayer = game:GetService("Players").LocalPlayer
-               
-               while autoNetOwnerLoop do
-                   local character = localPlayer.Character
-                   local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-                   
-                   if rootPart then
-                                              for _, part in ipairs(workspace:GetDescendants()) do
-                           if part:IsA("BasePart") and not part:IsAnchored() and not part.Parent:FindFirstChildWhichIsA("Humanoid") then
-                            
-                               local distance = (part.Position - rootPart.Position).Magnitude
-                               if distance < 50 then
-                                   rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
-                               end
-                           end
-                       end
-                   end
-                   
-                   task.wait(0.4)
-               end
-           end)
-           
-           Rayfield:Notify({
-              Title = "네트워크 루프 활성화",
-              Content = "0.5초 간격으로 주변 오브젝트 소유권을 자동 획득합니다.",
-              Duration = 3,
-              Image = 4483362458,
-           })
-       else
-           Rayfield:Notify({
-              Title = "네트워크 루프 비활성화",
-              Content = "자동 네트워크 오너 기능이 꺼졌습니다.",
-              Duration = 3,
-              Image = 4483362458,
-           })
-       end
-   end,
-})
+    Name = "오토 네트워크 오너",
+    CurrentValue = false,
+    Flag = "AutoNetOwnerLoop",
+    Callback = function(v)
+        autoNetOwnerLoop = v
 
+        if v then
+            task.spawn(function()
+                while autoNetOwnerLoop do
+                    local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+
+                    if hrp then
+                        for _, part in ipairs(workspace:GetDescendants()) do
+                            if part:IsA("BasePart")
+                            and not part.Anchored
+                            and not part.Parent:FindFirstChildWhichIsA("Humanoid")
+                            and (part.Position - hrp.Position).Magnitude < 50 then
+
+                                SetNetworkOwner:FireServer(part, part.CFrame)
+                            end
+                        end
+                    end
+
+                    task.wait(0.4)
+                end
+            end)
+        end
+    end
+})
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
