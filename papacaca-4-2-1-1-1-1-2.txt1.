@@ -9581,7 +9581,7 @@ AuraTab:CreateToggle({
                                                     DamageEvent:FireServer(humanoid, 0)
                                                 else
                                                     
-                                                    humanoid.Health = 0
+                                                    humanoid.Health = 100
                                                 end
                                                 
                                             end
@@ -11764,7 +11764,7 @@ NTTab:CreateToggle({
                         end
                     end
 
-                    task.wait(0.001)
+                    task.wait(0.1)
                 end
             end)
         end
