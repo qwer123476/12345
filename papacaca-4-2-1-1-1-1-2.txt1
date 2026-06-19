@@ -11764,7 +11764,7 @@ NTTab:CreateToggle({
                         end
                     end
 
-                    task.wait(0.4)
+                    task.wait(0.001)
                 end
             end)
         end
