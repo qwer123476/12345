@@ -11643,8 +11643,7 @@ local createCustomNotification = function(titleText, descText, originalName)
     end)
 end
 
-
-local ServerAlertToggle = getTab:CreateToggle({
+getTab:CreateToggle({
    Name = "출입,퇴장알림",
    CurrentValue = false,
    Callback = function(Value)
