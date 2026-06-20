@@ -7917,7 +7917,7 @@ LoopTab:CreateToggle({
 })
     
 LoopTab:CreateSection("Owner Kick")
-local OLTPInput = LoopTab:CreateInput({
+local OLTPI1nput = LoopTab:CreateInput({
     Name = "X Y Z",
     CurrentValue = "0,20,0",
     PlaceholderText = "",
@@ -7926,12 +7926,12 @@ local OLTPInput = LoopTab:CreateInput({
     Callback = function(Value)
         local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
         if x and y and z then
-            OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
+            OLTP1Value = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
         else
         end
     end
 })
-OLTPInput:Set("0,20,0")
+OLTP1Input:Set("0,20,0")
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
     Name = "구버전킥",
@@ -8100,7 +8100,7 @@ function loopPlayerBlobF41() -- 오너킥
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
-                        task.wait(0.05)
+                        task.wait(0.06)
                         charHUM.Sit = false
                     end
                 end
@@ -8205,7 +8205,7 @@ end
                         targetPosition = myHRP.CFrame * CFrame.new(OLTPValue)
                     end
 
-                    --if isnetworkowner(charHRP) then charHRP.CFrame = targetPosition end
+                    if isnetworkowner(charHRP) then charHRP.CFrame = targetPosition end
                     charHRP.CFrame = targetPosition
                 end)
 
