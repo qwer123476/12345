@@ -11777,6 +11777,8 @@ NTTab:CreateToggle({
 
         if v then
             task.spawn(function()
+                local players = game:GetService("Players")
+
                 while autoNetOwnerLoop do
                     local char = plr.Character
                     local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -11785,15 +11787,21 @@ NTTab:CreateToggle({
                         for _, part in ipairs(workspace:GetDescendants()) do
                             if part:IsA("BasePart")
                             and not part.Anchored
-                            and not part:IsDescendantOf(char)
                             and (part.Position - hrp.Position).Magnitude < 50 then
+                                
+                            
+                                local model = part:FindFirstAncestorOfClass("Model")
+                                local isPlayer = model and players:GetPlayerFromCharacter(model)
 
-                                SetNetworkOwner:FireServer(part, part.CFrame)
+                            
+                                if not isPlayer then
+                                    SetNetworkOwner:FireServer(part, part.CFrame)
+                                end
                             end
                         end
                     end
 
-                    task.wait(0.4)
+                    task.wait(0.2)
                 end
             end)
         end
