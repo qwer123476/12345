@@ -7931,7 +7931,7 @@ local OLTPI1nput = LoopTab:CreateInput({
         end
     end
 })
-OLTP1Input:Set("0,20,0")
+
 LoopTab:CreateSection("한번더 0,20,0을 설정해주세요")
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
