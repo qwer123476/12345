@@ -10694,10 +10694,13 @@ keybindTab:CreateSection("ESP")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 
+local RunService = game:GetService("RunService")
+
 local PcldViewT = false
 local processed = {}
 local redBoxes = {}
 local descendantConn = nil
+
 
 function PcldViewF()
     if descendantConn then
@@ -10705,40 +10708,42 @@ function PcldViewF()
         descendantConn = nil
         workspace:SetAttribute("PcldViewDescendantConn", false)
     end
+    if rainbowConn then
+        rainbowConn:Disconnect()
+        rainbowConn = nil
+    end
 
     if PcldViewT then
-        for _, obj in ipairs(workspace:GetChildren()) do
-            if (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
-                if not processed[obj] then
-                    local box = Instance.new("SelectionBox")
-                    box.Adornee = obj
-                    box.LineThickness = 0.005
-                    box.SurfaceTransparency = 1
-                    box.SurfaceColor3 = Color3.fromRGB(255, 255, 255)
-                    box.Color3 = Color3.fromRGB(255, 0, 0)
-                    box.Parent = obj
-                    processed[obj] = true
-                    redBoxes[obj] = box
-                end
+
+        local function createESP(obj)
+            if not processed[obj] then
+                local box = Instance.new("SelectionBox")
+                box.Adornee = obj
+                box.LineThickness = 0.005
+                box.SurfaceTransparency = 1
+                box.SurfaceColor3 = Color3.fromRGB(255, 255, 255)
+                box.Color3 = Color3.fromHSV(0, 1, 1) -- 초기 색상 (빨간색)
+                box.Parent = obj
+                processed[obj] = true
+                redBoxes[obj] = box
             end
         end
 
+        
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
+                createESP(obj)
+            end
+        end
+
+    
         descendantConn = workspace.DescendantAdded:Connect(function(obj)
             if PcldViewT and (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
-                if not processed[obj] then
-                    local box = Instance.new("SelectionBox")
-                    box.Adornee = obj
-                    box.LineThickness = 0.005
-                    box.SurfaceTransparency = 1
-                    box.SurfaceColor3 = Color3.fromRGB(255, 255, 255)
-                    box.Color3 = Color3.fromRGB(255, 0, 0)
-                    box.Parent = obj
-                    processed[obj] = true
-                    redBoxes[obj] = box
-                end
+                createESP(obj)
             end
         end)
 
+        
         workspace.DescendantRemoving:Connect(function(obj)
             if redBoxes[obj] then
                 redBoxes[obj]:Destroy()
@@ -10747,14 +10752,31 @@ function PcldViewF()
             end
         end)
 
+        
+        rainbowConn = RunService.RenderStepped:Connect(function()
+            
+            local hue = (tick() % 5) / 5 
+            local rainbowColor = Color3.fromHSV(hue, 1, 1)
+
+            for obj, box in pairs(redBoxes) do
+                if box and box.Parent then
+                    box.Color3 = rainbowColor
+                else
+                    redBoxes[obj] = nil
+                    processed[obj] = nil
+                end
+            end
+        end)
+
     else
-        for obj, box in pairs(redBoxes) do
+                for obj, box in pairs(redBoxes) do
             if box then box:Destroy() end
         end
         redBoxes = {}
         processed = {}
     end
 end
+
 
 local iconEsp = keybindTab:CreateToggle({
     Name = "esp 아이콘",
