@@ -7931,6 +7931,7 @@ local OLTPI1nput = LoopTab:CreateInput({
         end
     end
 })
+OLTP1Input:Set("0,20,0")
 LoopTab:CreateSection("한번더 0,20,0을 설정해주세요")
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
@@ -8202,7 +8203,7 @@ end
 
                     local targetPosition
                     if blobLoopT4 then
-                        targetPosition = myHRP.CFrame * CFrame.new(OLTPValue)
+                        targetPosition = myHRP.CFrame * CFrame.new(OLTP1Value)
                     end
 
                     if isnetworkowner(charHRP) then charHRP.CFrame = targetPosition end
@@ -8212,7 +8213,7 @@ end
                 if SkipOL then task.wait(2) end
 
                 anchorToggleTasks[player] = task.spawn(function()
-                    while blobLoopT4 and character and character.Parent and charHRP and charHRP.Parent and charHUM and charHUM.Health > 0 do
+                    while blobLoopT41 and character and character.Parent and charHRP and charHRP.Parent and charHUM and charHUM.Health > 0 do
                         if charTOR and SkipOL then charTOR.Anchored = true end
                         task.wait()
                     end
