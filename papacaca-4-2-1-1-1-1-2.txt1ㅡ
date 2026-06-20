@@ -8652,7 +8652,7 @@ antiTab:CreateToggle({
         end
     end,
 })
-AntiRelease:Set(true)
+
 
 antiTab:CreateDropdown({
     Name = "사용할 아이템 선택(누나 빵 추천)",
