@@ -3124,8 +3124,8 @@ function AntiGrabF(enable)
         end
 
         if not hrp or hum.Health <= 0 then
-        hum:ChangeState(Enum.HumanoidStateType.Dead)
-           char:BreakJoints()
+        --hum:ChangeState(Enum.HumanoidStateType.Dead)
+           --char:BreakJoints()
             --rs.CharacterEvents.Struggle:FireServer()
             --if hrp2 then hrp2.CFrame = CFrame.new(9999, DY, 9999) end
         end
