@@ -7889,7 +7889,32 @@ LoopTab:CreateButton({
             end
         end
     })
+LoopTab:CreateToggle({
+    Name = "고정",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        SkipOL = Value
+    end
+})
 
+LoopTab:CreateToggle({
+    Name = "그랩파괴 없이",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        OnlyOwner = Value
+    end
+})
+
+LoopTab:CreateToggle({
+    Name = "오리지널",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        OwnerKickMODED = Value
+    end
+})
     
 LoopTab:CreateSection("Owner Kick")
 local OLTPInput = LoopTab:CreateInput({
@@ -7983,7 +8008,23 @@ local blobLoopToggle = LoopTab:CreateToggle({
         end
     end
 })
+LoopTab:CreateToggle({
+    Name = "앉기",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        LoopBringMODED = Value
+    end
+})
 
+LoopTab:CreateToggle({
+    Name = "안티 인플레이스 모드",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        LoopReleaseMODED = Value
+    end
+})
 
 local blobLoop3Toggle = LoopTab:CreateToggle({
     Name = "루프킬 [ Blobman ]",
