@@ -2163,7 +2163,7 @@ function loopPlayerF() -- 룹1
 
         while loopPlayerT do
             if not player or not player.Character or not player.Character:FindFirstChild("Head") then break end
-            
+        
             rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
             local ownerTag = head:FindFirstChild("PartOwner")
             if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
@@ -3814,61 +3814,6 @@ plr.CharacterAdded:Connect(function(char)
     end
 end)
 
-function RagdollWalk()
-    task.spawn(function()
-        local jointCoroutineRunning = false
-
-        while RagdollWalkT do
-            local char = plr.Character
-            local hum = char and char:FindFirstChild("Humanoid")
-            local torso = char and char:FindFirstChild("Torso")
-            local leftArm = char and char:FindFirstChild("Left Arm")
-            local leftLeg = char and char:FindFirstChild("Left Leg")
-            local rightLeg = char and char:FindFirstChild("Right Leg")
-            local ragdoll = hum and hum:FindFirstChild("Ragdolled")
-            local limb = leftArm and leftArm:FindFirstChild("RagdollLimbPart")
-
-            if limb and limb:IsA("BasePart") and limb.CanCollide then
-                hum.AutoRotate = true
-
-                for _, leg in ipairs({leftLeg, rightLeg}) do
-                    local part = leg and leg:FindFirstChild("RagdollLimbPart")
-                    if part then part.CanCollide = false end
-                end
-
-                if ragdoll then ragdoll.Value = false end
-
-                if not jointCoroutineRunning then
-                    jointCoroutineRunning = true
-                    coroutine.wrap(function()
-                        while RagdollWalkT and limb.CanCollide do
-                            for _, jointName in ipairs({"Left Hip", "Left Shoulder", "Neck", "Right Hip", "Right Shoulder"}) do
-                                local joint = torso and torso:FindFirstChild(jointName)
-                                if joint then joint.Enabled = false end
-                            end
-                            task.wait(0.05)
-                            for _, jointName in ipairs({"Left Hip", "Left Shoulder", "Neck", "Right Hip", "Right Shoulder"}) do
-                                local joint = torso and torso:FindFirstChild(jointName)
-                                if joint then joint.Enabled = true end
-                            end
-                            task.wait(0.05)
-                        end
-                        jointCoroutineRunning = false
-                    end)()
-                end
-            end
-
-            task.wait(0.001)
-        end
-    end)
-end
-
-plr.CharacterAdded:Connect(function()
-    task.wait(0.2)
-    if RagdollWalkT then
-        RagdollWalk()
-    end
-end)
 
 function flyF()
     if not flyT then return end
