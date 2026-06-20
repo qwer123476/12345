@@ -11778,13 +11778,14 @@ NTTab:CreateToggle({
         if v then
             task.spawn(function()
                 while autoNetOwnerLoop do
-                    local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    local char = plr.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
 
                     if hrp then
                         for _, part in ipairs(workspace:GetDescendants()) do
                             if part:IsA("BasePart")
                             and not part.Anchored
-                            and not part.Parent:FindFirstChildWhichIsA("Humanoid")
+                            and not part:IsDescendantOf(char)
                             and (part.Position - hrp.Position).Magnitude < 50 then
 
                                 SetNetworkOwner:FireServer(part, part.CFrame)
@@ -11792,12 +11793,13 @@ NTTab:CreateToggle({
                         end
                     end
 
-                    task.wait(0.8)
+                    task.wait(0.4)
                 end
             end)
         end
     end
 })
+
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
