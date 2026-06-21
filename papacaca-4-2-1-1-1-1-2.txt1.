@@ -11544,7 +11544,7 @@ end)
 game.Players.LocalPlayer.Chatted:Connect(function(message)
     ProcessBlacklistCommand(message)
 end)
-
+BlacklistTab:CreateLabel("좆같은새끼=>OUISEO1225 6.21오전 10시 46분 26초")
 -- =============================================================================
 -- [ 블랙리스트 해제 
 -- =============================================================================
