@@ -12234,7 +12234,7 @@ elseif userInputService.GamepadEnabled and not userInputService.KeyboardEnabled 
 end
 deviceLabel:Set("기기: " .. deviceType)
 
-local hwid = (gethwid and gethwid()) or "지원하지 않음"
+--local hwid = (gethwid and gethwid()) or "지원하지 않음"
 hwidLabel:Set("HWID: " .. hwid)
 
 accountAgeLabel:Set("계정 생성일 수: " .. plr.AccountAge .. "일")
