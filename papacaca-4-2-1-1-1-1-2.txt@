@@ -12278,7 +12278,7 @@ end)
             sg:Destroy()
         end)
     end)
-end)
+--end
 
 getTab:CreateToggle({
    Name = "출입,퇴장알림",
