@@ -10023,7 +10023,7 @@ playerTab:CreateInput({
         mflyV = Value
     end
 })
-mflyInput:Set(80)
+
 playerTab:CreateSection("엑스트라")
 
 -- 1. Server Hop
