@@ -9937,73 +9937,58 @@ local flyInput = playerTab:CreateInput({
     end
 })
 flyInput:Set(80)
-if mflyT then
-    mflyT = false
-else
-    mflyT = true
-    mflyV = 50
+local function mflyF()
+    if not mflyT then return end
     
-    function mflyF()
-        if not mflyT then return end
-        
-        local Players = game:GetService("Players")
-        local RunService = game:GetService("RunService")
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local humanoid = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
 
-        local plr = Players.LocalPlayer
-        local char = plr.Character or plr.CharacterAdded:Wait()
-        local humanoid = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
-        local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
+    local BV = Instance.new("BodyVelocity")
+    local BG = Instance.new("BodyGyro")
 
-        local BV = Instance.new("BodyVelocity")
-        local BG = Instance.new("BodyGyro")
+    BG.P = 9e4
+    BG.Parent = hrp
+    BV.Parent = hrp
+    BG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    BG.CFrame = hrp.CFrame
+    BV.Velocity = Vector3.new(0,0,0)
+    BV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 
-        BG.P = 9e4
-        BG.Parent = hrp
-        BV.Parent = hrp
-        BG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-        BG.CFrame = hrp.CFrame
-        BV.Velocity = Vector3.new(0,0,0)
-        BV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    if mflyConnection then mflyConnection:Disconnect() end
 
-        if mflyKeyDown then mflyKeyDown:Disconnect() end
-        if mflyKeyUp then mflyKeyUp:Disconnect() end
-        if mflyConnection then mflyConnection:Disconnect() end
+    humanoid.PlatformStand = true
 
-        humanoid.PlatformStand = true
-
-        mflyConnection = RunService.Heartbeat:Connect(function()
-            if not mflyT then
-                mflyConnection:Disconnect()
-                BV:Destroy()
-                BG:Destroy()
-                humanoid.PlatformStand = false
-                return
-            end
-            
-            local camera = workspace.CurrentCamera
-            local SPEED = mflyV or 50
-            
-            if humanoid.MoveDirection.Magnitude > 0 then
-                BV.Velocity = humanoid.MoveDirection * SPEED
-            else
-                BV.Velocity = Vector3.new(0, 0, 0)
-            end
-            
-            BG.CFrame = camera.CFrame
-        end)
-    end
-
-    local plr = game:GetService("Players").LocalPlayer
-    if mflyCharAdded then mflyCharAdded:Disconnect() end
-    mflyCharAdded = plr.CharacterAdded:Connect(function()
-        task.wait(0.2)
-        if mflyT then
-            mflyF()
+    mflyConnection = RunService.Heartbeat:Connect(function()
+        if not mflyT then
+            mflyConnection:Disconnect()
+            BV:Destroy()
+            BG:Destroy()
+            humanoid.PlatformStand = false
+            return
         end
+        
+        local camera = workspace.CurrentCamera
+        local SPEED = mflyV or 50
+        
+        if humanoid.MoveDirection.Magnitude > 0 then
+            local lookAt = camera.CFrame:VectorToWorldSpace(Vector3.new(humanoid.MoveDirection.X, 0, humanoid.MoveDirection.Z))
+            
+            if humanoid.MoveDirection.Z < 0 then
+                BV.Velocity = camera.CFrame.LookVector * SPEED
+            elseif humanoid.MoveDirection.Z > 0 then
+                BV.Velocity = camera.CFrame.LookVector * -SPEED
+            else
+                BV.Velocity = lookAt * SPEED
+            end
+        else
+            BV.Velocity = Vector3.new(0, 0, 0)
+        end
+        
+        BG.CFrame = camera.CFrame
     end)
-
-    mflyF()
 end
+
 playerTab:CreateToggle({ 
     Name = "플라이", 
     CurrentValue = false,
