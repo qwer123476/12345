@@ -9957,14 +9957,11 @@ local function mflyF()
 
     if mflyConnection then mflyConnection:Disconnect() end
 
-    humanoid.PlatformStand = true
-
     mflyConnection = RunService.Heartbeat:Connect(function()
         if not mflyT then
             mflyConnection:Disconnect()
             BV:Destroy()
             BG:Destroy()
-            humanoid.PlatformStand = false
             return
         end
         
@@ -9972,14 +9969,15 @@ local function mflyF()
         local SPEED = mflyV or 50
         
         if humanoid.MoveDirection.Magnitude > 0 then
-            local lookAt = camera.CFrame:VectorToWorldSpace(Vector3.new(humanoid.MoveDirection.X, 0, humanoid.MoveDirection.Z))
+            local forwardInverse = camera.CFrame.LookVector
+            local sideInverse = (camera.CFrame * CFrame.new(humanoid.MoveDirection.X, 0, 0).p) - camera.CFrame.p
             
             if humanoid.MoveDirection.Z < 0 then
-                BV.Velocity = camera.CFrame.LookVector * SPEED
+                BV.Velocity = (forwardInverse + sideInverse) * SPEED
             elseif humanoid.MoveDirection.Z > 0 then
-                BV.Velocity = camera.CFrame.LookVector * -SPEED
+                BV.Velocity = (-forwardInverse + sideInverse) * SPEED
             else
-                BV.Velocity = lookAt * SPEED
+                BV.Velocity = sideInverse * SPEED
             end
         else
             BV.Velocity = Vector3.new(0, 0, 0)
