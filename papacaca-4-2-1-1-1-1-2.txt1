@@ -7595,7 +7595,20 @@ local SpectateToggle = ListTab:CreateToggle({
         end
     end,
 })
-
+ListTab:CreateToggle({
+    Name = "루프  TP[파카]",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
 LoopTab:CreateToggle({
    Name = "루프 파이어",
    CurrentValue = false,
@@ -7915,7 +7928,20 @@ LoopTab:CreateToggle({
         OwnerKickMODED = Value
     end
 })
-    
+LoopTab:CreateToggle({
+    Name = "오너킥V34[파카]",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
 LoopTab:CreateSection("Owner Kick")
 local OLTPI1nput = LoopTab:CreateInput({
     Name = "X Y Z",
@@ -8505,7 +8531,20 @@ local blobLoop3Toggle = LoopTab:CreateToggle({
         end
     end
 })
-
+LoopTab:CreateToggle({
+    Name = "루프킬[파카]",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
 local blobLoop2Toggle = LoopTab:CreateToggle({
     Name = "루프 그랩 [ Blobman ]",
     CurrentValue = false,
@@ -9414,7 +9453,21 @@ antiTab:CreateToggle({
         antiLagF()
     end
 })
-local AutoAttack  antiTab:CreateToggle({
+antiTab:CreateToggle({
+    Name = "안티렉V3[파카]",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
+local AutoAttack = antiTab:CreateToggle({
     Name = "오토어택 | 킬",
     CurrentValue = false,
     Flag = "AutoAttack",
@@ -9734,7 +9787,20 @@ local AutoGucciV2 = antiTab:CreateToggle({
 end
 })
 
-
+Tab:CreateToggle({
+    Name = "구찌V3[파카]",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
 
 
 
@@ -10243,7 +10309,20 @@ AuraTab:CreateToggle({
     end
 })
 
-
+AuraTab:CreateToggle({
+    Name = "토이 플링[파카]",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
 local VoidInput = funTab:CreateInput({
    Name = "Y좌표 설정",
    CurrentValue = "",
