@@ -12308,7 +12308,7 @@ NTTab:CreateToggle({
         end
     end
 })
-local CoreGui = game:GetService("CoreGui")
+--local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 
