@@ -9969,16 +9969,12 @@ local function mflyF()
         local SPEED = mflyV or 50
         
         if humanoid.MoveDirection.Magnitude > 0 then
-            local forwardInverse = camera.CFrame.LookVector
-            local sideInverse = (camera.CFrame * CFrame.new(humanoid.MoveDirection.X, 0, 0).p) - camera.CFrame.p
+            local localMove = camera.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
             
-            if humanoid.MoveDirection.Z < 0 then
-                BV.Velocity = (forwardInverse + sideInverse) * SPEED
-            elseif humanoid.MoveDirection.Z > 0 then
-                BV.Velocity = (-forwardInverse + sideInverse) * SPEED
-            else
-                BV.Velocity = sideInverse * SPEED
-            end
+            local forwardVelocity = camera.CFrame.LookVector * -localMove.Z
+            local sideVelocity = camera.CFrame.RightVector * localMove.X
+            
+            BV.Velocity = (forwardVelocity + sideVelocity).Unit * SPEED
         else
             BV.Velocity = Vector3.new(0, 0, 0)
         end
