@@ -9782,7 +9782,7 @@ local AutoGucciV2 = antiTab:CreateToggle({
 end
 })
 
-Tab:CreateToggle({
+antiTab:CreateToggle({
     Name = "구찌V3[파카]",
     CurrentValue = false,
     Callback = function(Value)
