@@ -1105,10 +1105,10 @@ local function CreateGUI()
         l.Text = txt
         l.Parent = container
     end
-    addInfo("개발자 디스코드: park75816150(부키 덕질중)", InfoContainer)
+    addInfo("보짓구녕", InfoContainer)
     addInfo("몬스터 TP가 실패할 경우, 대상 근처로 이동한 뒤 재시도하세요.", InfoContainer, 62)
-    addInfo("피드백이나 버그제보는 개발자 한테 dm을 보내주세요", InfoContainer, 112)
-    addInfo("이 스크립트는 개발자 혼자 개발한 무료 스크립트입니다. 무단 판매를 금지합니다.", InfoContainer, 152)
+    addInfo("이제 이거는 제껍니다 해킹해서 스크탈취", InfoContainer, 112)
+    addInfo("이스크는 업데이트가없을예정입니다", InfoContainer, 152)
     -- ClickContainer UI: 오토클릭 + 스킬 통합 (요청대로 스킬을 여기로 이동함)
     do
         -- 오토클릭 버튼
