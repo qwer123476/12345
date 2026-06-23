@@ -12309,8 +12309,8 @@ NTTab:CreateToggle({
     end
 })
 --local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
-local Lighting = game:GetService("Lighting")
+--local TweenService = game:GetService("TweenService")
+--local Lighting = game:GetService("Lighting")
 
 -- 킥창을 생성하는 핵심 함수
 local function ShowFakeKick()
