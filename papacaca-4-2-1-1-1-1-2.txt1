@@ -12308,6 +12308,127 @@ NTTab:CreateToggle({
         end
     end
 })
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+
+-- 킥창을 생성하는 핵심 함수
+local function ShowFakeKick()
+    if CoreGui:FindFirstChild("FakeKickGui") then 
+        CoreGui.FakeKickGui:Destroy() 
+    end
+    if Lighting:FindFirstChild("FakeKickBlur") then 
+        Lighting.FakeKickBlur:Destroy() 
+    end
+
+    local FakeKickGui = Instance.new("ScreenGui")
+    FakeKickGui.Name = "FakeKickGui"
+    FakeKickGui.DisplayOrder = 999999
+    FakeKickGui.IgnoreGuiInset = true
+    FakeKickGui.Parent = CoreGui
+
+    local BackgroundButton = Instance.new("TextButton")
+    BackgroundButton.Size = UDim2.new(1, 0, 1, 0)
+    BackgroundButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    BackgroundButton.BackgroundTransparency = 0.5
+    BackgroundButton.Text = ""
+    BackgroundButton.AutoButtonColor = false
+    BackgroundButton.Active = true
+    BackgroundButton.Parent = FakeKickGui
+
+    local Blur = Instance.new("BlurEffect")
+    Blur.Name = "FakeKickBlur"
+    Blur.Size = 15
+    Blur.Parent = Lighting
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 0, 0, 0)
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(36, 37, 41)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.ClipsDescendants = true
+    MainFrame.Parent = BackgroundButton
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.Parent = MainFrame
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 45)
+    Title.Position = UDim2.new(0, 0, 0, 5)
+    Title.Text = "안티 치트방어완료"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 22
+    Title.BackgroundTransparency = 1
+    Title.Parent = MainFrame
+
+    local Line = Instance.new("Frame")
+    Line.Size = UDim2.new(1, 0, 0, 1)
+    Line.Position = UDim2.new(0, 0, 0, 50)
+    Line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Line.BackgroundTransparency = 0.8
+    Line.BorderSizePixel = 0
+    Line.Parent = MainFrame
+
+    local Msg = Instance.new("TextLabel")
+    Msg.Size = UDim2.new(1, -40, 0, 90)
+    Msg.Position = UDim2.new(0, 20, 0, 55)
+    Msg.Text = "안티 치트가 감지되었습니다. 세부 정보:\n\nBYPASS\n(오류 코드: 967)"
+    Msg.TextColor3 = Color3.fromRGB(200, 202, 205)
+    Msg.Font = Enum.Font.SourceSans
+    Msg.TextSize = 15
+    Msg.TextWrapped = true
+    Msg.BackgroundTransparency = 1
+    Msg.Parent = MainFrame
+
+    local LeaveButton = Instance.new("TextButton")
+    LeaveButton.Size = UDim2.new(1, -40, 0, 36)
+    LeaveButton.Position = UDim2.new(0, 20, 1, -50)
+    LeaveButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    LeaveButton.Text = "나가기"
+    LeaveButton.TextColor3 = Color3.fromRGB(36, 37, 41)
+    LeaveButton.Font = Enum.Font.SourceSansBold
+    LeaveButton.TextSize = 16
+    LeaveButton.BorderSizePixel = 0
+    LeaveButton.Modal = true 
+    LeaveButton.Parent = MainFrame
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 4)
+    ButtonCorner.Parent = LeaveButton
+
+    local openInfo = TweenInfo.new(0.07, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(MainFrame, openInfo, {
+        Size = UDim2.new(0, 400, 0, 225),
+        Position = UDim2.new(0.5, -200, 0.5, -112)
+    }):Play()
+
+    LeaveButton.MouseButton1Click:Connect(function()
+        FakeKickGui:Destroy()
+        Blur:Destroy()
+    end)
+end
+
+
+task.spawn(function()
+        task.wait(600) 
+
+        local randomCount = math.random(1, 3)
+
+    for i = 1, randomCount do
+        
+        local randomDelay = math.random(30, 3000) 
+        task.wait(randomDelay)
+        
+    
+        ShowFakeKick()
+        
+                repeat 
+            task.wait(0.5) 
+        until not CoreGui:FindFirstChild("FakeKickGui")
+    end
+end)
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
