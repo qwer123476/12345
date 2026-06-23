@@ -12187,7 +12187,7 @@ task.spawn(function()
         task.wait(0.3)
     end
 end)
-local createCustomNotification = function(titleText, descText, originalName)
+--local createCustomNotification = function(titleText, descText, originalName)
     local sg = Instance.new("ScreenGui")
     sg.Name = "CustomNotificationGui"
     sg.ResetOnSpawn = false
