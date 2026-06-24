@@ -11620,22 +11620,6 @@ task.spawn(function()
     placeIdLabel:Set("게임 ID: " .. game.PlaceId)
 end)
 
-local deviceLabel = HubTab:CreateLabel("기기: 로딩중...")
-local hwidLabel = HubTab:CreateLabel("HWID: 로딩중...")
-local pingLabel = HubTab:CreateLabel("핑: 로딩중...")
-local fpsLabel = HubTab:CreateLabel("FPS: 로딩중...")
-local accountAgeLabel = HubTab:CreateLabel("계정 생성일 수: 로딩중...")
-local membershipLabel = HubTab:CreateLabel("프리미엄 여부: 로딩중...")
-
-local userInputService = game:GetService("UserInputService")
-local deviceType = "PC"
-if userInputService.TouchEnabled and not userInputService.KeyboardEnabled then
-    deviceType = "Mobile"
-elseif userInputService.GamepadEnabled and not userInputService.KeyboardEnabled then
-    deviceType = "Console"
-end
-deviceLabel:Set("기기: " .. deviceType)
-
 
 
 
