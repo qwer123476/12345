@@ -33,7 +33,7 @@ local getTab = Window:CreateTab("알림",649498361)
 local grabTab = Window:CreateTab("컴뱃", 6026568198)               
 local UtilityTab = Window:CreateTab("유틸리티", 6031094678) 
 local plotTab = Window:CreateTab("집")
-local DDTab = Window:CreateTab("딸딸이")
+local DDTab = Window:CreateTab("티배깅")
 local antiTab = Window:CreateTab("안전", 6034831332)               
 local ListTab = Window:CreateTab("명단", 3572491301)              
 local LoopTab = Window:CreateTab("조지기", 6023426923)             
@@ -11698,6 +11698,147 @@ DDTab:CreateToggle({
             if jerkAnimationTrack then
                 jerkAnimationTrack:Stop()
             end
+        end
+    end,
+})
+local activeTracks = {}
+
+DDTab:CreateToggle({
+    Name = "Rthro 도발 댄스",
+    CurrentValue = false,
+    Flag = "RthroTiltToggle",
+    Callback = function(Value)
+        if activeTracks["Tilt"] then activeTracks["Tilt"]:Stop() activeTracks["Tilt"] = nil end
+        if Value then
+            local p = game:GetService("Players").LocalPlayer
+            local c = p.Character
+            local h = c Ram and c:FindFirstChildOfClass("Humanoid")
+            local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
+            if not a then return end
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://4049037604"
+            local track = a:LoadAnimation(anim)
+            activeTracks["Tilt"] = track
+            track:Play()
+            task.wait(0.4)
+            task.spawn(function()
+                while activeTracks["Tilt"] and track.IsPlaying do
+                    track.TimePosition = 0.42
+                    task.wait(0.08)
+                end
+            end)
+        end
+    end,
+})
+
+DDTab:CreateToggle({
+    Name = "기괴한 취침",
+    CurrentValue = false,
+    Flag = "SleepLayToggle",
+    Callback = function(Value)
+        if activeTracks["Sleep"] then activeTracks["Sleep"]:Stop() activeTracks["Sleep"] = nil end
+        if Value then
+            local p = game:GetService("Players").LocalPlayer
+            local c = p.Character
+            local h = c and c:FindFirstChildOfClass("Humanoid")
+            local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
+            if not a then return end
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://4686925579"
+            local track = a:LoadAnimation(anim)
+            activeTracks["Sleep"] = track
+            track:Play()
+            task.wait(0.2)
+            task.spawn(function()
+                while activeTracks["Sleep"] and track.IsPlaying do
+                    track.TimePosition = 0.25
+                    task.wait(0.05)
+                end
+            end)
+        end
+    end,
+})
+
+DDTab:CreateToggle({
+    Name = "발작",
+    CurrentValue = false,
+    Flag = "MonkeyDanceToggle",
+    Callback = function(Value)
+        if activeTracks["Monkey"] then activeTracks["Monkey"]:Stop() activeTracks["Monkey"] = nil end
+        if Value then
+            local p = game:GetService("Players").LocalPlayer
+            local c = p.Character
+            local h = c and c:FindFirstChildOfClass("Humanoid")
+            local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
+            if not a then return end
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://3333499508"
+            local track = a:LoadAnimation(anim)
+            activeTracks["Monkey"] = track
+            track:Play()
+            task.wait(0.15)
+            task.spawn(function()
+                while activeTracks["Monkey"] and track.IsPlaying do
+                    track.TimePosition = 0.18
+                    task.wait(0.06)
+                end
+            end)
+        end
+    end,
+})
+
+DDTab:CreateToggle({
+    Name = "닌자 브레이크",
+    CurrentValue = false,
+    Flag = "NinjaWaitToggle",
+    Callback = function(Value)
+        if activeTracks["Ninja"] then activeTracks["Ninja"]:Stop() activeTracks["Ninja"] = nil end
+        if Value then
+            local p = game:GetService("Players").LocalPlayer
+            local c = p.Character
+            local h = c and c:FindFirstChildOfClass("Humanoid")
+            local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
+            if not a then return end
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://656117400"
+            local track = a:LoadAnimation(anim)
+            activeTracks["Ninja"] = track
+            track:Play()
+            task.wait(0.3)
+            task.spawn(function()
+                while activeTracks["Ninja"] and track.IsPlaying do
+                    track.TimePosition = 0.35
+                    task.wait(0.07)
+                end
+            end)
+        end
+    end,
+})
+
+DDTab:CreateToggle({
+    Name = "좀비",
+    CurrentValue = false,
+    Flag = "ZombieToggle",
+    Callback = function(Value)
+        if activeTracks["Zombie"] then activeTracks["Zombie"]:Stop() activeTracks["Zombie"] = nil end
+        if Value then
+            local p = game:GetService("Players").LocalPlayer
+            local c = p.Character
+            local h = c and c:FindFirstChildOfClass("Humanoid")
+            local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
+            if not a then return end
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://616157476"
+            local track = a:LoadAnimation(anim)
+            activeTracks["Zombie"] = track
+            track:Play()
+            task.wait(0.25)
+            task.spawn(function()
+                while activeTracks["Zombie"] and track.IsPlaying do
+                    track.TimePosition = 0.28
+                    task.wait(0.09)
+                end
+            end)
         end
     end,
 })
