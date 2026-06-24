@@ -6960,6 +6960,7 @@ grabTab:CreateToggle({
 local isAnchorState = false
 local currentConn = nil
 local colorConn = nil
+local hColor = nil
 
 local function runAnchorLogic()
     local original = workspace:FindFirstChild("GrabParts")
@@ -7042,10 +7043,15 @@ local function runAnchorLogic()
     if colorConn then colorConn:Disconnect() end
     colorConn = game:GetService("RunService").RenderStepped:Connect(function()
         if hl and hl.Parent then
-            local hue = (tick() % 4) / 4
-            local color = Color3.fromHSV(hue, 1, 1)
-            hl.FillColor = color
-            hl.OutlineColor = color
+            if hColor then
+                hl.FillColor = hColor
+                hl.OutlineColor = hColor
+            else
+                local hue = (tick() % 4) / 4
+                local color = Color3.fromHSV(hue, 1, 1)
+                hl.FillColor = color
+                hl.OutlineColor = color
+            end
         else
             if colorConn then colorConn:Disconnect() colorConn = nil end
         end
@@ -7076,7 +7082,7 @@ local function toggleAnchor(Value)
     end
 end
 
-toggleElement = DDTab:CreateToggle({
+toggleElement = grabTab:CreateToggle({
     Name = "물체 고정 토글",
     CurrentValue = false,
     Callback = function(Value)
@@ -7084,10 +7090,115 @@ toggleElement = DDTab:CreateToggle({
     end,
 })
 
-DDTab:CreateButton({
+grabTab:CreateButton({
     Name = "물체 고정 수동 실행",
     Callback = function()
         task.spawn(runAnchorLogic)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 그라데이션 (기본값)",
+    Callback = function()
+        hColor = nil
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 빨강",
+    Callback = function()
+        hColor = Color3.fromRGB(255, 0, 0)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 주황",
+    Callback = function()
+        hColor = Color3.fromRGB(255, 127, 0)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 노랑",
+    Callback = function()
+        hColor = Color3.fromRGB(255, 255, 0)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 초록",
+    Callback = function()
+        hColor = Color3.fromRGB(0, 255, 0)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 파랑",
+    Callback = function()
+        hColor = Color3.fromRGB(0, 0, 255)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 남색",
+    Callback = function()
+        hColor = Color3.fromRGB(75, 0, 130)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 보라",
+    Callback = function()
+        hColor = Color3.fromRGB(148, 0, 211)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 검정",
+    Callback = function()
+        hColor = Color3.fromRGB(0, 0, 0)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 흰색",
+    Callback = function()
+        hColor = Color3.fromRGB(255, 255, 255)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 핑크",
+    Callback = function()
+        hColor = Color3.fromRGB(255, 105, 180)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 민트",
+    Callback = function()
+        hColor = Color3.fromRGB(170, 255, 195)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 골드",
+    Callback = function()
+        hColor = Color3.fromRGB(255, 215, 0)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 네온 그린",
+    Callback = function()
+        hColor = Color3.fromRGB(57, 255, 20)
+    end,
+})
+
+grabTab:CreateButton({
+    Name = "색상: 청록",
+    Callback = function()
+        hColor = Color3.fromRGB(0, 128, 128)
     end,
 })
 
