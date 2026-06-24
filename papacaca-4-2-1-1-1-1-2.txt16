@@ -29,11 +29,11 @@ local Window = Rayfield:CreateWindow({
 local HubTab = Window:CreateTab("파카허브란",0)
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
-local getTab = Window:CreateTab("출입,퇴장알림",649498361)
+local getTab = Window:CreateTab("알림",649498361)
 local grabTab = Window:CreateTab("컴뱃", 6026568198)               
 local UtilityTab = Window:CreateTab("유틸리티", 6031094678) 
 local plotTab = Window:CreateTab("집")
-local NTTab = Window:CreateTab("네트워크 오너 설정")
+local DDTab = Window:CreateTab("딸딸이")
 local antiTab = Window:CreateTab("안전", 6034831332)               
 local ListTab = Window:CreateTab("명단", 3572491301)              
 local LoopTab = Window:CreateTab("조지기", 6023426923)             
@@ -10536,30 +10536,6 @@ keybindTab:CreateButton({
     end
 })
 
-function jerk()
-    local v2 = game:GetService('Players').LocalPlayer
-    local v3 = (v2.Character or v2.CharacterAdded:Wait()):FindFirstChildOfClass('Humanoid')
-
-    if not vu5 then
-        local v4 = Instance.new('Animation')
-        v4.AnimationId = 'rbxassetid://168268306'
-        vu5 = (v3:FindFirstChildOfClass('Animator') or v3:WaitForChild('Animator')):LoadAnimation(v4)
-    end
-    
-    vu6 = not vu6
-
-    if vu6 then
-        vu5:Play()
-        task.wait(0.3)
-
-        while vu6 do
-            vu5.TimePosition = 0.3
-            task.wait(0.1)
-        end
-    else
-        vu5:Stop()
-    end
-end
 
 keybindTab:CreateSection("줄")
 local antilagDet = keybindTab:CreateInput({
@@ -11692,44 +11668,47 @@ end)
 
 
 
-NTTab:CreateToggle({
-    Name = "오토 네트워크 오너",
+DDTab:CreateToggle({
+    Name = "모션 반복 (Jerk)",
     CurrentValue = false,
-    Flag = "AutoNetOwnerLoop",
-    Callback = function(v)
-        autoNetOwnerLoop = v
+    Flag = "JerkMotionToggle", 
+    Callback = function(Value)
+        jerkActive = Value
 
-        if v then
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local animator = humanoid and (humanoid:FindFirstChildOfClass("Animator") or humanoid:WaitForChild("Animator"))
+
+        if not animator then return end
+
+        if jerkActive then
+            
+            if not jerkAnimationTrack then
+                local animation = Instance.new("Animation")
+                animation.AnimationId = "rbxassetid://168268306"
+                jerkAnimationTrack = animator:LoadAnimation(animation)
+            end
+
+            
+            jerkAnimationTrack:Play()
+            task.wait(0.3)
+
             task.spawn(function()
-                local players = game:GetService("Players")
-
-                while autoNetOwnerLoop do
-                    local char = plr.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-
-                    if hrp then
-                        for _, part in ipairs(workspace:GetDescendants()) do
-                            if part:IsA("BasePart")
-                            and not part.Anchored
-                            and (part.Position - hrp.Position).Magnitude < 50 then
-                                
-                            
-                                local model = part:FindFirstAncestorOfClass("Model")
-                                local isPlayer = model and players:GetPlayerFromCharacter(model)
-
-                            
-                                if not isPlayer then
-                                    SetNetworkOwner:FireServer(part, part.CFrame)
-                                end
-                            end
-                        end
+                while jerkActive do
+                    if jerkAnimationTrack then
+                        jerkAnimationTrack.TimePosition = 0.3
                     end
-
-                    task.wait(0.2)
+                    task.wait(0.1)
                 end
             end)
+        else
+            
+            if jerkAnimationTrack then
+                jerkAnimationTrack:Stop()
+            end
         end
-    end
+    end,
 })
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
