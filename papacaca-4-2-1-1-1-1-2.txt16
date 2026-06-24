@@ -1963,7 +1963,7 @@ end
                         charHUM.Sit = true
                         task.delay(0.02, function() if charHUM then charHUM.Sit = false end end)
                     end
-                    task.wait()
+                    task.wait(0.00005)
                 end
 
                 if independentHoldConnections[player] then 
