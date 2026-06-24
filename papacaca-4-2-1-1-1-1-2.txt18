@@ -1663,7 +1663,7 @@ SkipOL = false
 OLTPValue = Vector3.new(0, 20, 0)
 
 
-function loopPlayerBlobF4() 
+function loopPlayerBlobF4() -- 오너킥
     UpdateCurrentBlobman()
 
     local runningTasks = {}
@@ -1703,13 +1703,13 @@ function loopPlayerBlobF4()
             local character = player.Character
             while blobLoopT4 and (not character or not character:FindFirstChild("Humanoid")) do
                 if not player.Parent then return end
-                task.wait()
+                task.wait(0.5)
                 character = player.Character
             end
 
             local charHUM = character and character:FindFirstChild("Humanoid")
             if not charHUM then
-                task.wait(0.05)
+                task.wait(0.5)
                 continue
             end
 
@@ -1744,28 +1744,28 @@ function loopPlayerBlobF4()
                     anchorToggleTasks[player] = nil
                 end
                 
-                task.wait(0.000005)
+                task.wait(0.5)
                 character = player.Character
                 charHUM = character and character:FindFirstChild("Humanoid")
             end
 
             local _, safeHRP, head = safeGetCharacterParts(player)
             if not safeHRP or not head then
-                task.wait(0.005)
+                task.wait(0.5)
                 continue
             end
 
             local myChar = plr.Character
             local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
             if not myHRP then
-                task.wait(0.005)
+                task.wait(0.5)
                 continue
             end
 
             local charHRP = character:FindFirstChild("HumanoidRootPart")
             local charTOR = character:FindFirstChild("Torso")
             if not charHRP then
-                task.wait(0.05)
+                task.wait(0.5)
                 continue
             end
 
@@ -1811,11 +1811,11 @@ function loopPlayerBlobF4()
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
-                        task.wait()
+                        task.wait(0.05)
                         charHUM.Sit = false
                     end
                 end
-                task.wait()
+                task.wait(0.05)
             end
 
             if not shouldContinue then
@@ -1920,7 +1920,7 @@ end
                     charHRP.CFrame = targetPosition
                 end)
 
-                if SkipOL then task.wait(0.4) end
+                if SkipOL then task.wait(2) end
 
                 anchorToggleTasks[player] = task.spawn(function()
                     while blobLoopT4 and character and character.Parent and charHRP and charHRP.Parent and charHUM and charHUM.Health > 0 do
@@ -1956,18 +1956,15 @@ end
                         break 
                     end
 
-                    
-local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
+                    local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         BlobGrab(currentBlobS, charHRP, "Right")
-                        
-                         BlobRelease(currentBlobS, charHRP, "Right")
-                        task.wait()
-                        
-                                     charHUM.Sit = true
-                        task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
+                        task.wait(0.03)
+                        BlobRelease(currentBlobS, charHRP, "Right")
+                        charHUM.Sit = true
+                        task.delay(0.02, function() if charHUM then charHUM.Sit = false end end)
                     end
-                    task.wait()
+                    task.wait(0.01)
                 end
 
                 if independentHoldConnections[player] then 
@@ -2000,7 +1997,7 @@ local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Human
                 originPositions[player] = nil
             end
             
-            task.wait()
+            task.wait(0.5)
         end
     end
 
@@ -2124,7 +2121,6 @@ local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Human
         destroyCounts = {}
     end)
 end
-
 function loopPlayerF() -- 룹1
     UpdateCurrentBlobman()
 
