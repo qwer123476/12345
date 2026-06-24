@@ -6281,7 +6281,7 @@ DevTab:CreateToggle({
     end
 })
 
-DevTab:CreateSection("Gam")
+getTab:CreateSection("Gam")
 getTab:CreateToggle({
     Name = "킥알림!",
     CurrentValue = true,
@@ -6297,8 +6297,6 @@ getTab:CreateToggle({
 headMatrix = {0,0,0,0,0,0,0,1,0}
 torsoMatrix = {0,0,0,0,0,0,0,1,0}
 rightArmMatrix = {0,0,2,0,0,0,0,0,1}
-
-DevTab:CreateSection("")
 DevTab:CreateToggle({ 
     Name = "락", 
     CurrentValue = false,
@@ -6647,7 +6645,7 @@ LoopTab:CreateButton({
     end
 })
 
-DevTab:CreateSection("블롭")
+
 DevTab:CreateToggle({
     Name = "wd 소환 (상대안티킥 해제)",
     CurrentValue = false,
@@ -7823,7 +7821,7 @@ local AutoSit = LoopTab:CreateToggle({
         AutoSitF()
     end
 })
-LoopTab:CreateSection("Bring")
+LoopTab:CreateSection("브링")
 LoopTab:CreateButton({
     Name = "끌고오기 [ Blobman ]",
     Callback = function()
@@ -8122,6 +8120,7 @@ LoopTab:CreateToggle({
         OwnerKickMODED = Value
     end
 })
+LoopTab:CreateSection("오너")
 LoopTab:CreateToggle({
     Name = "오너킥V34[파카]",
     CurrentValue = false,
@@ -8139,7 +8138,7 @@ LoopTab:CreateToggle({
 
 
 
-
+LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
     Name = "무질량 끄기",
     Callback = function()
@@ -8193,7 +8192,7 @@ local blobLoopToggle = LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "앉기",
+    Name = "ㄴ 앉기",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -8202,14 +8201,14 @@ LoopTab:CreateToggle({
 })
 
 LoopTab:CreateToggle({
-    Name = "안티 인플레이스 모드",
+    Name = "ㄴ 안티 인플레이스 모드",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
         LoopReleaseMODED = Value
     end
 })
-
+LoopTab:CreateSection("루프킬 블롭맨")
 local blobLoop3Toggle = LoopTab:CreateToggle({
     Name = "루프킬 [ Blobman ]",
     CurrentValue = false,
@@ -8263,7 +8262,7 @@ local blobLoop2Toggle = LoopTab:CreateToggle({
     end
 })
 
-
+LoopTab:CreateSection("블롭없음")
 local Loop1 = LoopTab:CreateToggle({
     Name = "루프킬 [ Owner ]",
     CurrentValue = false,
