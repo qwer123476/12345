@@ -1920,7 +1920,7 @@ end
                     charHRP.CFrame = targetPosition
                 end)
 
-                if SkipOL then task.wait(2) end
+                if SkipOL then task.wait(0.4) end
 
                 anchorToggleTasks[player] = task.spawn(function()
                     while blobLoopT4 and character and character.Parent and charHRP and charHRP.Parent and charHUM and charHUM.Health > 0 do
@@ -1965,7 +1965,7 @@ local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Human
                         task.wait()
                         
                                      charHUM.Sit = true
-                        task.delay(0.02, function() if charHUM then charHUM.Sit = false end end)
+                        task.delay(0.00002, function() if charHUM then charHUM.Sit = false end end)
                     end
                     task.wait()
                 end
@@ -2000,7 +2000,7 @@ local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Human
                 originPositions[player] = nil
             end
             
-            task.wait(0.0005)
+            task.wait()
         end
     end
 
