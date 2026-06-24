@@ -6989,6 +6989,7 @@ end
 
 local toggleElement = nil
 local isAnchorState = false
+local currentConn = nil
 
 local function runAnchorLogic()
     local original = workspace:FindFirstChild("GrabParts")
@@ -7004,53 +7005,40 @@ local function runAnchorLogic()
     local targetModel = nil
     local touchingParts = grabPart:GetTouchingParts()
 
-    if #touchingParts == 0 then
-        grabPart.CanCollide = wasCollide
-        return
-    end
-
-    for _, part in ipairs(touchingParts) do
-        if not part:IsDescendantOf(original) then
-            local current = part
-            while current and current ~= workspace do
-                if current:IsA("Model") then
-                    targetModel = current
-                    break
+    if #touchingParts > 0 then
+        for _, part in ipairs(touchingParts) do
+            if not part:IsDescendantOf(original) then
+                local current = part
+                while current and current ~= workspace do
+                    if current:IsA("Model") then
+                        targetModel = current
+                        break
+                    end
+                    current = current.Parent
                 end
-                current = current.Parent
+                if targetModel then break end
             end
-            if targetModel then break end
         end
     end
 
     grabPart.CanCollide = wasCollide
-
     if not targetModel then return end
 
     if not targetModel.Parent then
         local found = false
         local connection
         connection = targetModel.AncestryChanged:Connect(function(_, parent)
-            if parent then
-                found = true
-                connection:Disconnect()
-            end
+            if parent then found = true connection:Disconnect() end
         end)
-
         local startTime = tick()
-        while not found and tick() - startTime < 2 do
-            task.wait(0.1)
-        end
-
+        while not found and tick() - startTime < 2 do task.wait(0.1) end
         if not found then return end
     end
 
     local existing = targetModel:FindFirstChild("Force")
     if existing then
         local existingHighlight = targetModel:FindFirstChild("AnchorHighlight")
-        if existingHighlight then
-            existingHighlight:Destroy()
-        end
+        if existingHighlight then existingHighlight:Destroy() end
         existing:Destroy()
         return
     end
@@ -7062,10 +7050,8 @@ local function runAnchorLogic()
         if desc:IsA("BasePart") then
             desc.Transparency = 1
             desc.CanCollide = false
-
             local beam = desc:FindFirstChild("GrabBeam")
             if beam then beam:Destroy() end
-
             for _, sName in ipairs({"AttachSound1", "AttachSound", "BeamSound", "BeamSound1"}) do
                 local sound = desc:FindFirstChild(sName)
                 if sound then sound:Destroy() end
@@ -7084,17 +7070,16 @@ local function runAnchorLogic()
     hl.Adornee = targetModel
     hl.Parent = targetModel
 
-    local connection
-    connection = game:GetService("RunService").Heartbeat:Connect(function()
+    if currentConn then currentConn:Disconnect() end
+    currentConn = game:GetService("RunService").Heartbeat:Connect(function()
         if not clone or not clone.Parent or not targetModel or not targetModel.Parent then
-            if connection then connection:Disconnect() end
+            if currentConn then currentConn:Disconnect() currentConn = nil end
             return
         end
-
         if hl and hl.Parent then
             hl.Adornee = targetModel
         else
-            connection:Disconnect()
+            if currentConn then currentConn:Disconnect() currentConn = nil end
         end
     end)
 end
@@ -7114,7 +7099,7 @@ local function updateAnchorUI(isActive)
     end
 end
 
-toggleElement = grabTab:CreateToggle({
+toggleElement = DDTab:CreateToggle({
     Name = "물체 고정 (Anchor)",
     CurrentValue = false,
     Flag = "AnchoredToggle",
@@ -7135,6 +7120,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         end
     end
 end)
+
 
 -- =============== [ 보호 대상 목록 ] ==
 local GF = {"wetokwk3jr"}
@@ -10892,49 +10878,6 @@ task.wait(0.4)
 
 PBDrun = false
 end
-
-keybindTab:CreateKeybind({
-    Name = "하우스 그랩",
-    CurrentKeybind = "G",
-    HoldToInteract = false,
-    Callback = function()
-        if isExecuting then
-            return
-        end
-
-        isExecuting = true
-
-        local plr = game.Players.LocalPlayer
-        local char = plr.Character or plr.CharacterAdded:Wait()
-        local torso = char:WaitForChild("Torso")
-
-        local inPlot = plr:FindFirstChild("InPlot")
-        if not inPlot or inPlot.Value == false then
-            isExecuting = false
-            return
-        end
-
-        local TP = getMyPlot()
-        if not TP then
-            isExecuting = false
-            return
-        end
-
-        local GrabParts = workspace:FindFirstChild("GrabParts")
-        if GrabParts then
-        mouse1click()
-        end
-
-        local torso = char:WaitForChild("Torso")
-        local OCF = torso.CFrame
-        torso.CFrame = TP.CFrame
-        task.wait(0.15)
-        torso.CFrame = OCF
-        task.wait(0.15)
-        mouse1click()
-        isExecuting = false
-    end
-})
 
 
 keybindTab:CreateSection("ESP")
