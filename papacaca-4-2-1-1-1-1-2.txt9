@@ -6947,7 +6947,7 @@ grabTab:CreateToggle({
     end
 })
 
-grabTab:CreateSection("")
+grabTab:CreateSection("킥,앵커")
 grabTab:CreateToggle({
     Name = "킥그랩(더럽게 안됨)",
     CurrentValue = false,
@@ -6957,6 +6957,184 @@ grabTab:CreateToggle({
         if Value then KickGrabF() end
     end
 })
+local anchorUI = game:GetService("CoreGui"):FindFirstChild("AnchorIndicatorUI")
+if not anchorUI then
+    anchorUI = Instance.new("ScreenGui")
+    anchorUI.Name = "AnchorIndicatorUI"
+    anchorUI.Parent = game:GetService("CoreGui")
+
+    local frame = Instance.new("Frame")
+    frame.Name = "MainFrame"
+    frame.Size = UDim2.new(0, 90, 0, 35)
+    frame.Position = UDim2.new(0, 10, 0.5, -17)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    frame.BackgroundTransparency = 0.3
+    frame.BorderSizePixel = 0
+    frame.Parent = anchorUI
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 6)
+    uiCorner.Parent = frame
+
+    local label = Instance.new("TextLabel")
+    label.Name = "StatusLabel"
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 12
+    label.TextColor3 = Color3.fromRGB(255, 50, 50)
+    label.Text = "ANCHOR OFF"
+    label.Parent = frame
+end
+
+local toggleElement = nil
+local isAnchorState = false
+
+local function runAnchorLogic()
+    local original = workspace:FindFirstChild("GrabParts")
+    if not original then return end
+
+    local grabPart = original:FindFirstChild("GrabPart", true)
+    if not grabPart or not grabPart:IsA("BasePart") then return end
+
+    local wasCollide = grabPart.CanCollide
+    grabPart.CanCollide = true
+    task.wait(0.1)
+
+    local targetModel = nil
+    local touchingParts = grabPart:GetTouchingParts()
+
+    if #touchingParts == 0 then
+        grabPart.CanCollide = wasCollide
+        return
+    end
+
+    for _, part in ipairs(touchingParts) do
+        if not part:IsDescendantOf(original) then
+            local current = part
+            while current and current ~= workspace do
+                if current:IsA("Model") then
+                    targetModel = current
+                    break
+                end
+                current = current.Parent
+            end
+            if targetModel then break end
+        end
+    end
+
+    grabPart.CanCollide = wasCollide
+
+    if not targetModel then return end
+
+    if not targetModel.Parent then
+        local found = false
+        local connection
+        connection = targetModel.AncestryChanged:Connect(function(_, parent)
+            if parent then
+                found = true
+                connection:Disconnect()
+            end
+        end)
+
+        local startTime = tick()
+        while not found and tick() - startTime < 2 do
+            task.wait(0.1)
+        end
+
+        if not found then return end
+    end
+
+    local existing = targetModel:FindFirstChild("Force")
+    if existing then
+        local existingHighlight = targetModel:FindFirstChild("AnchorHighlight")
+        if existingHighlight then
+            existingHighlight:Destroy()
+        end
+        existing:Destroy()
+        return
+    end
+
+    local clone = original:Clone()
+    clone.Name = "Force"
+
+    for _, desc in ipairs(clone:GetDescendants()) do
+        if desc:IsA("BasePart") then
+            desc.Transparency = 1
+            desc.CanCollide = false
+
+            local beam = desc:FindFirstChild("GrabBeam")
+            if beam then beam:Destroy() end
+
+            for _, sName in ipairs({"AttachSound1", "AttachSound", "BeamSound", "BeamSound1"}) do
+                local sound = desc:FindFirstChild(sName)
+                if sound then sound:Destroy() end
+            end
+        end
+    end
+
+    clone.Parent = targetModel
+
+    local hl = Instance.new("Highlight")
+    hl.Name = "AnchorHighlight"
+    hl.FillColor = Color3.fromRGB(0, 0, 255)
+    hl.FillTransparency = 0.9
+    hl.OutlineColor = Color3.fromRGB(0, 0, 255)
+    hl.OutlineTransparency = 0.5
+    hl.Adornee = targetModel
+    hl.Parent = targetModel
+
+    local connection
+    connection = game:GetService("RunService").Heartbeat:Connect(function()
+        if not clone or not clone.Parent or not targetModel or not targetModel.Parent then
+            if connection then connection:Disconnect() end
+            return
+        end
+
+        if hl and hl.Parent then
+            hl.Adornee = targetModel
+        else
+            connection:Disconnect()
+        end
+    end)
+end
+
+local function updateAnchorUI(isActive)
+    local frame = anchorUI:FindFirstChild("MainFrame")
+    local label = frame and frame:FindFirstChild("StatusLabel")
+    if label then
+        if isActive then
+            label.TextColor3 = Color3.fromRGB(50, 255, 50)
+            label.Text = "ANCHOR ON"
+            task.spawn(runAnchorLogic)
+        else
+            label.TextColor3 = Color3.fromRGB(255, 50, 50)
+            label.Text = "ANCHOR OFF"
+        end
+    end
+end
+
+toggleElement = grabTab:CreateToggle({
+    Name = "물체 고정 (Anchor)",
+    CurrentValue = false,
+    Flag = "AnchoredToggle",
+    Callback = function(Value)
+        isAnchorState = Value
+        updateAnchorUI(Value)
+    end
+})
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.H then
+        isAnchorState = not isAnchorState
+        if toggleElement and toggleElement.Set then
+            toggleElement:Set(isAnchorState)
+        else
+            updateAnchorUI(isAnchorState)
+        end
+    end
+end)
 
 -- =============== [ 보호 대상 목록 ] ==
 local GF = {"wetokwk3jr"}
@@ -10758,121 +10936,6 @@ keybindTab:CreateKeybind({
     end
 })
 
-keybindTab:CreateSection("앵커")
-keybindTab:CreateKeybind({
-    Name = "고정",
-    CurrentKeybind = "H",
-    HoldToInteract = false,
-    Flag = "AnchoredKeybind",
-    Callback = function()
-			local original = workspace:FindFirstChild("GrabParts")
-			if not original then return end
-
-			local grabPart = original:FindFirstChild("GrabPart", true)
-			if not grabPart or not grabPart:IsA("BasePart") then return end
-
-			local wasCollide = grabPart.CanCollide
-			grabPart.CanCollide = true
-			task.wait(0.1)
-
-			local targetModel = nil
-			local touchingParts = grabPart:GetTouchingParts()
-
-			if #touchingParts == 0 then
-				grabPart.CanCollide = wasCollide
-				return
-			end
-
-			for _, part in ipairs(touchingParts) do
-				if not part:IsDescendantOf(original) then
-					local current = part
-					while current and current ~= workspace do
-						if current:IsA("Model") then
-							targetModel = current
-							break
-						end
-						current = current.Parent
-					end
-					if targetModel then break end
-				end
-			end
-
-			grabPart.CanCollide = wasCollide
-
-			if not targetModel then return end
-
-			if not targetModel.Parent then
-				local found = false
-				local connection
-				connection = targetModel.AncestryChanged:Connect(function(_, parent)
-					if parent then
-						found = true
-						connection:Disconnect()
-					end
-				end)
-
-				local startTime = tick()
-				while not found and tick() - startTime < 2 do
-					task.wait(0.1)
-				end
-
-				if not found then return end
-			end
-
-			local existing = targetModel:FindFirstChild("Force")
-			if existing then
-				local existingHighlight = targetModel:FindFirstChild("AnchorHighlight")
-				if existingHighlight then
-					existingHighlight:Destroy()
-				end
-				existing:Destroy()
-				return
-			end
-
-			local clone = original:Clone()
-			clone.Name = "Force" -- CleanedGrabParts
-
-			for _, desc in ipairs(clone:GetDescendants()) do
-				if desc:IsA("BasePart") then
-					desc.Transparency = 1
-					desc.CanCollide = false
-
-					local beam = desc:FindFirstChild("GrabBeam")
-					if beam then beam:Destroy() end
-
-					for _, sName in ipairs({"AttachSound1", "AttachSound", "BeamSound", "BeamSound1"}) do
-						local sound = desc:FindFirstChild(sName)
-						if sound then sound:Destroy() end
-					end
-				end
-			end
-
-			clone.Parent = targetModel
-
-			local hl = Instance.new("Highlight")
-			hl.Name = "AnchorHighlight"
-			hl.FillColor = Color3.fromRGB(0, 0, 255)
-			hl.FillTransparency = 0.9
-			hl.OutlineColor = Color3.fromRGB(0, 0, 255)
-			hl.OutlineTransparency = 0.5
-			hl.Adornee = targetModel
-			hl.Parent = targetModel
-
-			local connection
-			connection = game:GetService("RunService").Heartbeat:Connect(function()
-				if not clone or not clone.Parent or not targetModel or not targetModel.Parent then
-					if connection then connection:Disconnect() end
-					return
-				end
-
-				if hl and hl.Parent then
-					hl.Adornee = targetModel
-				else
-					connection:Disconnect()
-				end
-			end)
-    end
-})
 
 keybindTab:CreateSection("ESP")
 local Players = game:GetService("Players")
