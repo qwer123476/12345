@@ -6957,37 +6957,6 @@ grabTab:CreateToggle({
         if Value then KickGrabF() end
     end
 })
-local anchorUI = game:GetService("CoreGui"):FindFirstChild("AnchorIndicatorUI")
-if not anchorUI then
-    anchorUI = Instance.new("ScreenGui")
-    anchorUI.Name = "AnchorIndicatorUI"
-    anchorUI.Parent = game:GetService("CoreGui")
-
-    local frame = Instance.new("Frame")
-    frame.Name = "MainFrame"
-    frame.Size = UDim2.new(0, 90, 0, 35)
-    frame.Position = UDim2.new(0, 10, 0.5, -17)
-    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    frame.BackgroundTransparency = 0.3
-    frame.BorderSizePixel = 0
-    frame.Parent = anchorUI
-
-    local uiCorner = Instance.new("UICorner")
-    uiCorner.CornerRadius = UDim.new(0, 6)
-    uiCorner.Parent = frame
-
-    local label = Instance.new("TextLabel")
-    label.Name = "StatusLabel"
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 12
-    label.TextColor3 = Color3.fromRGB(255, 50, 50)
-    label.Text = "ANCHOR OFF"
-    label.Parent = frame
-end
-
-local toggleElement = nil
 local isAnchorState = false
 local currentConn = nil
 
@@ -7084,29 +7053,29 @@ local function runAnchorLogic()
     end)
 end
 
-local function updateAnchorUI(isActive)
-    local frame = anchorUI:FindFirstChild("MainFrame")
-    local label = frame and frame:FindFirstChild("StatusLabel")
-    if label then
-        if isActive then
-            label.TextColor3 = Color3.fromRGB(50, 255, 50)
-            label.Text = "ANCHOR ON"
-            task.spawn(runAnchorLogic)
-        else
-            label.TextColor3 = Color3.fromRGB(255, 50, 50)
-            label.Text = "ANCHOR OFF"
-        end
+local toggleElement = nil
+
+local function toggleAnchor(Value)
+    isAnchorState = Value
+    if isAnchorState then
+        task.spawn(runAnchorLogic)
     end
 end
 
 toggleElement = DDTab:CreateToggle({
-    Name = "물체 고정 (Anchor)",
+    Name = "물체 고정 토글",
     CurrentValue = false,
     Flag = "AnchoredToggle",
     Callback = function(Value)
-        isAnchorState = Value
-        updateAnchorUI(Value)
-    end
+        toggleAnchor(Value)
+    end,
+})
+
+DDTab:CreateButton({
+    Name = "물체 고정 수동 실행",
+    Callback = function()
+        task.spawn(runAnchorLogic)
+    end,
 })
 
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
@@ -7116,7 +7085,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         if toggleElement and toggleElement.Set then
             toggleElement:Set(isAnchorState)
         else
-            updateAnchorUI(isAnchorState)
+            toggleAnchor(isAnchorState)
         end
     end
 end)
