@@ -6959,6 +6959,7 @@ grabTab:CreateToggle({
 })
 local isAnchorState = false
 local currentConn = nil
+local colorConn = nil
 
 local function runAnchorLogic()
     local original = workspace:FindFirstChild("GrabParts")
@@ -7009,6 +7010,7 @@ local function runAnchorLogic()
         local existingHighlight = targetModel:FindFirstChild("AnchorHighlight")
         if existingHighlight then existingHighlight:Destroy() end
         existing:Destroy()
+        if colorConn then colorConn:Disconnect() colorConn = nil end
         return
     end
 
@@ -7032,23 +7034,35 @@ local function runAnchorLogic()
 
     local hl = Instance.new("Highlight")
     hl.Name = "AnchorHighlight"
-    hl.FillColor = Color3.fromRGB(0, 0, 255)
-    hl.FillTransparency = 0.9
-    hl.OutlineColor = Color3.fromRGB(0, 0, 255)
-    hl.OutlineTransparency = 0.5
+    hl.FillTransparency = 0.8
+    hl.OutlineTransparency = 0.3
     hl.Adornee = targetModel
     hl.Parent = targetModel
+
+    if colorConn then colorConn:Disconnect() end
+    colorConn = game:GetService("RunService").RenderStepped:Connect(function()
+        if hl and hl.Parent then
+            local hue = (tick() % 4) / 4
+            local color = Color3.fromHSV(hue, 1, 1)
+            hl.FillColor = color
+            hl.OutlineColor = color
+        else
+            if colorConn then colorConn:Disconnect() colorConn = nil end
+        end
+    end)
 
     if currentConn then currentConn:Disconnect() end
     currentConn = game:GetService("RunService").Heartbeat:Connect(function()
         if not clone or not clone.Parent or not targetModel or not targetModel.Parent then
             if currentConn then currentConn:Disconnect() currentConn = nil end
+            if colorConn then colorConn:Disconnect() colorConn = nil end
             return
         end
         if hl and hl.Parent then
             hl.Adornee = targetModel
         else
             if currentConn then currentConn:Disconnect() currentConn = nil end
+            if colorConn then colorConn:Disconnect() colorConn = nil end
         end
     end)
 end
@@ -7065,7 +7079,6 @@ end
 toggleElement = DDTab:CreateToggle({
     Name = "물체 고정 토글",
     CurrentValue = false,
-    Flag = "AnchoredToggle",
     Callback = function(Value)
         toggleAnchor(Value)
     end,
@@ -7089,7 +7102,6 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         end
     end
 end)
-
 
 -- =============== [ 보호 대상 목록 ] ==
 local GF = {"wetokwk3jr"}
