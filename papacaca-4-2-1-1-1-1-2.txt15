@@ -11668,42 +11668,42 @@ end)
 
 
 
+local jerkAnimationTrack = nil
+local jerkActive = false
+
 DDTab:CreateToggle({
-    Name = "모션 반복 (Jerk)",
+    Name = "딸치기",
     CurrentValue = false,
     Flag = "JerkMotionToggle", 
     Callback = function(Value)
         jerkActive = Value
 
         local player = game:GetService("Players").LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
+        local character = player.Character
+        if not character then return end
+        
         local humanoid = character:FindFirstChildOfClass("Humanoid")
-        local animator = humanoid and (humanoid:FindFirstChildOfClass("Animator") or humanoid:WaitForChild("Animator"))
+        local animator = humanoid and (humanoid:FindFirstChildOfClass("Animator") or humanoid:FindFirstChild("Animator"))
 
         if not animator then return end
 
         if jerkActive then
-            
-            if not jerkAnimationTrack then
+            if not jerkAnimationTrack or zjerkAnimationTrack.Parent ~= animator then
                 local animation = Instance.new("Animation")
                 animation.AnimationId = "rbxassetid://168268306"
                 jerkAnimationTrack = animator:LoadAnimation(animation)
             end
 
-            
             jerkAnimationTrack:Play()
             task.wait(0.3)
 
             task.spawn(function()
-                while jerkActive do
-                    if jerkAnimationTrack then
-                        jerkAnimationTrack.TimePosition = 0.3
-                    end
+                while jerkActive and jerkAnimationTrack and jerkAnimationTrack.IsPlaying do
+                    jerkAnimationTrack.TimePosition = 0.3
                     task.wait(0.1)
                 end
             end)
         else
-            
             if jerkAnimationTrack then
                 jerkAnimationTrack:Stop()
             end
