@@ -9419,7 +9419,19 @@ local NoClipToggle = playerTab:CreateToggle({
     end
 })
 
+PlayerTab:CreateToggle({
+    Name = "무한 점프",
+    CurrentValue = false,
+    Callback = function(v)
+        _G.InfiniteJump = v
+    end
+})
 
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if _G.InfiniteJump then
+        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
 local Fly = playerTab:CreateToggle({ 
     Name = "플라이(컴퓨터)", 
     CurrentValue = false,
