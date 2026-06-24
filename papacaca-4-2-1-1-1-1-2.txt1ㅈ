@@ -11678,32 +11678,6 @@ task.spawn(function()
 end)
 
 
-NTTab:CreateButton({
-    Name = "네트워크 오너 (셀프)",
-    Callback = function()
-        local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-
-        local count = 0
-
-        for _, part in ipairs(workspace:GetDescendants()) do
-            if part:IsA("BasePart")
-            and not part.Anchored
-            and not part.Parent:FindFirstChildWhichIsA("Humanoid")
-            and (part.Position - hrp.Position).Magnitude < 50 then
-
-                SetNetworkOwner:FireServer(part, part.CFrame)
-                count += 1
-            end
-        end
-
-        Rayfield:Notify({
-            Title = "네트워크 오너 변경 완료",
-            Content = "주변 " .. count .. "개 오브젝트의 소유권을 가져왔습니다.",
-            Duration = 3
-        })
-    end
-})
 
 
 NTTab:CreateToggle({
