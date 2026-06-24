@@ -1516,12 +1516,11 @@ if hrp then
                 processPlayer(player)
                 task.wait(0.01)
             end
-            task.wait(0.0001)
+            task.wait(0.01)
         end
     end)
 end
-
-function loopPlayerBlobF3() -- 블롭뤂3
+function loopPlayerBlobF3() -- 블롭 룹3
 
     UpdateCurrentBlobman()
 
@@ -1631,7 +1630,7 @@ function loopPlayerBlobF3() -- 블롭뤂3
                             task.wait()
                         end
 
-                        task.wait(0.05)
+                        task.wait()
                     end
 
                     if beforeTP then
@@ -2150,7 +2149,7 @@ function loopPlayerF() -- 룹1
 
         while loopPlayerT do
             if not player or not player.Character or not player.Character:FindFirstChild("Head") then break end
-        
+            
             rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
             local ownerTag = head:FindFirstChild("PartOwner")
             if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
@@ -2227,7 +2226,7 @@ function loopPlayerF() -- 룹1
     end)
 end
 
-function loopPlayerF2() -- 뤂2
+function loopPlayerF2() -- 룹2
     UpdateCurrentBlobman()
 
     local processedHumanoids = {}
@@ -2335,7 +2334,7 @@ function loopPlayerF2() -- 뤂2
                     rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
                     hrp.CFrame = CFrame.new(99999999, 99999999, 99999999)
                 end
-                task.wait()
+                task.wait(0.2)
             end
         end)
 
@@ -2372,6 +2371,7 @@ function loopPlayerF2() -- 뤂2
         end
     end)
 end
+
 function loopPlayerF3() -- 룹3
     UpdateCurrentBlobman()
 
@@ -2434,7 +2434,7 @@ function loopPlayerF3() -- 룹3
                                 local success = processPlayer(player)
 
                                 if success then
-                                    task.wait(1)
+                                    task.wait(2)
                                 end
 
                                 currentProcessing[player] = nil
@@ -2449,7 +2449,7 @@ function loopPlayerF3() -- 룹3
                     end
                 end
             end
-            task.wait(0.005)
+            task.wait(0.05)
         end
     end)
 end
