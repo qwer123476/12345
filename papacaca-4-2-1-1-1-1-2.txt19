@@ -11652,24 +11652,11 @@ elseif userInputService.GamepadEnabled and not userInputService.KeyboardEnabled 
 end
 deviceLabel:Set("기기: " .. deviceType)
 
---local hwid = (gethwid and gethwid()) or "지원하지 않음"
-hwidLabel:Set("HWID: " .. hwid)
-
-accountAgeLabel:Set("계정 생성일 수: " .. plr.AccountAge .. "일")
-membershipLabel:Set("프리미엄 여부: " .. (plr.MembershipType == Enum.MembershipType.Premium and "Yes" or "No"))
-
-task.spawn(function()
-    while task.wait(1) do
-        local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-        pingLabel:Set("핑: " .. string.split(ping, " ")[1] .. "ms")
-    end
-end)
 
 
 
 
-local jerkAnimationTrack = nil
-local jerkActive = false
+
 
 DDTab:CreateToggle({
     Name = "딸치기",
@@ -11692,7 +11679,7 @@ DDTab:CreateToggle({
         end
 
         if jerkActive then
-            if not jerkAnimationTrack or jerkAnimationTrack.Parent ~= animator then
+            if not jerkAnimationTrack then
                 local animation = Instance.new("Animation")
                 animation.AnimationId = "rbxassetid://168268306"
                 jerkAnimationTrack = animator:LoadAnimation(animation)
