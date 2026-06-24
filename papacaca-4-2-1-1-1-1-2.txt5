@@ -11712,7 +11712,7 @@ DDTab:CreateToggle({
         if Value then
             local p = game:GetService("Players").LocalPlayer
             local c = p.Character
-            local h = c Ram and c:FindFirstChildOfClass("Humanoid")
+            local h = c and c:FindFirstChildOfClass("Humanoid")
             local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
             if not a then return end
             local anim = Instance.new("Animation")
