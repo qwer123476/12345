@@ -11731,12 +11731,42 @@ DDTab:CreateToggle({
     end,
 })
 
+local activeTracks = {}
+
 DDTab:CreateToggle({
-    Name = "기괴한 취침",
+    Name = "댄스 1",
     CurrentValue = false,
-    Flag = "SleepLayToggle",
+    Flag = "R6Dance1Toggle",
     Callback = function(Value)
-        if activeTracks["Sleep"] then activeTracks["Sleep"]:Stop() activeTracks["Sleep"] = nil end
+        if activeTracks["Dance1"] then activeTracks["Dance1"]:Stop() activeTracks["Dance1"] = nil end
+        if Value then
+            local p = game:GetService("Players").LocalPlayer
+            local c = p.Character
+            local h = c and c:FindFirstChildOfClass("Humanoid")
+            local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
+            if not a then return end
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://182435964"
+            local track = a:LoadAnimation(anim)
+            activeTracks["Dance1"] = track
+            track:Play()
+            task.wait(0.1)
+            task.spawn(function()
+                while activeTracks["Dance1"] do
+                    track.TimePosition = 0.4
+                    task.wait(0.05)
+                end
+            end)
+        end
+    end,
+})
+
+DDTab:CreateToggle({
+    Name = "댄스 2",
+    CurrentValue = false,
+    Flag = "R6Dance2Toggle",
+    Callback = function(Value)
+        if activeTracks["Dance2"] then activeTracks["Dance2"]:Stop() activeTracks["Dance2"] = nil end
         if Value then
             local p = game:GetService("Players").LocalPlayer
             local c = p.Character
@@ -11746,12 +11776,12 @@ DDTab:CreateToggle({
             local anim = Instance.new("Animation")
             anim.AnimationId = "rbxassetid://182436411"
             local track = a:LoadAnimation(anim)
-            activeTracks["Sleep"] = track
+            activeTracks["Dance2"] = track
             track:Play()
-            task.wait(0.15)
+            task.wait(0.1)
             task.spawn(function()
-                while activeTracks["Sleep"] and track.IsPlaying do
-                    track.TimePosition = 0.2
+                while activeTracks["Dance2"] do
+                    track.TimePosition = 0.35
                     task.wait(0.05)
                 end
             end)
@@ -11760,11 +11790,11 @@ DDTab:CreateToggle({
 })
 
 DDTab:CreateToggle({
-    Name = "발작",
+    Name = "댄스 3",
     CurrentValue = false,
-    Flag = "MonkeyDanceToggle",
+    Flag = "R6Dance3Toggle",
     Callback = function(Value)
-        if activeTracks["Monkey"] then activeTracks["Monkey"]:Stop() activeTracks["Monkey"] = nil end
+        if activeTracks["Dance3"] then activeTracks["Dance3"]:Stop() activeTracks["Dance3"] = nil end
         if Value then
             local p = game:GetService("Players").LocalPlayer
             local c = p.Character
@@ -11774,12 +11804,12 @@ DDTab:CreateToggle({
             local anim = Instance.new("Animation")
             anim.AnimationId = "rbxassetid://182436824"
             local track = a:LoadAnimation(anim)
-            activeTracks["Monkey"] = track
+            activeTracks["Dance3"] = track
             track:Play()
             task.wait(0.1)
             task.spawn(function()
-                while activeTracks["Monkey"] and track.IsPlaying do
-                    track.TimePosition = 0.15
+                while activeTracks["Dance3"] do
+                    track.TimePosition = 0.25
                     task.wait(0.04)
                 end
             end)
@@ -11788,11 +11818,11 @@ DDTab:CreateToggle({
 })
 
 DDTab:CreateToggle({
-    Name = "닌자 브레이크",
+    Name = "손흔들기",
     CurrentValue = false,
-    Flag = "NinjaWaitToggle",
+    Flag = "R6WaveToggle",
     Callback = function(Value)
-        if activeTracks["Ninja"] then activeTracks["Ninja"]:Stop() activeTracks["Ninja"] = nil end
+        if activeTracks["Wave"] then activeTracks["Wave"]:Stop() activeTracks["Wave"] = nil end
         if Value then
             local p = game:GetService("Players").LocalPlayer
             local c = p.Character
@@ -11800,14 +11830,14 @@ DDTab:CreateToggle({
             local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
             if not a then return end
             local anim = Instance.new("Animation")
-            anim.AnimationId = "rbxassetid://182436971"
+            anim.AnimationId = "rbxassetid://128777973"
             local track = a:LoadAnimation(anim)
-            activeTracks["Ninja"] = track
+            activeTracks["Wave"] = track
             track:Play()
-            task.wait(0.2)
+            task.wait(0.1)
             task.spawn(function()
-                while activeTracks["Ninja"] and track.IsPlaying do
-                    track.TimePosition = 0.25
+                while activeTracks["Wave"] do
+                    track.TimePosition = 0.2
                     task.wait(0.05)
                 end
             end)
@@ -11816,11 +11846,11 @@ DDTab:CreateToggle({
 })
 
 DDTab:CreateToggle({
-    Name = "좀비",
+    Name = "삿대질",
     CurrentValue = false,
-    Flag = "ZombieToggle",
+    Flag = "R6PointToggle",
     Callback = function(Value)
-        if activeTracks["Zombie"] then activeTracks["Zombie"]:Stop() activeTracks["Zombie"] = nil end
+        if activeTracks["Point"] then activeTracks["Point"]:Stop() activeTracks["Point"] = nil end
         if Value then
             local p = game:GetService("Players").LocalPlayer
             local c = p.Character
@@ -11828,14 +11858,14 @@ DDTab:CreateToggle({
             local a = h and (h:FindFirstChildOfClass("Animator") or h:FindFirstChild("Animator"))
             if not a then return end
             local anim = Instance.new("Animation")
-            anim.AnimationId = "rbxassetid://182434002"
+            anim.AnimationId = "rbxassetid://128744471"
             local track = a:LoadAnimation(anim)
-            activeTracks["Zombie"] = track
+            activeTracks["Point"] = track
             track:Play()
-            task.wait(0.15)
+            task.wait(0.1)
             task.spawn(function()
-                while activeTracks["Zombie"] and track.IsPlaying do
-                    track.TimePosition = 0.2
+                while activeTracks["Point"] do
+                    track.TimePosition = 0.15
                     task.wait(0.05)
                 end
             end)
