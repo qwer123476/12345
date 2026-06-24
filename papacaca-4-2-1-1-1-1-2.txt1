@@ -9917,7 +9917,7 @@ local NoClipToggle = playerTab:CreateToggle({
 
 
 local Fly = playerTab:CreateToggle({ 
-    Name = "플라이(모바일불가)", 
+    Name = "플라이(컴퓨터)", 
     CurrentValue = false,
     Flag = "5",
     Callback = function(Value)
@@ -9937,6 +9937,7 @@ local flyInput = playerTab:CreateInput({
     end
 })
 flyInput:Set(80)
+playerTab:CreateSection("모바일플라이")
 local function mflyF()
     if not mflyT then return end
     
@@ -9966,7 +9967,7 @@ local function mflyF()
         end
         
         local camera = workspace.CurrentCamera
-        local SPEED = mflyV or 50
+        local SPEED = mflyV or 100
         
         if humanoid.MoveDirection.Magnitude > 0 then
             local localMove = camera.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
@@ -9984,7 +9985,7 @@ local function mflyF()
 end
 
 playerTab:CreateToggle({ 
-    Name = "플라이", 
+    Name = "플라이(모바일)", 
     CurrentValue = false,
     Flag = "5",
     Callback = function(Value)
@@ -10147,17 +10148,7 @@ local AntiPallet = AuraTab:CreateToggle({
 })
 
 
-AuraTab:CreateToggle({
-    Name = "뒤쪽에 불 상시소환",
-    CurrentValue = false,
-    Flag = "AntiDeathToggle",
-    Callback = function(Value)
-        _G.AntiDeathT = Value
-        if Value then
-            AntiDeathF()
-        end
-    end,
-})
+
 AuraTab:CreateSection("킬,플링")
 local runningFtapKillAura = false
 
