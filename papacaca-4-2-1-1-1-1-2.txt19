@@ -5478,12 +5478,12 @@ end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
---[
+
 local grabTpTouchActive = false
 local grabTpTouchList = {}
 local activeProcessing = {}
 local activeThreads = {}
-]--
+
 local function processPlayer(player)
     if not player then return false end
 
