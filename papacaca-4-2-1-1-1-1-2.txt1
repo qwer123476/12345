@@ -11968,47 +11968,7 @@ function fireAll()
         task.wait()
     end
 end
-]--
-function ragdollAll()
-    while _G.ragdollAllEnabled do
-        local success, err = pcall(function()
-            if not toysFolder:FindFirstChild("FoodBanana") then
-                spawnItem("FoodBanana", Vector3.new(-72.9304581, -5.96906614, -265.543732))
-            end
-            local banana = toysFolder:WaitForChild("FoodBanana")
-            local bananaPeel
-            for _, part in pairs(banana:GetChildren()) do
-                if part.Name == "BananaPeel" and part:FindFirstChild("TouchInterest") then
-                    part.Size = Vector3.new(10, 10, 10)
-                    part.Transparency = 1
-                    bananaPeel = part
-                    break
-                end
-            end
-            local bodyPosition = Instance.new("BodyPosition")
-            bodyPosition.P = 20000
-            bodyPosition.Parent = banana.Main
-            while _G.ragdollAllEnabled do
-                for _, player in pairs(Players:GetChildren()) do
-                    if not _G.ragdollAllEnabled then break end
-                    pcall(function()
-                        if player.Character and player.Character ~= playerCharacter then
-                            bananaPeel.Position = player.Character.HumanoidRootPart.Position or player.Character.Head.Position
-                            bodyPosition.Position = playerCharacter.Head.Position + Vector3.new(0, 600, 0)
-                            task.wait(0.000001)
-                        end
-                    end)
-                end   
-                task.wait()
-            end
-        end)
-        if not success then
-            warn("Error in ragdollAll: " .. tostring(err))
-        end
-        task.wait()
-    end
-end
-]--
+
 
 
 YTab:CreateToggle({
@@ -12044,12 +12004,12 @@ function LineLagF()
                 local args = {
                     [1] = "Line"
                 }
-                -- LineLagV(줄 수)만큼 반복하여 서버에 CreateGrabLine 이벤트를 발생시킵니다.
+        
                 for i = 1, tonumber(LineLagV) do
                     game:GetService("ReplicatedStorage").GrabEvents.CreateGrabLine:FireServer(unpack(args))
                 end
             end)
-            task.wait() -- 너무 빠른 반복으로 인한 튕김을 방지하기 위한 대기 타임
+            task.wait() 
         end
     end)
 end
