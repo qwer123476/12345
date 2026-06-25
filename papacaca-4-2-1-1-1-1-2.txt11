@@ -11822,10 +11822,10 @@ DDTab:CreateToggle({
         end
     end,
 })
-local _G = getgenv and getgenv() or _G
-_G.fireGrabEnabled = false
-_G.fireAllEnabled = false
-_G.ragdollAllEnabled = false
+---local _G = getgenv and getgenv() or _G
+--_G.fireGrabEnabled = false
+--_G.fireAllEnabled = false
+--_G.ragdollAllEnabled = false
 
 function fireGrab()
     while _G.fireGrabEnabled do
