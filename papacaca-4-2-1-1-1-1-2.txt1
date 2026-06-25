@@ -5487,6 +5487,36 @@ local grabTpTouchList = {}
 local activeProcessing = {}
 local activeThreads = {}
 
+local infoLabel = FDTab:CreateLabel({
+    Text = "선택된 플레이어 없음",
+    Amount = "Info"
+})
+
+task.spawn(function()
+    local success, p = pcall(function()
+        return infoLabel.TextLabel
+    end)
+    if success and p then
+        p.RichText = true
+    end
+end)
+
+local function updateProfileDisplay()
+    local textLines = {}
+    for _, name in ipairs(grabTpTouchList) do
+        local p = Players:FindFirstChild(name)
+        if p then
+            table.insert(textLines, string.format("<font color='#FFFFFF'><b>%s</b></font> <font color='#AAAAAA' size='12'>(@%s)</font>", p.DisplayName, p.Name))
+        end
+    end
+    
+    if #textLines == 0 then
+        infoLabel:Set("선택된 플레이어 없음")
+    else
+        infoLabel:Set(table.concat(textLines, "\n"))
+    end
+end
+
 local function processPlayer(player)
     if not player then return false end
 
@@ -5627,6 +5657,7 @@ local grabTpTouchDropdown = FDTab:CreateDropdown({
     Flag = "GrabTpTouchPlayerList",
     Callback = function(Options)
         grabTpTouchList = Options
+        updateProfileDisplay()
     end
 })
 
@@ -5710,8 +5741,6 @@ FDTab:CreateToggle({
         end
     end
 })
-
-
 
 
 -- ================== [ 유틸리티 기능 ] ==================
