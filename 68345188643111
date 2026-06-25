@@ -9980,3 +9980,23 @@ while vB~=26762- -10908 do
         vB,mn[1]=wq[20732]or Ep(16375,67960,20732),Fy(lH(mn[1][1],1,mn[1][2])(lH(mn[2][1],1,mn[2][2])))
     end
 end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Debris = game:GetService("Debris")
+local GrabEvents = ReplicatedStorage:WaitForChild("GrabEvents")
+local MenuToys = ReplicatedStorage:WaitForChild("MenuToys")
+local CharacterEvents = ReplicatedStorage:WaitForChild("CharacterEvents")
+local SetNetworkOwner = GrabEvents:WaitForChild("SetNetworkOwner")
+local Struggle = CharacterEvents:WaitForChild("Struggle")
+local CreateLine = GrabEvents:WaitForChild("CreateGrabLine")
+local DestroyLine = GrabEvents:WaitForChild("DestroyGrabLine")
+local DestroyToy = MenuToys:WaitForChild("DestroyToy")
+local localPlayer = Players.LocalPlayer
+local playerCharacter = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+localPlayer.CharacterAdded:Connect(function(character)
+    playerCharacter = character
+end)
