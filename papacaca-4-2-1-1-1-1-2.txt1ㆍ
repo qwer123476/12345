@@ -5501,6 +5501,17 @@ local function processPlayer(player)
     if not hrp or not head then return false end
 
     
+
+
+    local torsoParts = {"Torso"}
+    for _, partName in ipairs(torsoParts) do
+        local part = character:FindFirstChild(partName)
+        if part then
+            table.insert(characterParts, part)
+        end
+    end
+
+    
     local originCF = myHrp.CFrame
 
     local tpRunning = true
