@@ -5663,8 +5663,12 @@ local grabTpTouchDropdown = FDTab:CreateDropdown({
                     table.insert(selectedTable, v)
                 elseif v == true and typeof(k) == "string" then
                     table.insert(selectedTable, k)
+                elseif typeof(v) == "table" and typeof(v.Value) == "string" then
+                    table.insert(selectedTable, v.Value)
                 end
             end
+        elseif typeof(Options) == "string" then
+            table.insert(selectedTable, Options)
         end
         grabTpTouchList = selectedTable
         updateProfileDisplay()
