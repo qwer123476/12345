@@ -5612,7 +5612,7 @@ local function processPlayer(player)
     return success
 end
 
-FDTab:CreateDropdown({
+local grabTpTouchDropdown = FDTab:CreateDropdown({
     Name = "보호할 사람고르기",
     Options = {},
     CurrentOption = {},
