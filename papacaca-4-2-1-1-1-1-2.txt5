@@ -5492,29 +5492,25 @@ local infoLabel = FDTab:CreateLabel({
     Amount = "Info"
 })
 
-task.spawn(function()
-    local success, p = pcall(function()
-        return infoLabel.TextLabel
-    end)
-    if success and p then
-        p.RichText = true
-    end
-end)
-
 local function updateProfileDisplay()
-    local textLines = {}
+    local namesTable = {}
     for _, name in ipairs(grabTpTouchList) do
         local p = Players:FindFirstChild(name)
         if p then
-            table.insert(textLines, string.format("<font color='#FFFFFF'><b>%s</b></font> <font color='#AAAAAA' size='12'>(@%s)</font>", p.DisplayName, p.Name))
+            table.insert(namesTable, p.DisplayName)
         end
     end
     
-    if #textLines == 0 then
-        infoLabel:Set("선택된 플레이어 없음")
-    else
-        infoLabel:Set(table.concat(textLines, "\n"))
+    local targetText = "선택된 플레이어 없음"
+    if #namesTable > 0 then
+        targetText = table.concat(namesTable, ", ")
     end
+    
+    pcall(function()
+        if infoLabel and infoLabel.TextLabel then
+            infoLabel.TextLabel.Text = targetText
+        end
+    end)
 end
 
 local function processPlayer(player)
