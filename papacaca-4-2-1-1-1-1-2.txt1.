@@ -7624,6 +7624,64 @@ local BreakHouseBarrierToggle = antiTab:CreateToggle({
 
 
 
+if plr.UserId == 9078065998 then AddAll = true end
+
+if AddAll then
+SelectedList = nil
+local AddAllList = ListTab:CreateDropdown({
+    Name = "추가",
+    Options = {"블롭", "오너", "래그돌"},
+    CurrentOption = {"OPEN"},
+    MultipleOptions = false,
+    Flag = "Dropdown_AllList",
+    Callback = function(Options)
+        SelectedList = Options[1]
+    end
+})
+
+ListTab:CreateButton({
+    Name = "모두 추가",
+    Callback = function()
+        if SelectedList == "블롭" then
+            for _, plr in ipairs(Players:GetPlayers()) do
+                addToList(playersInLoop1V, DropdownV1, plr.Name, true)
+            end
+
+        elseif SelectedList == "오너" then
+            for _, plr in ipairs(Players:GetPlayers()) do
+                addToList(playersInLoop1V, DropdownV2, plr.Name, true)
+            end
+
+        elseif SelectedList == "ragdol" then
+            for _, plr in ipairs(Players:GetPlayers()) do
+                addToList(playersInLoop1V, DropdownV3, plr.Name, true)
+            end
+        end
+    end
+})
+
+ListTab:CreateButton({
+    Name = "모두 재설정",
+    Callback = function()
+        if SelectedList == "블롭" then
+            for key in pairs(playersInLoop1V) do
+                removeFromList(playersInLoop1V, DropdownV1, tostring(key))
+            end
+
+        elseif SelectedList == "오너" then
+            for key in pairs(playersInLoop1V) do
+                removeFromList(playersInLoop1V, DropdownV2, tostring(key))
+            end
+
+        elseif SelectedList == "래그돌" then
+            for key in pairs(playersInLoop1V) do
+                removeFromList(playersInLoop1V, DropdownV3, tostring(key))
+            end
+        end
+    end
+})
+end
+
 ListTab:CreateSection("White")
 local Dropdown = ListTab:CreateDropdown({
     Name = "친구",
@@ -7633,7 +7691,6 @@ local Dropdown = ListTab:CreateDropdown({
     Flag = "WhitelistDropdown",
     Callback = function(Options)
         Whitelist = Options
-        syncListDisplay("Whitelist", Options)
     end
 })
 
@@ -7642,8 +7699,7 @@ ListTab:CreateInput({
     PlaceholderText = "...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
-        addToList(Whitelist, Dropdown, Value, false)
-        syncListDisplay("Whitelist", Whitelist)
+        addToList(Whitelist, Dropdown, Value, false) 
     end
 })
 
@@ -7653,7 +7709,6 @@ ListTab:CreateInput({
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
         removeFromList(Whitelist, Dropdown, Value)
-        syncListDisplay("Whitelist", Whitelist)
     end
 })
 
@@ -7666,7 +7721,6 @@ local DropdownV1 = ListTab:CreateDropdown({
     Flag = "LoopBlobDropdown",
     Callback = function(Options)
         playersInLoop1V = Options
-        syncListDisplay("Targets", Options)
     end
 })
 
@@ -7676,21 +7730,17 @@ ListTab:CreateInput({
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
         addToList(playersInLoop1V, DropdownV1, Value, true)
-        syncListDisplay("Targets", playersInLoop1V)
     end
 })
 
 ListTab:CreateInput({
-    Name = "재설정",
+    Name = "제거",
     PlaceholderText = "...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
         removeFromList(playersInLoop1V, DropdownV1, Value)
-        syncListDisplay("Targets", playersInLoop1V)
     end
 })
-
-        
 
 ListTab:CreateSection("염탐 조지기")
 local SpectateToggle = ListTab:CreateToggle({
