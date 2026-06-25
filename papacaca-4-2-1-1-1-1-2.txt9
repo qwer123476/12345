@@ -7680,62 +7680,125 @@ local BreakHouseBarrierToggle = antiTab:CreateToggle({
     end
 })
 
-if plr.UserId == 9078065998 then AddAll = true end
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
 
-if AddAll then
-SelectedList = nil
-local AddAllList = ListTab:CreateDropdown({
-    Name = "추가",
-    Options = {"블롭", "오너", "래그돌"},
-    CurrentOption = {"OPEN"},
-    MultipleOptions = false,
-    Flag = "Dropdown_AllList",
-    Callback = function(Options)
-        SelectedList = Options[1]
-    end
-})
+local activeListCards = {
+    Whitelist = {},
+    Targets = {}
+}
 
-ListTab:CreateButton({
-    Name = "모두 추가",
-    Callback = function()
-        if SelectedList == "블롭" then
-            for _, plr in ipairs(Players:GetPlayers()) do
-                addToList(playersInLoop1V, DropdownV1, plr.Name, true)
-            end
-
-        elseif SelectedList == "오너" then
-            for _, plr in ipairs(Players:GetPlayers()) do
-                addToList(playersInLoop1V, DropdownV2, plr.Name, true)
-            end
-
-        elseif SelectedList == "ragdol" then
-            for _, plr in ipairs(Players:GetPlayers()) do
-                addToList(playersInLoop1V, DropdownV3, plr.Name, true)
+local function getTabScrollingFrame()
+    for _, desc in ipairs(CoreGui:GetDescendants()) do
+        if desc:IsA("TextLabel") and (desc.Text == "친구" or desc.Text == "족칠 새끼 고르기") then
+            local current = desc
+            while current do
+                if current:IsA("ScrollingFrame") then
+                    return current
+                end
+                current = current.Parent
             end
         end
     end
-})
+    return nil
+end
 
-ListTab:CreateButton({
-    Name = "모두 재설정",
-    Callback = function()
-        if SelectedList == "블롭" then
-            for key in pairs(playersInLoop1V) do
-                removeFromList(playersInLoop1V, DropdownV1, tostring(key))
-            end
+local function syncListDisplay(listType, currentData)
+    local container = getTabScrollingFrame()
+    if not container then return end
 
-        elseif SelectedList == "오너" then
-            for key in pairs(playersInLoop1V) do
-                removeFromList(playersInLoop1V, DropdownV2, tostring(key))
-            end
+    local layout = container:FindFirstChildOfClass("UIListLayout")
+    if layout then
+        layout.Padding = UDim.new(0, 6)
+    end
 
-        elseif SelectedList == "래그돌" then
-            for key in pairs(playersInLoop1V) do
-                removeFromList(playersInLoop1V, DropdownV3, tostring(key))
+    local selectedNames = {}
+    if typeof(currentData) == "table" then
+        for k, v in pairs(currentData) do
+            if typeof(v) == "string" then
+                table.insert(selectedNames, v)
+            elseif v == true and typeof(k) == "string" then
+                table.insert(selectedNames, k)
+            elseif typeof(v) == "table" and typeof(v.Value) == "string" then
+                table.insert(selectedNames, v.Value)
             end
         end
+    elseif typeof(currentData) == "string" then
+        table.insert(selectedNames, currentData)
     end
-})
+
+    for name, card in pairs(activeListCards[listType]) do
+        if not table.find(selectedNames, name) then
+            if card and card.Parent then
+                card:Destroy()
+            end
+            activeListCards[listType][name] = nil
+        end
+    end
+
+    for _, name in ipairs(selectedNames) do
+        local p = Players:FindFirstChild(name)
+        if p and not activeListCards[listType][name] then
+            local card = Instance.new("Frame")
+            card.Name = listType .. "Card_" .. p.Name
+            card.Size = UDim2.new(1, -10, 0, 45)
+            card.BackgroundColor3 = listType == "Whitelist" and Color3.fromRGB(20, 35, 25) or Color3.fromRGB(40, 20, 25)
+            card.BorderSizePixel = 0
+            card.Parent = container
+
+            local cardCorner = Instance.new("UICorner")
+            cardCorner.CornerRadius = UDim.new(0, 6)
+            cardCorner.Parent = card
+
+            local cardStroke = Instance.new("UIStroke")
+            cardStroke.Color = listType == "Whitelist" and Color3.fromRGB(35, 60, 45) or Color3.fromRGB(70, 35, 40)
+            cardStroke.Thickness = 1
+            cardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            cardStroke.Parent = card
+
+            local pfp = Instance.new("ImageLabel")
+            pfp.Size = UDim2.new(0, 35, 0, 35)
+            pfp.Position = UDim2.new(0, 5, 0.5, -17.5)
+            pfp.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            pfp.BorderSizePixel = 0
+            pfp.Parent = card
+
+            local pfpCorner = Instance.new("UICorner")
+            pfpCorner.CornerRadius = UDim.new(1, 0)
+            pfpCorner.Parent = pfp
+
+            task.spawn(function()
+                local res, ready = Players:GetUserThumbnailAsync(p.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+                if ready then
+                    pfp.Image = res
+                end
+            end)
+
+            local dispLabel = Instance.new("TextLabel")
+            dispLabel.Size = UDim2.new(1, -50, 0, 18)
+            dispLabel.Position = UDim2.new(0, 48, 0, 4)
+            dispLabel.BackgroundTransparency = 1
+            dispLabel.Text = p.DisplayName
+            dispLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            dispLabel.TextSize = 13
+            dispLabel.Font = Enum.Font.SourceSansBold
+            dispLabel.TextXAlignment = Enum.TextXAlignment.Left
+            dispLabel.Parent = card
+
+            local userLabel = Instance.new("TextLabel")
+            userLabel.Size = UDim2.new(1, -50, 0, 15)
+            userLabel.Position = UDim2.new(0, 48, 0, 22)
+            userLabel.BackgroundTransparency = 1
+            userLabel.Text = "@" .. p.Name
+            userLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+            userLabel.TextSize = 11
+            userLabel.Font = Enum.Font.SourceSans
+            userLabel.TextXAlignment = Enum.TextXAlignment.Left
+            userLabel.Parent = card
+
+            activeListCards[listType][name] = card
+        end
+    end
 end
 
 ListTab:CreateSection("White")
@@ -7747,6 +7810,7 @@ local Dropdown = ListTab:CreateDropdown({
     Flag = "WhitelistDropdown",
     Callback = function(Options)
         Whitelist = Options
+        syncListDisplay("Whitelist", Options)
     end
 })
 
@@ -7755,16 +7819,18 @@ ListTab:CreateInput({
     PlaceholderText = "...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
-        addToList(Whitelist, Dropdown, Value, false) 
+        addToList(Whitelist, Dropdown, Value, false)
+        syncListDisplay("Whitelist", Whitelist)
     end
 })
 
 ListTab:CreateInput({
-    Name = "추가",
+    Name = "제거",
     PlaceholderText = "...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
         removeFromList(Whitelist, Dropdown, Value)
+        syncListDisplay("Whitelist", Whitelist)
     end
 })
 
@@ -7777,6 +7843,7 @@ local DropdownV1 = ListTab:CreateDropdown({
     Flag = "LoopBlobDropdown",
     Callback = function(Options)
         playersInLoop1V = Options
+        syncListDisplay("Targets", Options)
     end
 })
 
@@ -7786,6 +7853,7 @@ ListTab:CreateInput({
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
         addToList(playersInLoop1V, DropdownV1, Value, true)
+        syncListDisplay("Targets", playersInLoop1V)
     end
 })
 
@@ -7795,8 +7863,12 @@ ListTab:CreateInput({
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
         removeFromList(playersInLoop1V, DropdownV1, Value)
+        syncListDisplay("Targets", playersInLoop1V)
     end
 })
+
+        
+
 ListTab:CreateSection("염탐 조지기")
 local SpectateToggle = ListTab:CreateToggle({
     Name = "관전 기능 활성화",
