@@ -5478,40 +5478,119 @@ end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
-
-
-    local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
 
 local grabTpTouchActive = false
 local grabTpTouchList = {}
 local activeProcessing = {}
 local activeThreads = {}
+local activeCards = {}
 
-local infoLabel = FDTab:CreateLabel("선택된 플레이어 없음")
-
-local function updateProfileDisplay()
-    local textLines = {}
-    for _, name in ipairs(grabTpTouchList) do
-        local p = Players:FindFirstChild(name)
-        if p then
-            table.insert(textLines, p.DisplayName .. " (@" .. p.Name .. ")")
-        end
-    end
-    
-    local targetText = "선택된 플레이어 없음"
-    if #textLines > 0 then
-        targetText = table.concat(textLines, ", ")
-    end
-    
-    pcall(function()
-        if infoLabel then
-            if typeof(infoLabel.Set) == "function" then
-                infoLabel:Set(targetText)
-            elseif infoLabel.TextLabel then
-                infoLabel.TextLabel.Text = targetText
+local function getTabContainer()
+    for _, desc in ipairs(CoreGui:GetDescendants()) do
+        if desc:IsA("TextLabel") and (desc.Text == "보호할 사람고르기" or desc.Text == "보호 켜기") then
+            local current = desc
+            while current do
+                if current:IsA("ScrollingFrame") then
+                    return current
+                end
+                current = current.Parent
             end
         end
+    end
+    return nil
+end
+
+local function createPlayerCard(player, container)
+    if activeCards[player.Name] then return end
+
+    local card = Instance.new("Frame")
+    card.Name = "Card_" .. player.Name
+    card.Size = UDim2.new(1, -10, 0, 45)
+    card.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    card.BorderSizePixel = 0
+    card.Parent = container
+
+    local cardCorner = Instance.new("UICorner")
+    cardCorner.CornerRadius = UDim.new(0, 6)
+    cardCorner.Parent = card
+
+    local cardStroke = Instance.new("UIStroke")
+    cardStroke.Color = Color3.fromRGB(40, 40, 40)
+    cardStroke.Thickness = 1
+    cardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    cardStroke.Parent = card
+
+    local pfp = Instance.new("ImageLabel")
+    pfp.Size = UDim2.new(0, 35, 0, 35)
+    pfp.Position = UDim2.new(0, 5, 0.5, -17.5)
+    pfp.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    pfp.BorderSizePixel = 0
+    pfp.Parent = card
+
+    local pfpCorner = Instance.new("UICorner")
+    pfpCorner.CornerRadius = UDim.new(1, 0)
+    pfpCorner.Parent = pfp
+
+    task.spawn(function()
+        local res, ready = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+        if ready then
+            pfp.Image = res
+        end
     end)
+
+    local dispLabel = Instance.new("TextLabel")
+    dispLabel.Size = UDim2.new(1, -50, 0, 18)
+    dispLabel.Position = UDim2.new(0, 48, 0, 4)
+    dispLabel.BackgroundTransparency = 1
+    dispLabel.Text = player.DisplayName
+    dispLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    dispLabel.TextSize = 13
+    dispLabel.Font = Enum.Font.SourceSansBold
+    dispLabel.TextXAlignment = Enum.TextXAlignment.Left
+    dispLabel.Parent = card
+
+    local userLabel = Instance.new("TextLabel")
+    userLabel.Size = UDim2.new(1, -50, 0, 15)
+    userLabel.Position = UDim2.new(0, 48, 0, 22)
+    userLabel.BackgroundTransparency = 1
+    userLabel.Text = "@" .. player.Name
+    userLabel.TextColor3 = Color3.fromRGB(140, 140, 140)
+    userLabel.TextSize = 11
+    userLabel.Font = Enum.Font.SourceSans
+    userLabel.TextXAlignment = Enum.TextXAlignment.Left
+    userLabel.Parent = card
+
+    activeCards[player.Name] = card
+end
+
+local function updateProfileDisplay()
+    local container = getTabContainer()
+    if not container then return end
+
+    if not container:FindFirstChild("CardLayout") then
+        local layout = container:FindFirstChildOfClass("UIListLayout")
+        if layout then
+            layout.Padding = UDim.new(0, 6)
+        end
+    end
+
+    for name, card in pairs(activeCards) do
+        if not table.find(grabTpTouchList, name) then
+            if card and card.Parent then
+                card:Destroy()
+            end
+            activeCards[name] = nil
+        end
+    end
+
+    for _, name in ipairs(grabTpTouchList) do
+        local p = Players:FindFirstChild(name)
+        if p and not activeCards[name] then
+            createPlayerCard(p, container)
+        end
+    end
 end
 
 local function processPlayer(player)
@@ -5753,6 +5832,8 @@ FDTab:CreateToggle({
     end
 })
 
+
+    
 -- ================== [ 유틸리티 기능 ] ==================
 
 UtilityTab:CreateSection("환경 및 시야")
