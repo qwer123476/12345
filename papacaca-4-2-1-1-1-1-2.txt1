@@ -5500,37 +5500,7 @@ local function processPlayer(player)
     local head = character:FindFirstChild("Head")
     if not hrp or not head then return false end
 
-    local characterParts = {}
-    table.insert(characterParts, hrp)
-
-    if character:FindFirstChild("Head") then
-        table.insert(characterParts, character.Head)
-    end
-
-    local torsoParts = {"Torso"}
-    for _, partName in ipairs(torsoParts) do
-        local part = character:FindFirstChild(partName)
-        if part then
-            table.insert(characterParts, part)
-        end
-    end
-
-    local armParts = {"Left Arm", "Right Arm"}
-    for _, partName in ipairs(armParts) do
-        local part = character:FindFirstChild(partName)
-        if part then
-            table.insert(characterParts, part)
-        end
-    end
-
-    local legParts = {"Left Leg", "Right Leg"}
-    for _, partName in ipairs(legParts) do
-        local part = character:FindFirstChild(partName)
-        if part then
-            table.insert(characterParts, part)
-        end
-    end
-
+    
     local originCF = myHrp.CFrame
 
     local tpRunning = true
