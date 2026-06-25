@@ -1,3 +1,116 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+
+local LocalPlayer = Players.LocalPlayer
+local GrabEvents = ReplicatedStorage:WaitForChild("GrabEvents", 5)
+
+if not GrabEvents then 
+    warn("GrabEvents를 찾을 수 없습니다. 해당 게임이 아닐 수 있습니다.")
+    return 
+end 
+
+local CreateGrabLine = GrabEvents:WaitForChild("CreateGrabLine", 5)
+if not CreateGrabLine then 
+    warn("CreateGrabLine 이벤트를 찾을 수 없습니다.")
+    return 
+end 
+
+local ClientEvent = CreateGrabLine.OnClientEvent
+local IsAntiLagEnabled = true
+local DisableBeamOnLag = true
+local MaxEventCount = 30
+local UserEventLog = {}
+local Connection = nil
+
+local function AntiLagFunction()
+    if Connection then 
+        Connection:Disconnect()
+        Connection = nil 
+    end 
+
+    local CharacterAndBeamMove = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("CharacterAndBeamMove", 5)
+
+    if not IsAntiLagEnabled then 
+        if CharacterAndBeamMove then 
+            CharacterAndBeamMove.Enabled = true 
+        end 
+        return 
+    end 
+
+    if IsAntiLagEnabled and not DisableBeamOnLag then 
+        if CharacterAndBeamMove then 
+            CharacterAndBeamMove.Enabled = false 
+        end 
+    end 
+
+    Connection = ClientEvent:Connect(function(Sender, ...)
+        if typeof(Sender) ~= "Instance" or not Sender:IsA("Player") then return end 
+        if Sender == LocalPlayer then return end 
+        
+        if not IsAntiLagEnabled then 
+            if CharacterAndBeamMove then CharacterAndBeamMove.Enabled = true end 
+            return 
+        end 
+        if not DisableBeamOnLag then 
+            if CharacterAndBeamMove then CharacterAndBeamMove.Enabled = false end 
+            return 
+        end 
+
+        local CurrentTime = os.clock()
+        if not UserEventLog[Sender] then 
+            UserEventLog[Sender] = { count = 0, start = CurrentTime }
+        end 
+
+        local Log = UserEventLog[Sender]
+        
+        if CurrentTime - Log.start > 1 then 
+            Log.count = 0 
+            Log.start = CurrentTime 
+        end 
+
+        Log.count += 1 
+
+        if Log.count >= MaxEventCount and not Log.isDecreasing then 
+            Log.isDecreasing = true 
+            
+            pcall(function()
+                StarterGui:SetCore("SendNotification", {
+                    Title = "[ 렉 감지 ]",
+                    Text = Sender.Name .. " [ " .. Sender.DisplayName .. " ]",
+                    Duration = 3
+                })
+            end)
+
+            if CharacterAndBeamMove then 
+                CharacterAndBeamMove.Enabled = false 
+            end 
+
+            task.spawn(function()
+                while Log.count > 0 do 
+                    task.wait(0.1)
+                    Log.count -= 1 
+                end 
+                if CharacterAndBeamMove then 
+                    CharacterAndBeamMove.Enabled = true 
+                end 
+                UserEventLog[Sender] = nil 
+            end)
+        end 
+    end)
+end 
+
+AntiLagFunction()
+
+pcall(function()
+    StarterGui:SetCore("SendNotification", {
+        Title = "시스템",
+        Text = "자동 안티 렉 작동 시작",
+        Duration = 5
+    })
+end)
+
+print("자동 안티 렉 실행 됨")
 
 local ND,og,Tt,cp,jc,k=bit32.bxor,type,getmetatable,pairs
 local Av,Ru,zD,ik,La,eb,sn,ut,Lz,lH,bf,Cz,_l,fg,Su,ri,aD,wj,um,RD,Fy,FC,ge,QE,wa;
