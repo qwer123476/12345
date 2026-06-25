@@ -5479,114 +5479,13 @@ end
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
 
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "EmbeddedPlayerProtectionDisplay"
-mainFrame.BackgroundTransparency = 1
-mainFrame.Size = UDim2.new(1, 0, 0, 0)
-
-local uiList = Instance.new("UIListLayout")
-uiList.Padding = UDim.new(0, 6)
-uiList.SortOrder = Enum.SortOrder.LayoutOrder
-uiList.Parent = mainFrame
+    local Players = game:GetService("Players")
 
 local grabTpTouchActive = false
 local grabTpTouchList = {}
 local activeProcessing = {}
 local activeThreads = {}
-
-local function getTabContainer()
-    for _, desc in ipairs(CoreGui:GetDescendants()) do
-        if desc:IsA("TextLabel") and desc.Text == "보호할 사람고르기" then
-            local current = desc
-            while current do
-                if current:IsA("ScrollingFrame") then
-                    return current
-                end
-                current = current.Parent
-            end
-        end
-    end
-    return nil
-end
-
-local function updateProfileDisplay()
-    local tabContainer = getTabContainer()
-    if tabContainer then
-        mainFrame.Parent = tabContainer
-    end
-
-    for _, child in ipairs(mainFrame:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
-    end
-    
-    local count = 0
-    for _, name in ipairs(grabTpTouchList) do
-        local p = Players:FindFirstChild(name)
-        if p then
-            count = count + 1
-            local card = Instance.new("Frame")
-            card.Size = UDim2.new(1, -10, 0, 50)
-            card.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            card.BorderSizePixel = 0
-            card.Parent = mainFrame
-            
-            local cardCorner = Instance.new("UICorner")
-            cardCorner.CornerRadius = UDim.new(0, 6)
-            cardCorner.Parent = card
-            
-            local pfp = Instance.new("ImageLabel")
-            pfp.Size = UDim2.new(0, 40, 0, 40)
-            pfp.Position = UDim2.new(0, 5, 0.5, -20)
-            pfp.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            pfp.BorderSizePixel = 0
-            pfp.Parent = card
-            
-            local pfpCorner = Instance.new("UICorner")
-            pfpCorner.CornerRadius = UDim.new(1, 0)
-            pfpCorner.Parent = pfp
-            
-            task.spawn(function()
-                local res, ready = Players:GetUserThumbnailAsync(p.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
-                if ready then
-                    pfp.Image = res
-                end
-            end)
-            
-            local dispLabel = Instance.new("TextLabel")
-            dispLabel.Size = UDim2.new(1, -55, 0, 20)
-            dispLabel.Position = UDim2.new(0, 50, 0, 5)
-            dispLabel.BackgroundTransparency = 1
-            dispLabel.Text = p.DisplayName
-            dispLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            dispLabel.TextSize = 14
-            dispLabel.Font = Enum.Font.SourceSansBold
-            dispLabel.TextXAlignment = Enum.TextXAlignment.Left
-            dispLabel.Parent = card
-            
-            local userLabel = Instance.new("TextLabel")
-            userLabel.Size = UDim2.new(1, -55, 0, 20)
-            userLabel.Position = UDim2.new(0, 50, 0, 22)
-            userLabel.BackgroundTransparency = 1
-            userLabel.Text = "@" .. p.Name
-            userLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-            userLabel.TextSize = 12
-            userLabel.Font = Enum.Font.SourceSans
-            userLabel.TextXAlignment = Enum.TextXAlignment.Left
-            userLabel.Parent = card
-        end
-    end
-    
-    if count == 0 then
-        mainFrame.Size = UDim2.new(1, 0, 0, 0)
-    else
-        mainFrame.Size = UDim2.new(1, 0, 0, (count * 50) + ((count - 1) * 6))
-    end
-end
 
 local function processPlayer(player)
     if not player then return false end
@@ -5728,7 +5627,6 @@ local grabTpTouchDropdown = FDTab:CreateDropdown({
     Flag = "GrabTpTouchPlayerList",
     Callback = function(Options)
         grabTpTouchList = Options
-        task.defer(updateProfileDisplay)
     end
 })
 
@@ -5812,8 +5710,6 @@ FDTab:CreateToggle({
         end
     end
 })
-
-
 
 
 
