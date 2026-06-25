@@ -5487,28 +5487,29 @@ local grabTpTouchList = {}
 local activeProcessing = {}
 local activeThreads = {}
 
-local infoLabel = FDTab:CreateLabel({
-    Text = "선택된 플레이어 없음",
-    Amount = "Info"
-})
+local infoLabel = FDTab:CreateLabel("선택된 플레이어 없음")
 
 local function updateProfileDisplay()
-    local namesTable = {}
+    local textLines = {}
     for _, name in ipairs(grabTpTouchList) do
         local p = Players:FindFirstChild(name)
         if p then
-            table.insert(namesTable, p.DisplayName)
+            table.insert(textLines, p.DisplayName .. " (@" .. p.Name .. ")")
         end
     end
     
     local targetText = "선택된 플레이어 없음"
-    if #namesTable > 0 then
-        targetText = table.concat(namesTable, ", ")
+    if #textLines > 0 then
+        targetText = table.concat(textLines, ", ")
     end
     
     pcall(function()
-        if infoLabel and infoLabel.TextLabel then
-            infoLabel.TextLabel.Text = targetText
+        if infoLabel then
+            if typeof(infoLabel.Set) == "function" then
+                infoLabel:Set(targetText)
+            elseif infoLabel.TextLabel then
+                infoLabel.TextLabel.Text = targetText
+            end
         end
     end)
 end
@@ -5751,7 +5752,6 @@ FDTab:CreateToggle({
         end
     end
 })
-
 
 -- ================== [ 유틸리티 기능 ] ==================
 
