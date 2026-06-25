@@ -5612,8 +5612,8 @@ local function processPlayer(player)
     return success
 end
 
-local grabTpTouchDropdown = LoopTab:CreateDropdown({
-    Name = "그랩 감지 TP 터치 대상",
+FDTab:CreateDropdown({
+    Name = "보호할 사람고르기",
     Options = {},
     CurrentOption = {},
     MultipleOptions = true,
@@ -5637,8 +5637,8 @@ game.Players.PlayerAdded:Connect(refreshGrabTpTouchDropdown)
 game.Players.PlayerRemoving:Connect(refreshGrabTpTouchDropdown)
 refreshGrabTpTouchDropdown()
 
-LoopTab:CreateToggle({
-    Name = "그랩 감지 TP 터치",
+FDTab:CreateToggle({
+    Name = "보호 켜기",
     CurrentValue = false,
     Flag = "GrabDetectionTpTouchToggle",
     Callback = function(Value)
