@@ -7180,7 +7180,17 @@ grabTab:CreateToggle({
         KillGrabF()
     end
 })
-
+grabTab:CreateToggle({
+    Name = "파이어 그랩",
+    CurrentValue = false,
+    Flag = "fireGrabToggle",
+    Callback = function(Value)
+        _G.fireGrabEnabled = Value
+        if Value then
+            task.spawn(fireGrab)
+        end
+    end,
+})
 grabTab:CreateSection("킥")
 grabTab:CreateToggle({
     Name = "킥그랩(더럽게 안됨)",
@@ -8168,16 +8178,7 @@ ListTab:CreateToggle({
         end
     end,
 })
-LoopTab:CreateToggle({
-   Name = "루프 파이어",
-   CurrentValue = false,
-   Callback = function(Value)
-      LoopfireT = Value
-      if Value then
-     LoopfireF()
-      end
-   end,
-})
+
 LoopTab:CreateSection("자동블롭앉기")
 local AutoSit = LoopTab:CreateToggle({
     Name = "자동블롭앉기",
@@ -9145,6 +9146,44 @@ task.spawn(function()
 end)
 
 
+antiTab:CreateToggle({
+    Name = "안티그랩V3",
+    CurrentValue = false,
+    Flag = "AutoStruggle", 
+    Callback = function(enabled)
+        if enabled then
+            autoStruggleCoroutine = RunService.Heartbeat:Connect(function()
+                local character = localPlayer.Character
+                if character and character:FindFirstChild("Head") then
+                    local head = character.Head
+                    local partOwner = head:FindFirstChild("PartOwner")
+                    if partOwner then
+                        Struggle:FireServer()
+                        ReplicatedStorage.GameCorrectionEvents.StopAllVelocity:FireServer()
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Anchored = true
+                            end
+                        end
+                        while localPlayer.IsHeld.Value do
+                            wait()
+                        end
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Anchored = false
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if autoStruggleCoroutine then
+                autoStruggleCoroutine:Disconnect()
+                autoStruggleCoroutine = nil
+            end
+        end
+    end
+})
 
 
 local AntiGrabSticky = antiTab:CreateToggle({
@@ -9284,6 +9323,35 @@ antiTab:CreateDropdown({
         end
     end,
 })
+antiTab:CreateToggle({
+    Name = "안티킥 [그랩]",
+    CurrentValue = false,
+    Flag = "AntiKickGrab", 
+    Callback = function(enabled)
+        if enabled then
+            local character = localPlayer.Character
+
+            antiKickCoroutine = RunService.Heartbeat:Connect(function()
+                local character = localPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("HumanoidRootPart"):FindFirstChild("FirePlayerPart") then
+                    local partOwner = character:FindFirstChild("HumanoidRootPart"):FindFirstChild("FirePlayerPart"):FindFirstChild("PartOwner")
+                    if partOwner and partOwner.Value ~= localPlayer.Name then
+                        local args = {[1] = character:WaitForChild("HumanoidRootPart"), [2] = 0}
+                        game:GetService("ReplicatedStorage"):WaitForChild("CharacterEvents"):WaitForChild("RagdollRemote"):FireServer(unpack(args))
+                        print("grabbity shap!")
+                        wait(0.1)
+                        Struggle:FireServer()
+                    end
+                end
+            end)
+        else
+            if antiKickCoroutine then
+                antiKickCoroutine:Disconnect()
+                antiKickCoroutine = nil
+            end
+        end
+    end
+})
 
 
 
@@ -9359,6 +9427,48 @@ local AntiMassless = antiTab:CreateToggle({
     end
 })
 AntiMassless:Set(true)
+antiTab:CreateSection("안티 에어 서스펜션")
+antiTab:CreateToggle({
+    Name = "디펜스 / 에어 서브펜션",
+    CurrentValue = false,
+    Flag = "SelfDefenseAirSuspend", 
+    Callback = function(enabled)
+        if enabled then
+            autoDefendCoroutine = coroutine.create(function()
+                while wait(0.02) do
+                    local character = localPlayer.Character
+                    if character and character:FindFirstChild("Head") then
+                        local head = character.Head
+                        local partOwner = head:FindFirstChild("PartOwner")
+                        if partOwner then
+                            local attacker = Players:FindFirstChild(partOwner.Value)
+                            if attacker and attacker.Character then
+                                Struggle:FireServer()
+                                SetNetworkOwner:FireServer(attacker.Character.Head or attacker.Character.Torso, attacker.Character.HumanoidRootPart.FirePlayerPart.CFrame)
+                                task.wait(0.1)
+                                local target = attacker.Character:FindFirstChild("Torso")
+                                if target then
+                                    local velocity = target:FindFirstChild("l") or Instance.new("BodyVelocity")
+                                    velocity.Name = "l"
+                                    velocity.Parent = target
+                                    velocity.Velocity = Vector3.new(0, 50, 0)
+                                    velocity.MaxForce = Vector3.new(0, math.huge, 0)
+                                    Debris:AddItem(velocity, 100)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+            coroutine.resume(autoDefendCoroutine)
+        else
+            if autoDefendCoroutine then
+                coroutine.close(autoDefendCoroutine)
+                autoDefendCoroutine = nil
+            end
+        end
+    end
+})
 
 antiTab:CreateSection("")
 
@@ -11889,6 +11999,143 @@ DDTab:CreateToggle({
         end
     end,
 })
+local _G = getgenv and getgenv() or _G
+_G.fireGrabEnabled = false
+_G.fireAllEnabled = false
+_G.ragdollAllEnabled = false
+
+local function fireGrab()
+    while _G.fireGrabEnabled do
+        local success, err = pcall(function()
+            local child = workspace:FindFirstChild("GrabParts")
+            if child and child.Name == "GrabParts" then
+                local grabPart = child:FindFirstChild("GrabPart")
+                local grabbedPart = grabPart:FindFirstChild("WeldConstraint").Part1
+                local head = grabbedPart.Parent:FindFirstChild("Head")
+                if head then
+                    arson(head)
+                end
+            end
+        end)
+        task.wait(0.1)
+    end
+end
+
+local function fireAll()
+    while _G.fireAllEnabled do
+        local success, err = pcall(function()
+            if toysFolder:FindFirstChild("Campfire") then
+                DestroyT(toysFolder:FindFirstChild("Campfire"))
+                task.wait(0.5)
+            end
+            if not _G.fireAllEnabled then return end
+            spawnItemCf("Campfire", playerCharacter.Head.CFrame)
+            local campfire = toysFolder:WaitForChild("Campfire")
+            local firePlayerPart
+            for _, part in pairs(campfire:GetChildren()) do
+                if part.Name == "FirePlayerPart" then
+                    part.Size = Vector3.new(10, 10, 10)
+                    firePlayerPart = part
+                    break
+                end
+            end
+            local originalPosition = playerCharacter.Torso.Position
+            SetNetworkOwner:FireServer(firePlayerPart, firePlayerPart.CFrame)
+            playerCharacter:MoveTo(firePlayerPart.Position)
+            task.wait(0.3)
+            if not _G.fireAllEnabled then return end
+            playerCharacter:MoveTo(originalPosition)
+            local bodyPosition = Instance.new("BodyPosition")
+            bodyPosition.P = 20000
+            bodyPosition.Position = playerCharacter.Head.Position + Vector3.new(0, 600, 0)
+            bodyPosition.Parent = campfire.Main
+            while _G.fireAllEnabled do
+                for _, player in pairs(Players:GetChildren()) do
+                    if not _G.fireAllEnabled then break end
+                    pcall(function()
+                        bodyPosition.Position = playerCharacter.Head.Position + Vector3.new(0, 600, 0)
+                        if player.Character and player.Character.HumanoidRootPart and player.Character ~= playerCharacter then
+                            firePlayerPart.Position = player.Character.HumanoidRootPart.Position or player.Character.Head.Position
+                            task.wait(0.01)
+                        end
+                    end)
+                end  
+                task.wait()
+            end
+        end)
+        if not success then
+            warn("Error in fireAll: " .. tostring(err))
+        end
+        task.wait()
+    end
+end
+
+local function ragdollAll()
+    while _G.ragdollAllEnabled do
+        local success, err = pcall(function()
+            if not toysFolder:FindFirstChild("FoodBanana") then
+                spawnItem("FoodBanana", Vector3.new(-72.9304581, -5.96906614, -265.543732))
+            end
+            local banana = toysFolder:WaitForChild("FoodBanana")
+            local bananaPeel
+            for _, part in pairs(banana:GetChildren()) do
+                if part.Name == "BananaPeel" and part:FindFirstChild("TouchInterest") then
+                    part.Size = Vector3.new(10, 10, 10)
+                    part.Transparency = 1
+                    bananaPeel = part
+                    break
+                end
+            end
+            local bodyPosition = Instance.new("BodyPosition")
+            bodyPosition.P = 20000
+            bodyPosition.Parent = banana.Main
+            while _G.ragdollAllEnabled do
+                for _, player in pairs(Players:GetChildren()) do
+                    if not _G.ragdollAllEnabled then break end
+                    pcall(function()
+                        if player.Character and player.Character ~= playerCharacter then
+                            bananaPeel.Position = player.Character.HumanoidRootPart.Position or player.Character.Head.Position
+                            bodyPosition.Position = playerCharacter.Head.Position + Vector3.new(0, 600, 0)
+                            task.wait(0.000001)
+                        end
+                    end)
+                end   
+                task.wait()
+            end
+        end)
+        if not success then
+            warn("Error in ragdollAll: " .. tostring(err))
+        end
+        task.wait()
+    end
+end
+
+
+
+YTab:CreateToggle({
+    Name = "파이어 All",
+    CurrentValue = false,
+    Flag = "fireAllToggle",
+    Callback = function(Value)
+        _G.fireAllEnabled = Value
+        if Value then
+            task.spawn(fireAll)
+        end
+    end,
+})
+
+YTab:CreateToggle({
+    Name = "래그돌 all",
+    CurrentValue = false,
+    Flag = "ragdollAllToggle",
+    Callback = function(Value)
+        _G.ragdollAllEnabled = Value
+        if Value then
+            task.spawn(ragdollAll)
+        end
+    end,
+})
+
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
