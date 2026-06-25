@@ -77,7 +77,8 @@ if rayResult then n=rayResult.Position-Vector3.new(0,0.5,0)else n=offset+rayDire
 end originalRotation=(hrp.CFrame*CFrame.Angles(math.rad(-90),0,0)).Rotation m.CFrame=CFrame.new(n)*originalRotation m.Name='SpawnCF'
 end 
 task.wait()
-end end)return m 
+end end)
+    return m 
 end 
 function ForWhiteList(m)WhiteListMode=m 
 task.spawn(function()
