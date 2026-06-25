@@ -12004,7 +12004,7 @@ _G.fireGrabEnabled = false
 _G.fireAllEnabled = false
 _G.ragdollAllEnabled = false
 
-local function fireGrab()
+function fireGrab()
     while _G.fireGrabEnabled do
         local success, err = pcall(function()
             local child = workspace:FindFirstChild("GrabParts")
@@ -12021,7 +12021,7 @@ local function fireGrab()
     end
 end
 
-local function fireAll()
+function fireAll()
     while _G.fireAllEnabled do
         local success, err = pcall(function()
             if toysFolder:FindFirstChild("Campfire") then
@@ -12070,7 +12070,7 @@ local function fireAll()
     end
 end
 
-local function ragdollAll()
+function ragdollAll()
     while _G.ragdollAllEnabled do
         local success, err = pcall(function()
             if not toysFolder:FindFirstChild("FoodBanana") then
