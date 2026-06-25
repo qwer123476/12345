@@ -5656,7 +5656,17 @@ local grabTpTouchDropdown = FDTab:CreateDropdown({
     MultipleOptions = true,
     Flag = "GrabTpTouchPlayerList",
     Callback = function(Options)
-        grabTpTouchList = Options
+        local selectedTable = {}
+        if typeof(Options) == "table" then
+            for k, v in pairs(Options) do
+                if typeof(v) == "string" then
+                    table.insert(selectedTable, v)
+                elseif v == true and typeof(k) == "string" then
+                    table.insert(selectedTable, k)
+                end
+            end
+        end
+        grabTpTouchList = selectedTable
         updateProfileDisplay()
     end
 })
