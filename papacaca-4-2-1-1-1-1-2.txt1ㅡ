@@ -5608,6 +5608,12 @@ local function processPlayer(player)
             myHrp.CFrame = originCF
         end
     end
+
+    if myHum and myHum.Parent then
+        myHum.Sit = false
+        myHum.PlatformStand = false
+        myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
+    end
     
     return success
 end
@@ -5643,6 +5649,18 @@ FDTab:CreateToggle({
     Flag = "GrabDetectionTpTouchToggle",
     Callback = function(Value)
         grabTpTouchActive = Value
+
+        local myChar = plr.Character
+        local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+        if myHum then
+            myHum:SetStateEnabled(Enum.HumanoidStateType.Seated, not Value)
+            if Value then
+                myHum.Sit = false
+                myHum.PlatformStand = false
+                myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end
+
         if Value then
             task.spawn(function()
                 while grabTpTouchActive do
@@ -5671,6 +5689,7 @@ FDTab:CreateToggle({
                                         activeProcessing[player] = true
                                         task.spawn(function()
                                             processPlayer(player)
+                                            task.wait(0.3)
                                             activeProcessing[player] = nil
                                         end)
                                     end
@@ -5683,9 +5702,14 @@ FDTab:CreateToggle({
             end)
         else
             table.clear(activeProcessing)
+            local currentHum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+            if currentHum then
+                currentHum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+            end
         end
     end
 })
+
 
 
 
