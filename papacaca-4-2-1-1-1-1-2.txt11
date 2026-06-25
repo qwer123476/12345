@@ -43,7 +43,7 @@ local keybindTab = Window:CreateTab("설정", 6031094678)
 local DevTab = Window:CreateTab("잡기능", 3944680095)             
 local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
 local environmentTab = Window:CreateTab("환경 설정", 6023426923)   
-local combatTab = Window:CreateTab("전투 확장", 6026568198)        
+local FDTab = Window:CreateTab("친구 보호", 6026568198)        
 local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
 local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
 local CreditsTab = Window:CreateTab("제작자 한정")
@@ -5477,32 +5477,219 @@ end
 end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
-combatTab:CreateSection("물리 조작 및 전투")
-combatTab:CreateToggle({Name = "자동 그랩 방어", CurrentValue = false, Flag = "C1", Callback = function(v) _G.A_G = v while _G.A_G do pcall(function() for _,x in pairs(game.Players.LocalPlayer.Character:GetChildren()) do if x:IsA("BasePart") then x.CanTouch = false end end end) task.wait(0.1) end end})
-combatTab:CreateToggle({Name = "주변 유저 밀기", CurrentValue = false, Flag = "C2", Callback = function(v) _G.P_H = v while _G.P_H do for _,p in pairs(game.Players:GetPlayers()) do if p ~= game.Players.LocalPlayer and p.Character then local d = (p.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude if d < 12 then p.Character.HumanoidRootPart.Velocity = (p.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Unit * 60 end end end task.wait(0.1) end end})
-combatTab:CreateToggle({Name = "라그돌 자동 해제", CurrentValue = false, Flag = "C3", Callback = function(v) _G.N_R = v while _G.N_R do pcall(function() if game.Players.LocalPlayer.Character:FindFirstChild("RagdollConfig") then game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false end end) task.wait(0.1) end end})
-combatTab:CreateToggle({Name = "무게 무시", CurrentValue = false, Flag = "C4", Callback = function(v) for _,x in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do if x:IsA("BasePart") then x.Massless = v end end end})
-combatTab:CreateToggle({Name = "자동 점프", CurrentValue = false, Flag = "C5", Callback = function(v) _G.A_J = v while _G.A_J do pcall(function() game.Players.LocalPlayer.Character.Humanoid.Jump = true end) task.wait(0.1) end end})
-combatTab:CreateToggle({Name = "스핀 공격", CurrentValue = false, Flag = "C6", Callback = function(v) _G.S_N = v while _G.S_N do pcall(function() game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.Angles(0, math.rad(35), 0) end) task.wait() end end})
-combatTab:CreateToggle({Name = "그랩 파트 삭제", CurrentValue = false, Flag = "C7", Callback = function(v) if v and workspace:FindFirstChild("GrabParts") then workspace.GrabParts:Destroy() end end})
-combatTab:CreateToggle({Name = "유저 위치 고정", CurrentValue = false, Flag = "C8", Callback = function(v) for _,p in pairs(game.Players:GetPlayers()) do if p ~= game.Players.LocalPlayer and p.Character then p.Character.HumanoidRootPart.Anchored = v end end end})
-combatTab:CreateToggle({Name = "캐릭터 투명화", CurrentValue = false, Flag = "C9", Callback = function(v) for _,x in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do if x:IsA("BasePart") then x.Transparency = v and 0.6 or 0 end end end})
-combatTab:CreateToggle({Name = "주변 물체 날리기", CurrentValue = false, Flag = "C10", Callback = function(v) _G.B_W = v while _G.B_W do for _,x in pairs(workspace:GetChildren()) do if x:IsA("BasePart") and (x.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 15 then x.Velocity = Vector3.new(0, 60, 0) end end task.wait(0.2) end end})
-combatTab:CreateToggle({Name = "플레이어 강조", CurrentValue = false, Flag = "C11", Callback = function(v) for _,p in pairs(game.Players:GetPlayers()) do if p ~= game.Players.LocalPlayer and p.Character then local h = p.Character:FindFirstChild("Highlight") or Instance.new("Highlight", p.Character) h.Enabled = v end end end})
-combatTab:CreateButton({Name = "전원 소환", Callback = function() for _,p in pairs(game.Players:GetPlayers()) do if p ~= game.Players.LocalPlayer and p.Character then p.Character:MoveTo(game.Players.LocalPlayer.Character.HumanoidRootPart.Position) end end end})
-combatTab:CreateButton({Name = "구조물 삭제", Callback = function() for _,x in pairs(workspace:GetChildren()) do if x:IsA("Part") and x.Name ~= "Baseplate" then x:Destroy() end end end})
-combatTab:CreateButton({Name = "지옥 TP", Callback = function() game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -600, 0) end})
-combatTab:CreateButton({Name = "우주 TP", Callback = function() game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10000, 0) end})
-combatTab:CreateButton({Name = "스폰 TP", Callback = function() game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 15, 0) end})
-combatTab:CreateButton({Name = "랜덤 유저 TP", Callback = function() local ps = game.Players:GetPlayers() local r = ps[math.random(1, #ps)] if r.Character then game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = r.Character.HumanoidRootPart.CFrame end end})
-combatTab:CreateButton({Name = "강제 앉기", Callback = function() game.Players.LocalPlayer.Character.Humanoid.Sit = true end})
 
-combatTab:CreateButton({Name = "맵 청소", Callback = function() if workspace:FindFirstChild("GrabParts") then workspace.GrabParts:Destroy() end end})
-combatTab:CreateButton({Name = "몸체 고정", Callback = function() game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true end})
-combatTab:CreateButton({Name = "고정 해제", Callback = function() game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = false end})
-combatTab:CreateButton({Name = "이동 속도 리셋", Callback = function() game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16 end})
-combatTab:CreateButton({Name = "점프력 리셋", Callback = function() game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50 end})
-combatTab:CreateButton({Name = "닉네임 출력", Callback = function() print(game.Players.LocalPlayer.Name) end})
+--[
+local grabTpTouchActive = false
+local grabTpTouchList = {}
+local activeProcessing = {}
+local activeThreads = {}
+]--
+local function processPlayer(player)
+    if not player then return false end
+
+    local myChar = plr.Character
+    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+    if not myChar or not myHrp or not myHum or myHum.Health <= 0 then
+        return false
+    end
+
+    local character = player.Character
+    if not character then return false end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local head = character:FindFirstChild("Head")
+    if not hrp or not head then return false end
+
+    local characterParts = {}
+    table.insert(characterParts, hrp)
+
+    if character:FindFirstChild("Head") then
+        table.insert(characterParts, character.Head)
+    end
+
+    local torsoParts = {"Torso"}
+    for _, partName in ipairs(torsoParts) do
+        local part = character:FindFirstChild(partName)
+        if part then
+            table.insert(characterParts, part)
+        end
+    end
+
+    local armParts = {"Left Arm", "Right Arm"}
+    for _, partName in ipairs(armParts) do
+        local part = character:FindFirstChild(partName)
+        if part then
+            table.insert(characterParts, part)
+        end
+    end
+
+    local legParts = {"Left Leg", "Right Leg"}
+    for _, partName in ipairs(legParts) do
+        local part = character:FindFirstChild(partName)
+        if part then
+            table.insert(characterParts, part)
+        end
+    end
+
+    local originCF = myHrp.CFrame
+
+    local tpRunning = true
+    local tpThread = task.spawn(function()
+        while tpRunning do
+            if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
+               (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+                break
+            end
+
+            local ok, cf = false, nil
+            if typeof(TP) == "function" then
+                ok, cf = TP(player)
+            else
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    ok, cf = true, player.Character.HumanoidRootPart.CFrame
+                end
+            end
+
+            if ok and cf then
+                myHrp.CFrame = cf
+            end
+            task.wait()
+        end
+    end)
+    table.insert(activeThreads, tpThread)
+
+    local success = false
+    local startTime = tick()
+    local timeout = 10
+
+    while tpRunning and tick() - startTime < timeout do
+        if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
+           (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+            break
+        end
+
+        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") or 
+           (player.Character:FindFirstChildOfClass("Humanoid") and player.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+            break
+        end
+
+        for _, part in ipairs(characterParts) do
+            if part and part.Parent then
+                rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
+            end
+        end
+        
+        local ownerTag = head:FindFirstChild("PartOwner")
+        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+            success = true
+            break
+        end
+        task.wait()
+    end
+
+    tpRunning = false
+
+    for _, thread in ipairs(activeThreads) do
+        if thread then
+            pcall(task.cancel, thread)
+        end
+    end
+    table.clear(activeThreads)
+
+    if originCF and myHrp and myHrp.Parent then
+        myHrp.CFrame = originCF
+        task.wait()
+    end
+
+    if originCF and myHrp and myHrp.Parent then 
+        if typeof(BACK) == "function" then
+            BACK(originCF)
+        else
+            myHrp.CFrame = originCF
+        end
+    end
+    
+    return success
+end
+
+local grabTpTouchDropdown = LoopTab:CreateDropdown({
+    Name = "그랩 감지 TP 터치 대상",
+    Options = {},
+    CurrentOption = {},
+    MultipleOptions = true,
+    Flag = "GrabTpTouchPlayerList",
+    Callback = function(Options)
+        grabTpTouchList = Options
+    end
+})
+
+local function refreshGrabTpTouchDropdown()
+    local playerNames = {}
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= plr then
+            table.insert(playerNames, player.Name)
+        end
+    end
+    grabTpTouchDropdown:Refresh(playerNames, true)
+end
+
+game.Players.PlayerAdded:Connect(refreshGrabTpTouchDropdown)
+game.Players.PlayerRemoving:Connect(refreshGrabTpTouchDropdown)
+refreshGrabTpTouchDropdown()
+
+LoopTab:CreateToggle({
+    Name = "그랩 감지 TP 터치",
+    CurrentValue = false,
+    Flag = "GrabDetectionTpTouchToggle",
+    Callback = function(Value)
+        grabTpTouchActive = Value
+        if Value then
+            task.spawn(function()
+                while grabTpTouchActive do
+                    local myChar = plr.Character
+                    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+                    if not myChar or not myHum or myHum.Health <= 0 then
+                        task.wait(0.5)
+                        continue
+                    end
+
+                    for _, name in ipairs(grabTpTouchList) do
+                        if not grabTpTouchActive then break end
+
+                        local player = game.Players:FindFirstChild(name)
+                        if player and not table.find(Whitelist, player.Name) then
+                            local character = player.Character
+                            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                            local head = character and character:FindFirstChild("Head")
+
+                            if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
+
+                            if humanoid and humanoid.Health > 0 and head then
+                                local ownerTag = head:FindFirstChild("PartOwner")
+                                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value ~= "" and ownerTag.Value ~= plr.Name then
+                                    if not activeProcessing[player] then
+                                        activeProcessing[player] = true
+                                        task.spawn(function()
+                                            processPlayer(player)
+                                            activeProcessing[player] = nil
+                                        end)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    task.wait(0.01)
+                end
+            end)
+        else
+            table.clear(activeProcessing)
+        end
+    end
+})
+
+
+
+
 environmentTab:CreateSection("시각 및 시스템")
 environmentTab:CreateToggle({Name = "풀브라이트", CurrentValue = false, Flag = "E1", Callback = function(v) if v then game:GetService("Lighting").Brightness = 2 game:GetService("Lighting").ClockTime = 14 else game:GetService("Lighting").Brightness = 1 end end})
 environmentTab:CreateToggle({Name = "그림자 제거", CurrentValue = false, Flag = "E2", Callback = function(v) game:GetService("Lighting").GlobalShadows = not v end})
