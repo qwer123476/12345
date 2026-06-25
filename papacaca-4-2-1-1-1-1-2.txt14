@@ -11902,7 +11902,23 @@ function fireGrab()
         task.wait(0.1)
     end
 end
-
+local function spawnItemCf(itemName, cframe)
+    task.spawn(function()
+        local rotation = Vector3.new(0, 0, 0)
+        ReplicatedStorage.MenuToys.SpawnToyRemoteFunction:InvokeServer(itemName, cframe, rotation)
+    end)
+end
+local function arson(part)
+    if not toysFolder:FindFirstChild("Campfire") then
+        spawnItem("Campfire", Vector3.new(-72.9304581, -5.96906614, -265.543732))
+    end
+    local campfire = toysFolder:FindFirstChild("Campfire")
+    burnPart = campfire:FindFirstChild("FirePlayerPart") or campfire.FirePlayerPart
+    burnPart.Size = Vector3.new(7, 7, 7)
+    burnPart.Position = part.Position
+    task.wait(0.3)
+    burnPart.Position = Vector3.new(0, -50, 0)
+end
 function fireAll()
     while _G.fireAllEnabled do
         local success, err = pcall(function()
