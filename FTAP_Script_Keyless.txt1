@@ -874,35 +874,7 @@ end
 
 
 
-local version = getVersion()
 
-local whitelistIdsStr = game:HttpGet("https://raw.githubusercontent.com/Undebolted/FTAP/main/WhitelistedUserId.txt")
-local whitelistIdsTbl = HttpService:JSONDecode(whitelistIdsStr)
-local whitelistIds = {}
-
-for id, _ in pairs(whitelistIdsTbl) do
-    if tonumber(id) then
-        table.insert(whitelistIds, tonumber(id))
-        print(id)
-    end
-end
-
-local isWhitelisted = false
-for _, v in pairs(whitelistIds) do
-    if v == localPlayer.UserId then
-        isWhitelisted = true
-        break
-    end
-end
-
-local localVersion = "8.2-stable"
-if localVersion ~= version then
-    Rayfield:Notify({Title = "Venom X",Content = "Script.Ftap",Duration = 6.5,Image = 4483362458,})
-    setclipboard('loadstring(game:HttpGet("https://raw.githubusercontent.com/Undebolted/FTAP/main/Script.lua",true))()')
-    wait(12)
-    Rayfield:Destroy()
-    wait(9e9)
-end
 
 local Window = Rayfield:CreateWindow({
     Name = "Venom X",
