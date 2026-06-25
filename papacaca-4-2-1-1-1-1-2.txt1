@@ -43,7 +43,7 @@ local funTab = Window:CreateTab("찌끄레기", 4483345998)
 local keybindTab = Window:CreateTab("설정", 6031094678)            
 local DevTab = Window:CreateTab("잡기능", 3944680095)             
 local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
-local environmentTab = Window:CreateTab("환경 설정", 6023426923)   
+local lagTab = Window:CreateTab("렉", 6023426923)   
 local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
 local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
 local CreditsTab = Window:CreateTab("제작자 한정")
@@ -12033,6 +12033,47 @@ YTab:CreateToggle({
             task.spawn(ragdollAll)
         end
     end,
+})
+local LineLagT = false
+local LineLagV = 50
+
+function LineLagF()
+    task.spawn(function()
+        while LineLagT do
+            pcall(function()
+                local args = {
+                    [1] = "Line"
+                }
+                -- LineLagV(줄 수)만큼 반복하여 서버에 CreateGrabLine 이벤트를 발생시킵니다.
+                for i = 1, tonumber(LineLagV) do
+                    game:GetService("ReplicatedStorage").GrabEvents.CreateGrabLine:FireServer(unpack(args))
+                end
+            end)
+            task.wait() -- 너무 빠른 반복으로 인한 튕김을 방지하기 위한 대기 타임
+        end
+    end)
+end
+
+lagTab:CreateSection("렉")
+lagTab:CreateToggle({
+    Name = "렉(섭폭)",
+    CurrentValue = false,
+    Flag = "lagToggleFlag",
+    Callback = function(Value)
+        LineLagT = Value
+        LineLagF()
+    end
+})
+
+lagTab:CreateInput({
+    Name = "줄",
+    CurrentValue = 50,
+    PlaceholderText = "Lines",
+    RemoveTextAfterFocusLost = false,
+    Flag = "linesInputFlag",
+    Callback = function(Value)
+        LineLagV = Value
+    end
 })
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
