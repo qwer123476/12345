@@ -55,3 +55,52 @@ pcall(function()
     })
 end)
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local Player = Players.LocalPlayer
+
+local function Setup(char)
+	local humanoid = char:WaitForChild("Humanoid")
+	local root = char:WaitForChild("HumanoidRootPart")
+	local animator = humanoid:WaitForChild("Animator")
+
+	RunService:UnbindFromRenderStep("PassiveFix")
+
+	RunService:BindToRenderStep("PassiveFix", Enum.RenderPriority.Character.Value + 100, function()
+		if not char or not char.Parent or not humanoid or not root or not animator then
+			return
+		end
+
+		for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+			track:AdjustSpeed(1)
+		end
+
+		local move = humanoid.MoveDirection
+		local vy = root.AssemblyLinearVelocity.Y
+		local state = humanoid:GetState()
+		local isGrounded = state ~= Enum.HumanoidStateType.Jumping and state ~= Enum.HumanoidStateType.Freefall
+
+		if move.Magnitude > 0 then
+			local sp = humanoid.WalkSpeed
+			root.AssemblyLinearVelocity = Vector3.new(move.X * sp, vy, move.Z * sp)
+		else
+			root.AssemblyLinearVelocity = Vector3.new(0, vy, 0)
+			if isGrounded then
+				root.CFrame = CFrame.new(root.Position) * (root.CFrame - root.Position)
+			end
+		end
+
+		if isGrounded then
+			root.AssemblyAngularVelocity = Vector3.zero
+		end
+	end)
+end
+
+Player.CharacterAdded:Connect(function(char)
+	task.defer(Setup, char)
+end)
+
+if Player.Character then
+	Setup(Player.Character)
+end
