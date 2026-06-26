@@ -793,41 +793,7 @@ function AntiLagF()
         end
     end)
 end
--- ================== 하우스 브레이크 (집안 바깥물건 들이기) ==================
-local HouseBreakT = false
-local HouseBreakConnection = nil
 
-function HouseBreakF()
-    if HouseBreakConnection then
-        HouseBreakConnection:Disconnect()
-        HouseBreakConnection = nil
-    end
-
-    if not HouseBreakT then return end
-
-    HouseBreakConnection = game:GetService("RunService").Heartbeat:Connect(function()
-        if not HouseBreakT then return end
-
-        for _, item in ipairs(workspace:GetDescendants()) do
-            if item:IsA("BasePart") and item.CanCollide == true then
-                if item:FindFirstAncestor("Plot") or item.Name:find("Barrier") or item.Name:find("Wall") then
-                    item.CanCollide = false
-                end
-            end
-        end
-
-        local grabParts = workspace:FindFirstChild("GrabParts")
-        if grabParts then
-            for _, part in ipairs(grabParts:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    pcall(function()
-                        rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
-                    end)
-                end
-            end
-        end
-    end)
-end
 
 function spawnBlobmanF()
      char = plr.Character
