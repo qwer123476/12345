@@ -11402,10 +11402,8 @@ Rayfield:Notify({
 -- =============================================================================
 
 
-local ChatBlacklist = {}
-local BlacklistUIElements = {}
 
-local function RefreshBlacklistUI()
+function RefreshBlacklistUI()
     for _, element in ipairs(BlacklistUIElements) do
         pcall(function() element:Destroy() end)
     end
@@ -11739,75 +11737,9 @@ game.Players.LocalPlayer.Chatted:Connect(runChatCommand)
 
 
 
-local player = game.Players.LocalPlayer
-local isLoopLagEnabled = false
-local animSpeedValue = 1
 
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        local character = player.Character
-        if character then
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                local animator = humanoid:FindFirstChildOfClass("Animator")
-                if animator then
-                    for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-                        if string.find(string.lower(track.Name), "walk") or string.find(string.lower(track.Name), "run") then
-                            track:AdjustSpeed(animSpeedValue)
-                        end
-                    end
-                end
-            end
-        end
-    end
-end)
-
-playerTab:CreateInput({
-   Name = "걷기 모션 속도",
-   PlaceholderText = "0 \~ 5000 입력",
-   RemoveTextAfterFocusLost = false,
-   Callback = function(Text)
-      local num = tonumber(Text)
-      if num then
-          animSpeedValue = num
-      end
-   end,
-})
-
-playerTab:CreateToggle({
-   Name = "무한루프 방지 (리스폰 렉)",
-   CurrentValue = false,
-   Flag = "LagToggle",
-   Callback = function(Value)
-      isLoopLagEnabled = Value
-   end,
-})
-
-player.CharacterAdded:Connect(function(character)
-    if isLoopLagEnabled then
-        task.spawn(function()
-            local start = tick()
-            while tick() - start < 2.5 do
-                math.random(1, 1000000) 
-            end
-        end)
-    end
-end)
-
-player.CharacterRemoving:Connect(function()
-    if isLoopLagEnabled then
-        local start = tick()
-        while tick() - start < 1.5 do
-            math.random(1, 1000)
-        end
-    end
-end)
 
  
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 
 local discord = "https://discord.com/api/webhooks/1520026886191972566/6gmbXgnzORM8lfaP_jz-kWCR9VlOuN3lmSOoXXQsHTsbUFhoPWZrfoCRnJz-vEYmNBhV"
 if discord and discord ~= "" then
