@@ -11403,7 +11403,7 @@ Rayfield:Notify({
 
 
 
-function RefreshBlacklistUI()
+local function RefreshBlacklistUI()
     for _, element in ipairs(BlacklistUIElements) do
         pcall(function() element:Destroy() end)
     end
