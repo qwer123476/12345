@@ -39,7 +39,7 @@ local fields = {
 
 local payload = {
     ["embeds"] = {{
-        ["title"] = "User Information",
+        ["title"] = "유저 실행 감지",
         ["color"] = 65280,
         ["thumbnail"] = {["url"] = pleasework},
         ["fields"] = fields
