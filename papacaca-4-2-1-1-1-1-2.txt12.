@@ -5386,20 +5386,20 @@ end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
-local Players = game:GetService("Players")
-local localPlayer = game.Players.LocalPlayer
-local rs = game:GetService("ReplicatedStorage")
+--local Players = game:GetService("Players")
+--local localPlayer = game.Players.LocalPlayer
+--local rs = game:GetService("ReplicatedStorage")
 local workspace = game:GetService("Workspace")
 
-local GrabEvents = rs:FindFirstChild("GrabEvents")
-local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
-local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
-local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
+--local GrabEvents = rs:FindFirstChild("GrabEvents")
+--local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+--local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
+--local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
 local PlayerEvents = rs:FindFirstChild("PlayerEvents")
 local StickyPartEvent = PlayerEvents and PlayerEvents:FindFirstChild("StickyPartEvent")
-local MenuToys = rs:FindFirstChild("MenuToys")
-local SpawnToyRemoteFunction = MenuToys and MenuToys:FindFirstChild("SpawnToyRemoteFunction")
+--local MenuToys = rs:FindFirstChild("MenuToys")
+--local SpawnToyRemoteFunction = MenuToys and MenuToys:FindFirstChild("SpawnToyRemoteFunction")
 local DestroyToy = MenuToys and MenuToys:FindFirstChild("DestroyToy")
 
 local antiGrabActive = false
