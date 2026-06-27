@@ -5431,9 +5431,12 @@ local function processAntiGrabPlayer(player)
             local ok, cf = false, nil
             if typeof(TP) == "function" then
                 ok, cf = TP(player)
+                if ok and cf then
+                    cf = cf * CFrame.new(0, -10, 0)
+                end
             else
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    ok, cf = true, player.Character.HumanoidRootPart.CFrame
+                    ok, cf = true, player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -10, 0)
                 end
             end
 
