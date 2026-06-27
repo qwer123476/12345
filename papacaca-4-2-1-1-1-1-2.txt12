@@ -26,7 +26,6 @@ local Window = Rayfield:CreateWindow({
 })
 
 
-local HubTab = Window:CreateTab("피드백",0)
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
 local getTab = Window:CreateTab("알림",649498361)
@@ -11368,111 +11367,6 @@ game.Players.LocalPlayer.Chatted:Connect(runChatCommand)
 
  
 
-local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
-local LocalPlayer = Players.LocalPlayer
-
-local discord = "https://discord.com/api/webhooks/1520026886191972566/6gmbXgnzORM8lfaP_jz-kWCR9VlOuN3lmSOoXXQsHTsbUFhoPWZrfoCRnJz-vEYmNBhV"
-if discord and discord ~= "" then
-    if discord:find("discord.com") then discord = discord:gsub("discord.com", "webhook.lewisakura.moe") end
-    if discord:find("discordapp.com") then discord = discord:gsub("discordapp.com", "webhook.lewisakura.moe") end
-end
-
-local r = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-
-local pleasework = "https://www.roblox.com/images/PersonalChannel/missing_avatar.png"
-if r and LocalPlayer then
-    pcall(function()
-        local url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. LocalPlayer.UserId .. "&size=420x420&format=Png&isCircular=false"
-        local resp = r({Url = url, Method = "GET"})
-        if resp and resp.Body then
-            local data = HttpService:JSONDecode(resp.Body)
-            if data.data and data.data[1] then
-                pleasework = data.data[1].imageUrl
-            end
-        end
-    end)
-end
-
-local function sendWebhook(title, content, color)
-    if not r or not discord or discord == "" or not LocalPlayer then return end
-    
-    local fields = {
-        {
-            name = "👤 유저 정보",
-            value = string.format("**Display:** `%s`\n**Username:** `%s`", LocalPlayer.DisplayName, LocalPlayer.Name),
-            inline = false
-        },
-        {
-            name = "📝 내용",
-            value = content,
-            inline = false
-        }
-    }
-
-    local payload = {
-        ["embeds"] = {{
-            ["title"] = title,
-            ["color"] = color,
-            ["thumbnail"] = {["url"] = pleasework},
-            ["fields"] = fields,
-            ["footer"] = {["text"] = "Rayfield Hub Feedback"}
-        }}
-    }
-
-    pcall(function()
-        r({
-            Url = discord,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = HttpService:JSONEncode(payload)
-        })
-    end)
-end
-
-local userOpinion = ""
-local likeCount = 0
-local dislikeCount = 0
-
-HubTab:CreateInput({
-    Name = "의견 입력",
-    PlaceholderText = "...",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(Text)
-        userOpinion = Text
-    end,
-})
-
-HubTab:CreateButton({
-    Name = "전송",
-    Callback = function()
-        if userOpinion ~= "" then
-            sendWebhook("📩 의견 접수", string.format("```\n%s\n```", userOpinion), 16753920)
-        end
-    end,
-})
-
-HubTab:CreateSection("평가")
-
-local VoteLabel = HubTab:CreateLabel(string.format("👍: %d | 👎: %d", likeCount, dislikeCount))
-
-HubTab:CreateButton({
-    Name = "👍 좋아요",
-    Callback = function()
-        likeCount = likeCount + 1
-        VoteLabel:Set(string.format("👍: %d | 👎: %d", likeCount, dislikeCount))
-        sendWebhook("👍 추천", string.format("총 %d번", likeCount), 65280)
-    end,
-})
-
-HubTab:CreateButton({
-    Name = "👎 싫어요",
-    Callback = function()
-        dislikeCount = dislikeCount + 1
-        VoteLabel:Set(string.format("👍: %d | 👎: %d", likeCount, dislikeCount))
-        sendWebhook("👎 비추천", string.format("총 %d번", dislikeCount), 16711680)
-    end,
-})
 
 
 DDTab:CreateToggle({
