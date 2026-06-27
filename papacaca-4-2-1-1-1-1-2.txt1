@@ -7325,21 +7325,21 @@ local GF = {"wetokwk3jr"}
 
 
 local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "", "", "", "", "", "", "", "", "", ""}
-local Overseer = {""}
-local CoOwner = {""}
-local HeadAdmin = {""}
-local Admin = {""}
-local Mod = {""}
+--local Overseer = {""}
+--local CoOwner = {""}
+--local HeadAdmin = {""}
+--local Admin = {""}
+--local Mod = {""}
 
 local Ranks = {
     Owner = 7,
     GF = 6,
-    Overseer = 5,
-    CoOwner = 4,
-    HeadAdmin = 3,
-    Admin = 2,
-    Mod = 1,
-    User = 0
+    --Overseer = 5,
+    --CoOwner = 4,
+    --HeadAdmin = 3,
+    --Admin = 2,
+    --Mod = 1,
+    --User = 0
 }
 -- =============== ---------------- ==
 
@@ -7357,7 +7357,7 @@ local function Notify(type, playerName)
     elseif type == "Already" then
         title = "[ 💠 ]"; content = playerName.." - 이미 추가됐어요"
     elseif type == "NotFound" then
-        title = "[ ❌ ]"; content = "찾을 수 없어요!"
+        title = "[ ❌ ]"; content = "찾을수가없네요 나가거나 잘못입력"
     elseif type == "HigherRank" then
         title = "[ ⛔ ]"; content = "권한이 부족해요!"
     elseif type == "GFE" then
@@ -7552,7 +7552,7 @@ local BreakHouseBarrierToggle = antiTab:CreateToggle({
 
 
 
-if plr.UserId == 9078065998 then AddAll = true end
+if plr.UserId == 1 then AddAll = true end
 
 if AddAll then
 SelectedList = nil
