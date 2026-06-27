@@ -5386,125 +5386,24 @@ end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
-local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
+local localPlayer = game.Players.LocalPlayer
+local rs = game:GetService("ReplicatedStorage")
 
-local grabTpTouchActive = false
-local grabTpTouchList = {}
-local activeProcessing = {}
-local activeThreads = {}
-local activeCards = {}
+local GrabEvents = rs:FindFirstChild("GrabEvents")
+local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
+local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
-local function getTabContainer()
-    for _, desc in ipairs(CoreGui:GetDescendants()) do
-        if desc:IsA("TextLabel") and (desc.Text == "보호할 사람고르기" or desc.Text == "보호 켜기") then
-            local current = desc
-            while current do
-                if current:IsA("ScrollingFrame") then
-                    return current
-                end
-                current = current.Parent
-            end
-        end
-    end
-    return nil
-end
+local antiGrabActive = false
+local antiGrabTargetList = {}
+local antiGrabProcessing = {}
+local antiGrabThreads = {}
 
-local function createPlayerCard(player, container)
-    if activeCards[player.Name] then return end
-
-    local card = Instance.new("Frame")
-    card.Name = "Card_" .. player.Name
-    card.Size = UDim2.new(1, -10, 0, 45)
-    card.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    card.BorderSizePixel = 0
-    card.Parent = container
-
-    local cardCorner = Instance.new("UICorner")
-    cardCorner.CornerRadius = UDim.new(0, 6)
-    cardCorner.Parent = card
-
-    local cardStroke = Instance.new("UIStroke")
-    cardStroke.Color = Color3.fromRGB(40, 40, 40)
-    cardStroke.Thickness = 1
-    cardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    cardStroke.Parent = card
-
-    local pfp = Instance.new("ImageLabel")
-    pfp.Size = UDim2.new(0, 35, 0, 35)
-    pfp.Position = UDim2.new(0, 5, 0.5, -17.5)
-    pfp.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    pfp.BorderSizePixel = 0
-    pfp.Parent = card
-
-    local pfpCorner = Instance.new("UICorner")
-    pfpCorner.CornerRadius = UDim.new(1, 0)
-    pfpCorner.Parent = pfp
-
-    task.spawn(function()
-        local res, ready = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
-        if ready then
-            pfp.Image = res
-        end
-    end)
-
-    local dispLabel = Instance.new("TextLabel")
-    dispLabel.Size = UDim2.new(1, -50, 0, 18)
-    dispLabel.Position = UDim2.new(0, 48, 0, 4)
-    dispLabel.BackgroundTransparency = 1
-    dispLabel.Text = player.DisplayName
-    dispLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    dispLabel.TextSize = 13
-    dispLabel.Font = Enum.Font.SourceSansBold
-    dispLabel.TextXAlignment = Enum.TextXAlignment.Left
-    dispLabel.Parent = card
-
-    local userLabel = Instance.new("TextLabel")
-    userLabel.Size = UDim2.new(1, -50, 0, 15)
-    userLabel.Position = UDim2.new(0, 48, 0, 22)
-    userLabel.BackgroundTransparency = 1
-    userLabel.Text = "@" .. player.Name
-    userLabel.TextColor3 = Color3.fromRGB(140, 140, 140)
-    userLabel.TextSize = 11
-    userLabel.Font = Enum.Font.SourceSans
-    userLabel.TextXAlignment = Enum.TextXAlignment.Left
-    userLabel.Parent = card
-
-    activeCards[player.Name] = card
-end
-
-local function updateProfileDisplay()
-    local container = getTabContainer()
-    if not container then return end
-
-    if not container:FindFirstChild("CardLayout") then
-        local layout = container:FindFirstChildOfClass("UIListLayout")
-        if layout then
-            layout.Padding = UDim.new(0, 6)
-        end
-    end
-
-    for name, card in pairs(activeCards) do
-        if not table.find(grabTpTouchList, name) then
-            if card and card.Parent then
-                card:Destroy()
-            end
-            activeCards[name] = nil
-        end
-    end
-
-    for _, name in ipairs(grabTpTouchList) do
-        local p = Players:FindFirstChild(name)
-        if p and not activeCards[name] then
-            createPlayerCard(p, container)
-        end
-    end
-end
-
-local function processPlayer(player)
+local function processAntiGrabPlayer(player)
     if not player then return false end
 
-    local myChar = plr.Character
+    local myChar = localPlayer.Character
     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
     local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
     if not myChar or not myHrp or not myHum or myHum.Health <= 0 then
@@ -5513,48 +5412,18 @@ local function processPlayer(player)
 
     local character = player.Character
     if not character then return false end
-    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local targetRoot = character:FindFirstChild("HumanoidRootPart")
+    local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
     local head = character:FindFirstChild("Head")
-    if not hrp or not head then return false end
-
-    local characterParts = {}
-    table.insert(characterParts, hrp)
-
-    if character:FindFirstChild("Head") then
-        table.insert(characterParts, character.Head)
-    end
-
-    local torsoParts = {"Torso"}
-    for _, partName in ipairs(torsoParts) do
-        local part = character:FindFirstChild(partName)
-        if part then
-            table.insert(characterParts, part)
-        end
-    end
-
-    local armParts = {"Left Arm", "Right Arm"}
-    for _, partName in ipairs(armParts) do
-        local part = character:FindFirstChild(partName)
-        if part then
-            table.insert(characterParts, part)
-        end
-    end
-
-    local legParts = {"Left Leg", "Right Leg"}
-    for _, partName in ipairs(legParts) do
-        local part = character:FindFirstChild(partName)
-        if part then
-            table.insert(characterParts, part)
-        end
-    end
+    if not targetRoot or not head or not torso then return false end
 
     local originCF = myHrp.CFrame
 
     local tpRunning = true
     local tpThread = task.spawn(function()
         while tpRunning do
-            if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
-               (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+            if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
+               (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
                 break
             end
 
@@ -5573,15 +5442,15 @@ local function processPlayer(player)
             task.wait()
         end
     end)
-    table.insert(activeThreads, tpThread)
+    table.insert(antiGrabThreads, tpThread)
 
     local success = false
     local startTime = tick()
-    local timeout = 10
+    local timeout = 0.1
 
     while tpRunning and tick() - startTime < timeout do
-        if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
-           (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+        if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
+           (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
             break
         end
 
@@ -5590,14 +5459,21 @@ local function processPlayer(player)
             break
         end
 
-        for _, part in ipairs(characterParts) do
-            if part and part.Parent then
-                rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
-            end
+        if SetNetworkOwner and SetNetworkOwner.FireServer then
+            SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
         end
         
+        if DestroyGrabLine and DestroyGrabLine.FireServer then
+            DestroyGrabLine:FireServer(character)
+            DestroyGrabLine:FireServer(torso)
+        end
+
+        if EndGrabEarly and EndGrabEarly.FireServer then
+            EndGrabEarly:FireServer()
+        end
+
         local ownerTag = head:FindFirstChild("PartOwner")
-        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == localPlayer.Name then
             success = true
             break
         end
@@ -5606,12 +5482,29 @@ local function processPlayer(player)
 
     tpRunning = false
 
-    for _, thread in ipairs(activeThreads) do
+    for _, thread in ipairs(antiGrabThreads) do
         if thread then
             pcall(task.cancel, thread)
         end
     end
-    table.clear(activeThreads)
+    table.clear(antiGrabThreads)
+
+    if success then
+        pcall(function()
+            for _, v in ipairs(character:GetDescendants()) do
+                if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") or v:IsA("TouchTransmitter") then
+                    v:Destroy()
+                end
+            end
+            for _, v in ipairs(myChar:GetDescendants()) do
+                if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+                    if v.Part0 == torso or v.Part1 == torso or v.Part0 == targetRoot or v.Part1 == targetRoot then
+                        v:Destroy()
+                    end
+                end
+            end
+        end)
+    end
 
     if originCF and myHrp and myHrp.Parent then
         myHrp.CFrame = originCF
@@ -5633,12 +5526,12 @@ local function processPlayer(player)
     return success
 end
 
-local grabTpTouchDropdown = FDTab:CreateDropdown({
+local antiGrabDropdown = FDTab:CreateDropdown({
     Name = "보호할 사람고르기",
     Options = {},
     CurrentOption = {},
     MultipleOptions = true,
-    Flag = "GrabTpTouchPlayerList",
+    Flag = "AntiGrabUniquePlayerList",
     Callback = function(Options)
         local selectedTable = {}
         if typeof(Options) == "table" then
@@ -5654,92 +5547,158 @@ local grabTpTouchDropdown = FDTab:CreateDropdown({
         elseif typeof(Options) == "string" then
             table.insert(selectedTable, Options)
         end
-        grabTpTouchList = selectedTable
-        updateProfileDisplay()
+        antiGrabTargetList = selectedTable
     end
 })
 
-local function refreshGrabTpTouchDropdown()
+local function refreshAntiGrabDropdown()
     local playerNames = {}
     for _, player in ipairs(game.Players:GetPlayers()) do
-        if player ~= plr then
+        if player ~= localPlayer then
             table.insert(playerNames, player.Name)
         end
     end
-    grabTpTouchDropdown:Refresh(playerNames, true)
+    antiGrabDropdown:Refresh(playerNames, true)
+    
+    local updatedOptions = {}
+    local validList = {}
+    for _, currentName in ipairs(antiGrabTargetList) do
+        if game.Players:FindFirstChild(currentName) then
+            table.insert(validList, currentName)
+            updatedOptions[currentName] = true
+        end
+    end
+    antiGrabTargetList = validList
+    antiGrabDropdown:Set(updatedOptions)
 end
 
-game.Players.PlayerAdded:Connect(refreshGrabTpTouchDropdown)
-game.Players.PlayerRemoving:Connect(refreshGrabTpTouchDropdown)
-refreshGrabTpTouchDropdown()
+game.Players.PlayerAdded:Connect(refreshAntiGrabDropdown)
+game.Players.PlayerRemoving:Connect(refreshAntiGrabDropdown)
+refreshAntiGrabDropdown()
 
-FDTab:CreateToggle({
-    Name = "보호 켜기",
-    CurrentValue = false,
-    Flag = "GrabDetectionTpTouchToggle",
-    Callback = function(Value)
-        grabTpTouchActive = Value
+task.spawn(function()
+    while true do
+        if antiGrabActive then
+            local myChar = localPlayer.Character
+            local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+            if myChar and myHum and myHum.Health > 0 then
+                for i = 1, #antiGrabTargetList do
+                    local name = antiGrabTargetList[i]
+                    local player = game.Players:FindFirstChild(name)
+                    if player and not table.find(Whitelist, player.Name) then
+                        local character = player.Character
+                        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                        local head = character and character:FindFirstChild("Head")
 
-        local myChar = plr.Character
-        local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-        if myHum then
-            myHum:SetStateEnabled(Enum.HumanoidStateType.Seated, not Value)
-            if Value then
-                myHum.Sit = false
-                myHum.PlatformStand = false
-                myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
-            end
-        end
-
-        if Value then
-            task.spawn(function()
-                while grabTpTouchActive do
-                    local myChar = plr.Character
-                    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-                    if not myChar or not myHum or myHum.Health <= 0 then
-                        task.wait(0.5)
-                        continue
-                    end
-
-                    for _, name in ipairs(grabTpTouchList) do
-                        if not grabTpTouchActive then break end
-
-                        local player = game.Players:FindFirstChild(name)
-                        if player and not table.find(Whitelist, player.Name) then
-                            local character = player.Character
-                            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                            local head = character and character:FindFirstChild("Head")
-
-                            if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
-
+                        if not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
                             if humanoid and humanoid.Health > 0 and head then
                                 local ownerTag = head:FindFirstChild("PartOwner")
-                                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value ~= "" and ownerTag.Value ~= plr.Name then
-                                    if not activeProcessing[player] then
-                                        activeProcessing[player] = true
+                                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value ~= "" and ownerTag.Value ~= localPlayer.Name then
+                                    if not antiGrabProcessing[player] then
+                                        antiGrabProcessing[player] = true
+                                        
                                         task.spawn(function()
-                                            processPlayer(player)
-                                            task.wait(0.3)
-                                            activeProcessing[player] = nil
+                                            processAntiGrabPlayer(player)
+                                            task.wait(0.5)
+                                            antiGrabProcessing[player] = nil
                                         end)
                                     end
                                 end
                             end
                         end
                     end
-                    task.wait(0.01)
                 end
-            end)
+            end
+        end
+        task.wait(0.03)
+    end
+end)
+
+
+
+FDTab:CreateInput({
+    Name = "보호 대상 추가 (닉네임 입력)",
+    PlaceholderText = "플레이어 이름 입력",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(Text)
+        if Text == "" or Text == nil then return end
+        
+        local foundPlayer = nil
+        local searchPattern = Text:lower()
+        
+        for _, p in ipairs(game.Players:GetPlayers()) do
+            if p ~= localPlayer then
+                local nameMatch = p.Name:lower():sub(1, #searchPattern) == searchPattern
+                local displayMatch = p.DisplayName:lower():sub(1, #searchPattern) == searchPattern
+                
+                if nameMatch or displayMatch then
+                    foundPlayer = p
+                    break
+                end
+            end
+        end
+
+        if foundPlayer then
+            if not table.find(antiGrabTargetList, foundPlayer.Name) then
+                table.insert(antiGrabTargetList, foundPlayer.Name)
+                
+                if Rayfield then
+                    Rayfield:Notify({
+                        Title = "[ ☑️ ]",
+                        Content = foundPlayer.Name .. " - 추가",
+                        Duration = 2
+                    })
+                end
+                
+                local updatedOptions = {}
+                for _, currentName in ipairs(antiGrabTargetList) do
+                    updatedOptions[currentName] = true
+                end
+                antiGrabDropdown:Set(updatedOptions)
+            else
+                if Rayfield then
+                    Rayfield:Notify({
+                        Title = "[ 💠 ]",
+                        Content = foundPlayer.Name .. " - 이미 추가됐어요",
+                        Duration = 2
+                    })
+                end
+            end
         else
-            table.clear(activeProcessing)
-            local currentHum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
-            if currentHum then
-                currentHum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+            if Rayfield then
+                Rayfield:Notify({
+                    Title = "[ ❌ ]",
+                    Content = "찾을 수 없어요!",
+                    Duration = 2
+                })
+            end
+        end
+    endFDTab:CreateToggle({
+    Name = "보호 시스템 활성화",
+    CurrentValue = false,
+    Flag = "AntiGrabUniqueSystemToggle",
+    Callback = function(Value)
+        antiGrabActive = Value
+        
+        local myChar = localPlayer.Character
+        local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+        
+        if Value then
+            if myHum then
+                myHum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                myHum.Sit = false
+                myHum.PlatformStand = false
+                myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        else
+            table.clear(antiGrabProcessing)
+            if myHum then
+                myHum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
             end
         end
     end
 })
-
+})
 
     
 -- ================== [ 유틸리티 기능 ] ==================
