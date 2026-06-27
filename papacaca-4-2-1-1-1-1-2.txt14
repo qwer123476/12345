@@ -8968,7 +8968,7 @@ LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 
 
 
-Tab:CreateToggle({
+antiTab:CreateToggle({
     Name = "Anti-Ownership Spam",
     CurrentValue = false,
     Flag = "AntiFlingToggle",
