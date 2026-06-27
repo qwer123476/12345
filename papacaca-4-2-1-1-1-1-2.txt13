@@ -5477,7 +5477,7 @@ local function processAntiGrabPlayer(player)
             success = true
             break
         end
-        task.wait()
+        task.wait(0.02)
     end
 
     tpRunning = false
@@ -5614,8 +5614,6 @@ task.spawn(function()
     end
 end)
 
-
-
 FDTab:CreateInput({
     Name = "보호 대상 추가 (닉네임 입력)",
     PlaceholderText = "플레이어 이름 입력",
@@ -5673,7 +5671,10 @@ FDTab:CreateInput({
                 })
             end
         end
-    endFDTab:CreateToggle({
+    end
+})
+
+FDTab:CreateToggle({
     Name = "보호 시스템 활성화",
     CurrentValue = false,
     Flag = "AntiGrabUniqueSystemToggle",
@@ -5698,7 +5699,6 @@ FDTab:CreateInput({
         end
     end
 })
-
 
     
 -- ================== [ 유틸리티 기능 ] ==================
