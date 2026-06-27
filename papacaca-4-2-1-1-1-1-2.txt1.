@@ -5443,7 +5443,7 @@ local function processAntiGrabPlayer(player)
             if ok and cf then
                 myHrp.CFrame = cf
             end
-            task.wait()
+            task.wait(0.01)
         end
     end)
     table.insert(antiGrabThreads, tpThread)
