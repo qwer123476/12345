@@ -8557,6 +8557,8 @@ local function startSpeedCheck()
         end
     end)
 end
+antiTab:CreateLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
+
 antiTab:CreateLabel("날라가는것과 킬방지")
 local antiTeleportToggle = antiTab:CreateToggle({
     Name = "안티플링",
@@ -8587,8 +8589,22 @@ local antiTeleportToggle = antiTab:CreateToggle({
         end
     end
 })
-
-antiTab:CreateLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
+antiTab:CreateSection("오너쉽")
+antiTab:CreateToggle({
+    Name = "안티 오너쉽 스팸",
+    CurrentValue = false,
+    Flag = "AntiFlingToggle",
+    Callback = function(Value)
+        _G.AntiFlingEnabled = Value
+        if Value then
+            if LocalPlayer.Character then
+                monitorCharacter(LocalPlayer.Character)
+            end
+        else
+            cleanupCharacterConnections(LocalPlayer.UserId)
+        end
+    end,
+})
 antiTab:CreateSection("그랩 | 토클")
 local AntiGrab = antiTab:CreateToggle({
     Name = "안티 그랩",
@@ -8968,21 +8984,7 @@ LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 
 
 
-antiTab:CreateToggle({
-    Name = "Anti-Ownership Spam",
-    CurrentValue = false,
-    Flag = "AntiFlingToggle",
-    Callback = function(Value)
-        _G.AntiFlingEnabled = Value
-        if Value then
-            if LocalPlayer.Character then
-                monitorCharacter(LocalPlayer.Character)
-            end
-        else
-            cleanupCharacterConnections(LocalPlayer.UserId)
-        end
-    end,
-})
+
 
 
 antiTab:CreateSection("블롭")
