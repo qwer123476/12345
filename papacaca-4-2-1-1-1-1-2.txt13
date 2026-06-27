@@ -8878,7 +8878,7 @@ local function cleanupCharacterConnections(userId)
         end
         characterConnections[userId] = nil
     end
-    table.clear(trackedParts or {})
+    activeCharacters[userId] = nil
 end
 
 local function monitorCharacter(character)
@@ -8927,7 +8927,7 @@ local function monitorCharacter(character)
             return
         end
 
-        if not character or not character:Parent() or humanoid.Health <= 0 then
+        if not character or not character.Parent or humanoid.Health <= 0 then
             cleanupCharacterConnections(userId)
             return
         end
@@ -8935,7 +8935,7 @@ local function monitorCharacter(character)
         local anomalyDetected = false
 
         for _, part in ipairs(charData.Parts) do
-            if part and part:Parent() then
+            if part and part.Parent then
                 local velocity = part.AssemblyLinearVelocity.Magnitude
                 local rotVelocity = part.AssemblyAngularVelocity.Magnitude
 
@@ -8965,10 +8965,11 @@ local function monitorCharacter(character)
 end
 
 LocalPlayer.CharacterAdded:Connect(monitorCharacter)
- 
 
-antiTab:CreateToggle({
-    Name = "안티 오너쉽스팸",
+
+
+Tab:CreateToggle({
+    Name = "Anti-Ownership Spam",
     CurrentValue = false,
     Flag = "AntiFlingToggle",
     Callback = function(Value)
@@ -8982,6 +8983,7 @@ antiTab:CreateToggle({
         end
     end,
 })
+
 
 antiTab:CreateSection("블롭")
 local AntiBlob = antiTab:CreateToggle({
