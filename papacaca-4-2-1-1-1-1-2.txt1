@@ -10173,7 +10173,7 @@ AuraTab:CreateSection("킬,플링")
 local runningFtapKillAura = false
 
 AuraTab:CreateToggle({
-    Name = "킬아우라(오너쉽)",
+    Name = "래그돌 아우라",
     Default = false,
     Save = false,
     Flag = "FtapKillAura",
