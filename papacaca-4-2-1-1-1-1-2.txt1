@@ -5386,28 +5386,20 @@ end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
---local Players = game:GetService("Players")
---local localPlayer = game.Players.LocalPlayer
---local rs = game:GetService("ReplicatedStorage")
-local workspace = game:GetService("Workspace")
 
---local GrabEvents = rs:FindFirstChild("GrabEvents")
---local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
---local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
---local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
+local Players = game:GetService("Players")
+local localPlayer = game.Players.LocalPlayer
+local rs = game:GetService("ReplicatedStorage")
 
-local PlayerEvents = rs:FindFirstChild("PlayerEvents")
-local StickyPartEvent = PlayerEvents and PlayerEvents:FindFirstChild("StickyPartEvent")
---local MenuToys = rs:FindFirstChild("MenuToys")
---local SpawnToyRemoteFunction = MenuToys and MenuToys:FindFirstChild("SpawnToyRemoteFunction")
-local DestroyToy = MenuToys and MenuToys:FindFirstChild("DestroyToy")
+local GrabEvents = rs:FindFirstChild("GrabEvents")
+local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
+local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
 local antiGrabActive = false
-local antiGrabStickyActive = false
 local antiGrabTargetList = {}
 local antiGrabProcessing = {}
 local antiGrabThreads = {}
-local stickySpawningState = {}
 
 local function processAntiGrabPlayer(player)
     if not player then return false end
@@ -5459,7 +5451,7 @@ local function processAntiGrabPlayer(player)
 
     while tpRunning and tick() - startTime < timeout do
         if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
-               (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
+           (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
             break
         end
 
@@ -5533,116 +5525,6 @@ local function processAntiGrabPlayer(player)
     end
     
     return success
-end
-
-local function manageStickyForPlayer(targetPlr)
-    if not targetPlr or not targetPlr.Parent then return end
-    
-    local char = targetPlr.Character
-    if not char or not char.Parent then return end
-
-    local inv = workspace:FindFirstChild(targetPlr.Name.."SpawnedInToys")
-    if not inv then return end
-
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    local head = char:FindFirstChild("Head")
-    if not hrp or not hum or not head then return end
-
-    local agFolder = inv:FindFirstChild("AG")
-    local stickyPart = agFolder and agFolder:FindFirstChild("StickyPart")
-
-    local headPartOwner = head:FindFirstChild("PartOwner")
-    local stickyWeld = stickyPart and stickyPart:FindFirstChild("StickyWeld")
-    local targetPart = hrp:FindFirstChild("RagdollTouchedHitbox")
-
-    if headPartOwner and stickyWeld and targetPart and stickyWeld.Part1 == targetPart then
-        pcall(function()
-            SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
-        end)
-
-        if hum.Sit then
-            hum.Sit = false
-        end
-        if not hum.AutoRotate then
-            hum.AutoRotate = true
-        end
-
-        headPartOwner:Destroy()
-    end
-
-    if stickyWeld and targetPart and stickyWeld.Part1 ~= targetPart then
-        pcall(function()
-            SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
-        end)
-    end
-
-    if stickyPart then
-        local distance = (hrp.Position - stickyPart.Position).Magnitude
-        if distance > 25 then
-            pcall(function()
-                DestroyToy:FireServer(agFolder)
-            end)
-            task.wait(0.00001)
-        else
-            local partOwner = stickyPart:FindFirstChild("PartOwner")
-            if not partOwner or partOwner.Value ~= targetPlr.Name then
-                pcall(function()
-                    SetNetworkOwner:FireServer(stickyPart, hrp.CFrame)
-                end)
-            end
-
-            local targetPartCheck = hrp:FindFirstChild("RagdollTouchedHitbox")
-            local stickyWeldCheck = stickyPart:FindFirstChild("StickyWeld")
-
-            if targetPartCheck and stickyPart then
-                if not stickyWeldCheck or stickyWeldCheck.Part1 ~= targetPartCheck then
-                    pcall(function()
-                        StickyPartEvent:FireServer(stickyPart, targetPartCheck, CFrame.new(0, -0.3, 0.3) * CFrame.Angles(190, 0, 0))
-                    end)
-                end
-            end
-        end
-    else
-        local existingNinja = inv:FindFirstChild("AG")
-        if not existingNinja then
-            if not stickySpawningState[targetPlr] then
-                stickySpawningState[targetPlr] = true
-                task.spawn(function()
-                    pcall(function()
-                        SpawnToyRemoteFunction:InvokeServer("NinjaShuriken", hrp.CFrame * CFrame.new(0,10,20), Vector3.new(0,0,0))
-                    end)
-                    task.wait(0.5)
-                    stickySpawningState[targetPlr] = nil
-                end)
-            end
-
-            task.wait(0.00001)
-
-            local newNinjaFolder = inv:FindFirstChild("NinjaShuriken")
-            if newNinjaFolder then
-                local newStickyPart = newNinjaFolder:FindFirstChild("StickyPart")
-                if newStickyPart then
-                    local distance = (hrp.Position - newStickyPart.Position).Magnitude
-                    if distance <= 30 then
-                        newNinjaFolder.Name = "AG"
-                    else
-                        pcall(function()
-                            DestroyToy:FireServer(newNinjaFolder)
-                        end)
-                    end
-                end
-            end
-        else
-            local newStickyPart = existingNinja:FindFirstChild("StickyPart")
-            if newStickyPart then
-                local distance = (hrp.Position - newStickyPart.Position).Magnitude
-                if distance <= 30 then
-                    existingNinja.Name = "AG"
-                end
-            end
-        end
-    end
 end
 
 local antiGrabDropdown = FDTab:CreateDropdown({
@@ -5733,21 +5615,6 @@ task.spawn(function()
     end
 end)
 
-task.spawn(function()
-    while true do
-        if antiGrabStickyActive then
-            for i = 1, #antiGrabTargetList do
-                local name = antiGrabTargetList[i]
-                local player = game.Players:FindFirstChild(name)
-                if player then
-                    manageStickyForPlayer(player)
-                end
-            end
-        end
-        task.wait(0.1)
-    end
-end)
-
 FDTab:CreateInput({
     Name = "보호 대상 추가 (닉네임 입력)",
     PlaceholderText = "플레이어 이름 입력",
@@ -5834,19 +5701,6 @@ FDTab:CreateToggle({
     end
 })
 
-FDTab:CreateToggle({
-    Name = "지정 대상 안티킥(스티키) 활성화",
-    CurrentValue = false,
-    Flag = "AntiGrabStickyUniqueToggle",
-    Callback = function(Value)
-        antiGrabStickyActive = Value
-        if not Value then
-            table.clear(stickySpawningState)
-        end
-    end
-})
-
-    
 -- ================== [ 유틸리티 기능 ] ==================
 
 UtilityTab:CreateSection("환경 및 시야")
