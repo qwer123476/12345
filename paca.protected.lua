@@ -1747,13 +1747,6 @@ function loopPlayerBlobF4()
     local ownerTags = {}
     local originPositions = {}
 
-    local function verifyAndGetBlobman()
-        if not currentBlobS or not currentBlobS.Parent or not currentBlobS:FindFirstChild("PrimaryPart") then
-            UpdateCurrentBlobman()
-        end
-        return currentBlobS
-    end
-
     local function processPlayer(player)
         if not player then return end
 
@@ -1762,7 +1755,7 @@ function loopPlayerBlobF4()
                 monitoredPlayers[player] = nil
                 independentHoldConnections[player] = nil
                 if anchorToggleTasks[player] then
-                    if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                    task.cancel(anchorToggleTasks[player])
                     anchorToggleTasks[player] = nil
                 end
                 if ownerTags[player] then
@@ -1773,7 +1766,7 @@ function loopPlayerBlobF4()
                     originPositions[player] = nil
                 end
                 if player.Character then
-                    local charTOR = player.Character:FindFirstChild("Torso") or player.Character:FindFirstChild("UpperTorso")
+                    local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                     if charTOR then
                         charTOR.Anchored = false
                     end
@@ -1821,7 +1814,7 @@ function loopPlayerBlobF4()
                 end
                 
                 if anchorToggleTasks[player] then
-                    if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                    task.cancel(anchorToggleTasks[player])
                     anchorToggleTasks[player] = nil
                 end
                 
@@ -1844,7 +1837,7 @@ function loopPlayerBlobF4()
             end
 
             local charHRP = character:FindFirstChild("HumanoidRootPart")
-            local charTOR = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+            local charTOR = character:FindFirstChild("Torso")
             if not charHRP then
                 task.wait(0.5)
                 continue
@@ -1893,16 +1886,9 @@ function loopPlayerBlobF4()
                         charHRP.Velocity = Vector3.new(0,0,0)
                         charHRP.RotVelocity = Vector3.new(0,0,0)
                     end
-                    
-                    local activeBlob = verifyAndGetBlobman()
-                    if amIRiding and activeBlob then
-                        local blobHRP = activeBlob:FindFirstChild("HumanoidRootPart") or activeBlob.PrimaryPart
-                        if blobHRP then
-                            blobHRP.Velocity = Vector3.new(0,0,0)
-                            blobHRP.RotVelocity = Vector3.new(0,0,0)
-                        end
-                        BlobGrab(activeBlob, charHRP, "Right")
-                        BlobRelease(activeBlob, charHRP, "Right")
+                    if amIRiding then
+                        BlobGrab(currentBlobS, charHRP, "Right")
+                        BlobRelease(currentBlobS, charHRP, "Right")
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
@@ -1925,7 +1911,7 @@ function loopPlayerBlobF4()
                 end
 
                 if anchorToggleTasks[player] then
-                    if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                    task.cancel(anchorToggleTasks[player])
                     anchorToggleTasks[player] = nil
                 end
 
@@ -1965,7 +1951,7 @@ function loopPlayerBlobF4()
                             destroyCounts[player] = nil
                         end
                         if anchorToggleTasks[player] then
-                            if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                            task.cancel(anchorToggleTasks[player])
                             anchorToggleTasks[player] = nil
                         end
                         if ownerTags[player] then
@@ -2047,7 +2033,7 @@ function loopPlayerBlobF4()
                             independentHoldConnections[player] = nil
                         end
                         if anchorToggleTasks[player] then
-                            if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                            task.cancel(anchorToggleTasks[player])
                             anchorToggleTasks[player] = nil
                         end
                         if ownerTags[player] then
@@ -2070,17 +2056,8 @@ function loopPlayerBlobF4()
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         charHRP.Velocity = Vector3.new(0,0,0)
-                        
-                        local activeBlob = verifyAndGetBlobman()
-                        if activeBlob then
-                            local blobHRP = activeBlob:FindFirstChild("HumanoidRootPart") or activeBlob.PrimaryPart
-                            if blobHRP then
-                                blobHRP.Velocity = Vector3.new(0,0,0)
-                                blobHRP.RotVelocity = Vector3.new(0,0,0)
-                            end
-                            BlobGrab(activeBlob, charHRP, "Right")
-                            BlobRelease(activeBlob, charHRP, "Right")
-                        end
+                        BlobGrab(currentBlobS, charHRP, "Right")
+                        BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
                         task.delay(0, function() if charHUM then charHUM.Sit = false end end)
                     end
@@ -2093,7 +2070,7 @@ function loopPlayerBlobF4()
                 end
 
                 if anchorToggleTasks[player] then
-                    if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                    task.cancel(anchorToggleTasks[player])
                     anchorToggleTasks[player] = nil
                 end
 
@@ -2144,7 +2121,7 @@ function loopPlayerBlobF4()
                                 independentHoldConnections[player] = nil
                             end
                             if anchorToggleTasks[player] then
-                                if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                                task.cancel(anchorToggleTasks[player])
                                 anchorToggleTasks[player] = nil
                             end
                             if ownerTags[player] then
@@ -2156,7 +2133,7 @@ function loopPlayerBlobF4()
                             end
                             destroyCounts[player] = nil
                             if player.Character then
-                                local charTOR = player.Character:FindFirstChild("Torso") or player.Character:FindFirstChild("UpperTorso")
+                                local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                                 if charTOR then
                                     charTOR.Anchored = false
                                 end
@@ -2168,9 +2145,7 @@ function loopPlayerBlobF4()
 
             for player, taskInfo in pairs(runningTasks) do
                 if not player.Parent then
-                    if taskInfo and task.status(taskInfo) ~= "dead" then
-                        task.cancel(taskInfo)
-                    end
+                    task.cancel(taskInfo)
                     runningTasks[player] = nil
                     monitoredPlayers[player] = nil
                     if independentHoldConnections[player] then
@@ -2178,7 +2153,7 @@ function loopPlayerBlobF4()
                         independentHoldConnections[player] = nil
                     end
                     if anchorToggleTasks[player] then
-                        if task.status(anchorToggleTasks[player]) ~= "dead" then task.cancel(anchorToggleTasks[player]) end
+                        task.cancel(anchorToggleTasks[player])
                         anchorToggleTasks[player] = nil
                     end
                     if ownerTags[player] then
@@ -2190,7 +2165,7 @@ function loopPlayerBlobF4()
                     end
                     destroyCounts[player] = nil
                     if player.Character then
-                        local charTOR = player.Character:FindFirstChild("Torso") or player.Character:FindFirstChild("UpperTorso")
+                        local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                         if charTOR then
                             charTOR.Anchored = false
                         end
@@ -2200,17 +2175,13 @@ function loopPlayerBlobF4()
             task.wait(0.5)
         end
 
-        for player, taskObj in pairs(anchorToggleTasks) do
-            if taskObj and task.status(taskObj) ~= "dead" then
-                task.cancel(taskObj)
+        for player, task in pairs(anchorToggleTasks) do
+            if task then
+                task.cancel(task)
             end
         end
 
-        for _, taskInfo in pairs(runningTasks) do 
-            if taskInfo and task.status(taskInfo) ~= "dead" then
-                task.cancel(taskInfo) 
-            end
-        end
+        for _, taskInfo in pairs(runningTasks) do task.cancel(taskInfo) end
         for player, connection in pairs(independentHoldConnections) do
             if connection then connection:Disconnect() end
         end
@@ -2233,7 +2204,7 @@ function loopPlayerBlobF4()
 
         for _, player in ipairs(game.Players:GetPlayers()) do
             if player.Character then
-                local charTOR = player.Character:FindFirstChild("Torso") or player.Character:FindFirstChild("UpperTorso")
+                local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                 if charTOR then
                     charTOR.Anchored = false
                 end
