@@ -1747,14 +1747,6 @@ function loopPlayerBlobF4()
     local ownerTags = {}
     local originPositions = {}
 
-    -- 블롭맨의 유효성을 실시간으로 확인하고 필요시 갱신하는 헬퍼 함수
-    local function verifyAndGetBlobman()
-        if not currentBlobS or not currentBlobS.Parent or not currentBlobS:FindFirstChild("PrimaryPart") then
-            UpdateCurrentBlobman()
-        end
-        return currentBlobS
-    end
-
     local function processPlayer(player)
         if not player then return end
 
@@ -1851,11 +1843,6 @@ function loopPlayerBlobF4()
                 continue
             end
 
-            -- 킥 대상이 리셋 버튼을 눌러도 목이 부러져 사망하지 않도록 차단
-            if charHUM then
-                charHUM.RequiresNeck = false
-            end
-
             local tpRunning = true
             local CF
             task.spawn(function()
@@ -1899,17 +1886,9 @@ function loopPlayerBlobF4()
                         charHRP.Velocity = Vector3.new(0,0,0)
                         charHRP.RotVelocity = Vector3.new(0,0,0)
                     end
-                    
-                    -- 블롭맨 튕김 방지 및 재설 체크 로직
-                    local activeBlob = verifyAndGetBlobman()
-                    if amIRiding and activeBlob then
-                        local blobHRP = activeBlob:FindFirstChild("HumanoidRootPart") or activeBlob.PrimaryPart
-                        if blobHRP then
-                            blobHRP.Velocity = Vector3.new(0,0,0)
-                            blobHRP.RotVelocity = Vector3.new(0,0,0)
-                        end
-                        BlobGrab(activeBlob, charHRP, "Right")
-                        BlobRelease(activeBlob, charHRP, "Right")
+                    if amIRiding then
+                        BlobGrab(currentBlobS, charHRP, "Right")
+                        BlobRelease(currentBlobS, charHRP, "Right")
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
@@ -2077,18 +2056,8 @@ function loopPlayerBlobF4()
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         charHRP.Velocity = Vector3.new(0,0,0)
-                        
-                        -- 실시간 블롭맨 소환 갱신 및 물리 잠금
-                        local activeBlob = verifyAndGetBlobman()
-                        if activeBlob then
-                            local blobHRP = activeBlob:FindFirstChild("HumanoidRootPart") or activeBlob.PrimaryPart
-                            if blobHRP then
-                                blobHRP.Velocity = Vector3.new(0,0,0)
-                                blobHRP.RotVelocity = Vector3.new(0,0,0)
-                            end
-                            BlobGrab(activeBlob, charHRP, "Right")
-                            BlobRelease(activeBlob, charHRP, "Right")
-                        end
+                        BlobGrab(currentBlobS, charHRP, "Right")
+                        BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
                         task.delay(0, function() if charHUM then charHUM.Sit = false end end)
                     end
