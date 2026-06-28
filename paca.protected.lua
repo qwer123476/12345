@@ -2554,7 +2554,7 @@ function loopPlayerF3() -- 룹3
         end
     end)
 end
-function executeBlobmanDesyncKick()
+ function executeBlobmanDesyncKick()
     UpdateCurrentBlobman()
     
     local targetPlayers = {}
@@ -2621,7 +2621,6 @@ function executeBlobmanDesyncKick()
 
             if hrp and head and hum and hum.Health > 0 then
                 
-                -- 1. 소유권을 획득하기 전까지 기존 TP(player) 로직 비동기 연사 실행
                 local ownerTag = head:FindFirstChild("PartOwner")
                 local hasOwnership = ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name
 
@@ -2642,8 +2641,14 @@ function executeBlobmanDesyncKick()
                             end
                         end)
                     end
+                    
+                    -- 소유권 얻기 전: 위로 올리지 않고 TP(p)가 반환한 현재 좌표 주변이나 내 앞쪽으로 대상을 고정
+                    if data.lastCF then
+                        hrp.CFrame = data.lastCF
+                    else
+                        hrp.CFrame = myHRP.CFrame * CFrame.new(0, 0, -3)
+                    end
                 else
-                    -- 소유권 확보 완료 시 실시간 TP 추적 중단 후 위치 락(Lock)
                     if data.tpRunning then
                         data.tpRunning = false
                         if data.lastCF then
@@ -2652,14 +2657,15 @@ function executeBlobmanDesyncKick()
                             BACK(data.originCF)
                         end
                     end
+                    
+                    -- 소유권 얻은 후: 무한 위로 상승 방지를 위해 오프셋을 없애거나 내 정면에 고정
+                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 0, -3)
                 end
 
-                -- 2. 대상 플레이어 강제 동기화 제어 및 오프셋 좌표 고정
+                -- 물리 속도 초기화로 들림 현상 원천 차단
                 hrp.Velocity = Vector3.new(0, 0, 0)
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
-                hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
 
-                -- 3. 원격 이벤트 레이트 리미트 필터 (네트워크 소유권 박탈 및 Desync 유도)
                 if now - lastRemoteTime >= 0.08 then
                     if not hasOwnership then
                         rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
@@ -2668,7 +2674,6 @@ function executeBlobmanDesyncKick()
 
                     rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
 
-                    -- 4. 몬스터(Blobman) 탑승 상태일 경우 무한 잡기/해제 탈착 유도 및 시트 변조 KICK
                     if activeBlob then
                         BlobGrab(activeBlob, hrp, "Right")
                         BlobRelease(activeBlob, hrp, "Right")
@@ -2679,7 +2684,6 @@ function executeBlobmanDesyncKick()
                     lastRemoteTime = now
                 end
             else
-                -- 대상 캐릭터가 죽었거나 증발했을 경우 백트랙 복구 시퀀스
                 if data.tpRunning then data.tpRunning = false end
                 if data.originCF then 
                     BACK(data.originCF)
