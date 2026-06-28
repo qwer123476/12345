@@ -5459,7 +5459,7 @@ end
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
 
-local Players = game:GetService("Players")
+Local Players = game:GetService("Players")
 local localPlayer = game.Players.LocalPlayer
 local rs = game:GetService("ReplicatedStorage")
 
@@ -5556,15 +5556,6 @@ local function processAntiGrabPlayer(player)
         task.wait(0.02)
     end
 
-    tpRunning = false
-
-    for _, thread in ipairs(antiGrabThreads) do
-        if thread then
-            pcall(task.cancel, thread)
-        end
-    end
-    table.clear(antiGrabThreads)
-
     if success then
         pcall(function()
             for _, v in ipairs(character:GetDescendants()) do
@@ -5581,6 +5572,17 @@ local function processAntiGrabPlayer(player)
             end
         end)
     end
+
+    task.wait(1)
+
+    tpRunning = false
+
+    for _, thread in ipairs(antiGrabThreads) do
+        if thread then
+            pcall(task.cancel, thread)
+        end
+    end
+    table.clear(antiGrabThreads)
 
     if originCF and myHrp and myHrp.Parent then
         myHrp.CFrame = originCF
