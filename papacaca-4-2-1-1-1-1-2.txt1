@@ -259,47 +259,49 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
 local paca = {
     TextColor = Color3.fromRGB(255,255,255),
+    LabelColor = Color3.fromRGB(0,220,100),
 
     Background = Color3.fromRGB(0,0,0),
-    Topbar = Color3.fromRGB(15,15,15),
+    Topbar = Color3.fromRGB(8,8,8),
     Shadow = Color3.fromRGB(0,0,0),
 
-    NotificationBackground = Color3.fromRGB(20,20,20),
-    NotificationActionsBackground = Color3.fromRGB(35,35,35),
+    NotificationBackground = Color3.fromRGB(12,12,12),
+    NotificationActionsBackground = Color3.fromRGB(25,25,25),
 
-    TabBackground = Color3.fromRGB(25,20,35),
-    TabStroke = Color3.fromRGB(60,40,90),
-    TabBackgroundSelected = Color3.fromRGB(130,50,220),
-    TabTextColor = Color3.fromRGB(180,180,180),
+    TabBackground = Color3.fromRGB(15,10,22),
+    TabStroke = Color3.fromRGB(45,25,70),
+    TabBackgroundSelected = Color3.fromRGB(110,40,190),
+    TabTextColor = Color3.fromRGB(150,150,150),
     SelectedTabTextColor = Color3.fromRGB(255,255,255),
 
-    ElementBackground = Color3.fromRGB(18,18,18),
-    ElementBackgroundHover = Color3.fromRGB(28,28,28),
-    SecondaryElementBackground = Color3.fromRGB(12,12,12),
-    ElementStroke = Color3.fromRGB(40,40,40),
-    SecondaryElementStroke = Color3.fromRGB(30,30,30),
+    ElementBackground = Color3.fromRGB(10,10,10),
+    ElementBackgroundHover = Color3.fromRGB(18,18,18),
+    SecondaryElementBackground = Color3.fromRGB(5,5,5),
+    ElementStroke = Color3.fromRGB(25,25,25),
+    SecondaryElementStroke = Color3.fromRGB(18,18,18),
 
-    SliderBackground = Color3.fromRGB(45,45,45),
+    SliderBackground = Color3.fromRGB(30,30,30),
     SliderProgress = Color3.fromRGB(255,255,255),
-    SliderStroke = Color3.fromRGB(200,200,200),
+    SliderStroke = Color3.fromRGB(180,180,180),
 
-    ToggleBackground = Color3.fromRGB(20,20,20),
+    ToggleBackground = Color3.fromRGB(12,12,12),
 
-    ToggleEnabled = Color3.fromRGB(230,0,0),
-    ToggleEnabledStroke = Color3.fromRGB(255,100,100),
-    ToggleEnabledOuterStroke = Color3.fromRGB(180,0,0),
+    ToggleEnabled = Color3.fromRGB(220,0,0),
+    ToggleEnabledStroke = Color3.fromRGB(255,80,80),
+    ToggleEnabledOuterStroke = Color3.fromRGB(150,0,0),
 
-    ToggleDisabled = Color3.fromRGB(55,55,55),
-    ToggleDisabledStroke = Color3.fromRGB(80,80,80),
-    ToggleDisabledOuterStroke = Color3.fromRGB(35,35,35),
+    ToggleDisabled = Color3.fromRGB(40,40,40),
+    ToggleDisabledStroke = Color3.fromRGB(60,60,60),
+    ToggleDisabledOuterStroke = Color3.fromRGB(25,25,25),
 
-    DropdownSelected = Color3.fromRGB(30,25,35),
-    DropdownUnselected = Color3.fromRGB(20,20,20),
+    DropdownSelected = Color3.fromRGB(20,15,25),
+    DropdownUnselected = Color3.fromRGB(12,12,12),
 
-    InputBackground = Color3.fromRGB(25,25,15),
+    InputBackground = Color3.fromRGB(15,15,8),
     InputStroke = Color3.fromRGB(220,180,0),
-    PlaceholderColor = Color3.fromRGB(150,140,100),
+    PlaceholderColor = Color3.fromRGB(120,110,80),
 }
+
 
 local Window = Rayfield:CreateWindow({Name = "파카허브", Icon = 0, Theme = paca, ToggleUIKeybind = "T"})
 
