@@ -2556,7 +2556,7 @@ function loopPlayerF3() -- 룹3
 end
 function executeBlobmanDesyncKick()
     local targetPlayers = {}
-    local hasTeleported = {}
+    local lastTargetPositions = {} -- 거리 체크용 좌표 저장 테이블
     local lastRemoteTime = 0
 
     local function fetchTargets()
@@ -2573,7 +2573,8 @@ function executeBlobmanDesyncKick()
         return currentBlobS
     end
 
-    local function isolatePhysics(targetChar)
+    -- 시각적 데싱크 및 물리 오염 연출 함수
+    local function applyVisualGlitchAndPhysics(targetChar)
         if not targetChar then return end
         local hrp = targetChar:FindFirstChild("HumanoidRootPart")
         local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
@@ -2584,9 +2585,21 @@ function executeBlobmanDesyncKick()
             if rootJoint and rootJoint:IsA("Motor6D") then
                 rootJoint.Enabled = false
             end
-            -- [독특한 디싱크 효과] 서버 물리 데이터 강제 포화 연산으로 킥 확률 극대화
-            hrp.AssemblyLinearVelocity = Vector3.new(0, 5000, 0)
-            hrp.AssemblyAngularVelocity = Vector3.new(0, 5000, 0)
+            
+            -- [물리 데이터 폭발]
+            hrp.AssemblyLinearVelocity = Vector3.new(0, 8000, 0)
+            hrp.AssemblyAngularVelocity = Vector3.new(5000, 5000, 5000)
+            
+            -- [외관상 독특한 킥 비주얼 연출] 캐릭터 모든 파츠를 무작위로 찢고 비틀기
+            for _, part in ipairs(targetChar:GetChildren()) do
+                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                    part.CanCollide = false
+                    -- 무작위 크기 변조 및 회전 노이즈 삽입 (시각적 글리치 효과)
+                    local randomScale = math.random(5, 20) / 10
+                    part.Size = Vector3.new(randomScale, randomScale, randomScale)
+                    part.CFrame = part.CFrame * CFrame.Angles(math.rad(math.random(-45, 45)), math.rad(math.random(-45, 45)), 0)
+                end
+            end
         end
     end
 
@@ -2603,7 +2616,6 @@ function executeBlobmanDesyncKick()
         end
     end
 
-    -- 단 하나의 독립적인 마스터 연결 구조로 렉 현상 차단
     local masterConnection
     masterConnection = RunService.Heartbeat:Connect(function()
         if not advancedDesyncLoopActive then
@@ -2612,31 +2624,35 @@ function executeBlobmanDesyncKick()
                 if p.Character then restorePhysics(p.Character) end
             end
             targetPlayers = {}
-            hasTeleported = {}
+            lastTargetPositions = {}
             return
         end
 
         local currentNames = fetchTargets()
         local myChar = plr.Character
         local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local myHum = myChar and myChar:FindFirstChild("Humanoid")
         local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
         local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
         local activeBlob = isRidingBlob and verifyAndGetBlobman()
         local now = os.clock()
 
-        -- 활성화된 타겟 일괄 관리 및 가비지 수집
+        -- 내 캐릭터가 죽었거나 없으면 연산 스킵
+        if not myHRP or not myHum or myHum.Health <= 0 then return end
+
         for _, name in ipairs(currentNames) do
             local p = game.Players:FindFirstChild(name)
             if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
-                targetPlayers[p] = true
+                if not targetPlayers[p] then
+                    targetPlayers[p] = { hasTeleported = false, lastChar = nil }
+                end
             end
         end
 
-        for p in pairs(targetPlayers) do
+        for p, data in pairs(targetPlayers) do
             if not p.Parent or not table.find(currentNames, p.Name) then
                 if p.Character then restorePhysics(p.Character) end
                 targetPlayers[p] = nil
-                hasTeleported[p] = nil
                 continue
             end
 
@@ -2645,15 +2661,33 @@ function executeBlobmanDesyncKick()
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             local head = char and char:FindFirstChild("Head")
 
-            if hrp and head and hum and hum.Health > 0 and myHRP then
-                -- [최초 1회만 타겟에게 TP]
-                if not hasTeleported[p] then
-                    hasTeleported[p] = true
+            -- 타겟이 리스폰(재설)되었는지 감지하여 TP 잠금 초기화
+            if data.lastChar ~= char then
+                data.hasTeleported = false
+                data.lastChar = char
+            end
+
+            if hrp and head and hum and hum.Health > 0 then
+                local distance = (myHRP.Position - hrp.Position).Magnitude
+
+                -- [조건형 TP 엔진] 최초 1회 진입 시 또는 거리가 30스터드 밖으로 벌어졌을 때 즉시 재-TP
+                if not data.hasTeleported or distance > 30 then
+                    data.hasTeleported = true
                     myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
                 end
 
-                -- 원격 무부하 제어 스케줄러 (과도한 패킷 연사 제한으로 렉 제로화)
-                if now - lastRemoteTime >= 0.05 then
+                -- 공중 고정 좌표 강제 락 연산 (내 머리 위 18스터드 공중에 완전 격리)
+                local upperLockPosition = myHRP.CFrame * CFrame.new(0, 18, 0)
+                hrp.CFrame = upperLockPosition
+                
+                -- 속도 물리 엔진 무력화 락
+                hrp.Velocity = Vector3.new(0, 0, 0)
+                hrp.RotVelocity = Vector3.new(0, 0, 0)
+
+                applyVisualGlitchAndPhysics(char)
+
+                -- 패킷 드랍 및 무부하 초고속 리모트 바인딩
+                if now - lastRemoteTime >= 0.03 then
                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                     rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                     rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
@@ -2664,19 +2698,12 @@ function executeBlobmanDesyncKick()
                     end
                     lastRemoteTime = now
                 end
-
-                isolatePhysics(char)
-
-                -- [공중 고정 연산] 내 캐릭터 머리 위(Y축 +15) 공중에 정확하게 격리 고정
-                local upperLockPosition = myHRP.CFrame * CFrame.new(0, 15, 0)
-                hrp.CFrame = upperLockPosition
             else
                 if char then restorePhysics(char) end
             end
         end
     end)
 end
-
 
 
 
