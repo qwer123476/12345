@@ -2624,6 +2624,11 @@ function executeBlobmanDesyncKick()
                                     local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
                                     local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
                                     
+                                    if myHRP then
+                                        myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
+                                    end
+                                    task.wait(0.05)
+
                                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                                     rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                                     
@@ -2701,6 +2706,7 @@ function executeBlobmanDesyncKick()
         targetPlayers = {}
     end)
 end
+
 
 
 
