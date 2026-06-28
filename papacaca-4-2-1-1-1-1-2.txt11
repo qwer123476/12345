@@ -11419,7 +11419,7 @@ DDTab:CreateToggle({
 })
 
 local LineLagT = false
-local LineLagV = 50
+--local LineLagV = 50
 
 function LineLagF()
     task.spawn(function()
