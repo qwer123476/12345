@@ -2555,12 +2555,9 @@ function loopPlayerF3() -- 룹3
     end)
 end
  function executeBlobmanDesyncKick()
-    UpdateCurrentBlobman()
-    
     local targetPlayers = {}
     local lastRemoteTime = 0
 
-    -- [원본 로직 복구]
     local function fetchTargets()
         local list = {}
         if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(list, v) end end
@@ -2575,10 +2572,39 @@ end
         return currentBlobS
     end
 
+    local function isolatePhysics(targetChar)
+        if not targetChar then return end
+        local hrp = targetChar:FindFirstChild("HumanoidRootPart")
+        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+        if hrp and torso then
+            local rootJoint = hrp:FindFirstChild("RootJoint") or torso:FindFirstChild("RootJoint")
+            if rootJoint and rootJoint:IsA("Motor6D") then
+                rootJoint.Enabled = false
+            end
+            hrp.AssemblyLinearVelocity = Vector3.new(0, 9999, 0)
+            hrp.AssemblyAngularVelocity = Vector3.new(0, 9999, 0)
+        end
+    end
+
+    local function restorePhysics(targetChar)
+        if not targetChar then return end
+        local hrp = targetChar:FindFirstChild("HumanoidRootPart")
+        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+        if hrp then
+            local rootJoint = hrp:FindFirstChild("RootJoint") or (torso and torso:FindFirstChild("RootJoint"))
+            if rootJoint and rootJoint:IsA("Motor6D") then
+                rootJoint.Enabled = true
+            end
+        end
+    end
+
     local masterConnection
     masterConnection = RunService.Heartbeat:Connect(function()
         if not advancedDesyncLoopActive then
             if masterConnection then masterConnection:Disconnect() end
+            for p in pairs(targetPlayers) do
+                if p.Character then restorePhysics(p.Character) end
+            end
             targetPlayers = {}
             return
         end
@@ -2587,63 +2613,69 @@ end
         local myChar = plr.Character
         local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
         local myHum = myChar and myChar:FindFirstChild("Humanoid")
-        
-        -- [불필요한 좌표 연산 코드 전부 제거]
+        local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
+        local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
+        local activeBlob = isRidingBlob and verifyAndGetBlobman()
+        local now = os.clock()
+
         if not myHRP or not myHum or myHum.Health <= 0 then return end
 
         for _, name in ipairs(currentNames) do
             local p = game.Players:FindFirstChild(name)
             if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
                 if not targetPlayers[p] then
-                    targetPlayers[p] = { tpRunning = false, lockedCF = nil }
+                    targetPlayers[p] = { lastChar = nil }
                 end
             end
         end
 
         for p, data in pairs(targetPlayers) do
+            if not p.Parent or not table.find(currentNames, p.Name) then
+                if p.Character then restorePhysics(p.Character) end
+                targetPlayers[p] = nil
+                continue
+            end
+
             local char = p.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local hum = char and char:FindFirstChild("Humanoid")
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             local head = char and char:FindFirstChild("Head")
 
+            if data.lastChar ~= char then
+                data.lastChar = char
+            end
+
             if hrp and head and hum and hum.Health > 0 then
-                local hasOwnership = head:FindFirstChild("PartOwner") and head:FindFirstChild("PartOwner").Value == plr.Name
+                local distance = (myHRP.Position - hrp.Position).Magnitude
 
-                if not hasOwnership then
-                    if not data.tpRunning then
-                        data.tpRunning = true
-                        task.spawn(function()
-                            while data.tpRunning and advancedDesyncLoopActive and p.Parent do
-                                local ok, cf = TP(p)
-                                if ok and cf then data.lockedCF = cf end
-                                task.wait()
-                            end
-                        end)
-                    end
+                if distance > 30 then
+                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
                 else
-                    data.tpRunning = false
+                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
                 end
 
-                -- [핵심] 소유권 뺏은 후엔 TP 멈추고 저장된 좌표(lockedCF)에만 고정. 내 움직임 영향 0.
-                if data.lockedCF and not data.tpRunning then
-                    hrp.CFrame = data.lockedCF
-                    hrp.Velocity = Vector3.new(0, 0, 0)
-                    hrp.RotVelocity = Vector3.new(0, 0, 0)
-                end
+                hrp.Velocity = Vector3.new(0, 0, 0)
+                hrp.RotVelocity = Vector3.new(0, 0, 0)
 
-                if os.clock() - lastRemoteTime >= 0.08 then
-                    if not hasOwnership then
-                        rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                    end
+                isolatePhysics(char)
+
+                if now - lastRemoteTime >= 0.05 then
+                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                    rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                     rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
-                    lastRemoteTime = os.clock()
+                    
+                    if activeBlob then
+                        BlobGrab(activeBlob, hrp, "Right")
+                        BlobRelease(activeBlob, hrp, "Right")
+                    end
+                    lastRemoteTime = now
                 end
+            else
+                if char then restorePhysics(char) end
             end
         end
     end)
 end
-
 
 
 
