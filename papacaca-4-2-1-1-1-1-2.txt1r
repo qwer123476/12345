@@ -5494,7 +5494,7 @@ end
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
 
-local Players = game:GetService("Players")
+Local Players = game:GetService("Players")
 local localPlayer = game.Players.LocalPlayer
 local rs = game:GetService("ReplicatedStorage")
 
@@ -5617,20 +5617,19 @@ local function processAntiGrabPlayer(player)
         end)
     end
 
-    task.wait(1)
 
-    if originCF and myHrp and myHrp.Parent then
-        myHrp.CFrame = originCF
-        task.wait()
-    end
+    -- if originCF and myHrp and myHrp.Parent then
+    --     myHrp.CFrame = originCF
+    --     task.wait()
+    -- end
 
-    if originCF and myHrp and myHrp.Parent then 
-        if typeof(BACK) == "function" then
-            BACK(originCF)
-        else
-            myHrp.CFrame = originCF
-        end
-    end
+    -- if originCF and myHrp and myHrp.Parent then 
+    --     if typeof(BACK) == "function" then
+    --         BACK(originCF)
+    --     else
+    --         myHrp.CFrame = originCF
+    --     end
+    -- end
 
     if myHum and myHum.Parent then
         myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
@@ -5812,6 +5811,7 @@ FDTab:CreateToggle({
         end
     end
 })
+
 
 -- ================== [ 유틸리티 기능 ] ==================
 
