@@ -10,7 +10,7 @@ print("AP FTAP Script 시작 - 설정 저장 활성화")
 local Rayfield =   loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "파카허브",
+    Name = "파카허브 [FREE]",
     LoadingTitle = "로딩중",
     LoadingSubtitle = "by JIUO",
     ConfigurationSaving = {
@@ -42,14 +42,14 @@ local NTTab = Window:CreateTab("네트워크 오너 설정")
 local antiTab = Window:CreateTab("안전", 6034831332)               
 local ListTab = Window:CreateTab("명단", 3572491301)              
 local LoopTab = Window:CreateTab("조지기", 6023426923)             
-local AuraTab = Window:CreateTab("아우라", 6031068423)            
+--local AuraTab = Window:CreateTab("아우라", 6031068423)            
 local funTab = Window:CreateTab("찌끄레기", 4483345998)            
 local keybindTab = Window:CreateTab("설정", 6031094678)            
 local DevTab = Window:CreateTab("잡기능", 3944680095)             
 local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
 local environmentTab = Window:CreateTab("환경 설정", 6023426923)   
 local combatTab = Window:CreateTab("전투 확장", 6026568198)        
-local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
+--local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
 local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
 local CreditsTab = Window:CreateTab("제작자 한정")
 
@@ -6825,29 +6825,7 @@ DevTab:CreateToggle({
     end
 })
 
-local RRButton = LoopTab:CreateButton({
-    Name = "릴리즈 [ Blobman ]",
-    Callback = function()
-        table.clear(playersInLoop2V)
-	for i, e in ipairs(playersInLoop1V) do
-		local nameOnly = e:match("^(.-) %(") or e
-		table.insert(playersInLoop2V, nameOnly)
-	end
-        BlobReleaseR()
-    end
-})
 
-local LGButton = LoopTab:CreateButton({
-    Name = "메슬리즈 [ Blobman ]",
-    Callback = function()
-        table.clear(playersInLoop2V)
-	for i, e in ipairs(playersInLoop1V) do
-		local nameOnly = e:match("^(.-) %(") or e
-		table.insert(playersInLoop2V, nameOnly)
-	end
-        BlobMasslessR()
-    end
-})
 
 local RGButton = LoopTab:CreateButton({
     Name = "잡기 [ Blobman ]",
@@ -6875,7 +6853,7 @@ local RDButton = LoopTab:CreateButton({
 
 grabTab:CreateSection("Fling")
 local flingToggle = grabTab:CreateToggle({
-    Name = "던지기 V1",
+    Name = "던지기 ",
     CurrentValue = false,
     Flag = "1",
     Callback = function(Value)
@@ -6885,7 +6863,7 @@ local flingToggle = grabTab:CreateToggle({
 })
 
 local strengthInput = grabTab:CreateInput({
-    Name = "던지는 힘 V1",
+    Name = "던지는 힘 ",
     CurrentValue = 0,
     PlaceholderText = "Value",
     RemoveTextAfterFocusLost = false,
@@ -6896,116 +6874,9 @@ local strengthInput = grabTab:CreateInput({
 })
 strengthInput:Set(9999)
 grabTab:CreateLabel("모바일의경우 작동하지 않습니다.")
-local strengthConnection = nil
-local nageru = 800
-local lastThrowTime = 0
 
-grabTab:CreateToggle({
-    Name = "던지기 V2",
-    Default = false,
-    Save = true,
-    Flag = "SuperThrow",
-    Callback = function(enabled)
-        if enabled then
-            if strengthConnection then strengthConnection:Disconnect() end
-
-            strengthConnection = workspace.ChildAdded:Connect(function(model)
-                if model.Name == "GrabParts" then
-                    local grabPart = model:FindFirstChild("GrabPart")
-                    if grabPart and grabPart:FindFirstChild("WeldConstraint") then
-                        local targetPart = grabPart.WeldConstraint.Part1
-                        if targetPart then
-                            
-                            local bv = Instance.new("BodyVelocity")
-                            bv.Name = "SuperThrowBV"
-                            bv.MaxForce = Vector3.new(0, 0, 0)
-                            bv.Velocity = Vector3.new(0, 0, 0)
-                            bv.Parent = targetPart
-
-                            local throwConn
-                            throwConn = model:GetPropertyChangedSignal("Parent"):Connect(function()
-                                if not model.Parent then
-                                    local currentTime = tick()
-                                    
-                                    if currentTime - lastThrowTime < 1.4 then
-                                        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                                        bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * nageru
-                                        game:GetService("Debris"):AddItem(bv, 2)
-                                    else
-                                        bv:Destroy()
-                                    end
-                                    
-                                    if throwConn then throwConn:Disconnect() end
-                                end
-                            end)
-                        end
-                    end
-                end
-            end)
-        else
-            if strengthConnection then
-                strengthConnection:Disconnect()
-                strengthConnection = nil
-            end
-        end
-    end
-})
-
-grabTab:CreateInput({
-    Name = "던지는 힘 V2",
-    PlaceholderText = "숫자 입력 (기본값: 800)",
-    Default = "800",
-    Save = false,
-    Callback = function(value)
-        local num = tonumber(value)
-        if num and num >= 0 then
-            nageru = num
-        end
-    end
-})
-grabTab:CreateLabel("모바일,컴퓨터 모두 지원하며 가장좋은 슈퍼 쓰로우 입니다.")
-
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.UserInputType == Enum.UserInputType.MouseButton2 or input.UserInputType == Enum.UserInputType.Touch then
-        lastThrowTime = tick()
-    end
-end)
-grabTab:CreateSection("Line")
-local extendLineToggle = grabTab:CreateToggle({
-    Name = "줄길이",
-    CurrentValue = false,
-    Flag = "3",
-    Callback = function(Value)
-        infLineExtendT = Value
-        infLineExtendF()
-    end
-})
-
-local extendLineInput = grabTab:CreateInput({
-    Name = "휠속도",
-    CurrentValue = 0,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
-    Flag = "4",
-    Callback = function(Value)
-        increaseLineExtendV = Value
-    end
-})
-extendLineInput:Set(1.7)
 
 grabTab:CreateSection("Other")
-local AntiStruggleGrab = grabTab:CreateToggle({
-    Name = "루프 그랩",
-    CurrentValue = false,
-    Flag = "1",
-    Callback = function(Value)
-        AntiStruggleGrabT = Value
-        if Value then
-            AntiStruggleGrabF()
-        end
-    end
-})
 
 local RagdollGrabToggle = grabTab:CreateToggle({
     Name = "래그돌 그랩",
@@ -7043,26 +6914,6 @@ local NoClipGrab = grabTab:CreateToggle({
     end
 })
 
-grabTab:CreateToggle({ 
-    Name = "드럼통(킬)그랩", 
-    CurrentValue = false,
-    Flag = "1",
-    Callback = function(Value)
-        KillGrabT = Value
-        KillGrabF()
-    end
-})
-
-grabTab:CreateSection("")
-grabTab:CreateToggle({
-    Name = "킥그랩(더럽게 안됨)",
-    CurrentValue = false,
-    Flag = "1",
-    Callback = function(Value)
-        KickGrabT = Value
-        if Value then KickGrabF() end
-    end
-})
 
 -- =============== [ 보호 대상 목록 ] ==
 local GF = {"wetokwk3jr"}
@@ -7248,7 +7099,10 @@ function Logger()
 
     if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
         local success, errorMessage = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() -- anti kick
+          
+		  
+		  
+		  loadstring(game:HttpGet("https://raw.githubusercon:;(tent.com/qwer12~3476/1234~/5/main/anti kic8k"))() -- anti kick
         end)
 
         if not success then
@@ -7707,17 +7561,7 @@ LoopTab:CreateToggle({
       end
    end,
 })
-LoopTab:CreateSection("자동블롭앉기")
-local AutoSit = LoopTab:CreateToggle({
-    Name = "자동블롭앉기",
-    CurrentValue = false,
-    Flag = "AutoSitBlobman",
-    Callback = function(Value)
-        AutoSitT = Value
-        AutoSitF()
-    end
-})
-LoopTab:CreateSection("Bring")
+
 LoopTab:CreateButton({
     Name = "끌고오기 [ Blobman ]",
     Callback = function()
@@ -7953,82 +7797,7 @@ LoopTab:CreateButton({
     end
 })
 
-    LoopTab:CreateSection("오너킥")
     
-    local OLTPInput = LoopTab:CreateInput({
-        Name = "X Y Z",
-        CurrentValue = "0,40,0",
-        PlaceholderText = "",
-        RemoveTextAfterFocusLost = false,
-        Flag = "",
-        Callback = function(Value)
-            local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
-            if x and y and z then
-                OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
-            else
-            end
-        end
-    })
-    OLTPInput:Set("0,40,0")
-    
-    local blobLoop4Toggle = LoopTab:CreateToggle({
-        Name = "스팸킥v25 [ 더빠른속도 ]",
-        CurrentValue = false,
-        Flag = "21",
-        Callback = function(Value)
-            blobLoopT4 = Value
-            if blobLoopT4 then
-                table.clear(playersInLoop2V)
-                for i, e in ipairs(playersInLoop1V) do
-                    local nameOnly = e:match("^(.-) %(") or e
-                    table.insert(playersInLoop2V, nameOnly)
-                end
-                loopPlayerBlobF4()
-            else
-                blobLoopT4 = false
-                table.clear(playersInLoop2V)
-            end
-        end
-    })
-
-    
-LoopTab:CreateSection("Owner Kick")
-local OLTPInput = LoopTab:CreateInput({
-    Name = "X Y Z",
-    CurrentValue = "0,20,0",
-    PlaceholderText = "",
-    RemoveTextAfterFocusLost = false,
-    Flag = "",
-    Callback = function(Value)
-        local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
-        if x and y and z then
-            OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
-        else
-        end
-    end
-})
-OLTPInput:Set("0,20,0")
-
-local blobLoop4Toggle = LoopTab:CreateToggle({
-    Name = "구버전킥",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        blobLoopT4 = Value
-        if blobLoopT4 then
-            table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
-            end
-            loopPlayerBlobF4()
-        else
-            blobLoopT4 = false
-            table.clear(playersInLoop2V)
-        end
-    end
-})
-LoopTab:CreateLabel("스팸킥의 경우 렉이걸릴시 잘 되지않습니다.")
 
 
 
@@ -8086,25 +7855,7 @@ local blobLoopToggle = LoopTab:CreateToggle({
 })
 
 
-local blobLoop3Toggle = LoopTab:CreateToggle({
-    Name = "루프킬 [ Blobman ]",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        blobLoopT3 = Value
-        if blobLoopT3 then
-            table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
-            end
-            loopPlayerBlobF3()
-        else
-            blobLoopT3 = false
-            table.clear(playersInLoop2V)
-        end
-    end
-})
+
 
 local blobLoop2Toggle = LoopTab:CreateToggle({
     Name = "루프 그랩 [ Blobman ]",
@@ -8168,15 +7919,6 @@ local Loop2 = LoopTab:CreateToggle({
 })
 
 LoopTab:CreateSection("스팸")
-LoopTab:CreateToggle({
-    Name = "스팸",
-    CurrentValue = false,
-    Flag = "27",
-    Callback = function(Value)
-        LoopSnowBallT = Value
-        LoopSnowBallF()
-    end
-})
 
 LoopTab:CreateButton({
     Name = "블랙홀 [ 닌자 쿠나이 ]",
@@ -8580,17 +8322,9 @@ local antiTeleportToggle = antiTab:CreateToggle({
 
 antiTab:CreateLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
 antiTab:CreateSection("그랩 | 토클")
-local AntiGrab = antiTab:CreateToggle({
-    Name = "안티 그랩",
-    CurrentValue = false,
-    Flag = "5",
-    Callback = function(Value)
-        AntiGrabF(Value)
-    end
-})
-AntiGrab:Set(true)
+
 antiTab:CreateToggle({
-    Name = "안티그랩V2",
+    Name = "안티그랩",
     Default = false,
     Save = false,
     Flag = "antiGrab",
@@ -8644,37 +8378,6 @@ end)
 
 
 
-local AntiGrabSticky = antiTab:CreateToggle({
-    Name = "안티그랩 |  StickyPart",
-    CurrentValue = false,
-    Callback = function(Value)
-        AntiGrabStickyT = Value
-        if Value then
-            AntiGrabStickyF()
-        end
-    end
-})
-
-
-local AntiRelease = antiTab:CreateToggle({
-    Name = "안티 인풋(Network onwer)",
-    CurrentValue = false,
-    Flag = "AntiDeathToggleFlag",
-    Callback = function(Value)
-        AntiDeathT = Value
-        if AntiDeathT then
-            task.spawn(AntiDeathF)
-        else
-            if AntiDeathConnection then 
-                AntiDeathConnection:Disconnect() 
-                AntiDeathConnection = nil 
-            end
-            local donut = inv:FindFirstChild("FoodBread")
-            if donut then donut:Destroy() end
-        end
-    end,
-})
-AntiRelease:Set(true)
 
 antiTab:CreateSection("블롭")
 local AntiBlob = antiTab:CreateToggle({
@@ -8689,52 +8392,7 @@ local AntiBlob = antiTab:CreateToggle({
 	end
 })
 AntiBlob:Set(true)
-if not AntiCheatStates then
-    _G.AntiCheatStates = { blobConn = nil }
-end
 
-function SetAntiBlobman(enabled)
-    local localPlayer = game.Players.LocalPlayer
-    if not localPlayer then return end
-    
-    local function processPart(part)
-        local invalid = part.Name == "LeftWeld" or part.Name == "RightWeld" or part.Name == "LeftAlignOrientation" or
-                            part.Name == "RightAlignOrientation"
-
-        if invalid and part.Parent and part.Parent.Parent and part.Parent.Parent.Parent ~=
-            workspace:FindFirstChild(localPlayer.Name) then
-            part.Enabled = not enabled
-        end
-    end
-    for _, part in pairs(workspace:GetDescendants()) do
-        processPart(part)
-    end
-    if enabled then
-        if _G.AntiCheatStates.blobConn then
-            _G.AntiCheatStates.blobConn:Disconnect()
-        end
-        _G.AntiCheatStates.blobConn = workspace.DescendantAdded:Connect(function(part)
-            processPart(part)
-        end)
-    elseif _G.AntiCheatStates.blobConn then
-        _G.AntiCheatStates.blobConn:Disconnect()
-        _G.AntiCheatStates.blobConn = nil
-    end
-end
-
-antiTab:CreateToggle({
-    Name = "안티 블롭맨V2",
-    Default = false,
-    Callback = function(Value)
-        SetAntiBlobman(Value)
-    end
-})
-task.spawn(function()
-    task.wait(0.5)
-    if AntiBlobmanToggle and AntiBlobmanToggle.Set then
-        AntiBlobmanToggle:Set(true)
-    end
-end)
 
 
 
@@ -8819,41 +8477,7 @@ function setupAntiExplosion(character)
     end
 end
 
-antiTab:CreateToggle({
-    Name = "안티 폭발V2",
-    Default = false,
-    Save = false,
-    Flag = "AntiExplosion",
-    Callback = function(enabled)
-        local localPlayer = game.Players.LocalPlayer
-        if not localPlayer then return end
 
-        if enabled then
-            if localPlayer.Character then
-                setupAntiExplosion(localPlayer.Character)
-            end
-            if characterAddedConn then characterAddedConn:Disconnect() end
-            characterAddedConn = localPlayer.CharacterAdded:Connect(function(character)
-                setupAntiExplosion(character)
-            end)
-        else
-            if antiExplosionConnection then
-                antiExplosionConnection:Disconnect()
-                antiExplosionConnection = nil
-            end
-            if characterAddedConn then
-                characterAddedConn:Disconnect()
-                characterAddedConn = nil
-            end
-        end
-    end
-})
-task.spawn(function()
-    task.wait(0.5)
-    if AntiExplosionToggle and AntiExplosionToggle.Set then
-        AntiExplosionToggle:Set(true)
-    end
-end)
 
 
 local AntiBurn = antiTab:CreateToggle({
@@ -8867,15 +8491,6 @@ local AntiBurn = antiTab:CreateToggle({
 })
 AntiBurn:Set(true)
 
-local AntiPaint = antiTab:CreateToggle({
-    Name = "안티 페인트",
-    CurrentValue = false,
-    Callback = function(Value)
-        AntiPaintT = Value
-        antiPaintF(Value)
-    end
-})
-AntiPaint:Set(true)
 
 AntiLagF()
 local AntiLag = antiTab:CreateToggle({
@@ -8887,25 +8502,7 @@ local AntiLag = antiTab:CreateToggle({
     end
 })
 AntiLag:Set(true)
-function antiLagF()
-    local char = plr.Character
-    local hrp = char:WaitForChild("HumanoidRootPart")
-    local hum = char:WaitForChild("Humanoid")
-    if antiLagT == true then
-        plr.PlayerScripts.CharacterAndBeamMove.Disabled = true
-    elseif antiLagT == false then
-        plr.PlayerScripts.CharacterAndBeamMove.Enabled = true
-    end
-end
 
-antiTab:CreateToggle({
-    Name = "안티 렉V2",
-    Default = false,
-    Callback = function(Value)
-        antiLagT = Value
-        antiLagF()
-    end
-})
 local AutoAttack  antiTab:CreateToggle({
     Name = "오토어택 | 킬",
     CurrentValue = false,
@@ -8926,18 +8523,7 @@ local AntiHoldPart = antiTab:CreateToggle({
 })
 --AntiHoldPart:Set(true)
 antiTab:CreateLabel("동료핵이 있을경우 동료핵도 사용이 막힙니다.")
-local AntiBlobUse = antiTab:CreateToggle({
-    Name = "블롭맨 사용 막기",
-    CurrentValue = false,
-    Callback = function(Value)
-        AntiBlobUseT = Value
-        if Value then
-            AntiBlobUseF()
-        end
-    end
-})
 
-antiTab:CreateSection("킥")
 
 local flyingResetConn = nil
 local resetProtectionConn = nil
@@ -9009,156 +8595,7 @@ antiTab:CreateToggle({
    end,
 })
 
-antiTab:CreateButton({
-    Name = "안티킥 [ 집안 표창 소환 ]",
-    Callback = function()
-        House()
 
-        local plotItemsFolder = workspace.PlotItems:FindFirstChild("Plot"..Plot)
-        local TP = workspace.Plots["Plot"..Plot].PlotArea
-        local targetCFrame = CFrame.new(TP.Position)
-
-        local char = plr.Character
-        if not char then return end
-
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-
-        local ragdollHitbox = hrp:FindFirstChild("RagdollTouchedHitbox")
-        if ragdollHitbox then
-            hrp = ragdollHitbox
-        end
-
-        local originalPosition = hrp.CFrame
-
-        local targetValue = CFrame.new(0.05, -0.3, 0.3) * CFrame.Angles(190, 0, 0)
-        local stickyPartName = "NinjaShuriken"
-
-        if plotItemsFolder then
-
-            local closestShuriken = nil
-            local closestDistance = math.huge
-
-            for _, item in pairs(plotItemsFolder:GetChildren()) do
-                if item.Name == "NinjaShuriken" then
-                    local stickyPart = item:FindFirstChild("StickyPart")
-                    if stickyPart then
-                        local distance = (hrp.Position - stickyPart.Position).Magnitude
-                        if distance < closestDistance then
-                            closestDistance = distance
-                            closestShuriken = item
-                        end
-                    end
-                end
-            end
-
-            if closestShuriken and closestDistance <= 30 then
-                local stickyPart = closestShuriken:FindFirstChild("StickyPart")
-                if stickyPart then
-                    local FIND2 = stickyPart:FindFirstChild("StickyWeld")
-
-                    if not FIND2 or (FIND2 and FIND2.Part1 ~= hrp) then
-
-                        if not plr.InPlot.Value then
-                            hrp.CFrame = targetCFrame
-                            task.wait(0.5)
-                        end
-
-                        pcall(function()
-                            SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
-                        end)
-
-                        pcall(function()
-                            rs.PlayerEvents.StickyPartEvent:FireServer(stickyPart, hrp, targetValue)
-                        end)
-
-                        hrp.CFrame = originalPosition
-                    end
-                end
-            else
-                if not plr.InPlot.Value then
-                    hrp.CFrame = targetCFrame
-                    task.wait(0.5)
-                end
-
-                task.spawn(function()
-                    rs.MenuToys.SpawnToyRemoteFunction:InvokeServer(stickyPartName, hrp.CFrame * CFrame.new(0,20,15), Vector3.new(0,0,0))
-                end)
-
-                task.wait(0.15)
-
-                local newFind = plotItemsFolder:FindFirstChild("NinjaShuriken")
-                if newFind then
-                    local stickyPart = newFind:FindFirstChild("StickyPart")
-                    if stickyPart then
-                        pcall(function()
-                            SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
-                        end)
-
-                        pcall(function()
-                            rs.PlayerEvents.StickyPartEvent:FireServer(stickyPart, hrp, targetValue)
-                        end)
-                    end
-                end
-
-                hrp.CFrame = originalPosition
-            end
-        end
-    end
-})
-
-function AntiPCLDF()
-    local targetValueName = "[ " .. plr.DisplayName .. " ] ( @" .. plr.Name .. " )"
-    
-    while AntiPCLDT do
-        task.wait(1) 
-        
-        local character = plr.Character
-        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-        local hrp = character and character:FindFirstChild("HumanoidRootPart")
-        
-           if not character or not humanoid or humanoid.Health <= 0 or not hrp then
-            continue
-        end
-        
-        
-        local isDetected = false
-        for _, item in ipairs(workspace:GetChildren()) do
-            if item.Name == "PlayerCharacterLocationDetector" then
-                local foundValue = item:FindFirstChild(targetValueName)
-                if foundValue and foundValue:IsA("BoolValue") then
-                    isDetected = true
-                    break
-                end
-            end
-        end
-        
-           if isDetected then
-            pcall(function()
-                
-                hrp.CFrame = CFrame.new(0, 999999, 0)
-                task.wait(0.5)
-                
-                       humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-            end)
-            
-                    local currentCharacter = plr.Character
-            plr.CharacterAdded:Wait() 
-            task.wait(2) 
-        end
-    end
-end
-
-local AntiPCLD = antiTab:CreateToggle({
-    Name = "안티 킥 [ PCLD 지우기 ]",
-    CurrentValue = false,
-    Flag = "16",
-    Callback = function(Value)
-        AntiPCLDT = Value
-        task.spawn(AntiPCLDF)
-    end
-})
-if not TESTPP then AntiPCLD:Set(true) end
 
 antiTab:CreateSection("래그돌")
 local PermRag = antiTab:CreateToggle({
@@ -9178,30 +8615,7 @@ local PermRag = antiTab:CreateToggle({
 
 
 antiTab:CreateSection("구찌")
-local AutoGucci = antiTab:CreateToggle({
-    Name = "오토구찌(킥위험 약간 있음!)",
-    CurrentValue = false,
-    Flag = "autoGucciToggleFlag",
-    Callback = function(Value)
-        AutoGucciT = Value
-        if AutoGucciT then
-            task.spawn(AutoGucciF)
-        else
-            if plr.Character.Humanoid then
-                    plr.Character.Humanoid.Sit = true
-                    task.wait(0.1)
-                    plr.Character.Humanoid.Sit = false
-                end
-            end
 
-            sitJumpT = false
-
-            if blobmanInstanceS then
-            RepStorage.MenuToys.DestroyToy:FireServer(blobmanInstanceS)
-            blobmanInstanceS = nil
-        end
-    end
-})
 
 local AutoGucciV2 = antiTab:CreateToggle({
     Name = "기차 구찌",
@@ -9475,15 +8889,6 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
-    Name = "안티 파트 아우라 [ fellow owner ]",
-    CurrentValue = false,
-    Flag = "5",
-    Callback = function(Value)
-        ViewAuraT = Value
-        ViewAuraF()
-    end
-})
 
 
 
@@ -9678,62 +9083,7 @@ AuraTab:CreateToggle({
 })
 local runningFtapVoidKill = false
 
-AuraTab:CreateToggle({
-    Name = "낙사 아우라",
-    Default = false,
-    Save = false,
-    Flag = "FtapVoidKill",
-    Callback = function(enabled)
-        runningFtapVoidKill = enabled
-        if enabled then
-            task.spawn(function()
-                local Players = game:GetService("Players")
-                local localPlayer = game.Players.LocalPlayer
-                local rs = game:GetService("ReplicatedStorage")
-                
-                local GrabEvents = rs:FindFirstChild("GrabEvents")
-                local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
 
-                while runningFtapVoidKill do
-                    pcall(function()
-                        local character = localPlayer.Character
-                        local root = character and character:FindFirstChild("HumanoidRootPart")
-                        if root then
-                            local currentRadius = tonumber(auraRadius) or 30
-                            
-                            for _, player in pairs(Players:GetPlayers()) do
-                                if player ~= localPlayer and player.Character then
-                                    local isFriend = _G.Aurahowait and localPlayer:IsFriendsWith(player.UserId)
-                                    if not isFriend then
-                                        local targetChar = player.Character
-                                        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-                                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-                                        
-                                        if torso and targetRoot then
-                                            local distance = (torso.Position - root.Position).Magnitude
-                                            if distance <= currentRadius then
-                                                
-                                                -- 1단계: 물리 오너십 박탈
-                                                if SetNetworkOwner and SetNetworkOwner.FireServer then
-                                                    SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
-                                                end
-                                                
-                                                -- 2단계: 딜레이 없이 Y축 -10000 낭떠러지로 강제 사출 (시스템 즉사 유도)
-                                                targetRoot.CFrame = CFrame.new(targetRoot.Position.X, -10000, targetRoot.Position.Z)
-                                                
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end)
-                    task.wait()
-                end
-            end)
-        end
-    end
-})
 
 
 local VoidInput = funTab:CreateInput({
@@ -9987,182 +9337,6 @@ end
    end
 })
 
-funTab:CreateSection("떠있는것들 무력화")
-local Inputt = funTab:CreateInput({
-   Name = "쿠나이",
-   CurrentValue = "",
-   PlaceholderText = "Value",
-   RemoveTextAfterFocusLost = false,
-   Flag = "Input1",
-   Callback = function(Text)
-   end
-})
-
-funTab:CreateSection("UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요.")
-local Ctratee = funTab:CreateButton({
-   Name = "무력화",
-   Callback = function()
-       local ReplicatedStorage = game:GetService("ReplicatedStorage")
-       local Players = game:GetService("Players")
-       local plr = Players.LocalPlayer
-       
-       local kunaiCountText = Inputt.CurrentValue
-       local TNUM = tonumber(kunaiCountText)
-
-       if not TNUM or TNUM <= 0 or TNUM > 100 then
-           Rayfield:Notify({Title = "[ 🥷 ]", Content = "Invalid Value", Duration = 3, Image = 0})
-           return
-       end
-
-       local character = plr.Character or plr.CharacterAdded:Wait()
-       local hrp = character:WaitForChild("HumanoidRootPart")
-       local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
-       
-       if not torso then
-           return
-       end
-       
-       local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
-       local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
-
-       function GetTargetPartFromGrabParts()
-           local grabPartsModel = workspace:FindFirstChild("GrabParts")
-           if not grabPartsModel then return nil end
-
-           local grabPart = grabPartsModel:FindFirstChild("GrabPart")
-           if not grabPart then return nil end
-
-           local weldConstraint = grabPart:FindFirstChild("WeldConstraint")
-           if not weldConstraint or not weldConstraint:IsA("WeldConstraint") then return nil end
-
-           if not weldConstraint.Part1 then return nil end
-
-           return weldConstraint.Part1
-       end
-
-       function GetPlotNumber()
-           local char = plr.Character
-           if not char then return nil end
-
-           if char.Parent == workspace then 
-               return nil
-           elseif char.Parent.Name == "PlayersInPlots" then
-               for _, plot in workspace.Plots:GetChildren() do
-                   local plotSign = plot:FindFirstChild("PlotSign")
-                   if plotSign and plotSign:FindFirstChild("ThisPlotsOwners") then
-                       for _, owner in plotSign.ThisPlotsOwners:GetChildren() do
-                           if owner.Value == plr.Name then
-                               if plot.Name == "Plot1" then
-                                   return 1
-                               elseif plot.Name == "Plot2" then
-                                   return 2
-                               elseif plot.Name == "Plot3" then
-                                   return 3
-                               elseif plot.Name == "Plot4" then
-                                   return 4
-                               elseif plot.Name == "Plot5" then
-                                   return 5
-                               end
-                           end
-                       end
-                   end
-               end
-           end
-           return nil
-       end
-
-       function GetInventory()
-           local plotNumber = GetPlotNumber()
-
-           if plotNumber then
-               local plotItems = workspace:FindFirstChild("PlotItems")
-               if plotItems then
-                   local plotFolder = plotItems:FindFirstChild("Plot" .. plotNumber)
-                   if plotFolder then
-                       return plotFolder
-                   end
-               end
-           end
-           
-           local defaultInv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
-           if defaultInv then
-               return defaultInv
-           end
-           
-           return nil
-       end
-
-       local targetPart = GetTargetPartFromGrabParts()
-       if not targetPart then
-           return
-       end
-
-       function createAndAttachKunai()
-           while not plr.CanSpawnToy.Value do 
-               task.wait(0.1) 
-           end
-
-           local position = hrp.CFrame
-
-           local success, result = pcall(function()
- task.spawn(function()
-               return SpawnToy:InvokeServer("NinjaKunai", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0, 0, 0))
-           end)
-           end)
-           
-           if not success then
-               return nil
-           end
-
-           task.wait(0.2)
-
-           local inv = GetInventory()
-           if not inv then
-               return nil
-           end
-
-           local kunai
-           local children = inv:GetChildren()
-           for i = #children, 1, -1 do
-               if children[i].Name == "NinjaKunai" then
-                   kunai = children[i]
-                   break
-               end
-           end
-
-           if not kunai then 
-               return nil 
-           end
-
-           local stickyPart = kunai:WaitForChild("StickyPart")
-           local SoundPart = kunai:WaitForChild("SoundPart")
-
-           if stickyPart and SoundPart then
-               pcall(function()
-                   ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)
-                   ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, torso.CFrame)
-               end)
-           end
-
-           if stickyPart then
-               local attachPosition = targetPart.CFrame
-               local relativeCF = targetPart.CFrame:ToObjectSpace(attachPosition)
-
-               pcall(function()
-                   StickyPartEvent:FireServer(stickyPart, targetPart, relativeCF)
-               end)
-           end
-
-           task.wait(0.1)
-           return kunai
-       end
-
-       for i = 1, TNUM do
-           createAndAttachKunai()
-           task.wait(0.1)
-       end
-   end
-})
 
 keybindTab:CreateSection("배경")
 keybindTab:CreateButton({
@@ -10512,122 +9686,6 @@ local BarrierNoclip = plotTab:CreateToggle({
 })
 BarrierNoclip:Set(true)
 
-plotTab:CreateButton({
-    Name = "집 베리어 완전삭제 | 햄버거",
-    Callback = function()
-        PlotBarrierDelete()
-    end,
-})
-
-local isExecuting = false
-
-local function getMyPlot()
-    for i = 1, 5 do
-        local plot = workspace.Plots:FindFirstChild("Plot" .. i)
-        if plot then
-            local plotSign = plot:FindFirstChild("PlotSign")
-            if plotSign then
-                local thisPlotsOwners = plotSign:FindFirstChild("ThisPlotsOwners")
-                if thisPlotsOwners then
-                    for _, child in ipairs(thisPlotsOwners:GetChildren()) do
-                        if child:IsA("StringValue") and child.Value == game.Players.LocalPlayer.Name then
-                            return plot.PlotArea
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-function PlotBarrierDelete()
-if PBDrun then return end
-PBDrun = true
-
-local char = plr.Character
-if not char then PBDrun = false return end
-
-local hrp = char:FindFirstChild("HumanoidRootPart")
-if not hrp then PBDrun = false return end
-
-local metal = workspace.Plots.Plot1.TeslaCoil.Metal
-if not metal then PBDrun = false return end
-
-local TP = metal.CFrame
-local OCF = hrp.CFrame
-
-task.spawn(function()
-rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", hrp.CFrame, Vector3.new(0,0,0))
-end)
-
-task.wait(0.2)
-
-local foodHamburger = inv:FindFirstChild("FoodHamburger")
-if not foodHamburger then PBDrun = false return end
-
-if foodHamburger then
-task.spawn(function()
-foodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
-end)
-end
-
-task.wait(0.1)
-
-hrp.CFrame = TP
-task.wait(0.17)
-
-if foodHamburger then
-rs.MenuToys.DestroyToy:FireServer(foodHamburger)
-end
-
-hrp.CFrame = OCF
-task.wait(0.4)
-
-PBDrun = false
-end
-
-keybindTab:CreateKeybind({
-    Name = "하우스 그랩",
-    CurrentKeybind = "G",
-    HoldToInteract = false,
-    Callback = function()
-        if isExecuting then
-            return
-        end
-
-        isExecuting = true
-
-        local plr = game.Players.LocalPlayer
-        local char = plr.Character or plr.CharacterAdded:Wait()
-        local torso = char:WaitForChild("Torso")
-
-        local inPlot = plr:FindFirstChild("InPlot")
-        if not inPlot or inPlot.Value == false then
-            isExecuting = false
-            return
-        end
-
-        local TP = getMyPlot()
-        if not TP then
-            isExecuting = false
-            return
-        end
-
-        local GrabParts = workspace:FindFirstChild("GrabParts")
-        if GrabParts then
-        mouse1click()
-        end
-
-        local torso = char:WaitForChild("Torso")
-        local OCF = torso.CFrame
-        torso.CFrame = TP.CFrame
-        task.wait(0.15)
-        torso.CFrame = OCF
-        task.wait(0.15)
-        mouse1click()
-        isExecuting = false
-    end
-})
 
 keybindTab:CreateSection("앵커")
 keybindTab:CreateKeybind({
@@ -10833,16 +9891,6 @@ local PCLDView = keybindTab:CreateToggle({
 })
 PCLDView:Set(true)
 
-local ViewTool = keybindTab:CreateToggle({
-    Name = "표창,쿠나이 보기",
-    CurrentValue = false,
-    Flag = "5",
-    Callback = function(Value)
-        ViewToolT = Value
-        ViewToolF()
-    end
-})
-ViewTool:Set(true)
 
 
 
@@ -11770,6 +10818,4 @@ NTTab:CreateToggle({
         end
     end
 })
----loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
-Logger()
+---
