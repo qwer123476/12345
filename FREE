@@ -1,0 +1,3 @@
+ loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/PACAFREE.protected.lua"))()
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/obfuscated_script.lua.txt1"))()
