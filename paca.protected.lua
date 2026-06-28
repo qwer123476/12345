@@ -1873,8 +1873,10 @@ function loopPlayerBlobF4()
                 local mySeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                 local amIRiding = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
 
-                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                 local ownerTag = head:FindFirstChild("PartOwner")
+                if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                end
 
                 if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
                     break
@@ -1885,7 +1887,6 @@ function loopPlayerBlobF4()
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
-                        task.wait()
                         charHUM.Sit = false
                     end
                 end
@@ -2047,7 +2048,6 @@ function loopPlayerBlobF4()
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
                         BlobGrab(currentBlobS, charHRP, "Right")
-                        task.wait()
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
                         task.delay(0, function() if charHUM then charHUM.Sit = false end end)
