@@ -8154,9 +8154,9 @@ LoopTab:CreateToggle({
         OwnerKickMODED = Value
     end
 })
-LoopTab:CreateSection("오너")
+LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 local BlobDesyncKickToggle = LoopTab:CreateToggle({
-    Name = "블롭맨 디싱크 킥    <font color='rgb(255,85,85)'>[NEW]</font>",
+    Name = "디싱크 킥    <font color='rgb(255,85,85)'>[NEW]</font>",
     CurrentValue = false,
     Flag = "BlobDesyncKickFlag",
     Callback = function(Value)
@@ -8174,7 +8174,7 @@ local BlobDesyncKickToggle = LoopTab:CreateToggle({
         end
     end
 })
-
+LoopTab:CreateSection("오너")
 LoopTab:CreateToggle({
     Name = "오너킥V34   <font color='rgb(255,250,255)'>[파카]</font>",
     CurrentValue = false,
