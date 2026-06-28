@@ -2624,7 +2624,8 @@ end
             local p = game.Players:FindFirstChild(name)
             if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
                 if not targetPlayers[p] then
-                    targetPlayers[p] = { lastChar = nil }
+                    -- TP 상태 관리를 위한 플래그 추가
+                    targetPlayers[p] = { lastChar = nil, tpRunning = false }
                 end
             end
         end
@@ -2648,11 +2649,31 @@ end
             if hrp and head and hum and hum.Health > 0 then
                 local distance = (myHRP.Position - hrp.Position).Magnitude
 
+                -- 거리가 멀면 내 위로 강제 견인할 때까지 TP(p) 연사 실행
                 if distance > 30 then
-                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
+                    if not data.tpRunning then
+                        data.tpRunning = true
+                        task.spawn(function()
+                            while data.tpRunning and advancedDesyncLoopActive and p.Parent do
+                                local charCheck = p.Character
+                                local hrpCheck = charCheck and charCheck:FindFirstChild("HumanoidRootPart")
+                                if hrpCheck and (myHRP.Position - hrpCheck.Position).Magnitude > 30 then
+                                    TP(p)
+                                else
+                                    data.tpRunning = false
+                                    break
+                                end
+                                task.wait()
+                            end
+                            data.tpRunning = false
+                        end)
+                    end
                 else
-                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
+                    data.tpRunning = false
                 end
+
+                -- [형 원본 고정 로직 유지] 무조건 내 머리 위 15스터드 고정 및 물리 박살
+                hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
 
                 hrp.Velocity = Vector3.new(0, 0, 0)
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
@@ -2676,6 +2697,7 @@ end
         end
     end)
 end
+
 
 
 
