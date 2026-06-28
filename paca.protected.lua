@@ -2556,7 +2556,6 @@ function loopPlayerF3() -- 룹3
 end
 function executeBlobmanDesyncKick()
     local targetPlayers = {}
-    local lastTargetPositions = {} -- 거리 체크용 좌표 저장 테이블
     local lastRemoteTime = 0
 
     local function fetchTargets()
@@ -2573,8 +2572,8 @@ function executeBlobmanDesyncKick()
         return currentBlobS
     end
 
-    -- 시각적 데싱크 및 물리 오염 연출 함수
-    local function applyVisualGlitchAndPhysics(targetChar)
+    -- 렉 없는 깔끔한 데이터 오염 연출
+    local function applyDesyncPhysics(targetChar)
         if not targetChar then return end
         local hrp = targetChar:FindFirstChild("HumanoidRootPart")
         local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
@@ -2586,20 +2585,9 @@ function executeBlobmanDesyncKick()
                 rootJoint.Enabled = false
             end
             
-            -- [물리 데이터 폭발]
-            hrp.AssemblyLinearVelocity = Vector3.new(0, 8000, 0)
-            hrp.AssemblyAngularVelocity = Vector3.new(5000, 5000, 5000)
-            
-            -- [외관상 독특한 킥 비주얼 연출] 캐릭터 모든 파츠를 무작위로 찢고 비틀기
-            for _, part in ipairs(targetChar:GetChildren()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    part.CanCollide = false
-                    -- 무작위 크기 변조 및 회전 노이즈 삽입 (시각적 글리치 효과)
-                    local randomScale = math.random(5, 20) / 10
-                    part.Size = Vector3.new(randomScale, randomScale, randomScale)
-                    part.CFrame = part.CFrame * CFrame.Angles(math.rad(math.random(-45, 45)), math.rad(math.random(-45, 45)), 0)
-                end
-            end
+            -- [서버 물리 한계 돌파 연산] 외관 변경 대신 내부 데이터를 폭발시켜 프레임 드랍 없이 킥 유도
+            hrp.AssemblyLinearVelocity = Vector3.new(888888, 888888, 888888)
+            hrp.AssemblyAngularVelocity = Vector3.new(888888, 888888, 888888)
         end
     end
 
@@ -2624,7 +2612,6 @@ function executeBlobmanDesyncKick()
                 if p.Character then restorePhysics(p.Character) end
             end
             targetPlayers = {}
-            lastTargetPositions = {}
             return
         end
 
@@ -2637,7 +2624,6 @@ function executeBlobmanDesyncKick()
         local activeBlob = isRidingBlob and verifyAndGetBlobman()
         local now = os.clock()
 
-        -- 내 캐릭터가 죽었거나 없으면 연산 스킵
         if not myHRP or not myHum or myHum.Health <= 0 then return end
 
         for _, name in ipairs(currentNames) do
@@ -2661,7 +2647,6 @@ function executeBlobmanDesyncKick()
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             local head = char and char:FindFirstChild("Head")
 
-            -- 타겟이 리스폰(재설)되었는지 감지하여 TP 잠금 초기화
             if data.lastChar ~= char then
                 data.hasTeleported = false
                 data.lastChar = char
@@ -2670,23 +2655,23 @@ function executeBlobmanDesyncKick()
             if hrp and head and hum and hum.Health > 0 then
                 local distance = (myHRP.Position - hrp.Position).Magnitude
 
-                -- [조건형 TP 엔진] 최초 1회 진입 시 또는 거리가 30스터드 밖으로 벌어졌을 때 즉시 재-TP
+                -- 1회성 또는 30스터드 이상 이탈 시 강제 유도 TP
                 if not data.hasTeleported or distance > 30 then
                     data.hasTeleported = true
                     myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
                 end
 
-                -- 공중 고정 좌표 강제 락 연산 (내 머리 위 18스터드 공중에 완전 격리)
+                -- [몸체 공중 완전 락킹] 다른 곳으로 튀지 못하게 내 머리 위 18스터드 위치에 고정 박기
                 local upperLockPosition = myHRP.CFrame * CFrame.new(0, 18, 0)
                 hrp.CFrame = upperLockPosition
                 
-                -- 속도 물리 엔진 무력화 락
+                -- 기본 흔들림 방지 및 강제 정지
                 hrp.Velocity = Vector3.new(0, 0, 0)
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
 
-                applyVisualGlitchAndPhysics(char)
+                applyDesyncPhysics(char)
 
-                -- 패킷 드랍 및 무부하 초고속 리모트 바인딩
+                -- 원격 패킷 최적화 연사
                 if now - lastRemoteTime >= 0.03 then
                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                     rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
@@ -2704,7 +2689,6 @@ function executeBlobmanDesyncKick()
         end
     end)
 end
-
 
 
 local RunService = game:GetService("RunService")
