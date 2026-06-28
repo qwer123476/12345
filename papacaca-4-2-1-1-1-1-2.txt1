@@ -5617,19 +5617,18 @@ local function processAntiGrabPlayer(player)
         end)
     end
 
+    if originCF and myHrp and myHrp.Parent then
+        myHrp.CFrame = originCF
+        task.wait(0.5)
+    end
 
-    -- if originCF and myHrp and myHrp.Parent then
-    --     myHrp.CFrame = originCF
-    --     task.wait()
-    -- end
-
-    -- if originCF and myHrp and myHrp.Parent then 
-    --     if typeof(BACK) == "function" then
-    --         BACK(originCF)
-    --     else
-    --         myHrp.CFrame = originCF
-    --     end
-    -- end
+    if originCF and myHrp and myHrp.Parent then 
+        if typeof(BACK) == "function" then
+            BACK(originCF)
+        else
+            myHrp.CFrame = originCF
+        end
+    end
 
     if myHum and myHum.Parent then
         myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
@@ -5811,6 +5810,7 @@ FDTab:CreateToggle({
         end
     end
 })
+
 
 
 -- ================== [ 유틸리티 기능 ] ==================
