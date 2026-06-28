@@ -2036,7 +2036,7 @@ end
                         task.wait()
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
-                        task.delay(0.00000000002, function() if charHUM then charHUM.Sit = false end end)
+                        task.delay(0, function() if charHUM then charHUM.Sit = false end end)
                     end
                     task.wait()
                 end
