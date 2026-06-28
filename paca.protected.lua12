@@ -1766,7 +1766,7 @@ function loopPlayerBlobF4()
                     originPositions[player] = nil
                 end
                 if player.Character then
-                    local charTOR = player.Character:FindFirstChild("Torso")
+                    local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                     if charTOR then
                         charTOR.Anchored = false
                     end
@@ -2000,7 +2000,8 @@ function loopPlayerBlobF4()
                         local index = table.find(activeKicking, player) or 1
                         local count = #activeKicking
                         local angle = (index - 1) * (2 * math.pi / count)
-                        local offset = Vector3.new(math.cos(angle) * 4, 0, math.sin(angle) * 4)
+                        local radius = 20
+                        local offset = Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
                         targetPosition = (myHRP.CFrame * CFrame.new(OLTPValue)) * CFrame.new(offset)
                     end
 
@@ -2094,22 +2095,10 @@ function loopPlayerBlobF4()
             if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(targetList, v) end end
             if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(targetList, v) end end
 
-            local myChar = plr.Character
-            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-
             for _, name in ipairs(targetList) do
                 local player = game.Players:FindFirstChild(name)
                 if not player or player == plr then continue end
                 if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
-
-                if myHRP and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHRP = player.Character.HumanoidRootPart
-                    if (myHRP.Position - targetHRP.Position).Magnitude > 20 then
-                        continue
-                    end
-                elseif not monitoredPlayers[player] then
-                    continue
-                end
 
                 if not monitoredPlayers[player] then
                     monitoredPlayers[player] = true
@@ -2135,7 +2124,7 @@ function loopPlayerBlobF4()
                             end
                             destroyCounts[player] = nil
                             if player.Character then
-                                local charTOR = player.Character:FindFirstChild("Torso")
+                                local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                                 if charTOR then
                                     charTOR.Anchored = false
                                 end
@@ -2146,17 +2135,7 @@ function loopPlayerBlobF4()
             end
 
             for player, taskInfo in pairs(runningTasks) do
-                local shouldStop = false
                 if not player.Parent then
-                    shouldStop = true
-                elseif myHRP and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHRP = player.Character.HumanoidRootPart
-                    if (myHRP.Position - targetHRP.Position).Magnitude > 20 and not ownerTags[player] then
-                        shouldStop = true
-                    end
-                end
-
-                if shouldStop then
                     task.cancel(taskInfo)
                     runningTasks[player] = nil
                     monitoredPlayers[player] = nil
@@ -2177,7 +2156,7 @@ function loopPlayerBlobF4()
                     end
                     destroyCounts[player] = nil
                     if player.Character then
-                        local charTOR = player.Character:FindFirstChild("Torso")
+                        local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                         if charTOR then
                             charTOR.Anchored = false
                         end
@@ -2216,7 +2195,7 @@ function loopPlayerBlobF4()
 
         for _, player in ipairs(game.Players:GetPlayers()) do
             if player.Character then
-                local charTOR = player.Character:FindFirstChild("Torso")
+                local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
                 if charTOR then
                     charTOR.Anchored = false
                 end
@@ -2230,6 +2209,7 @@ function loopPlayerBlobF4()
         destroyCounts = {}
     end)
 end
+
 
 function loopPlayerF() -- 룹1
     UpdateCurrentBlobman()
