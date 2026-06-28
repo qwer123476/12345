@@ -5591,6 +5591,15 @@ local function processAntiGrabPlayer(player)
         task.wait(0.02)
     end
 
+    tpRunning = false
+
+    for _, thread in ipairs(antiGrabThreads) do
+        if thread then
+            pcall(task.cancel, thread)
+        end
+    end
+    table.clear(antiGrabThreads)
+
     if success then
         pcall(function()
             for _, v in ipairs(character:GetDescendants()) do
@@ -5609,15 +5618,6 @@ local function processAntiGrabPlayer(player)
     end
 
     task.wait(1)
-
-    tpRunning = false
-
-    for _, thread in ipairs(antiGrabThreads) do
-        if thread then
-            pcall(task.cancel, thread)
-        end
-    end
-    table.clear(antiGrabThreads)
 
     if originCF and myHrp and myHrp.Parent then
         myHrp.CFrame = originCF
@@ -5812,7 +5812,6 @@ FDTab:CreateToggle({
         end
     end
 })
-
 
 -- ================== [ 유틸리티 기능 ] ==================
 
