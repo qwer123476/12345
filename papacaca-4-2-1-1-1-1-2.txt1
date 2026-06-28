@@ -5603,7 +5603,7 @@ local function processAntiGrabPlayer(player)
 end
 
 local antiGrabDropdown = FDTab:CreateDropdown({
-    Name = "보호할 사람고르기",
+    Name = "보호할 사람고르기  <font color='rgb(0,0,255)'>[다수]</font>",
     Options = {},
     CurrentOption = {},
     MultipleOptions = true,
@@ -5691,8 +5691,8 @@ task.spawn(function()
 end)
 
 FDTab:CreateInput({
-    Name = "보호 대상 추가 (닉네임 입력)<font color='rgb(0,0,255)'>[다수]</font>",
-    PlaceholderText = "플레이어 이름 입력<font color='rgb(0,255,0)'>[한명]</font>",
+    Name = "보호 대상 추가 (닉네임 입력)   <font color='rgb(0,0,255)'>[한명]</font>",
+    PlaceholderText = "플레이어 이름 입력",
     RemoveTextAfterFocusLost = true,
     Callback = function(Text)
         if Text == "" or Text == nil then return end
@@ -5751,7 +5751,7 @@ FDTab:CreateInput({
 })
 
 FDTab:CreateToggle({
-    Name = "보호 시스템 활성화<font color='rgb(255,0,0)'>[오너쉽]</font>",
+    Name = "보호 시스템 활성화   <font color='rgb(255,0,0)'>[오너쉽]</font>",
     CurrentValue = false,
     Flag = "AntiGrabUniqueSystemToggle",
     Callback = function(Value)
@@ -6844,7 +6844,7 @@ local RDButton = LoopTab:CreateButton({
 
 grabTab:CreateSection("Fling")
 local flingToggle = grabTab:CreateToggle({
-    Name = "던지기 V1<font color='rgb(255,0,0)'>[데스크톱]</font>",
+    Name = "던지기 V1   <font color='rgb(255,0,0)'>[데스크톱]</font>",
     CurrentValue = false,
     Flag = "1",
     Callback = function(Value)
