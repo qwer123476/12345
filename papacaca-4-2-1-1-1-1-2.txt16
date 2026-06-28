@@ -257,51 +257,51 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
  local Rayfield =   loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local NP = {
+local paca = {
     TextColor = Color3.fromRGB(255,255,255),
 
-    Background = Color3.fromRGB(25,24,20),
-    Topbar = Color3.fromRGB(38,36,30),
-    Shadow = Color3.fromRGB(15,14,10),
+    Background = Color3.fromRGB(0,0,0),
+    Topbar = Color3.fromRGB(15,15,15),
+    Shadow = Color3.fromRGB(0,0,0),
 
-    NotificationBackground = Color3.fromRGB(33,31,25),
-    NotificationActionsBackground = Color3.fromRGB(55,50,35),
+    NotificationBackground = Color3.fromRGB(20,20,20),
+    NotificationActionsBackground = Color3.fromRGB(35,35,35),
 
-    TabBackground = Color3.fromRGB(45,42,32),
-    TabStroke = Color3.fromRGB(80,75,55),
-    TabBackgroundSelected = Color3.fromRGB(255,210,0),
-    TabTextColor = Color3.fromRGB(220,220,200),
-    SelectedTabTextColor = Color3.fromRGB(30,30,25),
+    TabBackground = Color3.fromRGB(25,20,35),
+    TabStroke = Color3.fromRGB(60,40,90),
+    TabBackgroundSelected = Color3.fromRGB(130,50,220),
+    TabTextColor = Color3.fromRGB(180,180,180),
+    SelectedTabTextColor = Color3.fromRGB(255,255,255),
 
-    ElementBackground = Color3.fromRGB(40,38,30),
-    ElementBackgroundHover = Color3.fromRGB(55,51,38),
-    SecondaryElementBackground = Color3.fromRGB(30,28,22),
-    ElementStroke = Color3.fromRGB(70,65,48),
-    SecondaryElementStroke = Color3.fromRGB(50,47,35),
+    ElementBackground = Color3.fromRGB(18,18,18),
+    ElementBackgroundHover = Color3.fromRGB(28,28,28),
+    SecondaryElementBackground = Color3.fromRGB(12,12,12),
+    ElementStroke = Color3.fromRGB(40,40,40),
+    SecondaryElementStroke = Color3.fromRGB(30,30,30),
 
-    SliderBackground = Color3.fromRGB(65,60,45),
-    SliderProgress = Color3.fromRGB(255,190,0),
-    SliderStroke = Color3.fromRGB(210,150,0),
+    SliderBackground = Color3.fromRGB(45,45,45),
+    SliderProgress = Color3.fromRGB(255,255,255),
+    SliderStroke = Color3.fromRGB(200,200,200),
 
-    ToggleBackground = Color3.fromRGB(35,33,26),
+    ToggleBackground = Color3.fromRGB(20,20,20),
 
-    ToggleEnabled = Color3.fromRGB(255,185,0),
-    ToggleEnabledStroke = Color3.fromRGB(255,230,150),
-    ToggleEnabledOuterStroke = Color3.fromRGB(255,210,50),
+    ToggleEnabled = Color3.fromRGB(230,0,0),
+    ToggleEnabledStroke = Color3.fromRGB(255,100,100),
+    ToggleEnabledOuterStroke = Color3.fromRGB(180,0,0),
 
-    ToggleDisabled = Color3.fromRGB(90,85,75),
-    ToggleDisabledStroke = Color3.fromRGB(115,110,95),
-    ToggleDisabledOuterStroke = Color3.fromRGB(60,57,50),
+    ToggleDisabled = Color3.fromRGB(55,55,55),
+    ToggleDisabledStroke = Color3.fromRGB(80,80,80),
+    ToggleDisabledOuterStroke = Color3.fromRGB(35,35,35),
 
-    DropdownSelected = Color3.fromRGB(60,55,40),
-    DropdownUnselected = Color3.fromRGB(35,33,26),
+    DropdownSelected = Color3.fromRGB(30,25,35),
+    DropdownUnselected = Color3.fromRGB(20,20,20),
 
-    InputBackground = Color3.fromRGB(30,28,22),
-    InputStroke = Color3.fromRGB(55,51,38),
-    PlaceholderColor = Color3.fromRGB(160,155,135),
+    InputBackground = Color3.fromRGB(25,25,15),
+    InputStroke = Color3.fromRGB(220,180,0),
+    PlaceholderColor = Color3.fromRGB(150,140,100),
 }
 
-local Window = Rayfield:CreateWindow({Name = "파카허브", Icon = 0, Theme = NP, ToggleUIKeybind = "T"})
+local Window = Rayfield:CreateWindow({Name = "파카허브", Icon = 0, Theme = paca, ToggleUIKeybind = "T"})
 
     
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
