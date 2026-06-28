@@ -2556,8 +2556,8 @@ function loopPlayerF3() -- 룹3
 end
 function executeBlobmanDesyncKick()
     local targetPlayers = {}
-    local activeConnections = {}
-    local hasTeleported = {} -- 타겟별 1회성 TP 판정용 테이블
+    local hasTeleported = {}
+    local lastRemoteTime = 0
 
     local function fetchTargets()
         local list = {}
@@ -2584,8 +2584,9 @@ function executeBlobmanDesyncKick()
             if rootJoint and rootJoint:IsA("Motor6D") then
                 rootJoint.Enabled = false
             end
-            hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-            hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+            -- [독특한 디싱크 효과] 서버 물리 데이터 강제 포화 연산으로 킥 확률 극대화
+            hrp.AssemblyLinearVelocity = Vector3.new(0, 5000, 0)
+            hrp.AssemblyAngularVelocity = Vector3.new(0, 5000, 0)
         end
     end
 
@@ -2602,116 +2603,77 @@ function executeBlobmanDesyncKick()
         end
     end
 
-    task.spawn(function()
-        while advancedDesyncLoopActive do
-            local currentNames = fetchTargets()
-            
-            for _, name in ipairs(currentNames) do
-                local p = game.Players:FindFirstChild(name)
-                if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
-                    if not targetPlayers[p] then
-                        targetPlayers[p] = true
-                        hasTeleported[p] = false -- 초기화
-                        
-                        task.spawn(function()
-                            while advancedDesyncLoopActive and p.Parent and targetPlayers[p] do
-                                local char = p.Character
-                                local hum = char and char:FindFirstChild("Humanoid")
-                                local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                                local head = char and char:FindFirstChild("Head")
-                                
-                                if hrp and head and hum and hum.Health > 0 then
-                                    local myChar = plr.Character
-                                    local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                                    local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
-                                    local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
-                                    
-                                    -- [최초 1회 단발성 TP] 한 번 이동하면 루프 내에서 더 이상 내 위치를 꺾지 않음
-                                    if myHRP and not hasTeleported[p] then
-                                        hasTeleported[p] = true
-                                        myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
-                                        task.wait(0.01) -- 위치 안정화 극소 대기
-                                    end
-
-                                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                                    rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                                    
-                                    isolatePhysics(char)
-                                    
-                                    if isRidingBlob then
-                                        local activeBlob = verifyAndGetBlobman()
-                                        if activeBlob then
-                                            -- 그랩 반응 속도 조절
-                                            BlobGrab(activeBlob, hrp, "Right")
-                                            BlobRelease(activeBlob, hrp, "Right")
-                                        end
-                                    end
-
-                                    if not activeConnections[p] then
-                                        activeConnections[p] = RunService.Heartbeat:Connect(function()
-                                            local currentMyChar = plr.Character
-                                            local currentMyHRP = currentMyChar and currentMyChar:FindFirstChild("HumanoidRootPart")
-                                            
-                                            if not advancedDesyncLoopActive or not p.Parent or not char.Parent or not hrp.Parent or hum.Health <= 0 then
-                                                if activeConnections[p] then
-                                                    activeConnections[p]:Disconnect()
-                                                    activeConnections[p] = nil
-                                                end
-                                                restorePhysics(char)
-                                                return
-                                            end
-                                            
-                                            isolatePhysics(char)
-                                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
-                                            
-                                            if currentMyHRP then
-                                                local targetOffset = OLTPValue or Vector3.new(0, 0, -5)
-                                                hrp.CFrame = currentMyHRP.CFrame * CFrame.new(targetOffset)
-                                            end
-                                        end)
-                                    end
-                                else
-                                    restorePhysics(char)
-                                    task.wait(0.02)
-                                end
-                                task.wait(0.01) -- 연사 루프 주기 대폭 단축
-                            end
-                            
-                            targetPlayers[p] = nil
-                            hasTeleported[p] = nil
-                            if activeConnections[p] then
-                                activeConnections[p]:Disconnect()
-                                activeConnections[p] = nil
-                            end
-                        end)
-                    end
-                end
-            end
-            
+    -- 단 하나의 독립적인 마스터 연결 구조로 렉 현상 차단
+    local masterConnection
+    masterConnection = RunService.Heartbeat:Connect(function()
+        if not advancedDesyncLoopActive then
+            if masterConnection then masterConnection:Disconnect() end
             for p in pairs(targetPlayers) do
-                if not p.Parent or not table.find(currentNames, p.Name) then
-                    targetPlayers[p] = nil
-                    hasTeleported[p] = nil
-                    if activeConnections[p] then
-                        activeConnections[p]:Disconnect()
-                        activeConnections[p] = nil
-                    end
-                    if p.Character then restorePhysics(p.Character) end
-                end
+                if p.Character then restorePhysics(p.Character) end
             end
-            task.wait(0.3)
+            targetPlayers = {}
+            hasTeleported = {}
+            return
         end
-        
-        for p, conn in pairs(activeConnections) do
-            if conn then conn:Disconnect() end
+
+        local currentNames = fetchTargets()
+        local myChar = plr.Character
+        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
+        local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
+        local activeBlob = isRidingBlob and verifyAndGetBlobman()
+        local now = os.clock()
+
+        -- 활성화된 타겟 일괄 관리 및 가비지 수집
+        for _, name in ipairs(currentNames) do
+            local p = game.Players:FindFirstChild(name)
+            if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
+                targetPlayers[p] = true
+            end
         end
+
         for p in pairs(targetPlayers) do
-            if p.Character then restorePhysics(p.Character) end
+            if not p.Parent or not table.find(currentNames, p.Name) then
+                if p.Character then restorePhysics(p.Character) end
+                targetPlayers[p] = nil
+                hasTeleported[p] = nil
+                continue
+            end
+
+            local char = p.Character
+            local hum = char and char:FindFirstChild("Humanoid")
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local head = char and char:FindFirstChild("Head")
+
+            if hrp and head and hum and hum.Health > 0 and myHRP then
+                -- [최초 1회만 타겟에게 TP]
+                if not hasTeleported[p] then
+                    hasTeleported[p] = true
+                    myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
+                end
+
+                -- 원격 무부하 제어 스케줄러 (과도한 패킷 연사 제한으로 렉 제로화)
+                if now - lastRemoteTime >= 0.05 then
+                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                    rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                    rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
+                    
+                    if activeBlob then
+                        BlobGrab(activeBlob, hrp, "Right")
+                        BlobRelease(activeBlob, hrp, "Right")
+                    end
+                    lastRemoteTime = now
+                end
+
+                isolatePhysics(char)
+
+                -- [공중 고정 연산] 내 캐릭터 머리 위(Y축 +15) 공중에 정확하게 격리 고정
+                local upperLockPosition = myHRP.CFrame * CFrame.new(0, 15, 0)
+                hrp.CFrame = upperLockPosition
+            else
+                if char then restorePhysics(char) end
+            end
         end
-        
-        activeConnections = {}
-        targetPlayers = {}
-        hasTeleported = {}
     end)
 end
 
