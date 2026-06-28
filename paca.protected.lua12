@@ -2560,6 +2560,7 @@ end
     local targetPlayers = {}
     local lastRemoteTime = 0
 
+    -- [원본 로직 복구]
     local function fetchTargets()
         local list = {}
         if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(list, v) end end
@@ -2578,10 +2579,6 @@ end
     masterConnection = RunService.Heartbeat:Connect(function()
         if not advancedDesyncLoopActive then
             if masterConnection then masterConnection:Disconnect() end
-            for p, data in pairs(targetPlayers) do
-                if data.tpRunning then data.tpRunning = false end
-                if data.originCF then BACK(data.originCF) end
-            end
             targetPlayers = {}
             return
         end
@@ -2590,110 +2587,63 @@ end
         local myChar = plr.Character
         local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
         local myHum = myChar and myChar:FindFirstChild("Humanoid")
-        local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
-        local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
-        local activeBlob = isRidingBlob and verifyAndGetBlobman()
-        local now = os.clock()
-
+        
+        -- [불필요한 좌표 연산 코드 전부 제거]
         if not myHRP or not myHum or myHum.Health <= 0 then return end
 
         for _, name in ipairs(currentNames) do
             local p = game.Players:FindFirstChild(name)
             if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
                 if not targetPlayers[p] then
-                    targetPlayers[p] = {
-                        tpRunning = false,
-                        originCF = nil,
-                        fixedCF = nil
-                    }
+                    targetPlayers[p] = { tpRunning = false, lockedCF = nil }
                 end
             end
         end
 
         for p, data in pairs(targetPlayers) do
-            if not p.Parent or not table.find(currentNames, p.Name) then
-                if data.tpRunning then data.tpRunning = false end
-                if data.originCF then BACK(data.originCF) end
-                targetPlayers[p] = nil
-                continue
-            end
-
             local char = p.Character
             local hum = char and char:FindFirstChildOfClass("Humanoid")
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             local head = char and char:FindFirstChild("Head")
 
             if hrp and head and hum and hum.Health > 0 then
-                local ownerTag = head:FindFirstChild("PartOwner")
-                local hasOwnership = ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name
+                local hasOwnership = head:FindFirstChild("PartOwner") and head:FindFirstChild("PartOwner").Value == plr.Name
 
                 if not hasOwnership then
-                    if not data.originCF then
-                        data.originCF = myHRP.CFrame
-                    end
-                    
                     if not data.tpRunning then
                         data.tpRunning = true
                         task.spawn(function()
                             while data.tpRunning and advancedDesyncLoopActive and p.Parent do
                                 local ok, cf = TP(p)
-                                if ok and cf then 
-                                    data.fixedCF = cf
-                                end
+                                if ok and cf then data.lockedCF = cf end
                                 task.wait()
                             end
                         end)
                     end
                 else
-                    if data.tpRunning then
-                        data.tpRunning = false
-                        if data.fixedCF then
-                            BACK(data.fixedCF)
-                        elseif data.originCF then
-                            BACK(data.originCF)
-                        end
-                        -- 내 위치 연동 차단: 소유권을 가져온 순간, 그 시점의 좌표로 고정값 박아두기
-                        if not data.fixedCF then
-                            data.fixedCF = hrp.CFrame
-                        end
-                    end
+                    data.tpRunning = false
                 end
 
-                -- 고정 좌표 지정된 이후에는 내 CFrame 연산 없이 이 좌표에 완전히 정지
-                if not data.tpRunning and data.fixedCF then
-                    hrp.CFrame = data.fixedCF
+                -- [핵심] 소유권 뺏은 후엔 TP 멈추고 저장된 좌표(lockedCF)에만 고정. 내 움직임 영향 0.
+                if data.lockedCF and not data.tpRunning then
+                    hrp.CFrame = data.lockedCF
+                    hrp.Velocity = Vector3.new(0, 0, 0)
+                    hrp.RotVelocity = Vector3.new(0, 0, 0)
                 end
 
-                hrp.Velocity = Vector3.new(0, 0, 0)
-                hrp.RotVelocity = Vector3.new(0, 0, 0)
-
-                if now - lastRemoteTime >= 0.08 then
+                if os.clock() - lastRemoteTime >= 0.08 then
                     if not hasOwnership then
                         rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                         rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                     end
-
                     rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
-
-                    if activeBlob then
-                        BlobGrab(activeBlob, hrp, "Right")
-                        BlobRelease(activeBlob, hrp, "Right")
-                        hum.Sit = true
-                        task.delay(0, function() if hum then hum.Sit = false end end)
-                    end
-                    
-                    lastRemoteTime = now
-                end
-            else
-                if data.tpRunning then data.tpRunning = false end
-                if data.originCF then 
-                    BACK(data.originCF)
-                    data.originCF = nil
+                    lastRemoteTime = os.clock()
                 end
             end
         end
     end)
 end
+
 
 
 
