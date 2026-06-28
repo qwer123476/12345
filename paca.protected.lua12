@@ -1957,6 +1957,7 @@ function loopPlayerBlobF4()
                     independentHoldConnections[player] = nil
                 end
 
+                local lastRemoteTime = 0
                 independentHoldConnections[player] = RunService.Heartbeat:Connect(function()
                     if not blobLoopT4 or not character or not character.Parent or not charHRP or not charHRP.Parent or not charHUM or charHUM.Health <= 0 then
                         if independentHoldConnections[player] then 
@@ -1988,15 +1989,19 @@ function loopPlayerBlobF4()
                     charHRP.Velocity = Vector3.new(0,0,0)
                     charHRP.RotVelocity = Vector3.new(0,0,0)
                     
-                    if not OnlyOwner then
+                    local now = os.clock()
+                    local shouldDestroyGrab = not OnlyOwner and (now - lastRemoteTime >= 0.05)
+
+                    if shouldDestroyGrab then
                         rs.GrabEvents.DestroyGrabLine:FireServer(charHRP)
+                        lastRemoteTime = now
                     end
 
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     local isRidingNow = currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman"
 
                     if not isRidingNow and not OwnerKickMODED then
-                        if not charHUM.Sit  and not OnlyOwner then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
+                        if not charHUM.Sit and not OnlyOwner then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
                         if player.IsHeld then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
                     end
                     if not isRidingNow and OwnerKickMODED then
@@ -2005,7 +2010,7 @@ function loopPlayerBlobF4()
                     end
                     if isRidingNow then
                         rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position))
-                        if SitMODED then  charHUM.Sit = true end
+                        if SitMODED then charHUM.Sit = true end
                     end
 
                     local activeKicking = {}
