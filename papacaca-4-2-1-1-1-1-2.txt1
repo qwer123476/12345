@@ -11418,7 +11418,7 @@ end
 
 lagTab:CreateSection("렉")
 lagTab:CreateToggle({
-    Name = "렉(섭폭)    <font color='rgb(255,0,0)'>[라인]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>   
+    Name = "렉(섭폭)    <font color='rgb(255,0,0)'>[라인]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>"
     CurrentValue = false,
     Flag = "lagToggleFlag",
     Callback = function(Value)
