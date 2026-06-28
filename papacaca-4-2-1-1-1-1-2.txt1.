@@ -5570,6 +5570,7 @@ local function processAntiGrabPlayer(player)
                     end
                 end
             end
+         pcall(task.cancel, tpThread)
         end)
     end
 
@@ -5777,6 +5778,7 @@ FDTab:CreateToggle({
         end
     end
 })
+
 
 -- ================== [ 유틸리티 기능 ] ==================
 
