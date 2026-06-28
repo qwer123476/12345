@@ -49,7 +49,7 @@ local DevTab = Window:CreateTab("잡기능", 3944680095)
 local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
 local environmentTab = Window:CreateTab("환경 설정", 6023426923)   
 local combatTab = Window:CreateTab("전투 확장", 6026568198)        
---local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
+local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
 local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
 local CreditsTab = Window:CreateTab("제작자 한정")
 
