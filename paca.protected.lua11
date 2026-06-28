@@ -2572,22 +2572,17 @@ function executeBlobmanDesyncKick()
         return currentBlobS
     end
 
-    -- 렉 없는 깔끔한 데이터 오염 연출
-    local function applyDesyncPhysics(targetChar)
+    local function isolatePhysics(targetChar)
         if not targetChar then return end
         local hrp = targetChar:FindFirstChild("HumanoidRootPart")
         local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-        local hum = targetChar:FindFirstChild("Humanoid")
-        
-        if hrp and torso and hum then
+        if hrp and torso then
             local rootJoint = hrp:FindFirstChild("RootJoint") or torso:FindFirstChild("RootJoint")
             if rootJoint and rootJoint:IsA("Motor6D") then
                 rootJoint.Enabled = false
             end
-            
-            -- [서버 물리 한계 돌파 연산] 외관 변경 대신 내부 데이터를 폭발시켜 프레임 드랍 없이 킥 유도
-            hrp.AssemblyLinearVelocity = Vector3.new(888888, 888888, 888888)
-            hrp.AssemblyAngularVelocity = Vector3.new(888888, 888888, 888888)
+            hrp.AssemblyLinearVelocity = Vector3.new(0, 9999, 0)
+            hrp.AssemblyAngularVelocity = Vector3.new(0, 9999, 0)
         end
     end
 
@@ -2595,7 +2590,6 @@ function executeBlobmanDesyncKick()
         if not targetChar then return end
         local hrp = targetChar:FindFirstChild("HumanoidRootPart")
         local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-        
         if hrp then
             local rootJoint = hrp:FindFirstChild("RootJoint") or (torso and torso:FindFirstChild("RootJoint"))
             if rootJoint and rootJoint:IsA("Motor6D") then
@@ -2630,7 +2624,7 @@ function executeBlobmanDesyncKick()
             local p = game.Players:FindFirstChild(name)
             if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
                 if not targetPlayers[p] then
-                    targetPlayers[p] = { hasTeleported = false, lastChar = nil }
+                    targetPlayers[p] = { lastChar = nil }
                 end
             end
         end
@@ -2648,31 +2642,24 @@ function executeBlobmanDesyncKick()
             local head = char and char:FindFirstChild("Head")
 
             if data.lastChar ~= char then
-                data.hasTeleported = false
                 data.lastChar = char
             end
 
             if hrp and head and hum and hum.Health > 0 then
                 local distance = (myHRP.Position - hrp.Position).Magnitude
 
-                -- 1회성 또는 30스터드 이상 이탈 시 강제 유도 TP
-                if not data.hasTeleported or distance > 30 then
-                    data.hasTeleported = true
-                    myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
+                if distance > 30 then
+                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
+                else
+                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
                 end
 
-                -- [몸체 공중 완전 락킹] 다른 곳으로 튀지 못하게 내 머리 위 18스터드 위치에 고정 박기
-                local upperLockPosition = myHRP.CFrame * CFrame.new(0, 18, 0)
-                hrp.CFrame = upperLockPosition
-                
-                -- 기본 흔들림 방지 및 강제 정지
                 hrp.Velocity = Vector3.new(0, 0, 0)
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
 
-                applyDesyncPhysics(char)
+                isolatePhysics(char)
 
-                -- 원격 패킷 최적화 연사
-                if now - lastRemoteTime >= 0.03 then
+                if now - lastRemoteTime >= 0.05 then
                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                     rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                     rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
@@ -2689,6 +2676,7 @@ function executeBlobmanDesyncKick()
         end
     end)
 end
+
 
 
 local RunService = game:GetService("RunService")
