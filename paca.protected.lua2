@@ -2557,6 +2557,7 @@ end
 function executeBlobmanDesyncKick()
     local targetPlayers = {}
     local activeConnections = {}
+    local hasTeleported = {} -- 타겟별 1회성 TP 판정용 테이블
 
     local function fetchTargets()
         local list = {}
@@ -2610,6 +2611,7 @@ function executeBlobmanDesyncKick()
                 if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
                     if not targetPlayers[p] then
                         targetPlayers[p] = true
+                        hasTeleported[p] = false -- 초기화
                         
                         task.spawn(function()
                             while advancedDesyncLoopActive and p.Parent and targetPlayers[p] do
@@ -2624,10 +2626,12 @@ function executeBlobmanDesyncKick()
                                     local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
                                     local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
                                     
-                                    if myHRP then
+                                    -- [최초 1회 단발성 TP] 한 번 이동하면 루프 내에서 더 이상 내 위치를 꺾지 않음
+                                    if myHRP and not hasTeleported[p] then
+                                        hasTeleported[p] = true
                                         myHRP.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
+                                        task.wait(0.01) -- 위치 안정화 극소 대기
                                     end
-                                    task.wait(0.05)
 
                                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                                     rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
@@ -2637,6 +2641,7 @@ function executeBlobmanDesyncKick()
                                     if isRidingBlob then
                                         local activeBlob = verifyAndGetBlobman()
                                         if activeBlob then
+                                            -- 그랩 반응 속도 조절
                                             BlobGrab(activeBlob, hrp, "Right")
                                             BlobRelease(activeBlob, hrp, "Right")
                                         end
@@ -2667,12 +2672,13 @@ function executeBlobmanDesyncKick()
                                     end
                                 else
                                     restorePhysics(char)
-                                    task.wait(0.1)
+                                    task.wait(0.02)
                                 end
-                                task.wait(0.1)
+                                task.wait(0.01) -- 연사 루프 주기 대폭 단축
                             end
                             
                             targetPlayers[p] = nil
+                            hasTeleported[p] = nil
                             if activeConnections[p] then
                                 activeConnections[p]:Disconnect()
                                 activeConnections[p] = nil
@@ -2685,6 +2691,7 @@ function executeBlobmanDesyncKick()
             for p in pairs(targetPlayers) do
                 if not p.Parent or not table.find(currentNames, p.Name) then
                     targetPlayers[p] = nil
+                    hasTeleported[p] = nil
                     if activeConnections[p] then
                         activeConnections[p]:Disconnect()
                         activeConnections[p] = nil
@@ -2692,7 +2699,7 @@ function executeBlobmanDesyncKick()
                     if p.Character then restorePhysics(p.Character) end
                 end
             end
-            task.wait(0.5)
+            task.wait(0.3)
         end
         
         for p, conn in pairs(activeConnections) do
@@ -2704,6 +2711,7 @@ function executeBlobmanDesyncKick()
         
         activeConnections = {}
         targetPlayers = {}
+        hasTeleported = {}
     end)
 end
 
