@@ -2554,16 +2554,22 @@ function loopPlayerF3() -- 룹3
         end
     end)
 end
-function executeAdvancedDesyncKick()
+function executeBlobmanDesyncKick()
     local targetPlayers = {}
     local activeConnections = {}
-    local originalFrames = {}
-    
+
     local function fetchTargets()
         local list = {}
         if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(list, v) end end
         if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(list, v) end end
         return list
+    end
+
+    local function verifyAndGetBlobman()
+        if not currentBlobS or not currentBlobS.Parent or not currentBlobS:FindFirstChild("PrimaryPart") then
+            UpdateCurrentBlobman()
+        end
+        return currentBlobS
     end
 
     local function isolatePhysics(targetChar)
@@ -2577,8 +2583,8 @@ function executeAdvancedDesyncKick()
             if rootJoint and rootJoint:IsA("Motor6D") then
                 rootJoint.Enabled = false
             end
-            hrp.AssemblyLinearVelocity = Vector3.new(9999, 9999, 9999)
-            torso.AssemblyLinearVelocity = Vector3.new(-9999, -9999, -9999)
+            hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
         end
     end
 
@@ -2613,21 +2619,28 @@ function executeAdvancedDesyncKick()
                                 local head = char and char:FindFirstChild("Head")
                                 
                                 if hrp and head and hum and hum.Health > 0 then
-                                    if not originalFrames[p] then
-                                        local myChar = plr.Character
-                                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                                        if myHRP then originalFrames[p] = myHRP.CFrame end
-                                    end
-
+                                    local myChar = plr.Character
+                                    local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                                    local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
+                                    local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
+                                    
                                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                                     rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                                     
                                     isolatePhysics(char)
                                     
+                                    if isRidingBlob then
+                                        local activeBlob = verifyAndGetBlobman()
+                                        if activeBlob then
+                                            BlobGrab(activeBlob, hrp, "Right")
+                                            BlobRelease(activeBlob, hrp, "Right")
+                                        end
+                                    end
+
                                     if not activeConnections[p] then
                                         activeConnections[p] = RunService.Heartbeat:Connect(function()
-                                            local myChar = plr.Character
-                                            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                                            local currentMyChar = plr.Character
+                                            local currentMyHRP = currentMyChar and currentMyChar:FindFirstChild("HumanoidRootPart")
                                             
                                             if not advancedDesyncLoopActive or not p.Parent or not char.Parent or not hrp.Parent or hum.Health <= 0 then
                                                 if activeConnections[p] then
@@ -2635,24 +2648,19 @@ function executeAdvancedDesyncKick()
                                                     activeConnections[p] = nil
                                                 end
                                                 restorePhysics(char)
-                                                if myHRP and originalFrames[p] then myHRP.CFrame = originalFrames[p] end
                                                 return
                                             end
                                             
                                             isolatePhysics(char)
                                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
                                             
-                                            local offsetPos = myHRP.CFrame * CFrame.new(OLTPValue or Vector3.new(0, 0, -5))
-                                            hrp.CFrame = offsetPos
+                                            if currentMyHRP then
+                                                local targetOffset = OLTPValue or Vector3.new(0, 0, -5)
+                                                hrp.CFrame = currentMyHRP.CFrame * CFrame.new(targetOffset)
+                                            end
                                         end)
                                     end
                                 else
-                                    if originalFrames[p] then
-                                        local myChar = plr.Character
-                                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                                        if myHRP then myHRP.CFrame = originalFrames[p] end
-                                        originalFrames[p] = nil
-                                    end
                                     restorePhysics(char)
                                     task.wait(0.1)
                                 end
@@ -2677,12 +2685,6 @@ function executeAdvancedDesyncKick()
                         activeConnections[p] = nil
                     end
                     if p.Character then restorePhysics(p.Character) end
-                    if originalFrames[p] then
-                        local myChar = plr.Character
-                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                        if myHRP then myHRP.CFrame = originalFrames[p] end
-                        originalFrames[p] = nil
-                    end
                 end
             end
             task.wait(0.5)
@@ -2697,9 +2699,9 @@ function executeAdvancedDesyncKick()
         
         activeConnections = {}
         targetPlayers = {}
-        originalFrames = {}
     end)
 end
+
 
 
 local RunService = game:GetService("RunService")
