@@ -301,12 +301,47 @@ local oldCreateDropdown = Rayfield.CreateDropdown
 local oldCreateSlider = Rayfield.CreateSlider
 local oldCreateInput = Rayfield.CreateInput
 
-local function applyRichText(element)
+-- 텍스트 내부에서 특정 단어를 찾아 그라데이션으로 쪼개주는 내부 함수
+local function autoGradient(text, target, startColor, endColor)
+    if not string.find(text, target, 1, true) then return text end
+    
+    local len = utf8.len(target)
+    local result = ""
+    local count = 0
+    
+    for _, code in utf8.codes(target) do
+        local char = utf8.char(code)
+        count = count + 1
+        local ratio = (len > 1) and ((count - 1) / (len - 1)) or 0
+        local r = math.floor(startColor.R * 255 + (endColor.R - startColor.R) * 255 * ratio)
+        local g = math.floor(startColor.G * 255 + (endColor.G - startColor.G) * 255 * ratio)
+        local b = math.floor(startColor.B * 255 + (endColor.B - startColor.B) * 255 * ratio)
+        result = result .. string.format("<font color='rgb(%d,%d,%d)'>%s</font>", r, g, b, char)
+    end
+    
+    return string.gsub(text, string.gsub(target, "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1"), result)
+end
+
+local function applyRichTextAndEffects(element)
     if not element then return end
     task.spawn(function()
         for _, v in pairs(element:GetDescendants()) do
             if v:IsA("TextLabel") then
+                local currentText = v.Text
+                
+                -- 이미 작성되어 있던 특정 문구들을 자동으로 그라데이션 텍스트로 변환
+                -- 예: [라인]을 주황->노랑 그라데이션으로 변경
+                currentText = autoGradient(currentText, "[라인]", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
+                -- 예: [프리미엄]을 빨강->파랑 그라데이션으로 변경
+                currentText = autoGradient(currentText, "[프리미엄]", Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255))
+                
+                v.Text = currentText
                 v.RichText = true
+                
+                -- 글자 뒤에 은은하게 깔리는 검은색 안개(번짐) 효과
+                v.TextStrokeTextColor3 = Color3.fromRGB(0, 0, 0)
+                v.TextStrokeThickness = 2.5
+                v.TextStrokeTransparency = 0.5
             end
         end
     end)
@@ -314,39 +349,40 @@ end
 
 function Rayfield:CreateToggle(options)
     local element = oldCreateToggle(self, options)
-    applyRichText(element)
+    applyRichTextAndEffects(element)
     return element
 end
 
 function Rayfield:CreateButton(options)
     local element = oldCreateButton(self, options)
-    applyRichText(element)
+    applyRichTextAndEffects(element)
     return element
 end
 
 function Rayfield:CreateLabel(options)
     local element = oldCreateLabel(self, options)
-    applyRichText(element)
+    applyRichTextAndEffects(element)
     return element
 end
 
 function Rayfield:CreateDropdown(options)
     local element = oldCreateDropdown(self, options)
-    applyRichText(element)
+    applyRichTextAndEffects(element)
     return element
 end
 
 function Rayfield:CreateSlider(options)
     local element = oldCreateSlider(self, options)
-    applyRichText(element)
+    applyRichTextAndEffects(element)
     return element
 end
 
 function Rayfield:CreateInput(options)
     local element = oldCreateInput(self, options)
-    applyRichText(element)
+    applyRichTextAndEffects(element)
     return element
 end
+
 
 local Window = Rayfield:CreateWindow({Name = "파카허브  [프리미엄]", Icon = 0, Theme = paca, ToggleUIKeybind = "T"})
 
