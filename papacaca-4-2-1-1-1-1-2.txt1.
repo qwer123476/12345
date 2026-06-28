@@ -7320,17 +7320,17 @@ local function Notify(type, playerName)
     local content = ""
 
     if type == "Added" then
-        title = "[☑️ ]"; content = playerName.." - 추가  <font color='rgb(0,255,0)'>[on]</font>"
+        title = "[☑️ ]"; content = playerName.." - 추가"
     elseif type == "Removed" then
-        title = "[ ☑️ ]"; content = playerName.." - 제거  <font color='rgb(255,0,0)'>[off]</font>"
+        title = "[ ☑️ ]"; content = playerName.." - 제거"
     elseif type == "Self" then
-        title = "[ ⚠️ ]"; content = "자신은 추가될 수 없어요!  <font color='rgb(255,0,0)'>[자신]</font>"
+        title = "[ ⚠️ ]"; content = "자신은 추가될 수 없어요!"
     elseif type == "Already" then
-        title = "[ 💠 ]"; content = playerName.." - 이미 추가됐어요   <font color='rgb(0,255,0)'>[중복]</font>"
+        title = "[ 💠 ]"; content = playerName.." - 이미 추가됐어요"
     elseif type == "NotFound" then
-        title = "[ ❌ ]"; content = "찾을수가없네요 <font color='rgb(255,0,0)'>[noo]</font>"
+        title = "[ ❌ ]"; content = "찾을수가없네요"
     elseif type == "HigherRank" then
-        title = "[ ⛔ ]"; content = "권한이 부족해요!  <font color='rgb(255,0,0)'>[no]</font>"
+        title = "[ ⛔ ]"; content = "권한이 부족해요!"
     elseif type == "GFE" then
         title = "[ ⛔ ]"; content = "나가 뒤져 엄마 장애인 ㅋㅋㅋ"
         GfLogger()
