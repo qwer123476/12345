@@ -5570,7 +5570,6 @@ local function processAntiGrabPlayer(player)
                     end
                 end
             end
-         pcall(task.cancel, tpThread)
         end)
     end
 
