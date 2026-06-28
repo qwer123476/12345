@@ -8179,10 +8179,10 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("오너")
-local AdvancedDesyncKickToggle = LoopTab:CreateToggle({
-    Name = "디싱크 스팸킥    <font color='rgb(255,85,85)'>[new]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+local BlobDesyncKickToggle = LoopTab:CreateToggle({
+    Name = "블롭맨 디싱크 킥    <font color='rgb(255,85,85)'>[NEW]</font>",
     CurrentValue = false,
-    Flag = "AdvancedDesyncKickFlag",
+    Flag = "BlobDesyncKickFlag",
     Callback = function(Value)
         advancedDesyncLoopActive = Value
         if Value then
@@ -8191,7 +8191,7 @@ local AdvancedDesyncKickToggle = LoopTab:CreateToggle({
                 local nameOnly = e:match("^(.-) %(") or e
                 table.insert(playersInLoop2V, nameOnly)
             end
-            executeAdvancedDesyncKick()
+            executeBlobmanDesyncKick()
         else
             advancedDesyncLoopActive = false
             table.clear(playersInLoop2V)
