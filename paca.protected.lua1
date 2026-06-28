@@ -1737,7 +1737,7 @@ SkipOL = false
 OLTPValue = Vector3.new(0, 20, 0)
 
 
-function loopPlayerBlobF4() -- 오너킥
+function loopPlayerBlobF4()
     UpdateCurrentBlobman()
 
     local runningTasks = {}
@@ -1766,7 +1766,7 @@ function loopPlayerBlobF4() -- 오너킥
                     originPositions[player] = nil
                 end
                 if player.Character then
-                    local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
+                    local charTOR = player.Character:FindFirstChild("Torso")
                     if charTOR then
                         charTOR.Anchored = false
                     end
@@ -1969,28 +1969,41 @@ function loopPlayerBlobF4() -- 오너킥
                     local isRidingNow = currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman"
 
                     if not isRidingNow and not OwnerKickMODED then
-                    if not charHUM.Sit  and not OnlyOwner then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
-                    if charHUM.Sit and not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
-                    if player.IsHeld then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
-                    if charHUM.Sit and not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
-end
+                        if not charHUM.Sit  and not OnlyOwner then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
+                        if charHUM.Sit and not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
+                        if player.IsHeld then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position)) end
+                        if charHUM.Sit and not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
+                    end
                     if not isRidingNow and OwnerKickMODED then
-                    rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position))
-                    if not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
-                    if SitMODED then charHUM.Sit = true end
-end
+                        rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position))
+                        if not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
+                        if SitMODED then charHUM.Sit = true end
+                    end
                     if isRidingNow then
-                    rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position))
-                    if not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
-                    if SitMODED then  charHUM.Sit = true end
-end
-
-                    local targetPosition
-                    if blobLoopT4 then
-                        targetPosition = myHRP.CFrame * CFrame.new(OLTPValue)
+                        rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, CFrame.lookAt(myHRP.Position, charHRP.Position))
+                        if not OnlyOwner then rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) end
+                        if SitMODED then  charHUM.Sit = true end
                     end
 
-                    --if isnetworkowner(charHRP) then charHRP.CFrame = targetPosition end
+                    local activeKicking = {}
+                    for p, t in pairs(runningTasks) do
+                        if t and p.Parent and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and ownerTags[p] then
+                            table.insert(activeKicking, p)
+                        end
+                    end
+                    table.sort(activeKicking, function(a, b) return a.Name < b.Name end)
+
+                    local targetPosition
+                    if #activeKicking <= 1 then
+                        targetPosition = myHRP.CFrame * CFrame.new(OLTPValue)
+                    else
+                        local index = table.find(activeKicking, player) or 1
+                        local count = #activeKicking
+                        local angle = (index - 1) * (2 * math.pi / count)
+                        local offset = Vector3.new(math.cos(angle) * 4, 0, math.sin(angle) * 4)
+                        targetPosition = (myHRP.CFrame * CFrame.new(OLTPValue)) * CFrame.new(offset)
+                    end
+
                     charHRP.CFrame = targetPosition
                 end)
 
@@ -2081,10 +2094,22 @@ end
             if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(targetList, v) end end
             if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(targetList, v) end end
 
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+
             for _, name in ipairs(targetList) do
                 local player = game.Players:FindFirstChild(name)
                 if not player or player == plr then continue end
                 if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
+
+                if myHRP and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHRP = player.Character.HumanoidRootPart
+                    if (myHRP.Position - targetHRP.Position).Magnitude > 20 then
+                        continue
+                    end
+                elseif not monitoredPlayers[player] then
+                    continue
+                end
 
                 if not monitoredPlayers[player] then
                     monitoredPlayers[player] = true
@@ -2110,7 +2135,7 @@ end
                             end
                             destroyCounts[player] = nil
                             if player.Character then
-                                local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
+                                local charTOR = player.Character:FindFirstChild("Torso")
                                 if charTOR then
                                     charTOR.Anchored = false
                                 end
@@ -2121,7 +2146,17 @@ end
             end
 
             for player, taskInfo in pairs(runningTasks) do
+                local shouldStop = false
                 if not player.Parent then
+                    shouldStop = true
+                elseif myHRP and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHRP = player.Character.HumanoidRootPart
+                    if (myHRP.Position - targetHRP.Position).Magnitude > 20 and not ownerTags[player] then
+                        shouldStop = true
+                    end
+                end
+
+                if shouldStop then
                     task.cancel(taskInfo)
                     runningTasks[player] = nil
                     monitoredPlayers[player] = nil
@@ -2142,7 +2177,7 @@ end
                     end
                     destroyCounts[player] = nil
                     if player.Character then
-                        local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
+                        local charTOR = player.Character:FindFirstChild("Torso")
                         if charTOR then
                             charTOR.Anchored = false
                         end
@@ -2181,7 +2216,7 @@ end
 
         for _, player in ipairs(game.Players:GetPlayers()) do
             if player.Character then
-                local charHRP = player.Character:FindFirstChild("HumanoidRootPart")
+                local charTOR = player.Character:FindFirstChild("Torso")
                 if charTOR then
                     charTOR.Anchored = false
                 end
@@ -2195,6 +2230,7 @@ end
         destroyCounts = {}
     end)
 end
+
 function loopPlayerF() -- 룹1
     UpdateCurrentBlobman()
 
