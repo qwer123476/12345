@@ -1850,7 +1850,7 @@ function loopPlayerBlobF4() -- 오너킥
                     end
                     if amIRiding and charHUM then
                         charHUM.Sit = true
-                        task.wait(0.05)
+                        task.wait()
                         charHUM.Sit = false
                     end
                 end
@@ -2001,7 +2001,7 @@ end
                         task.wait()
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
-                        task.delay(0.000000002, function() if charHUM then charHUM.Sit = false end end)
+                        task.delay(0.00000000002, function() if charHUM then charHUM.Sit = false end end)
                     end
                     task.wait()
                 end
@@ -2216,7 +2216,7 @@ function loopPlayerF() -- 룹1
             local FallenY = workspace.FallenPartsDestroyHeight
             local targetY = (FallenY <= -50000 and -49999) or (FallenY <= -100 and -99) or -100
             local storso = character:FindFirstChild("Torso")
-            --local ownerTag = head:FindFirstChild("PartOwner")
+            local ownerTag = head:FindFirstChild("PartOwner")
 
             if storso then --and ownerTag.Value == plr.Name then
                 storso.CFrame = CFrame.new(storso.Position.X, targetY, storso.Position.Z)
@@ -2295,7 +2295,7 @@ function loopPlayerF2() -- 룹2
 
         while loopPlayerT2 do
             rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-            local ownerTag = head:FindFirstChild("PartOwner")
+            --local ownerTag = head:FindFirstChild("PartOwner")
             if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
                 break
             end
@@ -7922,7 +7922,7 @@ LoopTab:CreateButton({
     OLTPInput:Set("0,40,0")
     
     local blobLoop4Toggle = LoopTab:CreateToggle({
-        Name = "스팸킥   <font color='rgb(255,250,255)'>[스팸]</font><font color='rgb(0,0,255)'>[프리미엄]</font>",
+        Name = "스팸킥    <font color='rgb(255,0,255)'>[스팸]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
         CurrentValue = false,
         Flag = "21",
         Callback = function(Value)
