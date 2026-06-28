@@ -1876,11 +1876,16 @@ function loopPlayerBlobF4()
                 local ownerTag = head:FindFirstChild("PartOwner")
                 if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
                     rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                    if charHRP then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, charHRP.CFrame) end
                 end
 
                 if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
                     break
                 else
+                    if charHRP then
+                        charHRP.Velocity = Vector3.new(0,0,0)
+                        charHRP.RotVelocity = Vector3.new(0,0,0)
+                    end
                     if amIRiding then
                         BlobGrab(currentBlobS, charHRP, "Right")
                         BlobRelease(currentBlobS, charHRP, "Right")
@@ -1966,6 +1971,9 @@ function loopPlayerBlobF4()
                         return
                     end
 
+                    charHRP.Velocity = Vector3.new(0,0,0)
+                    charHRP.RotVelocity = Vector3.new(0,0,0)
+
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     local isRidingNow = currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman"
 
@@ -2047,6 +2055,7 @@ function loopPlayerBlobF4()
 
                     local currentSeat = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
                     if currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman" then
+                        charHRP.Velocity = Vector3.new(0,0,0)
                         BlobGrab(currentBlobS, charHRP, "Right")
                         BlobRelease(currentBlobS, charHRP, "Right")
                         charHUM.Sit = true
