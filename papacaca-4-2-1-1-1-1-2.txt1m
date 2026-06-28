@@ -1,5 +1,4 @@
 
-
 print("AP FTAP Script 시작 - 설정 저장 활성화")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -5459,7 +5458,7 @@ end
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
 
-Local Players = game:GetService("Players")
+local Players = game:GetService("Players")
 local localPlayer = game.Players.LocalPlayer
 local rs = game:GetService("ReplicatedStorage")
 
