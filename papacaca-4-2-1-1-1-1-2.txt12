@@ -2,94 +2,6 @@
 
 print("AP FTAP Script 시작 - 설정 저장 활성화")
 -- ================== Rayfield 윈도우 생성 및 키 시스템 설정 ==================
-local Rayfield =   loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local NP = {
-    TextColor = Color3.fromRGB(255,255,255),
-
-    Background = Color3.fromRGB(20,20,20),
-    Topbar = Color3.fromRGB(30,30,30),
-    Shadow = Color3.fromRGB(15,15,15),
-
-    NotificationBackground = Color3.fromRGB(25,25,25),
-    NotificationActionsBackground = Color3.fromRGB(40,40,40),
-
-    TabBackground = Color3.fromRGB(40,40,40),
-    TabStroke = Color3.fromRGB(70,70,70),
-    TabBackgroundSelected = Color3.fromRGB(60,60,60),
-    TabTextColor = Color3.fromRGB(255,255,255),
-    SelectedTabTextColor = Color3.fromRGB(255,0,0),
-
-    ElementBackground = Color3.fromRGB(35,35,35),
-    ElementBackgroundHover = Color3.fromRGB(50,50,50),
-    SecondaryElementBackground = Color3.fromRGB(25,25,25),
-    ElementStroke = Color3.fromRGB(60,60,60),
-    SecondaryElementStroke = Color3.fromRGB(45,45,45),
-
-    SliderBackground = Color3.fromRGB(60,60,60),
-    SliderProgress = Color3.fromRGB(0,170,255),
-    SliderStroke = Color3.fromRGB(0,120,200),
-
-    ToggleBackground = Color3.fromRGB(30,30,30),
-
-    ToggleEnabled = Color3.fromRGB(185,0,0),
-    ToggleEnabledStroke = Color3.fromRGB(255,255,255),
-    ToggleEnabledOuterStroke = Color3.fromRGB(255,255,255),
-
-    ToggleDisabled = Color3.fromRGB(100, 100, 100),
-    ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
-    ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
-
-    DropdownSelected = Color3.fromRGB(50,50,50),
-    DropdownUnselected = Color3.fromRGB(30,30,30),
-
-    InputBackground = Color3.fromRGB(25,25,25),
-    InputStroke = Color3.fromRGB(45,45,45),
-    PlaceholderColor = Color3.fromRGB(150,150,150),
-}
-
-local Window = Rayfield:CreateWindow({
-    Name = "파카허브",
-    LoadingTitle = "로딩중",
-    LoadingSubtitle = "by JIUO",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "파카허브",
-        FileName = "AIPA_FTAP_Config"
-    },
-    KeySystem = true,
-    KeySettings = {
-        Title = "파카허브 키시스템",
-        Subtitle = "키",
-        Note = "오너에게 키를 받으세요(알파)",
-        FileName   = "AIPA_Key", 
-        SaveKey = true, 
-        GrabKeyFromSite = false, 
-        Key = {"파카허브v30"} 
-    }
-})
-
-
-local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
-local passTab = Window:CreateTab("패스잠금해제")
-local getTab = Window:CreateTab("알림",649498361)
-local grabTab = Window:CreateTab("컴뱃", 6026568198)               
-local UtilityTab = Window:CreateTab("유틸리티", 6031094678) 
-local plotTab = Window:CreateTab("집")
-local DDTab = Window:CreateTab("티배깅")
-local FDTab = Window:CreateTab("친구 보호", 6026568198)        
-local antiTab = Window:CreateTab("안전", 6034831332)               
-local ListTab = Window:CreateTab("명단", 3572491301)              
-local LoopTab = Window:CreateTab("조지기", 6023426923)             
-local AuraTab = Window:CreateTab("아우라", 6031068423)            
-local funTab = Window:CreateTab("찌끄레기", 4483345998)            
-local keybindTab = Window:CreateTab("설정", 6031094678)            
-local DevTab = Window:CreateTab("잡기능", 3944680095)             
-local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
-local lagTab = Window:CreateTab("렉", 6023426923)   
-local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
-local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
-local CreditsTab = Window:CreateTab("제작자 한정")
-local YTab = Window:CreateTab("트롤")
 
 
 
@@ -343,7 +255,95 @@ G = rs.GrabEvents
 G:WaitForChild("EndGrabEarly"):Destroy()
 Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
- 
+ local Rayfield =   loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local NP = {
+    TextColor = Color3.fromRGB(255,255,255),
+
+    Background = Color3.fromRGB(20,20,20),
+    Topbar = Color3.fromRGB(30,30,30),
+    Shadow = Color3.fromRGB(15,15,15),
+
+    NotificationBackground = Color3.fromRGB(25,25,25),
+    NotificationActionsBackground = Color3.fromRGB(40,40,40),
+
+    TabBackground = Color3.fromRGB(40,40,40),
+    TabStroke = Color3.fromRGB(70,70,70),
+    TabBackgroundSelected = Color3.fromRGB(60,60,60),
+    TabTextColor = Color3.fromRGB(255,255,255),
+    SelectedTabTextColor = Color3.fromRGB(255,0,0),
+
+    ElementBackground = Color3.fromRGB(35,35,35),
+    ElementBackgroundHover = Color3.fromRGB(50,50,50),
+    SecondaryElementBackground = Color3.fromRGB(25,25,25),
+    ElementStroke = Color3.fromRGB(60,60,60),
+    SecondaryElementStroke = Color3.fromRGB(45,45,45),
+
+    SliderBackground = Color3.fromRGB(60,60,60),
+    SliderProgress = Color3.fromRGB(0,170,255),
+    SliderStroke = Color3.fromRGB(0,120,200),
+
+    ToggleBackground = Color3.fromRGB(30,30,30),
+
+    ToggleEnabled = Color3.fromRGB(185,0,0),
+    ToggleEnabledStroke = Color3.fromRGB(255,255,255),
+    ToggleEnabledOuterStroke = Color3.fromRGB(255,255,255),
+
+    ToggleDisabled = Color3.fromRGB(100, 100, 100),
+    ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
+    ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
+
+    DropdownSelected = Color3.fromRGB(50,50,50),
+    DropdownUnselected = Color3.fromRGB(30,30,30),
+
+    InputBackground = Color3.fromRGB(25,25,25),
+    InputStroke = Color3.fromRGB(45,45,45),
+    PlaceholderColor = Color3.fromRGB(150,150,150),
+}
+
+local Window = Rayfield:CreateWindow({
+    Name = "파카허브",
+    LoadingTitle = "로딩중",
+    LoadingSubtitle = "by JIUO",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "파카허브",
+        FileName = "AIPA_FTAP_Config"
+    },
+    KeySystem = true,
+    KeySettings = {
+        Title = "파카허브 키시스템",
+        Subtitle = "키",
+        Note = "오너에게 키를 받으세요(알파)",
+        FileName   = "AIPA_Key", 
+        SaveKey = true, 
+        GrabKeyFromSite = false, 
+        Key = {"파카허브v30"} 
+    }
+})
+
+
+local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
+local passTab = Window:CreateTab("패스잠금해제")
+local getTab = Window:CreateTab("알림",649498361)
+local grabTab = Window:CreateTab("컴뱃", 6026568198)               
+local UtilityTab = Window:CreateTab("유틸리티", 6031094678) 
+local plotTab = Window:CreateTab("집")
+local DDTab = Window:CreateTab("티배깅")
+local FDTab = Window:CreateTab("친구 보호", 6026568198)        
+local antiTab = Window:CreateTab("안전", 6034831332)               
+local ListTab = Window:CreateTab("명단", 3572491301)              
+local LoopTab = Window:CreateTab("조지기", 6023426923)             
+local AuraTab = Window:CreateTab("아우라", 6031068423)            
+local funTab = Window:CreateTab("찌끄레기", 4483345998)            
+local keybindTab = Window:CreateTab("설정", 6031094678)            
+local DevTab = Window:CreateTab("잡기능", 3944680095)             
+local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
+local lagTab = Window:CreateTab("렉", 6023426923)   
+local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
+local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
+local CreditsTab = Window:CreateTab("제작자 한정")
+local YTab = Window:CreateTab("트롤")
+
 ----------------------------------------------------------------------------------------- [ 기능들 ]
 
 function ForWhiteList(enable)
