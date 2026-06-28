@@ -1889,7 +1889,7 @@ function loopPlayerBlobF4() -- 오너킥
                         charHUM.Sit = false
                     end
                 end
-                task.wait(0.05)
+                task.wait()
             end
 
             if not shouldContinue then
@@ -2071,7 +2071,7 @@ end
                 originPositions[player] = nil
             end
             
-            task.wait(0.5)
+            task.wait(0.35)
         end
     end
 
