@@ -2554,6 +2554,153 @@ function loopPlayerF3() -- 룹3
         end
     end)
 end
+function executeAdvancedDesyncKick()
+    local targetPlayers = {}
+    local activeConnections = {}
+    local originalFrames = {}
+    
+    local function fetchTargets()
+        local list = {}
+        if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(list, v) end end
+        if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(list, v) end end
+        return list
+    end
+
+    local function isolatePhysics(targetChar)
+        if not targetChar then return end
+        local hrp = targetChar:FindFirstChild("HumanoidRootPart")
+        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+        local hum = targetChar:FindFirstChild("Humanoid")
+        
+        if hrp and torso and hum then
+            local rootJoint = hrp:FindFirstChild("RootJoint") or torso:FindFirstChild("RootJoint")
+            if rootJoint and rootJoint:IsA("Motor6D") then
+                rootJoint.Enabled = false
+            end
+            hrp.AssemblyLinearVelocity = Vector3.new(9999, 9999, 9999)
+            torso.AssemblyLinearVelocity = Vector3.new(-9999, -9999, -9999)
+        end
+    end
+
+    local function restorePhysics(targetChar)
+        if not targetChar then return end
+        local hrp = targetChar:FindFirstChild("HumanoidRootPart")
+        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+        
+        if hrp then
+            local rootJoint = hrp:FindFirstChild("RootJoint") or (torso and torso:FindFirstChild("RootJoint"))
+            if rootJoint and rootJoint:IsA("Motor6D") then
+                rootJoint.Enabled = true
+            end
+        end
+    end
+
+    task.spawn(function()
+        while advancedDesyncLoopActive do
+            local currentNames = fetchTargets()
+            
+            for _, name in ipairs(currentNames) do
+                local p = game.Players:FindFirstChild(name)
+                if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
+                    if not targetPlayers[p] then
+                        targetPlayers[p] = true
+                        
+                        task.spawn(function()
+                            while advancedDesyncLoopActive and p.Parent and targetPlayers[p] do
+                                local char = p.Character
+                                local hum = char and char:FindFirstChild("Humanoid")
+                                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                                local head = char and char:FindFirstChild("Head")
+                                
+                                if hrp and head and hum and hum.Health > 0 then
+                                    if not originalFrames[p] then
+                                        local myChar = plr.Character
+                                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                                        if myHRP then originalFrames[p] = myHRP.CFrame end
+                                    end
+
+                                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                                    rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                                    
+                                    isolatePhysics(char)
+                                    
+                                    if not activeConnections[p] then
+                                        activeConnections[p] = RunService.Heartbeat:Connect(function()
+                                            local myChar = plr.Character
+                                            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                                            
+                                            if not advancedDesyncLoopActive or not p.Parent or not char.Parent or not hrp.Parent or hum.Health <= 0 then
+                                                if activeConnections[p] then
+                                                    activeConnections[p]:Disconnect()
+                                                    activeConnections[p] = nil
+                                                end
+                                                restorePhysics(char)
+                                                if myHRP and originalFrames[p] then myHRP.CFrame = originalFrames[p] end
+                                                return
+                                            end
+                                            
+                                            isolatePhysics(char)
+                                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
+                                            
+                                            local offsetPos = myHRP.CFrame * CFrame.new(OLTPValue or Vector3.new(0, 0, -5))
+                                            hrp.CFrame = offsetPos
+                                        end)
+                                    end
+                                else
+                                    if originalFrames[p] then
+                                        local myChar = plr.Character
+                                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                                        if myHRP then myHRP.CFrame = originalFrames[p] end
+                                        originalFrames[p] = nil
+                                    end
+                                    restorePhysics(char)
+                                    task.wait(0.1)
+                                end
+                                task.wait(0.1)
+                            end
+                            
+                            targetPlayers[p] = nil
+                            if activeConnections[p] then
+                                activeConnections[p]:Disconnect()
+                                activeConnections[p] = nil
+                            end
+                        end)
+                    end
+                end
+            end
+            
+            for p in pairs(targetPlayers) do
+                if not p.Parent or not table.find(currentNames, p.Name) then
+                    targetPlayers[p] = nil
+                    if activeConnections[p] then
+                        activeConnections[p]:Disconnect()
+                        activeConnections[p] = nil
+                    end
+                    if p.Character then restorePhysics(p.Character) end
+                    if originalFrames[p] then
+                        local myChar = plr.Character
+                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                        if myHRP then myHRP.CFrame = originalFrames[p] end
+                        originalFrames[p] = nil
+                    end
+                end
+            end
+            task.wait(0.5)
+        end
+        
+        for p, conn in pairs(activeConnections) do
+            if conn then conn:Disconnect() end
+        end
+        for p in pairs(targetPlayers) do
+            if p.Character then restorePhysics(p.Character) end
+        end
+        
+        activeConnections = {}
+        targetPlayers = {}
+        originalFrames = {}
+    end)
+end
+
 
 local RunService = game:GetService("RunService")
 local notifyCooldowns = {}
@@ -8030,6 +8177,26 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("오너")
+local AdvancedDesyncKickToggle = LoopTab:CreateToggle({
+    Name = "디싱크 스팸킥    <font color='rgb(255,85,85)'>[new]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    CurrentValue = false,
+    Flag = "AdvancedDesyncKickFlag",
+    Callback = function(Value)
+        advancedDesyncLoopActive = Value
+        if Value then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
+            end
+            executeAdvancedDesyncKick()
+        else
+            advancedDesyncLoopActive = false
+            table.clear(playersInLoop2V)
+        end
+    end
+})
+
 LoopTab:CreateToggle({
     Name = "오너킥V34   <font color='rgb(255,250,255)'>[파카]</font>",
     CurrentValue = false,
