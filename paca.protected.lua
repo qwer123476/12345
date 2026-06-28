@@ -2578,7 +2578,6 @@ end
     masterConnection = RunService.Heartbeat:Connect(function()
         if not advancedDesyncLoopActive then
             if masterConnection then masterConnection:Disconnect() end
-            -- 루프 꺼질 때 작동 중이던 모든 백트랙 복구 및 초기화
             for p, data in pairs(targetPlayers) do
                 if data.tpRunning then data.tpRunning = false end
                 if data.originCF then BACK(data.originCF) end
@@ -2605,8 +2604,7 @@ end
                     targetPlayers[p] = {
                         tpRunning = false,
                         originCF = nil,
-                        fixedCF = nil,
-                        hasGrabbed = false
+                        fixedCF = nil
                     }
                 end
             end
@@ -2629,7 +2627,6 @@ end
                 local ownerTag = head:FindFirstChild("PartOwner")
                 local hasOwnership = ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name
 
-                -- 1. 소유권 얻기 전: 형이 준 원래 로직대로 TP 비동기 연사
                 if not hasOwnership then
                     if not data.originCF then
                         data.originCF = myHRP.CFrame
@@ -2641,39 +2638,35 @@ end
                             while data.tpRunning and advancedDesyncLoopActive and p.Parent do
                                 local ok, cf = TP(p)
                                 if ok and cf then 
-                                    data.fixedCF = cf  -- 소유권 잡히는 순간 멈출 고정 좌표 저장
+                                    data.fixedCF = cf
                                 end
                                 task.wait()
                             end
                         end)
                     end
                 else
-                    -- 2. 소유권 뺏기 성공: 실시간 텔레포트 즉시 중단 (움직이지 않고 가만히 고정)
                     if data.tpRunning then
                         data.tpRunning = false
-                        
-                        -- 백트랙 끊고 고정 자리 지정
                         if data.fixedCF then
                             BACK(data.fixedCF)
                         elseif data.originCF then
                             BACK(data.originCF)
                         end
-                        
-                        -- 소유권 뺏은 시점의 내 머리 위(OLTPValue) 좌표로 타깃 위치 최종 락
-                        data.fixedCF = myHRP.CFrame * CFrame.new(OLTPValue or Vector3.new(0, 15, 0))
+                        -- 내 위치 연동 차단: 소유권을 가져온 순간, 그 시점의 좌표로 고정값 박아두기
+                        if not data.fixedCF then
+                            data.fixedCF = hrp.CFrame
+                        end
                     end
                 end
 
-                -- 3. 위치 홀딩 로직: 소유권을 얻은 후엔 지정된 고정 좌표에만 묶어두기 (내 움직임에 안 흔들림)
+                -- 고정 좌표 지정된 이후에는 내 CFrame 연산 없이 이 좌표에 완전히 정지
                 if not data.tpRunning and data.fixedCF then
                     hrp.CFrame = data.fixedCF
                 end
 
-                -- 속도 강제 초기화로 튀는 현상 방지
                 hrp.Velocity = Vector3.new(0, 0, 0)
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
 
-                -- 4. 원격 이벤트 연사 및 데스파운/킥 트리거
                 if now - lastRemoteTime >= 0.08 then
                     if not hasOwnership then
                         rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
@@ -2692,7 +2685,6 @@ end
                     lastRemoteTime = now
                 end
             else
-                -- 대상 뒤지거나 증발하면 원위치 복구 후 초기화
                 if data.tpRunning then data.tpRunning = false end
                 if data.originCF then 
                     BACK(data.originCF)
@@ -2702,6 +2694,7 @@ end
         end
     end)
 end
+
 
 
 local RunService = game:GetService("RunService")
