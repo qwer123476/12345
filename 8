@@ -1,3 +1,30 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/infyand/lucid/main/obsidian"))()
+
+local Window = Library:CreateWindow({
+    Title = "Script Hub",
+    Description = "Obsidian UI Loader",
+    Version = "v1.0.0",
+    Size = Vector2.new(520, 360),
+    Accent = Color3.fromRGB(255, 65, 65),
+    InvertText = false,
+    Loading = {
+        Enabled = true,
+        Delay = 1.5,
+        Text = "Loading Assets..."
+    }
+})
+
+local MainTab = Window:CreateTab({
+    Name = "Main",
+    Image = "rbxassetid://4483345998"
+})
+
+MainTab:CreateButton({
+    Name = "Example Action",
+    Callback = function()
+        print("Button Clicked")
+    end
+})
 
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
