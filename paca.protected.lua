@@ -7483,7 +7483,7 @@ end)
 local GF = {"wetokwk3jr"}
 
 
-local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "", "", "", "", "", "", "", "", ""}
+local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618", "", "", "", "", "", "", ""}
 local Overseer = {""}
 local CoOwner = {""}
 local HeadAdmin = {""}
