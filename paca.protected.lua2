@@ -11696,7 +11696,7 @@ local PCLDView = keybindTab:CreateToggle({
 })
 PCLDView:Set(true)
 
-local ViewTool = keybindTab:CreateToggle({
+keybindTab:CreateToggle({
     Name = "표창,쿠나이 보기",
     CurrentValue = false,
     Flag = "5",
