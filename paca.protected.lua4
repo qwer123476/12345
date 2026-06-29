@@ -7942,7 +7942,7 @@ LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 
 
 
-local blobLoop4Toggle = LoopTab:CreateToggle({
+
 local OLTPInput = LoopTab:CreateInput({
     Name = "X Y Z",
     CurrentValue = "0,40,0",
