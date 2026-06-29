@@ -10889,9 +10889,9 @@ local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 
 --local PcldViewT = false
-local processed = {}
-local redBoxes = {}
-local descendantConn = nil
+--local processed = {}
+--local redBoxes = {}
+--local descendantConn = nil
 
 
 function PcldViewF()
