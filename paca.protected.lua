@@ -1165,84 +1165,6 @@ function BlobSit()
         end
     end
 
-local function toggleTPUI(state)
-    tpEnabled = state
-    if state then
-        tpGui = Instance.new("ScreenGui")
-        tpGui.Name = "AlpacaMobileTPSystem"
-        tpGui.Parent = game.CoreGui -- Delta/Xeno/ 등 실행기가 CoreGui 권한을 가짐
-        
-       
-        local tpBtn = Instance.new("TextButton")
-        tpBtn.Name = "ElegantMobileTPButton"
-        tpBtn.Parent = tpGui
-        
-        
-        tpBtn.Position = UDim2.new(1, -127, 1, -127) 
-        tpBtn.Size = UDim2.new(0, 60, 0, 60) 
-        
-       
-        tpBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20) 
-        tpBtn.BackgroundTransparency = 0.4
-        tpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tpBtn.Text = "TP"
-        tpBtn.Font = Enum.Font.SourceSansBold
-        tpBtn.TextSize = 17
-        tpBtn.BorderSizePixel = 0
-        
-        local uiCornerBtn = Instance.new("UICorner")
-        uiCornerBtn.CornerRadius = UDim.new(1, 0) 
-        uiCornerBtn.Parent = tpBtn
-        
-        
-        local uiStroke = Instance.new("UIStroke")
-        uiStroke.Color = Color3.fromRGB(0, 217, 255) 
-        uiStroke.Thickness = 2.5
-        uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        uiStroke.Parent = tpBtn
-
-        
-        tpBtn.MouseButton1Click:Connect(performTeleport)
-    else
-        if tpGui then tpGui:Destroy() tpGui = nil end
-    end
-end
-
-
-    task.spawn(function()
-        rs:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction"):InvokeServer(
-            "CreatureBlobman", 
-            CFrame.new(0,9999999,0), 
-            Vector3.new(0,9999999,0)
-        )
-    end)
-
-    task.delay(0.1, function()
-         newInv = workspace:FindFirstChild(plr.Name.."SpawnedInToys")
-         newBlob = newInv and newInv:FindFirstChild("CreatureBlobman")
-        if newBlob then
-             seat = newBlob:FindFirstChildOfClass("VehicleSeat")
-            if seat and seat.Occupant == nil and humanoid then
-                seat:Sit(humanoid)
-            end
-        end
-        BLOBSIT = false
-    end)
-end
-
-local function getClosestPlayer(targetPart)
-    local closest, distance = nil, math.huge
-    for _, player in pairs(game.Players:GetPlayers()) do
-        if player ~= plr and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local mag = (targetPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
-            if mag < distance then
-                distance = mag
-                closest = player
-            end
-        end
-    end
-    return closest
-end
 
 function AntiBurn()
     task.spawn(function()
@@ -3611,7 +3533,7 @@ local AntiKickF = function()
         end
     end
 local Players = game:GetService("Players")
---local RunService = game:GetService("RunService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
