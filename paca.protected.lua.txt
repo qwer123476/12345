@@ -12448,6 +12448,37 @@ bdTab:CreateToggle({
         end
     end
 })
+bdTab:CreateToggle({
+    Name = " 무지개 블롭맨",
+    Callback = function(Value)
+        _G.RainbowBlobmanEnabled = Value
+        
+        if Value then
+            local runService = game:GetService("RunService")
+            local hue = 0
+            
+            task.spawn(function()
+                while _G.RainbowBlobmanEnabled do
+                    local deltaTime = runService.Heartbeat:Wait()
+                    hue = (hue + deltaTime * 0.1) % 1
+                    local rainbowColor = Color3.fromHSV(hue, 1, 1)
+                    
+                    local workspace = game:GetService("Workspace")
+                    for _, obj in ipairs(workspace:GetChildren()) do
+                        if obj.Name == "CurrentBlobman" then
+                            for _, part in ipairs(obj:GetDescendants()) do
+                                if part:IsA("BasePart") then
+                                    part.Color = rainbowColor
+                                    part.Material = Enum.Material.Neon
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
 
 keybindTab:CreateSection("줄")
 local antilagDet = keybindTab:CreateInput({
