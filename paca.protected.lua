@@ -2557,110 +2557,90 @@ end
  
 local plr = game.Players.LocalPlayer
 
-local plr = game.Players.LocalPlayer
-
 local function executeVortexBanishedF5()
     UpdateCurrentBlobman()
-
-    local activeVortexes = {}
-
-    local function engageVortex(targetPlayer)
-        if not targetPlayer or not targetPlayer.Parent then return end
-
-        while blobLoopT4 and targetPlayer.Parent do
-            local character = targetPlayer.Character
-            local targetHum = character and character:FindFirstChild("Humanoid")
-            local targetHRP = character and character:FindFirstChild("HumanoidRootPart")
-            local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-
-            if not targetHum or targetHum.Health <= 0 or not targetHRP or not myHRP then
-                task.wait(0.1)
-                continue
-            end
-
-            local tpActive = true
-            local currentCF = nil
-            
-            task.spawn(function()
-                while tpActive and blobLoopT4 and targetPlayer.Parent do
-                    local success, cf = TP(targetPlayer)
-                    if success and cf then 
-                        currentCF = cf
-                    end
-                    task.wait()
-                end
-            end)
-
-            while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                local head = character:FindFirstChild("Head")
-                if head then
-                    local ownerTag = head:FindFirstChild("PartOwner")
-                    if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
-                        rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                        rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
-                    else
-                        break
-                    end
-                end
-                task.wait()
-            end
-
-            tpActive = false
-            if currentCF then BACK(currentCF) end
-
-            local connection
-            connection = RunService.Heartbeat:Connect(function()
-                if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 then
-                    if connection then connection:Disconnect() end
-                    if targetHRP then targetHRP.Anchored = false end
-                    return
-                end
-
-                targetHRP.Velocity = Vector3.new(0, 0, 0)
-                targetHRP.RotVelocity = Vector3.new(0, 0, 0)
-                targetHRP.Anchored = true
-
-                local baseCF = myHRP.CFrame
-                if OLTPValue then
-                    baseCF = baseCF * CFrame.new(OLTPValue)
-                end
-                targetHRP.CFrame = CFrame.lookAt(baseCF.Position, myHRP.Position)
-            end)
-
-            while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                task.wait(0.2)
-            end
-
-            if connection then connection:Disconnect() end
-            if targetHRP then targetHRP.Anchored = false end
-            task.wait(0.1)
-        end
-    end
 
     task.spawn(function()
         while blobLoopT4 do
             for _, name in ipairs(playersInLoop2V) do
                 local targetPlayer = game.Players:FindFirstChild(name)
-                if targetPlayer and targetPlayer ~= plr and targetPlayer.Parent then
-                    if not activeVortexes[targetPlayer] then
-                        activeVortexes[targetPlayer] = true
+                
+                if targetPlayer and targetPlayer ~= plr and targetPlayer.Character then
+                    local character = targetPlayer.Character
+                    local targetHRP = character:FindFirstChild("HumanoidRootPart")
+                    local head = character:FindFirstChild("Head")
+                    local targetHum = character:FindFirstChild("Humanoid")
+                    local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+
+                    if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
+                        -- [1] 타겟에게 즉시 TP 연산 실행
+                        local tpActive = true
+                        local currentCF = nil
+                        
                         task.spawn(function()
-                            pcall(function() engageVortex(targetPlayer) end)
-                            activeVortexes[targetPlayer] = nil
+                            while tpActive and blobLoopT4 and targetPlayer.Parent do
+                                local success, cf = TP(targetPlayer)
+                                if success and cf then 
+                                    currentCF = cf
+                                end
+                                task.wait()
+                            end
                         end)
+
+                        -- [2] 네트워크 오너십 소유권 강제 변환 및 대기
+                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
+                            local ownerTag = head:FindFirstChild("PartOwner")
+                            if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                                rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
+                            else
+                                break
+                            end
+                            task.wait()
+                        end
+
+                        tpActive = false
+                        if currentCF then BACK(currentCF) end
+
+                        -- [3] 루프 내에서 실시간 위치 강제 고정 (Heartbeat 연동)
+                        local connection
+                        connection = RunService.Heartbeat:Connect(function()
+                            if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 then
+                                if connection then connection:Disconnect() end
+                                if targetHRP then targetHRP.Anchored = false end
+                                return
+                            end
+
+                            targetHRP.Velocity = Vector3.new(0, 0, 0)
+                            targetHRP.RotVelocity = Vector3.new(0, 0, 0)
+                            targetHRP.Anchored = true
+
+                            local baseCF = myHRP.CFrame
+                            if OLTPValue then
+                                baseCF = baseCF * CFrame.new(OLTPValue)
+                            end
+                            targetHRP.CFrame = CFrame.lookAt(baseCF.Position, myHRP.Position)
+                        end)
+
+                        -- 타겟 상태 체크하면서 홀딩 유지
+                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
+                            task.wait(0.1)
+                        end
+
+                        if connection then connection:Disconnect() end
+                        if targetHRP then targetHRP.Anchored = false end
                     end
                 end
             end
-            task.wait(0.3)
+            task.wait(0.2)
         end
 
-        for _, targetPlayer in ipairs(game.Players:GetPlayers()) do
-            if targetPlayer.Character then
-                local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if targetHRP then targetHRP.Anchored = false end
+        -- 토글 꺼질 시 모든 플레이어 앵커 해제 안전장치
+        for _, v in ipairs(game.Players:GetPlayers()) do
+            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                v.Character.HumanoidRootPart.Anchored = false
             end
         end
-        activeVortexes = {}
     end)
 end
 
