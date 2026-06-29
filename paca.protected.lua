@@ -2554,130 +2554,94 @@ function loopPlayerF3() -- 룹3
         end
     end)
 end
- function executeBlobmanDesyncKick()
-    local targetPlayers = {}
-    local lastRemoteTime = 0
+ local plr = game.Players.LocalPlayer
 
-    local function fetchTargets()
-        local list = {}
-        if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(list, v) end end
-        if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(list, v) end end
-        return list
-    end
+local function executeVortexBanishedF5()
+    UpdateCurrentBlobman()
 
-    local function verifyAndGetBlobman()
-        if not currentBlobS or not currentBlobS.Parent or not currentBlobS:FindFirstChild("PrimaryPart") then
-            UpdateCurrentBlobman()
-        end
-        return currentBlobS
-    end
+    task.spawn(function()
+        while blobLoopT4 do
+            for _, name in ipairs(playersInLoop2V) do
+                local targetPlayer = game.Players:FindFirstChild(name)
+                
+                if targetPlayer and targetPlayer ~= plr and targetPlayer.Character then
+                    local character = targetPlayer.Character
+                    local targetHRP = character:FindFirstChild("HumanoidRootPart")
+                    local head = character:FindFirstChild("Head")
+                    local targetHum = character:FindFirstChild("Humanoid")
+                    local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 
-    local function isolatePhysics(targetChar)
-        if not targetChar then return end
-        local hrp = targetChar:FindFirstChild("HumanoidRootPart")
-        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-        if hrp and torso then
-            local rootJoint = hrp:FindFirstChild("RootJoint") or torso:FindFirstChild("RootJoint")
-            if rootJoint and rootJoint:IsA("Motor6D") then
-                rootJoint.Enabled = false
-            end
-            hrp.AssemblyLinearVelocity = Vector3.new(0, 9999, 0)
-            hrp.AssemblyAngularVelocity = Vector3.new(0, 9999, 0)
-        end
-    end
+                    if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
+                        -- [1] 타겟에게 즉시 TP 연산 실행
+                        local tpActive = true
+                        local currentCF = nil
+                        
+                        task.spawn(function()
+                            while tpActive and blobLoopT4 and targetPlayer.Parent do
+                                local success, cf = TP(targetPlayer)
+                                if success and cf then 
+                                    currentCF = cf
+                                end
+                                task.wait()
+                            end
+                        end)
 
-    local function restorePhysics(targetChar)
-        if not targetChar then return end
-        local hrp = targetChar:FindFirstChild("HumanoidRootPart")
-        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-        if hrp then
-            local rootJoint = hrp:FindFirstChild("RootJoint") or (torso and torso:FindFirstChild("RootJoint"))
-            if rootJoint and rootJoint:IsA("Motor6D") then
-                rootJoint.Enabled = true
-            end
-        end
-    end
+                        -- [2] 네트워크 오너십 소유권 강제 변환 및 대기
+                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
+                            local ownerTag = head:FindFirstChild("PartOwner")
+                            if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                                rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
+                            else
+                                break
+                            end
+                            task.wait()
+                        end
 
-    local masterConnection
-    masterConnection = RunService.Heartbeat:Connect(function()
-        if not advancedDesyncLoopActive then
-            if masterConnection then masterConnection:Disconnect() end
-            for p in pairs(targetPlayers) do
-                if p.Character then restorePhysics(p.Character) end
-            end
-            targetPlayers = {}
-            return
-        end
+                        tpActive = false
+                        if currentCF then BACK(currentCF) end
 
-        local currentNames = fetchTargets()
-        local myChar = plr.Character
-        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-        local myHum = myChar and myChar:FindFirstChild("Humanoid")
-        local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
-        local isRidingBlob = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
-        local activeBlob = isRidingBlob and verifyAndGetBlobman()
-        local now = os.clock()
+                        -- [3] 루프 내에서 실시간 위치 강제 고정 (Heartbeat 연동)
+                        local connection
+                        connection = RunService.Heartbeat:Connect(function()
+                            if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 then
+                                if connection then connection:Disconnect() end
+                                if targetHRP then targetHRP.Anchored = false end
+                                return
+                            end
 
-        if not myHRP or not myHum or myHum.Health <= 0 then return end
+                            targetHRP.Velocity = Vector3.new(0, 0, 0)
+                            targetHRP.RotVelocity = Vector3.new(0, 0, 0)
+                            targetHRP.Anchored = true
 
-        for _, name in ipairs(currentNames) do
-            local p = game.Players:FindFirstChild(name)
-            if p and p ~= plr and not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
-                if not targetPlayers[p] then
-                    targetPlayers[p] = { lastChar = nil }
-                end
-            end
-        end
+                            local baseCF = myHRP.CFrame
+                            if OLTPValue then
+                                baseCF = baseCF * CFrame.new(OLTPValue)
+                            end
+                            targetHRP.CFrame = CFrame.lookAt(baseCF.Position, myHRP.Position)
+                        end)
 
-        for p, data in pairs(targetPlayers) do
-            if not p.Parent or not table.find(currentNames, p.Name) then
-                if p.Character then restorePhysics(p.Character) end
-                targetPlayers[p] = nil
-                continue
-            end
+                        -- 타겟 상태 체크하면서 홀딩 유지
+                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
+                            task.wait(0.1)
+                        end
 
-            local char = p.Character
-            local hum = char and char:FindFirstChild("Humanoid")
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-            local head = char and char:FindFirstChild("Head")
-
-            if data.lastChar ~= char then
-                data.lastChar = char
-            end
-
-            if hrp and head and hum and hum.Health > 0 then
-                local distance = (myHRP.Position - hrp.Position).Magnitude
-
-                if distance > 30 then
-                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
-                else
-                    hrp.CFrame = myHRP.CFrame * CFrame.new(0, 15, 0)
-                end
-
-                hrp.Velocity = Vector3.new(0, 0, 0)
-                hrp.RotVelocity = Vector3.new(0, 0, 0)
-
-                isolatePhysics(char)
-
-                if now - lastRemoteTime >= 0.05 then
-                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                    rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                    rs.GrabEvents.DestroyGrabLine:FireServer(hrp)
-                    
-                    if activeBlob then
-                        BlobGrab(activeBlob, hrp, "Right")
-                        BlobRelease(activeBlob, hrp, "Right")
+                        if connection then connection:Disconnect() end
+                        if targetHRP then targetHRP.Anchored = false end
                     end
-                    lastRemoteTime = now
                 end
-            else
-                if char then restorePhysics(char) end
+            end
+            task.wait(0.2)
+        end
+
+        -- 토글 꺼질 시 모든 플레이어 앵커 해제 안전장치
+        for _, v in ipairs(game.Players:GetPlayers()) do
+            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                v.Character.HumanoidRootPart.Anchored = false
             end
         end
     end)
 end
-
-
 
 
 local RunService = game:GetService("RunService")
@@ -8155,25 +8119,44 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
-local BlobDesyncKickToggle = LoopTab:CreateToggle({
-    Name = "디싱크 킥    <font color='rgb(255,85,85)'>[NEW]</font>",
-    CurrentValue = false,
-    Flag = "BlobDesyncKickFlag",
+if OLTPValue == nil then
+    OLTPValue = Vector3.new(0, 40, 0)
+end
+
+local OLTPInput = LoopTab:CreateInput({
+    Name = "X Y Z",
+    CurrentValue = "0,40,0",
+    PlaceholderText = "",
+    RemoveTextAfterFocusLost = false,
+    Flag = "",
     Callback = function(Value)
-        advancedDesyncLoopActive = Value
-        if Value then
+        local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
+        if x and y and z then
+            OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
+        end
+    end
+})
+OLTPInput:Set("0,40,0")
+
+local blobLoop4Toggle = LoopTab:CreateToggle({
+    Name = "스팸킥    <font color='rgb(255,0,255)'>[스팸]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        blobLoopT4 = Value
+        if blobLoopT4 then
             table.clear(playersInLoop2V)
             for i, e in ipairs(playersInLoop1V) do
                 local nameOnly = e:match("^(.-) %(") or e
                 table.insert(playersInLoop2V, nameOnly)
             end
-            executeBlobmanDesyncKick()
+            executeVortexBanishedF5()
         else
-            advancedDesyncLoopActive = false
             table.clear(playersInLoop2V)
         end
     end
 })
+
 LoopTab:CreateSection("오너")
 LoopTab:CreateToggle({
     Name = "오너킥V34   <font color='rgb(255,250,255)'>[파카]</font>",
