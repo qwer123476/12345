@@ -9536,16 +9536,7 @@ local AntiKick = antiTab:CreateToggle({
     end
 })
 --AntiKick:Set(true)
-antiTab:CreateToggle({
-   Name = "안티킥",
-   CurrentValue = false,
-   Callback = function(Value)
-      AntiGrabStickyT = Value
-      if Value then
-          task.spawn(AntiGrabStickyF)
-      end
-   end,
-})
+
 
 antiTab:CreateButton({
     Name = "안티킥   <font color='rgb(90,200,10)'>[TP]</font>",
