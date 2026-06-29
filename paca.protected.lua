@@ -2677,6 +2677,363 @@ end
     end)
 end
 
+local function executeVortexBanishedF5()
+    UpdateCurrentBlobman()
+
+    local activeVortexes = {}
+    local trackedTargets = {}
+    local pulseBinds = {}
+    local lockStates = {}
+    local insigniaMarks = {}
+
+    local function engageVortex(targetPlayer)
+        if not targetPlayer then return end
+
+        while blobLoopT4 do
+            if not targetPlayer.Parent then
+                trackedTargets[targetPlayer] = nil
+                pulseBinds[targetPlayer] = nil
+                if lockStates[targetPlayer] then
+                    task.cancel(lockStates[targetPlayer])
+                    lockStates[targetPlayer] = nil
+                end
+                if insigniaMarks[targetPlayer] then
+                    insigniaMarks[targetPlayer]:Destroy()
+                    insigniaMarks[targetPlayer] = nil
+                end
+                if targetPlayer.Character then
+                    local targetTorso = targetPlayer.Character:FindFirstChild("Torso") or targetPlayer.Character:FindFirstChild("UpperTorso") or targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if targetTorso then
+                        targetTorso.Anchored = false
+                    end
+                end
+                return
+            end
+
+            local character = targetPlayer.Character
+            while blobLoopT4 and (not character or not character:FindFirstChild("Humanoid")) do
+                if not targetPlayer.Parent then return end
+                task.wait(0.5)
+                character = targetPlayer.Character
+            end
+
+            local targetHum = character and character:FindFirstChild("Humanoid")
+            if not targetHum then
+                task.wait(0.5)
+                continue
+            end
+
+            while blobLoopT4 and targetHum and targetHum.Health <= 0 do
+                if not targetPlayer.Parent then return end
+                if insigniaMarks[targetPlayer] then
+                    insigniaMarks[targetPlayer]:Destroy()
+                    insigniaMarks[targetPlayer] = nil
+                end
+
+                if pulseBinds[targetPlayer] then
+                    pulseBinds[targetPlayer]:Disconnect()
+                    pulseBinds[targetPlayer] = nil
+                end
+                
+                if lockStates[targetPlayer] then
+                    task.cancel(lockStates[targetPlayer])
+                    lockStates[targetPlayer] = nil
+                end
+                
+                task.wait(0.5)
+                character = targetPlayer.Character
+                targetHum = character and character:FindFirstChild("Humanoid")
+            end
+
+            local _, safeHRP, head = safeGetCharacterParts(targetPlayer)
+            if not safeHRP or not head then
+                task.wait(0.5)
+                continue
+            end
+
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if not myHRP then
+                task.wait(0.5)
+                continue
+            end
+
+            local targetHRP = character:FindFirstChild("HumanoidRootPart")
+            local targetTorso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+            if not targetHRP then
+                task.wait(0.5)
+                continue
+            end
+
+            local tpActive = true
+            local currentCF
+            task.spawn(function()
+                while tpActive and blobLoopT4 do
+                    if not targetPlayer.Parent then break end
+                    local success, cf = TP(targetPlayer)
+                    if success and cf then 
+                        currentCF = cf
+                    end
+                    task.wait()
+                end
+            end)
+
+            local breakSequence = false
+            while blobLoopT4 do
+                if not character.Parent or not targetHum or targetHum.Health <= 0 then 
+                    tpActive = false
+                    breakSequence = true
+                    break
+                end
+
+                local ownerTag = head:FindFirstChild("PartOwner")
+                if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                    if targetHRP then rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame) end
+                end
+
+                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+                    break
+                else
+                    if targetHRP then
+                        targetHRP.Velocity = Vector3.new(0,0,0)
+                        targetHRP.RotVelocity = Vector3.new(0,0,0)
+                    end
+                end
+                task.wait()
+            end
+
+            if not breakSequence then
+                tpActive = false
+
+                if currentCF then
+                    BACK(currentCF)
+                end
+
+                if lockStates[targetPlayer] then
+                    task.cancel(lockStates[targetPlayer])
+                    lockStates[targetPlayer] = nil
+                end
+
+                if not insigniaMarks[targetPlayer] then
+                    local tag = Instance.new("StringValue")
+                    tag.Name = "VortexVoidMark"
+                    tag.Parent = head
+                    insigniaMarks[targetPlayer] = tag
+                end
+
+                if pulseBinds[targetPlayer] then
+                    pulseBinds[targetPlayer]:Disconnect()
+                    pulseBinds[targetPlayer] = nil
+                end
+
+                pulseBinds[targetPlayer] = RunService.Heartbeat:Connect(function()
+                    if not blobLoopT4 or not character or not character.Parent or not targetHRP or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 then
+                        if pulseBinds[targetPlayer] then 
+                            pulseBinds[targetPlayer]:Disconnect()
+                            pulseBinds[targetPlayer] = nil
+                        end
+                        if lockStates[targetPlayer] then
+                            task.cancel(lockStates[targetPlayer])
+                            lockStates[targetPlayer] = nil
+                        end
+                        if insigniaMarks[targetPlayer] then
+                            insigniaMarks[targetPlayer]:Destroy()
+                            insigniaMarks[targetPlayer] = nil
+                        end
+                        if targetHRP then targetHRP.Anchored = false end
+                        if targetTorso then targetTorso.Anchored = false end
+                        return
+                    end
+
+                    targetHRP.Velocity = Vector3.new(0,0,0)
+                    targetHRP.RotVelocity = Vector3.new(0,0,0)
+
+                    rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, CFrame.lookAt(myHRP.Position, targetHRP.Position))
+
+                    local activeKicks = {}
+                    for p, t in pairs(activeVortexes) do
+                        if t and p.Parent and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and insigniaMarks[p] then
+                            table.insert(activeKicks, p)
+                        end
+                    end
+                    table.sort(activeKicks, function(a, b) return a.Name < b.Name end)
+
+                    local index = table.find(activeKicks, targetPlayer) or 1
+                    local total = #activeKicks
+                    
+                    local currentTime = tick()
+                    local angle = ((index - 1) * (2 * math.pi / total)) + (currentTime * 8)
+                    local radius = 40
+                    local heightOffset = 15
+                    
+                    local offset = Vector3.new(math.cos(angle) * radius, heightOffset, math.sin(angle) * radius)
+                    local finalPosition = (myHRP.CFrame * CFrame.new(OLTPValue)) * CFrame.new(offset)
+
+                    targetHRP.CFrame = CFrame.lookAt(finalPosition, myHRP.Position)
+                end)
+
+                lockStates[targetPlayer] = task.spawn(function()
+                    while blobLoopT4 and character and character.Parent and targetHRP and targetHRP.Parent and targetHum and targetHum.Health > 0 do
+                        targetHRP.Anchored = true
+                        if targetTorso then 
+                            targetTorso.Anchored = true 
+                        end
+                        task.wait()
+                    end
+                end)
+
+                while blobLoopT4 do
+                    if not character.Parent or not targetHRP.Parent or targetHum.Health <= 0 then 
+                        if pulseBinds[targetPlayer] then
+                            pulseBinds[targetPlayer]:Disconnect()
+                            pulseBinds[targetPlayer] = nil
+                        end
+                        if lockStates[targetPlayer] then
+                            task.cancel(lockStates[targetPlayer])
+                            lockStates[targetPlayer] = nil
+                        end
+                        if insigniaMarks[targetPlayer] then
+                            insigniaMarks[targetPlayer]:Destroy()
+                            insigniaMarks[targetPlayer] = nil
+                        end
+                        if targetHRP then targetHRP.Anchored = false end
+                        if targetTorso then targetTorso.Anchored = false end
+                        break 
+                    end
+                    task.wait()
+                end
+
+                if pulseBinds[targetPlayer] then 
+                    pulseBinds[targetPlayer]:Disconnect()
+                    pulseBinds[targetPlayer] = nil
+                end
+
+                if lockStates[targetPlayer] then
+                    task.cancel(lockStates[targetPlayer])
+                    lockStates[targetPlayer] = nil
+                end
+
+                if insigniaMarks[targetPlayer] then
+                    insigniaMarks[targetPlayer]:Destroy()
+                    insigniaMarks[targetPlayer] = nil
+                end
+
+                if targetHRP then targetHRP.Anchored = false end
+                if targetTorso then targetTorso.Anchored = false end
+            end
+            task.wait(0.35)
+        end
+    end
+
+    task.spawn(function()
+        while blobLoopT4 do
+            local extractionList = {}
+            if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(extractionList, v) end end
+            if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(extractionList, v) end end
+
+            for _, name in ipairs(extractionList) do
+                local targetPlayer = game.Players:FindFirstChild(name)
+                if not targetPlayer or targetPlayer == plr then continue end
+                if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
+
+                local allowed, errorType = checkPermissions(targetPlayer)
+                if not allowed then
+                    if errorType then Notify(errorType, targetPlayer.Name) end
+                    continue
+                end
+
+                if not trackedTargets[targetPlayer] then
+                    trackedTargets[targetPlayer] = true
+                    if not activeVortexes[targetPlayer] then
+                        activeVortexes[targetPlayer] = task.spawn(function()
+                            pcall(function() engageVortex(targetPlayer) end)
+                            activeVortexes[targetPlayer] = nil
+                            trackedTargets[targetPlayer] = nil
+                            if pulseBinds[targetPlayer] then
+                                pulseBinds[targetPlayer]:Disconnect()
+                                pulseBinds[targetPlayer] = nil
+                            end
+                            if lockStates[targetPlayer] then
+                                task.cancel(lockStates[targetPlayer])
+                                lockStates[targetPlayer] = nil
+                            end
+                            if insigniaMarks[targetPlayer] then
+                                insigniaMarks[targetPlayer]:Destroy()
+                                insigniaMarks[targetPlayer] = nil
+                            end
+                            if targetPlayer.Character then
+                                local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                                local targetTorso = targetPlayer.Character:FindFirstChild("Torso") or targetPlayer.Character:FindFirstChild("UpperTorso")
+                                if targetHRP then targetHRP.Anchored = false end
+                                if targetTorso then targetTorso.Anchored = false end
+                            end
+                        end)
+                    end
+                end
+            end
+
+            for targetPlayer, coreTask in pairs(activeVortexes) do
+                if not targetPlayer.Parent then
+                    task.cancel(coreTask)
+                    activeVortexes[targetPlayer] = nil
+                    trackedTargets[targetPlayer] = nil
+                    if pulseBinds[targetPlayer] then
+                        pulseBinds[targetPlayer]:Disconnect()
+                        pulseBinds[targetPlayer] = nil
+                    end
+                    if lockStates[targetPlayer] then
+                        task.cancel(lockStates[targetPlayer])
+                        lockStates[targetPlayer] = nil
+                    end
+                    if insigniaMarks[targetPlayer] then
+                        insigniaMarks[targetPlayer]:Destroy()
+                        insigniaMarks[targetPlayer] = nil
+                    end
+                    if targetPlayer.Character then
+                        local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        local targetTorso = targetPlayer.Character:FindFirstChild("Torso") or targetPlayer.Character:FindFirstChild("UpperTorso")
+                        if targetHRP then targetHRP.Anchored = false end
+                        if targetTorso then targetTorso.Anchored = false end
+                    end
+                end
+            end
+            task.wait(0.5)
+        end
+
+        for targetPlayer, lockTask in pairs(lockStates) do
+            if lockTask then
+                task.cancel(lockTask)
+            end
+        end
+
+        for _, coreTask in pairs(activeVortexes) do task.cancel(coreTask) end
+        for targetPlayer, connection in pairs(pulseBinds) do
+            if connection then connection:Disconnect() end
+        end
+
+        for targetPlayer, tag in pairs(insigniaMarks) do
+            if tag then
+                tag:Destroy()
+            end
+        end
+        insigniaMarks = {}
+
+        for _, targetPlayer in ipairs(game.Players:GetPlayers()) do
+            if targetPlayer.Character then
+                local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local targetTorso = targetPlayer.Character:FindFirstChild("Torso") or targetPlayer.Character:FindFirstChild("UpperTorso")
+                if targetHRP then targetHRP.Anchored = false end
+                if targetTorso then targetTorso.Anchored = false end
+            end
+        end
+
+        activeVortexes = {}
+        trackedTargets = {}
+        pulseBinds = {}
+        lockStates = {}
+    end)
+end
 
 
 
@@ -8154,6 +8511,41 @@ LoopTab:CreateToggle({
         OwnerKickMODED = Value
     end
 })
+local OLTPInput = LoopTab:CreateInput({
+    Name = "X Y Z",
+    CurrentValue = "0,40,0",
+    PlaceholderText = "",
+    RemoveTextAfterFocusLost = false,
+    Flag = "",
+    Callback = function(Value)
+        local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
+        if x and y and z then
+            OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
+        end
+    end
+})
+OLTPInput:Set("0,40,0")
+
+local blobLoop4Toggle = LoopTab:CreateToggle({
+    Name = "레이지킥   <font color='rgb(255,95,15)'>[레인지]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        blobLoopT4 = Value
+        if blobLoopT4 then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
+            end
+            executeVortexBanishedF5()
+        else
+            blobLoopT4 = false
+            table.clear(playersInLoop2V)
+        end
+    end
+})
+
 LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 local BlobDesyncKickToggle = LoopTab:CreateToggle({
     Name = "디싱크 킥    <font color='rgb(255,85,85)'>[NEW]</font>",
@@ -11632,5 +12024,5 @@ lagTab:CreateInput({
 })
 BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초   <font color='rgb(255,0,0)'>[개 씨발 보지창녀]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
