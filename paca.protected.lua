@@ -2537,12 +2537,16 @@ local function executeVortexBanishedF5()
 
                     if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
                         
-                        -- [1] 타겟 무조건 제자리에 완벽 앵커 고정
+                        -- [1] 타겟 위치를 '바닥 기준 높이 40'으로 강제 고정 및 앵커
                         targetHRP.Velocity = Vector3.new(0, 0, 0)
                         targetHRP.RotVelocity = Vector3.new(0, 0, 0)
+                        
+                        -- 바닥(레이캐스트 등) 기준값 대용 혹은 기존 위치의 Y축을 40으로 고정해서 공중 결박
+                        local currentPos = targetHRP.Position
+                        targetHRP.CFrame = CFrame.new(currentPos.X, 40, currentPos.Z)
                         targetHRP.Anchored = true
 
-                        -- [2] 네가 준 원래 TP 구조 실행 (타겟을 내 쪽으로 연산하는 구조 유지)
+                        -- [2] 원본 TP 구조 실행
                         local tpActive = true
                         local currentCF = nil
                         
@@ -2556,7 +2560,7 @@ local function executeVortexBanishedF5()
                             end
                         end)
 
-                        -- [3] 네트워크 오너십 소유권 강제 탈취
+                        -- [3] 네트워크 오너십 강제 탈취
                         while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
                             local ownerTag = head:FindFirstChild("PartOwner")
                             if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
@@ -2571,7 +2575,7 @@ local function executeVortexBanishedF5()
                         tpActive = false
                         if currentCF then BACK(currentCF) end
 
-                        -- [4] 내가 날아서 타겟 주변을 고속 회전하는 독특한 시각 연산 및 그랩 킥
+                        -- [4] 좁은 반경(8스터드)으로 타겟 몸을 초고속 밀착 회전하며 그랩 연타
                         local connection
                         connection = RunService.Heartbeat:Connect(function()
                             if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 or not myHRP.Parent then
@@ -2579,35 +2583,31 @@ local function executeVortexBanishedF5()
                                 return
                             end
 
-                            -- 타겟은 공중에 완벽 고정
+                            -- 타겟 물리 고정 유지
                             targetHRP.Velocity = Vector3.new(0, 0, 0)
                             targetHRP.RotVelocity = Vector3.new(0, 0, 0)
                             targetHRP.Anchored = true
 
-                            -- 내가 타겟 주변 40스터드 반경 공중을 초고속으로 회전 (tick * 15로 초고속 궤적 구현)
+                            -- 초고속 회전 연산 (반경을 8로 대폭 축소하여 초밀착)
                             local currentTime = tick()
-                            local angle = currentTime * 15 
-                            local radius = 40
-                            local heightOffset = 10
+                            local angle = currentTime * 20 -- 속도 조금 더 상향 (초고속 돌풍 연출)
+                            local radius = 8               -- 좁은 반경 설정
+                            local heightOffset = 2         -- 타겟의 정면/살짝 위 높이에서 비비기
                             
                             local orbitOffset = Vector3.new(math.cos(angle) * radius, heightOffset, math.sin(angle) * radius)
                             
-                            -- 기준점설정 (OLTPValue 반영)
-                            local targetBaseCF = targetHRP.CFrame
-                            if OLTPValue then
-                                targetBaseCF = targetBaseCF * CFrame.new(OLTPValue)
-                            end
+                            local targetPos = targetHRP.Position
+                            local myTargetPos = targetPos + orbitOffset
                             
-                            -- 내 캐릭터를 타겟 주변 공중 회전 좌표로 꽂아버리고 타겟 바라보게 함
-                            local myTargetPos = targetBaseCF.Position + orbitOffset
-                            myHRP.CFrame = CFrame.lookAt(myTargetPos, targetHRP.Position)
+                            -- 내가 타겟을 정확히 정면으로 바라보며 초밀착 회전
+                            myHRP.CFrame = CFrame.lookAt(myTargetPos, targetPos)
 
-                            -- 이동과 동시에 블롭맨 그랩/리리스 연타로 탈탈 털어버림
+                            -- 밀착 상태에서 블롭맨 그랩/리리스 초고속 연타
                             BlobGrab(currentBlobS, targetHRP, "Right")
                             BlobRelease(currentBlobS, targetHRP, "Right")
                         end)
 
-                        -- 타겟 상태 체크하며 내 고속 회전 킥 루프 유지
+                        -- 타겟 상태 체크 루프
                         while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
                             task.wait(0.1)
                         end
@@ -2620,7 +2620,7 @@ local function executeVortexBanishedF5()
             task.wait(0.1)
         end
 
-        -- 토글 꺼질 시 앵커 상태 원상 복구
+        -- 토글 꺼질 때 맵 전체 앵커 해제
         for _, v in ipairs(game.Players:GetPlayers()) do
             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
                 v.Character.HumanoidRootPart.Anchored = false
