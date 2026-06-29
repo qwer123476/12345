@@ -12413,8 +12413,43 @@ bdTab:CreateButton({
         cc.Contrast = 0.35
         cc.Saturation = 0.2
         cc.TintColor = Color3.fromRGB(240, 220, 245)
+    end}
+bdTab:CreateSection("이외")
+bdTab:CreateToggle({
+    Name = "무지개 캐릭터",
+    Callback = function(Value)
+        _G.RainbowCharacterEnabled = Value
+        
+        if Value then
+            local runService = game:GetService("RunService")
+            local players = game:GetService("Players")
+            local localPlayer = players.LocalPlayer
+            local hue = 0
+            
+            task.spawn(function()
+                while _G.RainbowCharacterEnabled do
+                    local deltaTime = runService.Heartbeat:Wait()
+                    hue = (hue + deltaTime * 0.1) % 1
+                    local rainbowColor = Color3.fromHSV(hue, 1, 1)
+                    
+                    local character = localPlayer.Character
+                    if character then
+                        for _, part in ipairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Color = rainbowColor
+                            elseif part:IsA("Accessory") and part:FindFirstChild("Handle") then
+                                part.Handle.Color = rainbowColor
+                            end
+                        end
+                    end
+                end
+            end)
+        end
     end
 })
+
+
+
 
 keybindTab:CreateSection("줄")
 local antilagDet = keybindTab:CreateInput({
