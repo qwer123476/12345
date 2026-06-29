@@ -2537,16 +2537,15 @@ local function executeVortexBanishedF5()
 
                     if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
                         
-                        -- [1] 타겟 위치를 '바닥 기준 높이 40'으로 강제 고정 및 앵커
+                        -- [1] 타겟 플레이어: 땅에서부터 정확히 40스터드 높이에 영구 락(Lock)
                         targetHRP.Velocity = Vector3.new(0, 0, 0)
                         targetHRP.RotVelocity = Vector3.new(0, 0, 0)
                         
-                        -- 바닥(레이캐스트 등) 기준값 대용 혹은 기존 위치의 Y축을 40으로 고정해서 공중 결박
-                        local currentPos = targetHRP.Position
-                        targetHRP.CFrame = CFrame.new(currentPos.X, 40, currentPos.Z)
+                        local targetPos = targetHRP.Position
+                        targetHRP.CFrame = CFrame.new(targetPos.X, 40, targetPos.Z)
                         targetHRP.Anchored = true
 
-                        -- [2] 원본 TP 구조 실행
+                        -- [2] 원래 가지고 있던 네 TP 연산 실행
                         local tpActive = true
                         local currentCF = nil
                         
@@ -2560,7 +2559,7 @@ local function executeVortexBanishedF5()
                             end
                         end)
 
-                        -- [3] 네트워크 오너십 강제 탈취
+                        -- [3] 네트워크 오너십 강제 탈취 (소유권 뺏어오기)
                         while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
                             local ownerTag = head:FindFirstChild("PartOwner")
                             if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
@@ -2575,7 +2574,7 @@ local function executeVortexBanishedF5()
                         tpActive = false
                         if currentCF then BACK(currentCF) end
 
-                        -- [4] 좁은 반경(8스터드)으로 타겟 몸을 초고속 밀착 회전하며 그랩 연타
+                        -- [4] 블롭맨을 탄 상태로 타겟 정면에 고정되어 그랩/릴리스 무한 스팸
                         local connection
                         connection = RunService.Heartbeat:Connect(function()
                             if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 or not myHRP.Parent then
@@ -2583,33 +2582,23 @@ local function executeVortexBanishedF5()
                                 return
                             end
 
-                            -- 타겟 물리 고정 유지
+                            -- 타겟 공중 40 고정 유지
                             targetHRP.Velocity = Vector3.new(0, 0, 0)
                             targetHRP.RotVelocity = Vector3.new(0, 0, 0)
                             targetHRP.Anchored = true
 
-                            -- 초고속 회전 연산 (반경을 8로 대폭 축소하여 초밀착)
-                            local currentTime = tick()
-                            local angle = currentTime * 20 -- 속도 조금 더 상향 (초고속 돌풍 연출)
-                            local radius = 8               -- 좁은 반경 설정
-                            local heightOffset = 2         -- 타겟의 정면/살짝 위 높이에서 비비기
-                            
-                            local orbitOffset = Vector3.new(math.cos(angle) * radius, heightOffset, math.sin(angle) * radius)
-                            
-                            local targetPos = targetHRP.Position
-                            local myTargetPos = targetPos + orbitOffset
-                            
-                            -- 내가 타겟을 정확히 정면으로 바라보며 초밀착 회전
-                            myHRP.CFrame = CFrame.lookAt(myTargetPos, targetPos)
+                            -- 내가 블롭맨을 탄 채로 타겟 바로 정면(3스터드 앞)에 고정되도록 내 CFrame을 일치시킴
+                            -- 타겟을 바라보며 살짝 앞에 위치하게 세팅 (블롭맨 탑승 상태 유지용)
+                            myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, -3) * CFrame.Angles(0, math.pi, 0)
 
-                            -- 밀착 상태에서 블롭맨 그랩/리리스 초고속 연타
+                            -- 블롭맨 그랩 및 리리스 즉시 연타 (스팸 킥)
                             BlobGrab(currentBlobS, targetHRP, "Right")
                             BlobRelease(currentBlobS, targetHRP, "Right")
                         end)
 
-                        -- 타겟 상태 체크 루프
+                        -- 타겟 뒤질 때까지 루프 대기
                         while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                            task.wait(0.1)
+                            task.wait(0.05)
                         end
 
                         if connection then connection:Disconnect() end
@@ -2620,7 +2609,7 @@ local function executeVortexBanishedF5()
             task.wait(0.1)
         end
 
-        -- 토글 꺼질 때 맵 전체 앵커 해제
+        -- 토글 풀리면 맵 전체 앵커 초기화
         for _, v in ipairs(game.Players:GetPlayers()) do
             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
                 v.Character.HumanoidRootPart.Anchored = false
@@ -8107,22 +8096,7 @@ LoopTab:CreateToggle({
 LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 if OLTPValue == nil then
     OLTPValue = Vector3.new(0, 40, 0)
-end
 
-local OLTPInput = LoopTab:CreateInput({
-    Name = "X Y Z",
-    CurrentValue = "0,40,0",
-    PlaceholderText = "",
-    RemoveTextAfterFocusLost = false,
-    Flag = "",
-    Callback = function(Value)
-        local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
-        if x and y and z then
-            OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
-        end
-    end
-})
-OLTPInput:Set("0,40,0")
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
     Name = "스팸킥    <font color='rgb(255,0,255)'>[스팸]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
