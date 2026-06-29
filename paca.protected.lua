@@ -11627,16 +11627,7 @@ cmdWindowTab:CreateLabel("8. ;freeze \"PlayerName\"")
 cmdWindowTab:CreateLabel("9. ;unfreeze \"PlayerName\"")
 cmdWindowTab:CreateLabel("10.;goto \"PlayerName\"")
 cmdWindowTab:CreateLabel("11.;kicklogs or ;kl")
-local function getTargetPlayer(namePart)
-    if not namePart or namePart == "" then return nil end
-    local cleanPart = namePart:lower():gsub('"', ""):gsub("%s+", "")
-    for _, p in ipairs(game.Players:GetPlayers()) do
-        if string.find(p.Name:lower(), cleanPart) then
-            return p
-        end
-    end
-    return nil
-end
+
 
 local function runChatCommand(msg)
     if msg:sub(1, 1) ~= ";" then return end
