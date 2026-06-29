@@ -7901,8 +7901,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
-if OLTPValue == nil then
-    OLTPValue = Vector3.new(0, 40, 0)
+
 
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
