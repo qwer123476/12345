@@ -2563,7 +2563,6 @@ local function executeVortexBanishedF5()
         while blobLoopT4 do
             for _, name in ipairs(playersInLoop2V) do
                 local targetPlayer = game.Players:FindFirstChild(name)
-                
                 if targetPlayer and targetPlayer ~= plr and targetPlayer.Character then
                     local character = targetPlayer.Character
                     local targetHRP = character:FindFirstChild("HumanoidRootPart")
@@ -2571,70 +2570,31 @@ local function executeVortexBanishedF5()
                     local targetHum = character:FindFirstChild("Humanoid")
                     local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 
-                    if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
-                        -- [1] 타겟에게 즉시 TP 연산 실행
-                        local tpActive = true
-                        local currentCF = nil
-                        
-                        task.spawn(function()
-                            while tpActive and blobLoopT4 and targetPlayer.Parent do
-                                local success, cf = TP(targetPlayer)
-                                if success and cf then 
-                                    currentCF = cf
-                                end
-                                task.wait()
-                            end
-                        end)
+                    if targetHRP and targetHum and targetHum.Health > 0 and myHRP then
+                        -- 1. 즉시 무조건 앵커 박기
+                        targetHRP.Anchored = true
+                        targetHRP.Velocity = Vector3.new(0, 0, 0)
+                        targetHRP.RotVelocity = Vector3.new(0, 0, 0)
 
-                        -- [2] 네트워크 오너십 소유권 강제 변환 및 대기
-                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                            local ownerTag = head:FindFirstChild("PartOwner")
-                            if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
-                                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                                rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
-                            else
-                                break
-                            end
-                            task.wait()
+                        -- 2. 위치 연산 (CFrame 설정)
+                        local baseCF = myHRP.CFrame
+                        if OLTPValue then
+                            baseCF = baseCF * CFrame.new(OLTPValue)
                         end
+                        targetHRP.CFrame = CFrame.lookAt(baseCF.Position, myHRP.Position)
 
-                        tpActive = false
-                        if currentCF then BACK(currentCF) end
-
-                        -- [3] 루프 내에서 실시간 위치 강제 고정 (Heartbeat 연동)
-                        local connection
-                        connection = RunService.Heartbeat:Connect(function()
-                            if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 then
-                                if connection then connection:Disconnect() end
-                                if targetHRP then targetHRP.Anchored = false end
-                                return
-                            end
-
-                            targetHRP.Velocity = Vector3.new(0, 0, 0)
-                            targetHRP.RotVelocity = Vector3.new(0, 0, 0)
-                            targetHRP.Anchored = true
-
-                            local baseCF = myHRP.CFrame
-                            if OLTPValue then
-                                baseCF = baseCF * CFrame.new(OLTPValue)
-                            end
-                            targetHRP.CFrame = CFrame.lookAt(baseCF.Position, myHRP.Position)
-                        end)
-
-                        -- 타겟 상태 체크하면서 홀딩 유지
-                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                            task.wait(0.1)
+                        -- 3. 소유권 강제 탈취 (서버 이벤트 연타)
+                        if head then
+                            rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                         end
-
-                        if connection then connection:Disconnect() end
-                        if targetHRP then targetHRP.Anchored = false end
+                        rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
                     end
                 end
             end
-            task.wait(0.2)
+            task.wait(0.05) -- 반응 속도 극대화를 위해 루프 주기 단축
         end
 
-        -- 토글 꺼질 시 모든 플레이어 앵커 해제 안전장치
+        -- 토글 꺼지면 예외 없이 전부 앵커 해제
         for _, v in ipairs(game.Players:GetPlayers()) do
             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
                 v.Character.HumanoidRootPart.Anchored = false
@@ -2642,7 +2602,6 @@ local function executeVortexBanishedF5()
         end
     end)
 end
-
 
 local RunService = game:GetService("RunService")
 local notifyCooldowns = {}
