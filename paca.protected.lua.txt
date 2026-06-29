@@ -1821,7 +1821,7 @@ function loopPlayerBlobF4()
                     anchorToggleTasks[player] = nil
                 end
                 
-                task.wait(0.5)
+                task.wait(0.35)
                 character = player.Character
                 charHUM = character and character:FindFirstChild("Humanoid")
             end
