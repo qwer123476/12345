@@ -11084,16 +11084,7 @@ function PcldViewF()
 end
 
 
-local iconEsp = keybindTab:CreateToggle({
-    Name = "esp 아이콘<font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
-    Flag = "",
-    Callback = function(Value)
-        PlrEspT = Value
-        PlrEspF()
-    end
-})
---iconEsp:Set(true)
+
 
 local PCLDView = keybindTab:CreateToggle({
     Name = "PCLD 보기",
