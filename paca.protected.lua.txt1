@@ -11205,7 +11205,7 @@ bdTab:CreateButton({
         sky.CelestialBodiesShown = true
         sky.MoonAngularSize = 15
         sky.SkyboxBk = "rbxassetid://9054701258"
-        sky.SkyboxDn = "rbxassetid://9054701955"
+        sky.SkyboxDn = "9054701955"
         sky.SkyboxFt = "rbxassetid://9054701460"
         sky.SkyboxLf = "rbxassetid://9054701601"
         sky.SkyboxRt = "rbxassetid://9054701740"
@@ -11280,7 +11280,6 @@ bdTab:CreateButton({
         cc.TintColor = Color3.fromRGB(220, 230, 230)
     end
 })
-
 
 keybindTab:CreateSection("줄")
 local antilagDet = keybindTab:CreateInput({
