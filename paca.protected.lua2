@@ -1127,44 +1127,8 @@ end
     end
 end
 
-function BlobSit()
-    if BLOBSIT then return end
 
-     char = plr.Character
-    if not char then return end
-
-     humanoid = char:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-
-    if humanoid.SeatPart ~= nil then return end
-
-    BLOBSIT = true
-
-    myInv = workspace:FindFirstChild(plr.Name.."SpawnedInToys")
-    myBlob = myInv and myInv:FindFirstChild("CreatureBlobman")
-
-    if myBlob then
-         seat = myBlob:FindFirstChildOfClass("VehicleSeat")
-        if seat then
-            if seat.Occupant == nil then
-                seat:Sit(humanoid)
-                BLOBSIT = false
-                return
-            else
-                 targetPlr = game.Players:GetPlayerFromCharacter(seat.Occupant.Parent)
-                if targetPlr then
-                    TP(targetPlr)
-                    task.wait(0.3)
-                    SetOwner(targetPlr)
-                    task.wait(0.05)
-                    seat:Sit(humanoid)
-                    BLOBSIT = false
-                    return
-                end
-            end
-        end
-    end
-
+    
 
 function AntiBurn()
     task.spawn(function()
