@@ -386,11 +386,13 @@ function Rayfield:CreateInput(options)
 end
 
 
-local Window = Rayfield:CreateWindow({Name = "파카허브  [프리미엄]", Icon = 0, Theme = paca, ToggleUIKeybind = "T"})
-ConfigurationSaving = {
+local Window = Rayfield:CreateWindow({
+    Name = "Paca Hub",
+
+    ConfigurationSaving = {
         Enabled = true,
-        FolderName = "PacaHub", 
-        FileName = "Config"      
+        FolderName = "PacaHub", -- 저장 폴더
+        FileName = "Config"      -- 저장 파일명
     }
 })
     
