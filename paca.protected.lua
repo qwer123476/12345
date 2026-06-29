@@ -2518,106 +2518,144 @@ function loopPlayerF3() -- 룹3
         end
     end)
 end
- local plr = game.Players.LocalPlayer
+ local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local function executeVortexBanishedF5()
-    UpdateCurrentBlobman()
+local plr = Players.LocalPlayer
+local GrabEvents = ReplicatedStorage:WaitForChild("GrabEvents")
 
-    task.spawn(function()
-        while blobLoopT4 do
-            for _, name in ipairs(playersInLoop2V) do
-                local targetPlayer = game.Players:FindFirstChild(name)
-                
-                if targetPlayer and targetPlayer ~= plr and targetPlayer.Character then
-                    local character = targetPlayer.Character
-                    local targetHRP = character:FindFirstChild("HumanoidRootPart")
-                    local head = character:FindFirstChild("Head")
-                    local targetHum = character:FindFirstChild("Humanoid")
-                    local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+_G.BlobmanLoopActive = false
+_G.OLTPValue = Vector3.new(0, 5, 0)
 
-                    if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
-                        
-                        -- [1] 타겟 플레이어: 땅에서부터 정확히 40스터드 높이에 영구 락(Lock)
-                        targetHRP.Velocity = Vector3.new(0, 0, 0)
-                        targetHRP.RotVelocity = Vector3.new(0, 0, 0)
-                        
-                        local targetPos = targetHRP.Position
-                        targetHRP.CFrame = CFrame.new(targetPos.X, 40, targetPos.Z)
-                        targetHRP.Anchored = true
+local d1 = {}
+local d2 = {}
+local d3 = {}
 
-                        -- [2] 원래 가지고 있던 네 TP 연산 실행
-                        local tpActive = true
-                        local currentCF = nil
-                        
-                        task.spawn(function()
-                            while tpActive and blobLoopT4 and targetPlayer.Parent do
-                                local success, cf = TP(targetPlayer)
-                                if success and cf then 
-                                    currentCF = cf
-                                end
-                                task.wait()
-                            end
-                        end)
+local function f_x9v2(p)
+    if not p or not p.Parent then return nil end
+    local char = p.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        return char.HumanoidRootPart.CFrame
+    end
+    return nil
+end
 
-                        -- [3] 네트워크 오너십 강제 탈취 (소유권 뺏어오기)
-                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                            local ownerTag = head:FindFirstChild("PartOwner")
-                            if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
-                                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                                rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
-                            else
-                                break
-                            end
-                            task.wait()
-                        end
+local function f_k7r4(p)
+    if p == plr then return end
 
-                        tpActive = false
-                        if currentCF then BACK(currentCF) end
+    d2[p] = task.spawn(function()
+        while _G.BlobmanLoopActive and p.Parent do
+            local character = p.Character
+            local charHUM = character and character:FindFirstChild("Humanoid")
+            local charHRP = character and character:FindFirstChild("HumanoidRootPart")
+            local head = character and character:FindFirstChild("Head")
 
-                        -- [4] 블롭맨을 탄 상태로 타겟 정면에 고정되어 그랩/릴리스 무한 스팸
-                        local connection
-                        connection = RunService.Heartbeat:Connect(function()
-                            if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 or not myHRP.Parent then
-                                if connection then connection:Disconnect() end
-                                return
-                            end
+            if not charHUM or not charHRP or not head or charHUM.Health <= 0 then
+                task.wait(0.1)
+                continue
+            end
 
-                            -- 타겟 공중 40 고정 유지
-                            targetHRP.Velocity = Vector3.new(0, 0, 0)
-                            targetHRP.RotVelocity = Vector3.new(0, 0, 0)
-                            targetHRP.Anchored = true
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if myHRP and not d3[p] then
+                d3[p] = myHRP.CFrame
+            end
 
-                            -- 내가 블롭맨을 탄 채로 타겟 바로 정면(3스터드 앞)에 고정되도록 내 CFrame을 일치시킴
-                            -- 타겟을 바라보며 살짝 앞에 위치하게 세팅 (블롭맨 탑승 상태 유지용)
-                            myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, -3) * CFrame.Angles(0, math.pi, 0)
+            local ownerTag = head:FindFirstChild("PartOwner")
+            if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                GrabEvents.SetNetworkOwner:FireServer(charHRP, charHRP.CFrame)
+            end
 
-                            -- 블롭맨 그랩 및 리리스 즉시 연타 (스팸 킥)
-                            BlobGrab(currentBlobS, targetHRP, "Right")
-                            BlobRelease(currentBlobS, targetHRP, "Right")
-                        end)
+            local mySeat = myChar and myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").SeatPart
+            local amIRiding = mySeat and mySeat.Parent and mySeat.Parent.Name == "CreatureBlobman"
 
-                        -- 타겟 뒤질 때까지 루프 대기
-                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
-                            task.wait(0.05)
-                        end
-
-                        if connection then connection:Disconnect() end
-                        if targetHRP then targetHRP.Anchored = false end
-                    end
+            if amIRiding then
+                if typeof(BlobGrab) == "function" and typeof(BlobRelease) == "function" then
+                    BlobGrab(currentBlobS, charHRP, "Right")
+                    BlobRelease(currentBlobS, charHRP, "Right")
                 end
+                charHUM.Sit = true
+                charHUM.Sit = false
             end
-            task.wait(0.1)
-        end
 
-        -- 토글 풀리면 맵 전체 앵커 초기화
-        for _, v in ipairs(game.Players:GetPlayers()) do
-            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                v.Character.HumanoidRootPart.Anchored = false
+            if not d1[p] then
+                d1[p] = RunService.Heartbeat:Connect(function()
+                    if not _G.BlobmanLoopActive or not charHRP.Parent or charHUM.Health <= 0 then
+                        if d1[p] then
+                            d1[p]:Disconnect()
+                            d1[p] = nil
+                        end
+                        return
+                    end
+
+                    charHRP.Velocity = Vector3.new(0, 0, 0)
+                    charHRP.RotVelocity = Vector3.new(0, 0, 0)
+
+                    if myHRP then
+                        local targetPosition = myHRP.CFrame * CFrame.new(_G.OLTPValue)
+                        charHRP.CFrame = targetPosition
+                    end
+                end)
             end
+
+            task.wait()
         end
     end)
 end
 
+local function f_c3m8()
+    for p, connection in pairs(d1) do
+        if connection then connection:Disconnect() end
+    end
+    for p, t in pairs(d2) do
+        if t then task.cancel(t) end
+    end
+    
+    local myChar = plr.Character
+    local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+    for p, originCF in pairs(d3) do
+        if myHRP and originCF then
+            myHRP.CFrame = originCF
+        end
+    end
+
+    d1 = {}
+    d2 = {}
+    d3 = {}
+end
+
+local SystemAPI = {}
+
+function SystemAPI:ToggleLoop(state)
+    _G.BlobmanLoopActive = state
+    if state then
+        task.spawn(function()
+            while _G.BlobmanLoopActive do
+                local targets = (typeof(playersInLoop1V) == "table" and playersInLoop1V) or Players:GetPlayers()
+                
+                for _, p in ipairs(targets) do
+                    local targetPlayer = typeof(p) == "string" and Players:FindFirstChild(p) or p
+                    if targetPlayer and targetPlayer ~= plr and not d2[targetPlayer] then
+                        f_k7r4(targetPlayer)
+                    end
+                end
+                task.wait(0.5)
+            end
+        end)
+    else
+        f_c3m8()
+    end
+end
+
+function SystemAPI:UpdateOLTP(vectorX, vectorY, vectorZ)
+    if tonumber(vectorX) and tonumber(vectorY) and tonumber(vectorZ) then
+        _G.OLTPValue = Vector3.new(tonumber(vectorX), tonumber(vectorY), tonumber(vectorZ))
+    end
+end
+
+getgenv().BlobmanSystem = SystemAPI
 
 local RunService = game:GetService("RunService")
 local notifyCooldowns = {}
@@ -7905,23 +7943,38 @@ LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 
 
 local blobLoop4Toggle = LoopTab:CreateToggle({
+local OLTPInput = LoopTab:CreateInput({
+    Name = "X Y Z",
+    CurrentValue = "0,40,0",
+    PlaceholderText = "",
+    RemoveTextAfterFocusLost = false,
+    Flag = "",
+    Callback = function(Value)
+        local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
+        if x and y and z then
+            if getgenv().BlobmanSystem then
+                getgenv().BlobmanSystem:UpdateOLTP(x, y, z)
+            else
+                _G.OLTPValue = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
+            end
+        end
+    end
+})
+OLTPInput:Set("0,40,0")
+
+local blobLoop4Toggle = LoopTab:CreateToggle({
     Name = "스팸킥    <font color='rgb(255,0,255)'>[스팸]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
-        blobLoopT4 = Value
-        if blobLoopT4 then
-            table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
-            end
-            executeVortexBanishedF5()
+        if getgenv().BlobmanSystem then
+            getgenv().BlobmanSystem:ToggleLoop(Value)
         else
-            table.clear(playersInLoop2V)
+            _G.BlobmanLoopActive = Value
         end
     end
 })
+
 
 LoopTab:CreateSection("오너")
 LoopTab:CreateToggle({
