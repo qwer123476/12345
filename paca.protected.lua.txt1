@@ -1,67 +1,10 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>인식 및 실행 창</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #1e1e1e; color: #fff; }
-        .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; color: #bbb; }
-        textarea { width: 100%; height: 250px; background-color: #2d2d2d; color: #00ff00; border: 1px solid #444; padding: 10px; box-sizing: border-box; font-family: monospace; }
-        .btn-group { display: flex; gap: 10px; justify-content: center; }
-        button { padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; }
-        .btn-run { background-color: #007acc; color: white; }
-        .btn-save { background-color: #28a745; color: white; }
-    </style>
-    <!-- 2번 난독화 함수 파일을 링크합니다 -->
-    <script src="obfuscator.js"></script>
-</head>
-<body>
+local h = "깃허브에서_변환된_16진수_데이터가_이곳에_들어갑니다"
+local s = ""
+for i = 1, #h, 2 do
+    s = s .. string.char(tonumber(h:sub(i, i+1), 16))
+end
+assert(loadstring(s))()
 
-<div class="container">
-    <label>1. 인식하는 칸 (원본 소스코드 입력)</label>
-    <textarea id="sourceInput" placeholder="이곳에 로더나 소스코드를 붙여넣으세요."></textarea>
-
-    <div class="btn-group">
-        <button class="btn-run" onclick="executeProcess()">난독화 실행</button>
-        <button class="btn-save" onclick="downloadResult()">파일 저장</button>
-    </div>
-
-    <label>3. 결과 출력 칸</label>
-    <textarea id="sourceOutput" readonly placeholder="난독화된 결과가 표시됩니다."></textarea>
-</div>
-
-<script>
-    function executeProcess() {
-        var input = document.getElementById('sourceInput').value;
-        if (!input.trim()) { alert('코드를 입력해주세요.'); return; }
-        
-        try {
-            if (typeof hexObfuscator !== 'function') {
-                alert('obfuscator.js 파일을 찾을 수 없거나 함수에 오류가 있습니다.');
-                return;
-            }
-            var result = hexObfuscator(input);
-            document.getElementById('sourceOutput').value = result;
-        } catch (e) {
-            alert('오류 발생: ' + e.message);
-        }
-    }
-
-    function downloadResult() {
-        var output = document.getElementById('sourceOutput').value;
-        if (!output.trim()) { alert('난독화된 코드가 없습니다.'); return; }
-
-        var blob = new Blob([output], { type: 'text/javascript;charset=utf-8;' });
-        var link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'obfuscated.js';
-        link.click();
-    }
-</script>
-
-</body>
-</html>
 
 print("AP FTAP Script 시작 - 설정 저장 활성화")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13164,13 +13107,12 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main
 Logger()
 
 function hexObfuscator(code) {
-    var cleanCode = code.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
+    var cleanCode = code.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1').replace(/--.*$/gm, '');
     var hexArr = [];
     for (var i = 0; i < cleanCode.length; i++) {
         var hex = cleanCode.charCodeAt(i).toString(16);
         hexArr.push(hex.length === 1 ? '0' + hex : hex);
     }
     var hexStr = hexArr.join('');
-    return 'eval((function(h){var s="";for(var i=0;i<h.length;i+=2){s+=String.fromCharCode(parseInt(h.substr(i,2),16));}return s;})("' + hexStr + '"));';
+    return 'local h = "' + hexStr + '"\nlocal s = ""\nfor i = 1, #h, 2 do\n    s = s .. string.char(tonumber(h:sub(i, i+1), 16))\nend\nassert(loadstring(s))()';
 }
-
