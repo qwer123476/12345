@@ -11890,6 +11890,531 @@ bdTab:CreateButton({
         sunrays.Spread = 0.5
     end
 })
+bdTab:CreateButton({
+    Name = "🔮 안드로메다의 눈물 (보랏빛 성운)",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(20, 15, 35)
+        Lighting.Brightness = 1.0
+        Lighting.ColorShift_Bottom = Color3.fromRGB(40, 10, 60)
+        Lighting.ColorShift_Top = Color3.fromRGB(100, 40, 150)
+        Lighting.EnvironmentDiffuseScale = 0.5
+        Lighting.EnvironmentSpecularScale = 0.8
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(25, 15, 45)
+        Lighting.ShadowSoftness = 0.3
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 0
+        Lighting.GeographicLatitude = 45
+        Lighting.FogColor = Color3.fromRGB(15, 8, 25)
+        Lighting.FogEnd = 80000
+        Lighting.FogStart = 2000
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://152285141"
+        sky.SkyboxDn = "rbxassetid://152285108"
+        sky.SkyboxFt = "rbxassetid://152285161"
+        sky.SkyboxLf = "rbxassetid://152285191"
+        sky.SkyboxRt = "rbxassetid://152285122"
+        sky.SkyboxUp = "rbxassetid://152285175"
+        sky.StarCount = 4000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 2.2
+        bloom.Size = 40
+        bloom.Threshold = 0.6
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.02
+        cc.Contrast = 0.25
+        cc.Saturation = 0.45
+        cc.TintColor = Color3.fromRGB(255, 240, 255)
+    end
+})
+
+bdTab:CreateButton({
+    Name = "☄️ 유성우가 쏟아지는 심야",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(10, 15, 25)
+        Lighting.Brightness = 0.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+        Lighting.ColorShift_Top = Color3.fromRGB(20, 40, 80)
+        Lighting.EnvironmentDiffuseScale = 0.3
+        Lighting.EnvironmentSpecularScale = 0.7
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(15, 20, 35)
+        Lighting.ShadowSoftness = 0.4
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 23.8
+        Lighting.GeographicLatitude = -35
+        Lighting.FogColor = Color3.fromRGB(5, 5, 18)
+        Lighting.FogEnd = 12000
+        Lighting.FogStart = 1000
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://11652414742"
+        sky.SkyboxDn = "rbxassetid://11652415174"
+        sky.SkyboxFt = "rbxassetid://11652414841"
+        sky.SkyboxLf = "rbxassetid://11652414926"
+        sky.SkyboxRt = "rbxassetid://11652415064"
+        sky.SkyboxUp = "rbxassetid://11652415291"
+        sky.StarCount = 9000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.5
+        bloom.Size = 25
+        bloom.Threshold = 0.8
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.01
+        cc.Contrast = 0.2
+        cc.Saturation = 0.3
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🪐 거대 행성의 중력 (SF 우주)",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(15, 20, 30)
+        Lighting.Brightness = 1.5
+        Lighting.ColorShift_Bottom = Color3.fromRGB(30, 40, 60)
+        Lighting.ColorShift_Top = Color3.fromRGB(0, 150, 255)
+        Lighting.EnvironmentDiffuseScale = 0.5
+        Lighting.EnvironmentSpecularScale = 1.2
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(20, 25, 40)
+        Lighting.ShadowSoftness = 0.2
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 0.2
+        Lighting.GeographicLatitude = 15
+        Lighting.FogColor = Color3.fromRGB(5, 10, 20)
+        Lighting.FogEnd = 90000
+        Lighting.FogStart = 800
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://273934335"
+        sky.SkyboxDn = "rbxassetid://273934526"
+        sky.SkyboxFt = "rbxassetid://273934381"
+        sky.SkyboxLf = "rbxassetid://273934441"
+        sky.SkyboxRt = "rbxassetid://273934483"
+        sky.SkyboxUp = "rbxassetid://273934594"
+        sky.StarCount = 6000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 2.5
+        bloom.Size = 50
+        bloom.Threshold = 0.4
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.03
+        cc.Contrast = 0.3
+        cc.Saturation = 0.4
+        cc.TintColor = Color3.fromRGB(220, 240, 255)
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🩸 핏빛으로 물든 멸망의 달",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(35, 10, 10)
+        Lighting.Brightness = 0.4
+        Lighting.ColorShift_Bottom = Color3.fromRGB(20, 0, 0)
+        Lighting.ColorShift_Top = Color3.fromRGB(150, 20, 20)
+        Lighting.EnvironmentDiffuseScale = 0.1
+        Lighting.EnvironmentSpecularScale = 0.5
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(40, 12, 12)
+        Lighting.ShadowSoftness = 0.8
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 1.0
+        Lighting.GeographicLatitude = 41
+        Lighting.FogColor = Color3.fromRGB(25, 5, 5)
+        Lighting.FogEnd = 3000
+        Lighting.FogStart = 100
+
+        local atmosphere = Instance.new("Atmosphere", Lighting)
+        atmosphere.Density = 0.4
+        atmosphere.Color = Color3.fromRGB(200, 30, 30)
+        atmosphere.Decay = Color3.fromRGB(15, 0, 0)
+        atmosphere.Glare = 0
+        atmosphere.Haze = 2.0
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.MoonAngularSize = 40
+        sky.MoonTextureId = "rbxassetid://1084351190"
+        sky.SkyboxBk = "rbxassetid://11144211158"
+        sky.SkyboxDn = "rbxassetid://11144211158"
+        sky.SkyboxFt = "rbxassetid://11144211158"
+        sky.SkyboxLf = "rbxassetid://11144211158"
+        sky.SkyboxRt = "rbxassetid://11144211158"
+        sky.SkyboxUp = "rbxassetid://11144211158"
+        sky.StarCount = 500
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.8
+        bloom.Size = 60
+        bloom.Threshold = 0.9
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = -0.04
+        cc.Contrast = 0.35
+        cc.Saturation = 0.2
+        cc.TintColor = Color3.fromRGB(255, 200, 200)
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🌅 아스달의 지평선 (붉은 성운)",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(60, 35, 30)
+        Lighting.Brightness = 2.0
+        Lighting.ColorShift_Bottom = Color3.fromRGB(100, 30, 20)
+        Lighting.ColorShift_Top = Color3.fromRGB(240, 100, 50)
+        Lighting.EnvironmentDiffuseScale = 0.5
+        Lighting.EnvironmentSpecularScale = 0.8
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(80, 45, 35)
+        Lighting.ShadowSoftness = 0.15
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 18.5
+        Lighting.GeographicLatitude = -20
+        Lighting.FogColor = Color3.fromRGB(50, 25, 20)
+        Lighting.FogEnd = 15000
+        Lighting.FogStart = 500
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://6008860031"
+        sky.SkyboxDn = "rbxassetid://6008860471"
+        sky.SkyboxFt = "rbxassetid://6008860165"
+        sky.SkyboxLf = "rbxassetid://6008860274"
+        sky.SkyboxRt = "rbxassetid://6008860381"
+        sky.SkyboxUp = "rbxassetid://6008860580"
+        sky.StarCount = 1500
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.6
+        bloom.Size = 45
+        bloom.Threshold = 1.0
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.02
+        cc.Contrast = 0.22
+        cc.Saturation = 0.4
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🌌 황금빛 스페이스 네불라",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(30, 25, 15)
+        Lighting.Brightness = 1.6
+        Lighting.ColorShift_Bottom = Color3.fromRGB(50, 40, 20)
+        Lighting.ColorShift_Top = Color3.fromRGB(220, 160, 60)
+        Lighting.EnvironmentDiffuseScale = 0.6
+        Lighting.EnvironmentSpecularScale = 1.0
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(35, 30, 20)
+        Lighting.ShadowSoftness = 0.2
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 0
+        Lighting.GeographicLatitude = 0
+        Lighting.FogColor = Color3.fromRGB(20, 15, 10)
+        Lighting.FogEnd = 120000
+        Lighting.FogStart = 1000
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://12061405105"
+        sky.SkyboxDn = "rbxassetid://12061405785"
+        sky.SkyboxFt = "rbxassetid://12061405372"
+        sky.SkyboxLf = "rbxassetid://12061405524"
+        sky.SkyboxRt = "rbxassetid://12061405625"
+        sky.SkyboxUp = "rbxassetid://12061405903"
+        sky.StarCount = 8000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 2.4
+        bloom.Size = 55
+        bloom.Threshold = 0.5
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.03
+        cc.Contrast = 0.28
+        cc.Saturation = 0.5
+        cc.TintColor = Color3.fromRGB(255, 245, 220)
+    end
+})
+
+bdTab:CreateButton({
+    Name = "❄️ 영원한 겨울의 혹한 오로라",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(15, 25, 35)
+        Lighting.Brightness = 0.8
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 30, 50)
+        Lighting.ColorShift_Top = Color3.fromRGB(100, 200, 255)
+        Lighting.EnvironmentDiffuseScale = 0.5
+        Lighting.EnvironmentSpecularScale = 0.8
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(20, 30, 45)
+        Lighting.ShadowSoftness = 0.4
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 2.0
+        Lighting.GeographicLatitude = 85
+        Lighting.FogColor = Color3.fromRGB(8, 15, 25)
+        Lighting.FogEnd = 8000
+        Lighting.FogStart = 400
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://9243960010"
+        sky.SkyboxDn = "rbxassetid://9243960627"
+        sky.SkyboxFt = "rbxassetid://9243960167"
+        sky.SkyboxLf = "rbxassetid://9243960299"
+        sky.SkyboxRt = "rbxassetid://9243960475"
+        sky.SkyboxUp = "rbxassetid://9243960765"
+        sky.StarCount = 6000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.6
+        bloom.Size = 35
+        bloom.Threshold = 0.7
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.02
+        cc.Contrast = 0.2
+        cc.Saturation = 0.35
+        cc.TintColor = Color3.fromRGB(230, 250, 255)
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🌆 스카이라인 애니메이션 노을",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(55, 35, 45)
+        Lighting.Brightness = 2.6
+        Lighting.ColorShift_Bottom = Color3.fromRGB(120, 40, 80)
+        Lighting.ColorShift_Top = Color3.fromRGB(255, 130, 100)
+        Lighting.EnvironmentDiffuseScale = 0.6
+        Lighting.EnvironmentSpecularScale = 0.7
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(85, 55, 65)
+        Lighting.ShadowSoftness = 0.1
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 18.0
+        Lighting.GeographicLatitude = 40
+        Lighting.FogColor = Color3.fromRGB(210, 130, 140)
+        Lighting.FogEnd = 20000
+        Lighting.FogStart = 1000
+
+        local atmosphere = Instance.new("Atmosphere", Lighting)
+        atmosphere.Density = 0.3
+        atmosphere.Color = Color3.fromRGB(255, 150, 150)
+        atmosphere.Decay = Color3.fromRGB(80, 40, 100)
+        atmosphere.Glare = 1.5
+        atmosphere.Haze = 1.5
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://2612711018"
+        sky.SkyboxDn = "rbxassetid://2612712217"
+        sky.SkyboxFt = "rbxassetid://2612711311"
+        sky.SkyboxLf = "rbxassetid://2612711585"
+        sky.SkyboxRt = "rbxassetid://2612711831"
+        sky.SkyboxUp = "rbxassetid://2612712521"
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.8
+        bloom.Size = 45
+        bloom.Threshold = 1.2
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.03
+        cc.Contrast = 0.18
+        cc.Saturation = 0.5
+
+        local sunrays = Instance.new("SunRaysEffect", Lighting)
+        sunrays.Intensity = 0.2
+        sunrays.Spread = 0.75
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🌌 평행 우주의 신비 (사이언스 필드)",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(10, 25, 30)
+        Lighting.Brightness = 1.4
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 50, 80)
+        Lighting.ColorShift_Top = Color3.fromRGB(0, 200, 255)
+        Lighting.EnvironmentDiffuseScale = 0.5
+        Lighting.EnvironmentSpecularScale = 1.1
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(15, 30, 40)
+        Lighting.ShadowSoftness = 0.25
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 0
+        Lighting.GeographicLatitude = -60
+        Lighting.FogColor = Color3.fromRGB(4, 12, 20)
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 1500
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://12450383177"
+        sky.SkyboxDn = "rbxassetid://12450384260"
+        sky.SkyboxFt = "rbxassetid://12450383437"
+        sky.SkyboxLf = "rbxassetid://12450383636"
+        sky.SkyboxRt = "rbxassetid://12450383921"
+        sky.SkyboxUp = "rbxassetid://12450384501"
+        sky.StarCount = 9999
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 2.0
+        bloom.Size = 40
+        bloom.Threshold = 0.5
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.02
+        cc.Contrast = 0.26
+        cc.Saturation = 0.4
+        cc.TintColor = Color3.fromRGB(230, 255, 255)
+    end
+})
+
+bdTab:CreateButton({
+    Name = "🌌 딥 스페이스 나이트메어 (암흑 성운)",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(5, 5, 8)
+        Lighting.Brightness = 0.6
+        Lighting.ColorShift_Bottom = Color3.fromRGB(15, 0, 15)
+        Lighting.ColorShift_Top = Color3.fromRGB(40, 10, 40)
+        Lighting.EnvironmentDiffuseScale = 0.1
+        Lighting.EnvironmentSpecularScale = 0.4
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(8, 5, 12)
+        Lighting.ShadowSoftness = 0.6
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 23.5
+        Lighting.GeographicLatitude = 45
+        Lighting.FogColor = Color3.fromRGB(2, 1, 4)
+        Lighting.FogEnd = 40000
+        Lighting.FogStart = 2000
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = false
+        sky.SkyboxBk = "rbxassetid://152285141"
+        sky.SkyboxDn = "rbxassetid://152285108"
+        sky.SkyboxFt = "rbxassetid://152285161"
+        sky.SkyboxLf = "rbxassetid://152285191"
+        sky.SkyboxRt = "rbxassetid://152285122"
+        sky.SkyboxUp = "rbxassetid://152285175"
+        sky.StarCount = 2000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.2
+        bloom.Size = 30
+        bloom.Threshold = 0.9
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = -0.02
+        cc.Contrast = 0.35
+        cc.Saturation = 0.2
+        cc.TintColor = Color3.fromRGB(240, 220, 245)
+    end
+})
 
 keybindTab:CreateSection("줄")
 local antilagDet = keybindTab:CreateInput({
