@@ -2527,6 +2527,7 @@ local function executeVortexBanishedF5()
         while blobLoopT4 do
             for _, name in ipairs(playersInLoop2V) do
                 local targetPlayer = game.Players:FindFirstChild(name)
+                
                 if targetPlayer and targetPlayer ~= plr and targetPlayer.Character then
                     local character = targetPlayer.Character
                     local targetHRP = character:FindFirstChild("HumanoidRootPart")
@@ -2534,31 +2535,86 @@ local function executeVortexBanishedF5()
                     local targetHum = character:FindFirstChild("Humanoid")
                     local myHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 
-                    if targetHRP and targetHum and targetHum.Health > 0 and myHRP then
-                        -- 1. 즉시 무조건 앵커 박기
-                        targetHRP.Anchored = true
-                        targetHRP.Velocity = Vector3.new(0, 0, 0)
-                        targetHRP.RotVelocity = Vector3.new(0, 0, 0)
+                    if targetHRP and head and targetHum and targetHum.Health > 0 and myHRP then
+                        
+                        -- [1] 네가 준 원래 TP/BACK 구조 그대로 실행
+                        local tpActive = true
+                        local currentCF = nil
+                        
+                        task.spawn(function()
+                            while tpActive and blobLoopT4 and targetPlayer.Parent do
+                                local success, cf = TP(targetPlayer)
+                                if success and cf then 
+                                    currentCF = cf
+                                end
+                                task.wait()
+                            end
+                        end)
 
-                        -- 2. 위치 연산 (CFrame 설정)
-                        local baseCF = myHRP.CFrame
-                        if OLTPValue then
-                            baseCF = baseCF * CFrame.new(OLTPValue)
+                        -- [2] 네트워크 오너십 소유권 강제 탈취 및 대기
+                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
+                            local ownerTag = head:FindFirstChild("PartOwner")
+                            if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                                rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
+                            else
+                                break
+                            end
+                            task.wait()
                         end
-                        targetHRP.CFrame = CFrame.lookAt(baseCF.Position, myHRP.Position)
 
-                        -- 3. 소유권 강제 탈취 (서버 이벤트 연타)
-                        if head then
-                            rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                        tpActive = false
+                        if currentCF then BACK(currentCF) end
+
+                        -- [3] 레지스터 없이 무조건 고정 및 독특한 나선형 회전 외형 구현
+                        local connection
+                        connection = RunService.Heartbeat:Connect(function()
+                            if not blobLoopT4 or not targetPlayer.Parent or not targetHRP.Parent or not targetHum or targetHum.Health <= 0 then
+                                if connection then connection:Disconnect() end
+                                if targetHRP then targetHRP.Anchored = false end
+                                return
+                            end
+
+                            -- 무조건 앵커 및 물리력 0 고정
+                            targetHRP.Velocity = Vector3.new(0, 0, 0)
+                            targetHRP.RotVelocity = Vector3.new(0, 0, 0)
+                            targetHRP.Anchored = true
+
+                            -- 별도 테이블 없이 플레이어 주소값 숫자로 고유 각도(오프셋) 부여
+                            local uniqueSeed = tonumber(tostring(targetPlayer):match("0x%x+")) or 1
+                            local currentTime = tick()
+                            
+                            -- 이 킥만의 외형 효과: 공중에서 나를 중심으로 나선형 회전 + 위아래 요동 (시각적 볼거리)
+                            local angle = (currentTime * 5) + (uniqueSeed % 10)
+                            local radius = 35 + math.sin(currentTime * 3) * 5 -- 반지름이 유기적으로 변함
+                            local waveHeight = math.cos(currentTime * 4) * 8    -- 위아래로 출렁임
+                            
+                            local offset = Vector3.new(math.cos(angle) * radius, waveHeight, math.sin(angle) * radius)
+                            
+                            local baseCF = myHRP.CFrame
+                            if OLTPValue then
+                                baseCF = baseCF * CFrame.new(OLTPValue)
+                            end
+                            
+                            -- 연산된 공중 나선 좌표로 강제 텔레포트 및 시선 고정
+                            local finalPosition = baseCF * CFrame.new(offset)
+                            targetHRP.CFrame = CFrame.lookAt(finalPosition.Position, myHRP.Position)
+                        end)
+
+                        -- 타겟이 죽거나 해제될 때까지 홀딩 루프 유지
+                        while blobLoopT4 and targetPlayer.Parent and targetHum.Health > 0 do
+                            task.wait(0.1)
                         end
-                        rs.GrabEvents.SetNetworkOwner:FireServer(targetHRP, targetHRP.CFrame)
+
+                        if connection then connection:Disconnect() end
+                        if targetHRP then targetHRP.Anchored = false end
                     end
                 end
             end
-            task.wait(0.05) -- 반응 속도 극대화를 위해 루프 주기 단축
+            task.wait(0.1)
         end
 
-        -- 토글 꺼지면 예외 없이 전부 앵커 해제
+        -- 토글 꺼질 시 맵 전체 풀링 해제 (안전장치)
         for _, v in ipairs(game.Players:GetPlayers()) do
             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
                 v.Character.HumanoidRootPart.Anchored = false
@@ -2566,6 +2622,7 @@ local function executeVortexBanishedF5()
         end
     end)
 end
+
 
 local RunService = game:GetService("RunService")
 local notifyCooldowns = {}
