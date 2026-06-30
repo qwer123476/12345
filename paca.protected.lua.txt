@@ -8002,11 +8002,8 @@ LoopTab:CreateToggle({
                             hrp.AssemblyAngularVelocity = Vector3.zero
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, absoluteAirCF)
                             
-                            -- 3. [그랩/릴리스 초고속 매크로 순환] 
-                            -- 서버 시점에서 타겟이 잡혔다 풀렸다를 무한 반복하며 물리 충돌 에러 유도
-                            -- (게임 내부의 그랩 리모트 이벤트 형식에 맞게 FireServer를 날려야 합니다)
-                            pcall(function()
-                                -- 블롭맨 그랩 시도 (서버 이벤트 이름이 다를 수 있으니 기존 스크립트 참고 필요)
+                                    pcall(function()
+                            
                                 rs.GrabEvents.GrabPlayer:FireServer(hrp) 
                             end)
                             
@@ -8027,7 +8024,7 @@ LoopTab:CreateToggle({
                         end
                     end
                 end
-                task.wait(0.1)
+                task.wait(0.0000001)
             end
         end)
     end
