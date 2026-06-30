@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 고속그랩 킥 <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 그랩 공중고정 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7949,82 +7949,60 @@ LoopTab:CreateToggle({
                     local myChar = game.Players.LocalPlayer.Character
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
+
+                    -- [1] 납치 및 공중 기준점 설정
+                    -- 타겟이 있는 곳으로 가서 잡은 뒤, 그 공중 좌표를 그대로 고정점으로 씁니다.
+                    local targetAirCF = hrp.CFrame * CFrame.new(0, 50, 0) 
+
+                    -- 첫 납치 실행
+                    TP(pl)
+                    task.wait(0.05)
                     
-                    -- [치트 방어 1] 내 캐릭터의 현재 완벽한 바닥 좌표 확보
-                    local groundCF = myHrp.CFrame
-                    
-                    -- 타겟이 고정될 공중 절대 좌표 (내가 하늘로 안 올라가므로 완전히 고정됨)
-                    local absoluteAirCF = CFrame.new(groundCF.Position.X, groundCF.Position.Y + 60, groundCF.Position.Z)
+                    -- 그랩 리모트를 날려 블롭맨으로 타겟을 단단히 붙잡음
+                    pcall(function()
+                        rs.GrabEvents.GrabPlayer:FireServer(hrp)
+                    end)
+                    task.wait(0.05)
 
-                    local needToTP = false
-
-                    if not playerState[name] or playerState[name].PlayerInstance ~= pl then
-                        needToTP = true
-                        playerState[name] = { PlayerInstance = pl, IsDeadBefore = false }
-                    end
-
-                    if hum.Health <= 0 then
-                        playerState[name].IsDeadBefore = true
-                    elseif hum.Health > 0 and playerState[name].IsDeadBefore then
-                        needToTP = true
-                        playerState[name].IsDeadBefore = false 
-                    end
-
-                    local distance = (hrp.Position - myHrp.Position).Magnitude
-                    if distance > 40 then
-                        needToTP = true
-                    end
-
-                    -- 납치 단계
-                    if needToTP and hum.Health > 0 then
-                        TP(pl)
-                        task.wait(0.05)
-                        
-                        hrp.CFrame = CFrame.new(groundCF.Position.X, groundCF.Position.Y + 5, groundCF.Position.Z)
-                        BACK(groundCF)
-                        task.wait(0.00005)
-                    end
-
-                    -- [핵심] 초고속 그랩/릴리스 연타 + 내 캐릭터 바닥 고정 루프
+                    -- [2] 그랩으로 공중 고정 루프 (내가 치솟는 현상 방지)
                     if hum.Health > 0 and currentBlobS then
                         
-                        for i = 1, 30 do -- 30프레임 동안 난사 (이 사이에 안티치트 킥 터짐)
+                        for _ = 1, 40 do -- 킥이 걸릴 때까지 공중 고정 연타
                             if not blobLoopT2 then break end
                             
-                            -- 1. 내 캐릭터가 하늘로 끌려 올라가는 것을 프레임 단위로 원천 차단
-                            -- 그랩 인장력이 나를 당기기 전에 매 프레임 바닥 좌표로 내 캐릭터를 강제 텔포(잠금)시킵니다.
-                            myHrp.CFrame = groundCF
+                            -- 나와 블롭맨의 위치를 이 공중 좌표에 강제로 못 박아버립니다.
+                            -- 타겟이 나를 끌고 올라가려고 해도 내 좌표를 프레임마다 고정하므로 치솟지 못합니다.
+                            myHrp.CFrame = targetAirCF
                             myHrp.Velocity = Vector3.zero
                             
-                            -- 2. 타겟 PLCD 좌표 및 가속도 완전 고정 패킷
-                            hrp.CFrame = absoluteAirCF
-                            hrp.AssemblyLinearVelocity = Vector3.zero
-                            hrp.AssemblyAngularVelocity = Vector3.zero
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, absoluteAirCF)
+                            if currentBlobS.PrimaryPart then
+                                currentBlobS.PrimaryPart.CFrame = targetAirCF * CFrame.new(0, 0, -3)
+                            end
+
+                            -- 타겟을 내 앞에 묶어두는 그랩 유지 패킷
+                            hrp.CFrame = targetAirCF * CFrame.new(0, 0, 3)
                             
-                                    pcall(function()
-                            
-                                rs.GrabEvents.GrabPlayer:FireServer(hrp) 
-                            end)
-                            
-                            -- 아주 미세한 물리 틱을 주어 서버가 그랩을 인식하게 함
-                            game:GetService("RunService").Heartbeat:Wait()
-                            
-                            -- 내 위치 다시 한번 바닥으로 고정
-                            myHrp.CFrame = groundCF
-                            
-                            -- 즉시 그랩 해제 패킷 난사
+                            -- [3] 킥을 유도하는 초고속 릴리스 & 재그랩 난사
+                            -- 이미 잡혀있는 상태이므로 릴리스 패킷을 먼저 날려 에러를 유도합니다.
                             BlobRelease(currentBlobS, hrp, "Right")
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                             
-                            -- 다시 한번 타겟 정지 확인
-                            hrp.CFrame = absoluteAirCF
+                            game:GetService("RunService").Heartbeat:Wait()
+                            
+                            -- 풀리자마자 0.0001초만에 다시 그랩으로 낚아채서 고정
+                            pcall(function()
+                                rs.GrabEvents.GrabPlayer:FireServer(hrp)
+                            end)
                             
                             game:GetService("RunService").Heartbeat:Wait()
                         end
                     end
+                    
+                    -- 한 명 처리 끝나면 혹시 모를 그랩 완전 해제
+                    BlobRelease(currentBlobS, hrp, "Right")
+                    rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                 end
-                task.wait(0.0000001)
+                task.wait(0.1)
             end
         end)
     end
