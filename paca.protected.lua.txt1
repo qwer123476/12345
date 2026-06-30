@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "오너킥V34  <font color='rgb(255,154,123)'>[파카]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7923,69 +7923,61 @@ LoopTab:CreateToggle({
         end
 
         task.spawn(function()
-            local processed = {}
-
             while blobLoopT2 do
                 UpdateCurrentBlobman()
 
                 for _, name in ipairs(playersInLoop2V) do
                     if not blobLoopT2 then break end
+                    
+                    -- 화이트리스트 검사
                     if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
 
+                    -- 유저가 나갔거나 캐릭터가 없는 경우 체크하여 건너뛰기(Skip)
                     local pl = game.Players:FindFirstChild(name)
-                    local char = pl and pl.Character
+                    if not pl then continue end -- 이미 나간 사람은 즉시 패스
+                    
+                    local char = pl.Character
                     local hum = char and char:FindFirstChildOfClass("Humanoid")
                     local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    
+                    -- 캐릭터가 정상 상태가 아니거나 파괴된 경우 패스
+                    if not char or not hum or not hrp or char.Parent == nil or not hrp:IsDescendantOf(workspace) then 
+                        continue 
+                    end
 
-                    if hum and hum.Health > 0 and hrp and processed[pl] ~= hum then
+                    -- 대상이 살아있을 때만 연사 연계 진입
+                    if hum.Health > 0 and currentBlobS then
                         
                         local myChar = game.Players.LocalPlayer.Character
                         local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                         if not myHrp then continue end
-                        
-                        -- 1. 내 원래 위치 백업
                         local originCF = myHrp.CFrame
-                        
-                        -- 2. 나와 블롭맨이 먼저 공중 50스터드로 TP
-                        myHrp.CFrame = originCF * CFrame.new(0, 50, 0)
-                        if currentBlobS then
-                            local blobRoot = currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart
-                            if blobRoot then
-                                blobRoot.CFrame = myHrp.CFrame
-                            end
-                        end
+
+                        -- 원래 쓰시던 납치 수단 연계
+                        TP(pl)
                         task.wait(0.1)
 
-                        -- 3. 원래 잘 되던 툴/리모트 방식 납치 작동
-                        TP(pl)
-                        task.wait(0.2) 
+                        -- 주도권 선점 및 릴리스 -> 1번 오른손 그랩 연타
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
+                        
+                        BlobRelease(currentBlobS, hrp, "Right")
+                        task.wait(0.01)
+                        BlobGrab(currentBlobS, hrp, "Right")
+                        task.wait(0.05)
 
-                        -- 4. 오자마자 즉시 네트워크 주도권 설정 후 [릴리스 -> 그랩] 연계
-                        if currentBlobS and hum.Health > 0 then
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
-                            
-                            -- [추가된 연계 부분]
-                            BlobRelease(currentBlobS, hrp, "Right")
-                            task.wait(0.01) -- 아주 미세한 프레임 딜레이
-                            BlobGrab(currentBlobS, hrp, "Right")
-                            
-                            task.wait(0.1)
-                        end
-
-                        -- 5. 후처리 및 지상 복귀
+                        -- 후처리 및 원래 상태 유지 복구
                         rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                         
-                        myHrp.CFrame = originCF
-                        hrp.CFrame = originCF * CFrame.new(0, 5, 0)
+                        if originCF then
+                            hrp.CFrame = originCF * CFrame.new(0, 5, 0)
+                            myHrp.CFrame = originCF
+                        end
                         BACK(originCF)
-
-                        processed[pl] = hum
-                        task.wait(0.3)
-                    elseif not hum or hum.Health <= 0 then
-                        processed[pl] = nil
+                        
+                        task.wait(0.1) -- 여러 명을 빠르게 순회하기 위한 최소 딜레이
                     end
                 end
-                task.wait(0.5)
+                task.wait(0.2) -- 한 바퀴 돌고 다음 루프 재검색 사이의 부하 방지 텀
             end
         end)
     end
