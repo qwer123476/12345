@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 타겟 추적 강제 TP 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "블롭킬V2 <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7946,35 +7946,26 @@ LoopTab:CreateToggle({
                     if not myHrp then continue end
 
                     -- [1] 내가 타겟에게 강제 TP (집 안, 벽 내부 어디든 좌표 추적해서 밀착)
-                    if humanoid.Health > 0 for _ = 1, 1 do
-                        -- 타겟의 정면/뒤쪽 위치로 내 캐릭터 좌표를 완전히 덮어씌움
+                    if humanoid.Health > 0 then
+                        -- 타겟의 정면 위치로 내 캐릭터 좌표를 완전히 이동
                         myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
                         task.wait(0.05)
                     end
 
-                    -- [2] 밀착한 상태에서 그랩/릴리스 무제한 연사 및 즉사 패킷 유도
+                    -- [2] 밀착한 상태에서 그랩 ➔ task.wait ➔ 릴리스 순정 연사
                     if humanoid.Health > 0 and currentBlobS then
                         for _ = 1, 40 do
                             if not blobLoopT2 then break end
                             if humanoid.Health <= 0 then break end
                             
-                            -- 내가 타겟에게 붙어있는 상태 유지 (상대가 움직여도 계속 강제 TP 추적)
+                            -- 상대가 움직이거나 밀려나도 실시간으로 계속 따라붙도록 설정
                             myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
                             
-                            -- 소유권 강탈 및 물리 파괴 수치 주입
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                            pcall(function()
-                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
-                                hrp.AssemblyAngularVelocity = Vector3.new(999999, 999999, 999999)
-                                -- 공허 사망 트리거 전송
-                                --rs.GrabEvents.SetNetworkOwner:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
-                            end)
-
-                            -- 순정 그랩 실행 후 대기
+                            -- 그랩 실행 및 대기
                             BlobGrab(currentBlobS, hrp, "Right")
                             task.wait(0.01)
                             
-                            -- 릴리스 및 파괴 패킷 전송 후 대기
+                            -- 릴리스 실행 및 대기
                             BlobRelease(currentBlobS, hrp, "Right")
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                             task.wait(0.01)
@@ -7986,6 +7977,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 
 LoopTab:CreateSection("킥")
