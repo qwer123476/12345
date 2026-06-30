@@ -7979,12 +7979,16 @@ LoopTab:CreateToggle({
                             task.wait(0.3)
 
                             if currentBlobS then
-                                for _ = 1, 10 do
+                                -- 1번부터 9번까지는 그랩과 드롭을 빠르게 반복
+                                for _ = 1, 9 do
                                     BlobGrab(currentBlobS, hrp, "Right")
                                     task.wait(0.01)
                                     BlobDrop(currentBlobS, hrp, "Right")
                                     task.wait(0.01)
                                 end
+                                -- 마지막 10번째는 그랩만 딱 걸고 드롭하지 않고 유지
+                                BlobGrab(currentBlobS, hrp, "Right")
+                                task.wait(0.01)
                             end
 
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
@@ -8002,23 +8006,6 @@ LoopTab:CreateToggle({
             end
         end)
     end
-})
-
-
-LoopTab:CreateSection("오너")
-LoopTab:CreateToggle({
-    Name = "오너킥V34   <font color='rgb(255,250,255)'>[파카]</font>",
-    CurrentValue = false,
-    Callback = function(Value)
-        if Value then
-            Rayfield:Notify({
-                Title = "안내",
-                Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
-            })
-        end
-    end,
 })
 
 
