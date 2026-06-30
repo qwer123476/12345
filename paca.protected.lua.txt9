@@ -5929,23 +5929,6 @@ UtilityTab:CreateToggle({
 
 
 local clicking = false
-UtilityTab:CreateToggle({
-    Name = "자동 클릭 (마우스 왼쪽)",
-    CurrentValue = false,
-    Callback = function(Value)
-        clicking = Value
-        task.spawn(function()
-            while clicking do
-                pcall(function()
-                    local VirtualUser = game:GetService("VirtualUser")
-                    VirtualUser:CaptureController()
-                    VirtualUser:ClickButton1(Vector2.new(0, 0))
-                end)
-                task.wait(0.1)
-            end
-        end)
-    end,
-})
 
 
 UtilityTab:CreateButton({
@@ -5989,50 +5972,6 @@ UtilityTab:CreateSlider({
     end,
 })
 
--- 6. 가짜 래그 (서버에 자신의 위치를 끊겨 보이게 함)
-local fakeLag = false
-UtilityTab:CreateToggle({
-    Name = "가짜 렉 (위치 끊기기)",
-    CurrentValue = false,
-    Callback = function(Value)
-        fakeLag = Value
-        task.spawn(function()
-            while fakeLag do
-                pcall(function()
-                    game:GetService("NetworkClient"):SetOutgoingKBPSLimit(1)
-                    task.wait(0.3)
-                    game:GetService("NetworkClient"):SetOutgoingKBPSLimit(9e9)
-                end)
-                task.wait(0.5)
-            end
-        end)
-    end,
-})
-
-UtilityTab:CreateSection("기타 유틸리티")
-
-
-UtilityTab:CreateToggle({
-    Name = "3D 렌더링 비활성화 (잠수용)",
-    CurrentValue = false,
-    Callback = function(Value)
-        pcall(function()
-            game:GetService("RunService"):Set3dRenderingEnabled(not Value)
-        end)
-    end,
-})
-
-
-UtilityTab:CreateButton({
-    Name = "현재 좌표 복사 (클립보드)",
-    Callback = function()
-        pcall(function()
-            local pos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-            setclipboard(tostring(pos))
-            Rayfield:Notify({Title="알림", Content="좌표가 복사되었습니다.", Duration=2})
-        end)
-    end,
-})
 
 
 UtilityTab:CreateButton({
@@ -12653,7 +12592,18 @@ function PcldViewF()
 end
 
 
-keybindTab:CreateToggle({
+local iconEsp = keybindTab:CreateToggle({
+    Name = "esp 아이콘<font color='rgb(0,0,255)'>[프리미엄]</font>",
+    CurrentValue = false,
+    Flag = "",
+    Callback = function(Value)
+        PlrEspT = Value
+        PlrEspF()
+    end
+})
+--iconEsp:Set(true)
+
+local PCLDView = keybindTab:CreateToggle({
     Name = "PCLD 보기",
     CurrentValue = false,
     Flag = "PCLDView",
@@ -12663,7 +12613,8 @@ keybindTab:CreateToggle({
     end
 })
 PCLDView:Set(true)
-keybindTab:CreateToggle({
+
+local ViewTool = keybindTab:CreateToggle({
     Name = "표창,쿠나이 보기",
     CurrentValue = false,
     Flag = "5",
@@ -12673,7 +12624,6 @@ keybindTab:CreateToggle({
     end
 })
 ViewTool:Set(true)
-
 
 
 
