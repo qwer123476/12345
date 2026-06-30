@@ -8054,7 +8054,7 @@ LoopTab:CreateToggle({
                     local distance = (myHrp.Position - hrp.Position).Magnitude
                     if distance > 30 then
                         TP(player)
-                        task.wait(0.015)
+                        task.wait(0.5)
                         
                         -- TP 직후 다시 한번 내 위치 갱신 확인
                         myChar = plr.Character
@@ -9953,7 +9953,7 @@ AuraTab:CreateToggle({
 AuraTab:CreateSection("킬,플링")
 
 AuraTab:CreateToggle({
-    Name = "킬 아우라",
+    Name = "킬 all   <font color='rgb(0,0,255)'>[프리미엄]</font>       <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -10060,11 +10060,11 @@ AuraTab:CreateToggle({
 
                         if beforeTP and myHrp then
                             BACK(beforeTP)
-                            task.wait(0.05)
+                            task.wait(0.5)
                         end
                     end
                 end
-                task.wait(0.05)
+                task.wait(0.5)
             end
         end)
     end
