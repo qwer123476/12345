@@ -12653,6 +12653,27 @@ function PcldViewF()
 end
 
 
+keybindTab:CreateToggle({
+    Name = "PCLD 보기",
+    CurrentValue = false,
+    Flag = "PCLDView",
+    Callback = function(Value)
+        PcldViewT = Value
+        PcldViewF()
+    end
+})
+PCLDView:Set(true)
+keybindTab:CreateToggle({
+    Name = "표창,쿠나이 보기",
+    CurrentValue = false,
+    Flag = "5",
+    Callback = function(Value)
+        ViewToolT = Value
+        ViewToolF()
+    end
+})
+ViewTool:Set(true)
+
 
 
 
