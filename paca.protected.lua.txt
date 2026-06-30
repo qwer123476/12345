@@ -8074,7 +8074,7 @@ LoopTab:CreateToggle({
                             end
                         end
                         
-                        task.wait(0.5)
+                        task.wait()
                         
                         if beforeTP and myHrp then
                             BACK(beforeTP)
