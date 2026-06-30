@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 순정 그랩/릴리스 연사   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 순정 그랩/릴리스 + 서버 즉사 스팸   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7995,19 +7995,35 @@ LoopTab:CreateToggle({
                         task.wait(0.05)
                     end
 
-                    -- [2] 그랩 ➔ task.wait() ➔ 릴리스 연사 단계
+                    -- [2] 그랩 연사 + 서버 판정 즉사 유도 섹션
                     if humanoid.Health > 0 and currentBlobS then
                         for _ = 1, 30 do
                             if not blobLoopT2 then break end
+                            if humanoid.Health <= 0 then break end
                             
+                            -- 1. 소유권 강탈 및 서버 동기화 위치 고정
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                            
+                            pcall(function()
+                                -- 2. 무한 속도(Velocity) 주입
+                                -- 네트워크 소유권이 넘어온 상태에서 속도를 주입하면 서버가 캐릭터 파괴(데스) 판정을 내립니다.
+                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
+                                hrp.AssemblyAngularVelocity = Vector3.new(999999, 999999, 999999)
+                                
+                                -- 3. 공허(FallenPartsDestroyHeight) 강제 좌표 도달 패킷 연타
+                                -- 서버에 "이 캐릭터는 현재 Y축 매장 상태"임을 강제로 인지시킵니다.
+                                hrp.CFrame = CFrame.new(hrp.Position.X, -50000, hrp.Position.Z)
+                            end)
+
                             -- 그랩 실행
                             BlobGrab(currentBlobS, hrp, "Right")
-                            task.wait() -- 원하는 연사 속도에 맞춰 소수점 조절 가능
+                            task.wait(0.01)
                             
-                            -- 릴리스 및 그랩선 파괴
+                            -- 4. 그랩 파괴 이벤트를 비정상 좌표로 전송하여 백룸/서버 랙 즉사 유도
                             BlobRelease(currentBlobS, hrp, "Right")
-                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
-                            task.wait()
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(0, -50000, 0))
+                            
+                            task.wait(0.01)
                         end
                     end
                 end
@@ -8016,7 +8032,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
