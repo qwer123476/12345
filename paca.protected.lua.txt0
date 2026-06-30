@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 노그랩 PLCD 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 찐 앵커 킥 <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7924,6 +7924,15 @@ LoopTab:CreateToggle({
 
         task.spawn(function()
             local playerState = {}
+
+            -- [핵심] 타겟을 공중에 완벽히 묶어버릴 클라이언트 사이드 가짜 고정 앵커 파트 생성
+            local fakeAnchor = Instance.new("Part")
+            fakeAnchor.Size = Vector3.new(2, 2, 2)
+            fakeAnchor.Anchored = true
+            fakeAnchor.CanCollide = false
+            fakeAnchor.Transparency = 1 -- 눈에 안 보이게 투명화
+            fakeAnchor.Name = "FTAP_AntiCheat_Trigger"
+            fakeAnchor.Parent = workspace
 
             while blobLoopT2 do
                 UpdateCurrentBlobman()
@@ -7970,7 +7979,7 @@ LoopTab:CreateToggle({
                         needToTP = true
                     end
 
-                    -- [1] 납치 조건 시 우선 강제 소환
+                    -- [1] 조건 충족 시 타겟을 우선 납치
                     if needToTP and hum.Health > 0 then
                         TP(pl)
                         task.wait(0.05)
@@ -7983,47 +7992,53 @@ LoopTab:CreateToggle({
                         task.wait(0.05)
                     end
 
-                    -- [2] 그랩 없이 네트워크 패킷만으로 공중 정지 유도 (본인 날아감 방지)
+                    -- [2] SS(쌕스크)급 앵커 고정 킥 매커니즘 발동
                     if hum.Health > 0 and currentBlobS then
-                        -- 혹시 잡혀있을지 모를 그랩을 완전히 해제 (나랑 연결 끊기)
+                        -- 그랩은 나한테 튀는 반동을 막기 위해 철저히 해제
                         BlobRelease(currentBlobS, hrp, "Right")
                         rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
-                        
-                        -- 안전하게 하늘 높이 좌표 설정
+
+                        -- 내 머리 위 안전한 공중 50스터드 위로 가짜 앵커 파트 위치 고정
                         local freezeAirCF = originCF * CFrame.new(0, 50, 0)
-                        
-                        -- 타겟의 물리 속도를 완전히 소멸
+                        fakeAnchor.CFrame = freezeAirCF
+
+                        -- 대상 유저의 소유권을 뺏어온 뒤, 가짜 고정 파트 위치에 완벽하게 일치시킴
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
+                        hrp.CFrame = freezeAirCF
+
+                        -- 물리 속도 완전 제로화
                         hrp.Velocity = Vector3.zero
                         hrp.RotVelocity = Vector3.zero
                         hrp.AssemblyLinearVelocity = Vector3.zero
                         hrp.AssemblyAngularVelocity = Vector3.zero
-                        
-                        -- 소유권 강제 탈취 및 이동
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
-                        hrp.CFrame = freezeAirCF
-                        
-                        -- 붙잡지 않은 상태에서 타겟만 공중에 박아버리는 루프 난사
-                        -- 내가 안 붙잡고 있으므로 타겟이 요동쳐도 나는 미동조차 안 합니다.
-                        for _ = 1, 12 do
+
+                        -- [핵심 루프] 서버가 이 타겟을 완전히 '앵커(정지)'된 오브젝트로 인식하도록
+                        -- 하트비트 단위로 네트워크 소유권을 가짜 앵커 파트와 강제 동기화(Weld 효과) 시킵니다.
+                        for _ = 1, 15 do
                             if not blobLoopT2 then break end
                             
-                            hrp.CFrame = freezeAirCF
+                            -- 타겟의 CFrame을 내 고정 파트 좌표로 강제 락(Lock)
+                            hrp.CFrame = fakeAnchor.CFrame
+                            
                             hrp.Velocity = Vector3.zero
                             hrp.RotVelocity = Vector3.zero
                             hrp.AssemblyLinearVelocity = Vector3.zero
                             hrp.AssemblyAngularVelocity = Vector3.zero
-                            
-                            -- 공중에 묶인 정지 패킷 연속 전송
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
+
+                            -- 서버에 "얘 지금 여기 박혀서 움직임 0임" 패킷 지속 난사
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, fakeAnchor.CFrame)
                             game:GetService("RunService").Heartbeat:Wait()
                         end
                     end
                 end
                 task.wait(0.1)
             end
+            -- 토글 꺼지면 가짜 앵커 파트 삭제
+            fakeAnchor:Destroy()
         end)
     end
 })
+
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
