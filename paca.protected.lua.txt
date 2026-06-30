@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name =El오너킥V34   <font color='rgb(255,154,123)'>[파카]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7994,11 +7994,11 @@ LoopTab:CreateToggle({
                         rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
                         
                         BlobRelease(currentBlobS, hrp, "Right")
-                        task.wait(0.01)
+                        task.wait()
                         BlobGrab(currentBlobS, hrp, "Right")
                         
                         rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
-                        task.wait(0.05)
+                        task.wait()
                     end
                 end
                 task.wait(0.1)
