@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name =El오너킥V34   <font color='rgb(255,154,123)'>[파카]</font>",
+    Name ="오너킥V34   <font color='rgb(255,154,123)'>[파카]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
