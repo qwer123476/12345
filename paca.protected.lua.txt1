@@ -8338,6 +8338,102 @@ local Loop1 = LoopTab:CreateToggle({
         end
     end
 })
+local Players = game:GetService("Players")
+local localPlayer = game.Players.LocalPlayer
+local GrabEvents = game:GetService("ReplicatedStorage"):FindFirstChild("GrabEvents")
+
+loopPlayerT = false
+playersInLoop2V = {}
+
+local function killTarget(player)
+    if not player or player == localPlayer then return end
+    
+    local myChar = localPlayer.Character
+    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+    if not myHrp or not myChar:FindFirstChildOfClass("Humanoid") or myChar:FindFirstChildOfClass("Humanoid").Health <= 0 then return end
+
+    local targetChar = player.Character
+    local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+    local targetHum = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
+    local torso = targetChar and (targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso"))
+    
+    if not targetRoot or not targetHum or targetHum.Health <= 0 or not torso then return end
+
+    local originCF = myHrp.CFrame
+    local isKilling = true
+
+    local tpThread = task.spawn(function()
+        while isKilling do
+            if not localPlayer.Character or not myHrp or not myChar:FindFirstChildOfClass("Humanoid") or myChar:FindFirstChildOfClass("Humanoid").Health <= 0 or not player.Character or not targetRoot then break end
+            myHrp.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
+            task.wait(0.01)
+        end
+    end)
+
+    while isKilling do
+        if not player.Character or not targetRoot or not targetHum or targetHum.Health <= 0 or not localPlayer.Character or not myHrp or not myChar:FindFirstChildOfClass("Humanoid") or myChar:FindFirstChildOfClass("Humanoid").Health <= 0 then
+            break
+        end
+
+        if GrabEvents then
+            if GrabEvents:FindFirstChild("SetNetworkOwner") then GrabEvents.SetNetworkOwner:FireServer(torso, targetRoot.CFrame) end
+            if GrabEvents:FindFirstChild("DestroyGrabLine") then 
+                激Events.DestroyGrabLine:FireServer(targetChar)
+                GrabEvents.DestroyGrabLine:FireServer(torso)
+            end
+            if GrabEvents:FindFirstChild("EndGrabEarly") then GrabEvents.EndGrabEarly:FireServer() end
+        end
+
+        targetHum.Health = 0
+        task.wait(0.02)
+    end
+
+    isKilling = false
+    pcall(task.cancel, tpThread)
+
+    if myHrp and myHrp.Parent then
+        if typeof(BACK) == "function" then BACK(originCF) else myHrp.CFrame = originCF end
+    end
+
+    if myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").Parent then
+        myChar:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.GettingUp)
+    end
+end
+
+function loopPlayerF()
+    task.spawn(function()
+        while loopPlayerT do
+            local hasTargets = false
+            for _, name in ipairs(playersInLoop2V) do
+                if not loopPlayerT then break end
+                local target = Players:FindFirstChild(name)
+                if target and target.Character and target.Character:FindFirstChildOfClass("Humanoid") and target.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+                    hasTargets = true
+                    killTarget(target)
+                end
+            end
+            task.wait(hasTargets and 0.05 or 0.1)
+        end
+    end)
+end
+
+LoopTab:CreateToggle({
+    Name = "루프킬V2   <font color='rgb(0,255,0)'>[그랩]</font>",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        loopPlayerT = Value
+        if loopPlayerT then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
+            end
+            loopPlayerF()
+        else
+            table.clear(playersInLoop2V)
+        end
+    end
+})
 
 local Loop2 = LoopTab:CreateToggle({
     Name = "루프킥   <font color='rgb(0,255,0)'>[그랩]</font>",
