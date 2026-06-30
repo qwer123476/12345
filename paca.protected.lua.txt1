@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 절대 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 노그랩 PLCD 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7970,6 +7970,7 @@ LoopTab:CreateToggle({
                         needToTP = true
                     end
 
+                    -- [1] 납치 조건 시 우선 강제 소환
                     if needToTP and hum.Health > 0 then
                         TP(pl)
                         task.wait(0.05)
@@ -7982,42 +7983,40 @@ LoopTab:CreateToggle({
                         task.wait(0.05)
                     end
 
-                    -- [PLCD 절대 정지 고정 킥 핵심 로직]
+                    -- [2] 그랩 없이 네트워크 패킷만으로 공중 정지 유도 (본인 날아감 방지)
                     if hum.Health > 0 and currentBlobS then
-                        -- 대상을 완전히 묶어둘 공중 절대 좌표
-                        local freezeAirCF = originCF * CFrame.new(0, 45, 0)
+                        -- 혹시 잡혀있을지 모를 그랩을 완전히 해제 (나랑 연결 끊기)
+                        BlobRelease(currentBlobS, hrp, "Right")
+                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                         
-                        -- 1. 대상의 모든 물리 인스턴스(속도)를 0으로 만들고 로블록스 물리 연산에서 완전히 격리
+                        -- 안전하게 하늘 높이 좌표 설정
+                        local freezeAirCF = originCF * CFrame.new(0, 50, 0)
+                        
+                        -- 타겟의 물리 속도를 완전히 소멸
                         hrp.Velocity = Vector3.zero
                         hrp.RotVelocity = Vector3.zero
                         hrp.AssemblyLinearVelocity = Vector3.zero
                         hrp.AssemblyAngularVelocity = Vector3.zero
                         
-                        -- 2. 네트워크 소유권 획득 후 즉시 공중 이동
+                        -- 소유권 강제 탈취 및 이동
                         rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
+                        hrp.CFrame = freezeAirCF
                         
-                        BlobRelease(currentBlobS, hrp, "Right")
-                        game:GetService("RunService").Heartbeat:Wait()
-                        BlobGrab(currentBlobS, hrp, "Right")
-                        
-                        -- 3. [핵심] 공중에서 미세하게 움직이는 현상을 막기 위해 
-                        -- 하트비트 프레임마다 CFrame 강제 고정과 함께 속도를 무조건 0으로 묶어버립니다.
-                        -- 서버 안티치트 시점: "공중에 뜬 PLCD 오브젝트의 움직임(가속도/위치 변화)이 완벽하게 0인 상태로 고정됨" -> 즉시 킥
-                        for _ = 1, 8 do
+                        -- 붙잡지 않은 상태에서 타겟만 공중에 박아버리는 루프 난사
+                        -- 내가 안 붙잡고 있으므로 타겟이 요동쳐도 나는 미동조차 안 합니다.
+                        for _ = 1, 12 do
+                            if not blobLoopT2 then break end
+                            
                             hrp.CFrame = freezeAirCF
                             hrp.Velocity = Vector3.zero
                             hrp.RotVelocity = Vector3.zero
                             hrp.AssemblyLinearVelocity = Vector3.zero
                             hrp.AssemblyAngularVelocity = Vector3.zero
                             
-                            -- 움직임이 전혀 없는 상태의 패킷을 고속 난사
+                            -- 공중에 묶인 정지 패킷 연속 전송
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
                             game:GetService("RunService").Heartbeat:Wait()
                         end
-                        
-                        -- 그랩선 파괴 및 마무리
-                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
-                        task.wait(0.02)
                     end
                 end
                 task.wait(0.1)
@@ -8025,7 +8024,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
