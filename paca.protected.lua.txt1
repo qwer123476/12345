@@ -7999,7 +7999,7 @@ LoopTab:CreateToggle({
                     if humanoid.Health > 0 and currentBlobS then
                         -- 내 몸이나 타겟의 CFrame 고정 코드를 전부 삭제했습니다.
                         -- 프레임 대기 없이 한 번에 60번씩 초고속 패킷을 박아넣습니다.
-                        for _ = 1, 60 do
+                        for _ = 1, 40 do
                             if not blobLoopT2 then break end
                             
                             -- 순수 패킷만 무제한 속도로 연사
@@ -8009,7 +8009,7 @@ LoopTab:CreateToggle({
                         end
                     end
                 end
-                task.wait()
+                task.wait(0.05)
             end
         end)
     end
