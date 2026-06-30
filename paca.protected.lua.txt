@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 그랩 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7970,6 +7970,7 @@ LoopTab:CreateToggle({
                         needToTP = true
                     end
 
+                    -- [1] 납치 조건 충족 시 타겟을 내 근처로 이동
                     if needToTP and hum.Health > 0 then
                         TP(pl)
                         task.wait(0.05)
@@ -7982,31 +7983,36 @@ LoopTab:CreateToggle({
                         task.wait(0.05)
                     end
 
-                    -- [물리 오버플로우 킥 핵심 연계 부분]
+                    -- [2] 공중 고정 킥(PLCD 원리) 연계 부분
                     if hum.Health > 0 and currentBlobS then
-                        -- 1. 소유권을 강제로 뺏어와 내 컴퓨터가 대상의 위치를 계산하게 만듦
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
+                        -- 대상을 고정시킬 공중 30스터드 위 좌표 설정 (내 원래 지상 위치 기준 안전거리 확보)
+                        local freezeAirCF = originCF * CFrame.new(0, 30, 0)
                         
-                        -- 2. 릴리스 후 즉시 그랩
+                        -- 내 캐릭터의 반동 방지를 위해 타겟의 물리 속도를 완전히 0으로 소멸
+                        hrp.Velocity = Vector3.new(0, 0, 0)
+                        hrp.RotVelocity = Vector3.new(0, 0, 0)
+                        
+                        -- 네트워크 소유권을 확보한 뒤 공중으로 이동
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
+                        
                         BlobRelease(currentBlobS, hrp, "Right")
-                        runAnimation = game:GetService("RunService").Heartbeat:Wait() -- 최소 프레임 동기화 대기
+                        game:GetService("RunService").Heartbeat:Wait()
                         BlobGrab(currentBlobS, hrp, "Right")
                         
-                        -- 3. [연구 핵심] 그랩된 대상의 속도(Velocity)와 좌표를 서버 한계치까지 순간적으로 회전/비틀기
-                        -- 이 연산이 들어가는 순간 FTAP 서버 안티치트가 속도/물리 버그로 판정하고 유저를 킥(Kick)합니다.
-                        for i = 1, 3 do
-                            hrp.Velocity = Vector3.new(999999, 999999, 999999)
-                            hrp.RotVelocity = Vector3.new(999999, 999999, 999999)
-                            -- 초고속 위치 변조 리모트 난사
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame * CFrame.Angles(math.rad(i*90), 0, 0))
+                        -- [핵심] 타겟의 CFrame을 공중 한 좌표에 고정된 채로 서버에 난사 (Freeze 상태 유도)
+                        -- 이 패킷이 연속으로 들어가면서 서버 안티치트가 공중 고정 상태(PLCD 누적 부하)로 판단하고 킥을 보냅니다.
+                        for _ = 1, 5 do
+                            hrp.CFrame = freezeAirCF
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, freezeAirCF)
+                            game:GetService("RunService").Heartbeat:Wait()
                         end
                         
-                        -- 4. 그랩선 파괴 패킷으로 쐐기 박기
+                        -- 그랩선 해제 후 종료
                         rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                         task.wait(0.02)
                     end
                 end
-                task.wait(0.05)
+                task.wait(0.1)
             end
         end)
     end
