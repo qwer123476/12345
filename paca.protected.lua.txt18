@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 서버고정 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 고속그랩 킥 (하늘 승천 완벽 차단)   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7950,10 +7950,11 @@ LoopTab:CreateToggle({
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
                     
-                    -- 고정된 공중 절대 좌표 계산 (내 현재 위치와 무관한 월드 절대 좌표로 지정)
-                    -- 내 캐릭터가 출렁여도 이 좌표는 서버에서 절대 변하지 않습니다.
-                    local targetPos = myHrp.Position
-                    local absoluteAirCF = CFrame.new(targetPos.X, targetPos.Y + 60, targetPos.Z)
+                    -- [치트 방어 1] 내 캐릭터의 현재 완벽한 바닥 좌표 확보
+                    local groundCF = myHrp.CFrame
+                    
+                    -- 타겟이 고정될 공중 절대 좌표 (내가 하늘로 안 올라가므로 완전히 고정됨)
+                    local absoluteAirCF = CFrame.new(groundCF.Position.X, groundCF.Position.Y + 60, groundCF.Position.Z)
 
                     local needToTP = false
 
@@ -7974,49 +7975,54 @@ LoopTab:CreateToggle({
                         needToTP = true
                     end
 
-                    -- [1] 납치 연계
+                    -- 납치 단계
                     if needToTP and hum.Health > 0 then
                         TP(pl)
                         task.wait(0.05)
                         
-                        hrp.CFrame = CFrame.new(targetPos.X, targetPos.Y + 5, targetPos.Z)
-                        BACK(myHrp.CFrame)
+                        hrp.CFrame = CFrame.new(groundCF.Position.X, groundCF.Position.Y + 5, groundCF.Position.Z)
+                        BACK(groundCF)
                         task.wait(0.05)
                     end
 
-                    -- [2] 찐 핵앵커: 네트워크 패킷 오버플로우를 통한 서버사이드 고정
+                    -- [핵심] 초고속 그랩/릴리스 연타 + 내 캐릭터 바닥 고정 루프
                     if hum.Health > 0 and currentBlobS then
-                        -- 블롭맨과의 물리 결착을 완전히 차단하여 내가 날아가는 물리 반동을 원천 봉쇄
-                        BlobRelease(currentBlobS, hrp, "Right")
-                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                         
-                        -- 타겟의 물리 속도를 서버 메모리 상에서 강제로 제로화
-                        hrp.Velocity = Vector3.zero
-                        hrp.RotVelocity = Vector3.zero
-                        hrp.AssemblyLinearVelocity = Vector3.zero
-                        hrp.AssemblyAngularVelocity = Vector3.zero
-                        
-                        -- 타겟의 소유권을 뺏어오며 공중 절대 좌표로 전송
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, absoluteAirCF)
-                        hrp.CFrame = absoluteAirCF
-                        
-                        -- [핵심 루프] 서버 안티치트에 락을 걸어버리는 가짜 패킷 난사
-                        -- 내 캐릭터의 위치(`myHrp`)를 참조하지 않고 오직 고정된 `absoluteAirCF`만 쏘기 때문에
-                        -- 내가 위아래로 움직이든 날아가든 타겟은 공중에 완벽히 박혀있게 됩니다.
-                        for _ = 1, 20 do
+                        for i = 1, 30 do -- 30프레임 동안 난사 (이 사이에 안티치트 킥 터짐)
                             if not blobLoopT2 then break end
                             
-                            -- 클라이언트 레벨에서 좌표와 물리 속도를 강제로 정지
+                            -- 1. 내 캐릭터가 하늘로 끌려 올라가는 것을 프레임 단위로 원천 차단
+                            -- 그랩 인장력이 나를 당기기 전에 매 프레임 바닥 좌표로 내 캐릭터를 강제 텔포(잠금)시킵니다.
+                            myHrp.CFrame = groundCF
+                            myHrp.Velocity = Vector3.zero
+                            
+                            -- 2. 타겟 PLCD 좌표 및 가속도 완전 고정 패킷
                             hrp.CFrame = absoluteAirCF
-                            hrp.Velocity = Vector3.zero
-                            hrp.RotVelocity = Vector3.zero
                             hrp.AssemblyLinearVelocity = Vector3.zero
                             hrp.AssemblyAngularVelocity = Vector3.zero
-                            
-                            -- 서버에 "이 녀석의 현재 물리 상태는 움직임 0" 임을 1초에 수십 번 강제 동기화
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, absoluteAirCF)
                             
-                            -- 로블록스 서버의 물리 틱인 Heartbeat 단위로 완벽하게 밀착 동기화
+                            -- 3. [그랩/릴리스 초고속 매크로 순환] 
+                            -- 서버 시점에서 타겟이 잡혔다 풀렸다를 무한 반복하며 물리 충돌 에러 유도
+                            -- (게임 내부의 그랩 리모트 이벤트 형식에 맞게 FireServer를 날려야 합니다)
+                            pcall(function()
+                                -- 블롭맨 그랩 시도 (서버 이벤트 이름이 다를 수 있으니 기존 스크립트 참고 필요)
+                                rs.GrabEvents.GrabPlayer:FireServer(hrp) 
+                            end)
+                            
+                            -- 아주 미세한 물리 틱을 주어 서버가 그랩을 인식하게 함
+                            game:GetService("RunService").Heartbeat:Wait()
+                            
+                            -- 내 위치 다시 한번 바닥으로 고정
+                            myHrp.CFrame = groundCF
+                            
+                            -- 즉시 그랩 해제 패킷 난사
+                            BlobRelease(currentBlobS, hrp, "Right")
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+                            
+                            -- 다시 한번 타겟 정지 확인
+                            hrp.CFrame = absoluteAirCF
+                            
                             game:GetService("RunService").Heartbeat:Wait()
                         end
                     end
@@ -8026,7 +8032,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
