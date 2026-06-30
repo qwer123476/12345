@@ -8155,9 +8155,8 @@ local function killTarget(player)
         end
 
         pcall(function()
-            targetRoot.Velocity = Vector3.new(0, -500, 0)
-            targetRoot.AssemblyLinearVelocity = Vector3.new(0, -500, 0)
-            targetHum:ChangeState(Enum.HumanoidStateType.Dead)
+            targetRoot.CFrame = CFrame.new(targetRoot.Position.X, -50000, targetRoot.Position.Z)
+            targetRoot.AssemblyLinearVelocity = Vector3.new(0, -10000, 0)
         end)
 
         task.wait(0.02)
@@ -8197,7 +8196,7 @@ function loopPlayerF()
 end
 
 LoopTab:CreateToggle({
-    Name = "루프킬v2   <font color='rgb(0,255,0)'>[그랩]</font>",
+    Name = "루프킬   <font color='rgb(255,0,0)'>[그랩]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -8215,6 +8214,7 @@ LoopTab:CreateToggle({
         end
     end
 })
+
 
 
 local Loop2 = LoopTab:CreateToggle({
