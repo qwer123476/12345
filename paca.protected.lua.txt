@@ -7979,14 +7979,23 @@ LoopTab:CreateToggle({
                             task.wait(0.3)
 
                             if currentBlobS then
-                                -- 1번부터 9번까지는 그랩과 드롭을 빠르게 반복
+                                -- 1. 왼쪽(Left) 그랩 & 드롭 10번 반복
+                                for _ = 1, 10 do
+                                    BlobGrab(currentBlobS, hrp, "Left")
+                                    task.wait(0.01)
+                                    BlobDrop(currentBlobS, hrp, "Left")
+                                    task.wait(0.01)
+                                end
+
+                                -- 2. 오른쪽(Right) 그랩 & 드롭 9번 반복
                                 for _ = 1, 9 do
                                     BlobGrab(currentBlobS, hrp, "Right")
                                     task.wait(0.01)
                                     BlobDrop(currentBlobS, hrp, "Right")
                                     task.wait(0.01)
                                 end
-                                -- 마지막 10번째는 그랩만 딱 걸고 드롭하지 않고 유지
+                                
+                                -- 3. 마지막 오른쪽 10번째는 그랩 상태로 유지
                                 BlobGrab(currentBlobS, hrp, "Right")
                                 task.wait(0.01)
                             end
