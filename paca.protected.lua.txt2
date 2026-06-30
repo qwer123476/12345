@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 절대고정 그랩 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 순정그랩 킥 (내 몸 완전고정)   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7925,7 +7925,7 @@ LoopTab:CreateToggle({
         task.spawn(function()
             local playerState = {}
 
-            -- 토글을 켠 순간 내 캐릭터의 현재 위치를 완벽하게 고정점으로 기억
+            -- 토글 켠 시점의 내 위치 고정 (그랩 인장력 상쇄용)
             local myChar = game.Players.LocalPlayer.Character
             local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
             local freezeCF = myHrp and myHrp.CFrame
@@ -7951,15 +7951,9 @@ LoopTab:CreateToggle({
                         continue 
                     end
 
-                    -- [1] 내 캐릭터 움직임 원천 차단 (얼어붙음)
-                    if myHrp and freezeCF then
-                        myHrp.CFrame = freezeCF
-                        myHrp.AssemblyLinearVelocity = Vector3.zero
-                        myHrp.AssemblyAngularVelocity = Vector3.zero
-                    end
-
-                    -- 납치 (타겟을 내 앞으로 소환)
+                    -- [기존 납치 로직 순정 유지]
                     local needToTP = false
+
                     if not playerState[name] or playerState[name].PlayerInstance ~= pl then
                         needToTP = true
                         playerState[name] = { PlayerInstance = pl, IsDeadBefore = false }
@@ -7972,34 +7966,43 @@ LoopTab:CreateToggle({
                         playerState[name].IsDeadBefore = false 
                     end
 
-                    if needToTP and hum.Health > 0 and freezeCF then
-                        TP(pl)
-                        task.wait(0.03)
-                        hrp.CFrame = freezeCF * CFrame.new(0, 0, -5) -- 내 5스터드 앞으로 타겟 강제 소환
-                        task.wait(0.03)
+                    -- 전달해주신 원래의 TP 및 좌표 할당 방식 그대로 유지
+                    local distance = (hrp.Position - myHrp.Position).Magnitude
+                    if distance > 40 then
+                        needToTP = true
                     end
 
-                    -- [2] 오직 패킷 연타로만 킥 유도 (내 몸은 고정)
-                    if hum.Health > 0 and currentBlobS and freezeCF then
+                    if needToTP and hum.Health > 0 then
+                        TP(pl)
+                        task.wait(0.05)
                         
-                        for _ = 1, 50 do -- 50번 초고속 연타
+                        -- 원래 쓰시던 상대방 끌고 오기 좌표 연산
+                        hrp.CFrame = myHrp.CFrame * CFrame.new(0, 60, 0)
+                        BACK(myHrp.CFrame)
+                        task.wait(0.05)
+                    end
+
+                    -- [그랩 난사 및 내 몸 고정 섹션]
+                    if hum.Health > 0 and currentBlobS then
+                        
+                        for _ = 1, 40 do -- 안티치트 과부하를 위한 패킷 연타
                             if not blobLoopT2 then break end
                             
-                            -- 그랩 인장력이 나를 당기지 못하도록 매 프레임 위치 고정 유지
-                            myHrp.CFrame = freezeCF
-                            myHrp.AssemblyLinearVelocity = Vector3.zero
+                            -- 그랩 반동으로 내 몸이 위로 빨려 들어가는 것을 프레임 단위로 억제
+                            if myHrp and freezeCF then
+                                myHrp.CFrame = freezeCF
+                                myHrp.AssemblyLinearVelocity = Vector3.zero
+                                myHrp.AssemblyAngularVelocity = Vector3.zero
+                            end
                             
-                            -- 타겟 위치도 내 앞에 임시 고정
-                            hrp.CFrame = freezeCF * CFrame.new(0, 0, -5)
-                            
-                            -- 초고속 그랩 실행 패킷
+                            -- 원래 사용하시던 그랩 리모트 이벤트 스팸
                             pcall(function()
                                 rs.GrabEvents.GrabPlayer:FireServer(hrp)
                             end)
                             
                             game:GetService("RunService").Heartbeat:Wait()
                             
-                            -- 즉시 릴리스(그랩 파괴) 패킷 연타
+                            -- 즉시 원래 쓰시던 릴리스 및 그랩선 파괴 패킷 전송
                             BlobRelease(currentBlobS, hrp, "Right")
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                             
@@ -8007,12 +8010,11 @@ LoopTab:CreateToggle({
                         end
                     end
                 end
-                task.wait(0.05)
+                task.wait(0.1)
             end
         end)
     end
 })
-
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
