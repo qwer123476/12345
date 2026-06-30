@@ -7954,20 +7954,25 @@ LoopTab:CreateToggle({
                                 blobRoot.CFrame = myHrp.CFrame
                             end
                         end
-                        task.wait(0.1) -- 공중 위치 잡힐 시간 확보
+                        task.wait(0.1)
 
                         -- 3. 원래 잘 되던 툴/리모트 방식 납치 작동
                         TP(pl)
-                        task.wait(0.2) -- 대상이 올 때까지 미세 대기
+                        task.wait(0.2) 
 
-                        -- 4. 오자마자 즉시 네트워크 주도권 뺏고 그랩 1번 연계
+                        -- 4. 오자마자 즉시 네트워크 주도권 설정 후 [릴리스 -> 그랩] 연계
                         if currentBlobS and hum.Health > 0 then
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
+                            
+                            -- [추가된 연계 부분]
+                            BlobRelease(currentBlobS, hrp, "Right")
+                            task.wait(0.01) -- 아주 미세한 프레임 딜레이
                             BlobGrab(currentBlobS, hrp, "Right")
+                            
                             task.wait(0.1)
                         end
 
-                        -- 5. 후처리 및 지상 복귀 (원래 소스 흐름)
+                        -- 5. 후처리 및 지상 복귀
                         rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                         
                         myHrp.CFrame = originCF
