@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "오너킥V34  <font color='rgb(255,154,123)'>[파카]</font>",
+    Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7923,61 +7923,85 @@ LoopTab:CreateToggle({
         end
 
         task.spawn(function()
+            -- 플레이어별로 최초 납치 여부 및 이전 인스턴스(재접속 감지용)를 기억하는 테이블
+            local playerState = {}
+
             while blobLoopT2 do
                 UpdateCurrentBlobman()
 
                 for _, name in ipairs(playersInLoop2V) do
                     if not blobLoopT2 then break end
-                    
-                    -- 화이트리스트 검사
                     if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
 
-                    -- 유저가 나갔거나 캐릭터가 없는 경우 체크하여 건너뛰기(Skip)
                     local pl = game.Players:FindFirstChild(name)
-                    if not pl then continue end -- 이미 나간 사람은 즉시 패스
+                    if not pl then 
+                        -- 서버에 없는 사람은 패스하고, 상태값 리셋 (나중에 재접속 시 새로 납치하도록)
+                        playerState[name] = nil
+                        continue 
+                    end
                     
                     local char = pl.Character
                     local hum = char and char:FindFirstChildOfClass("Humanoid")
                     local hrp = char and char:FindFirstChild("HumanoidRootPart")
                     
-                    -- 캐릭터가 정상 상태가 아니거나 파괴된 경우 패스
                     if not char or not hum or not hrp or char.Parent == nil or not hrp:IsDescendantOf(workspace) then 
                         continue 
                     end
 
-                    -- 대상이 살아있을 때만 연사 연계 진입
-                    if hum.Health > 0 and currentBlobS then
-                        
-                        local myChar = game.Players.LocalPlayer.Character
-                        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                        if not myHrp then continue end
-                        local originCF = myHrp.CFrame
+                    local myChar = game.Players.LocalPlayer.Character
+                    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                    if not myHrp then continue end
+                    local originCF = myHrp.CFrame
 
-                        -- 원래 쓰시던 납치 수단 연계
+                    -- [핵심] 재납치(TP 어게인) 조건 체크 변수
+                    local needToTP = false
+
+                    -- 1. 신규 유저이거나 유저가 나갔다 다시 들어온 경우 (재접속 감지)
+                    if not playerState[name] or playerState[name].PlayerInstance ~= pl then
+                        needToTP = true
+                        playerState[name] = { PlayerInstance = pl, IsDeadBefore = false }
+                    end
+
+                    -- 2. 대상이 죽었다가 살아난 경우 감지 (Health가 0이 되었다가 다시 채워졌을 때)
+                    if hum.Health <= 0 then
+                        playerState[name].IsDeadBefore = true
+                    elseif hum.Health > 0 and playerState[name].IsDeadBefore then
+                        needToTP = true
+                        playerState[name].IsDeadBefore = false -- 사망 상태 리셋
+                    end
+
+                    -- 3. 내 반경 40스터드 이상으로 도망치거나 빠져나간 경우 감지
+                    local distance = (hrp.Position - myHrp.Position).Magnitude
+                    if distance > 40 then
+                        needToTP = true
+                    end
+
+                    -- 설정한 3가지 조건 중 하나라도 발동하면 납치(TP) 실행
+                    if needToTP and hum.Health > 0 then
                         TP(pl)
                         task.wait(0.1)
-
-                        -- 주도권 선점 및 릴리스 -> 1번 오른손 그랩 연타
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
-                        
-                        BlobRelease(currentBlobS, hrp, "Right")
-                        task.wait(0.01)
-                        BlobGrab(currentBlobS, hrp, "Right")
-                        task.wait(0.05)
-
-                        -- 후처리 및 원래 상태 유지 복구
-                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                         
                         if originCF then
                             hrp.CFrame = originCF * CFrame.new(0, 5, 0)
                             myHrp.CFrame = originCF
                         end
                         BACK(originCF)
+                        task.wait(0.05)
+                    end
+
+                    -- 납치 상태와 상관없이, 유저가 살아있고 내 주변에 있다면 오른손 그랩 연타 유지
+                    if hum.Health > 0 and currentBlobS then
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
                         
-                        task.wait(0.1) -- 여러 명을 빠르게 순회하기 위한 최소 딜레이
+                        BlobRelease(currentBlobS, hrp, "Right")
+                        task.wait(0.01)
+                        BlobGrab(currentBlobS, hrp, "Right")
+                        
+                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+                        task.wait(0.05)
                     end
                 end
-                task.wait(0.2) -- 한 바퀴 돌고 다음 루프 재검색 사이의 부하 방지 텀
+                task.wait(0.1)
             end
         end)
     end
