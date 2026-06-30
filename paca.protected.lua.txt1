@@ -7943,51 +7943,61 @@ LoopTab:CreateToggle({
                         local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                         if not myHrp then continue end
                         
+                        -- [1] 내 원래 위치 저장 및 공중 50스터드 좌표 계산
                         local originCF = myHrp.CFrame
                         local skyCF = originCF * CFrame.new(0, 50, 0)
                         
+                        -- [2] 내가 먼저 공중 50스터드로 TP + 블롭맨도 같이 이동
+                        myHrp.CFrame = skyCF
+                        if currentBlobS then
+                            local blobRoot = currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart
+                            if blobRoot then
+                                blobRoot.CFrame = skyCF
+                            end
+                        end
+                        task.wait(0.05) -- 내 위치 서버 동기화 딜레이
+
                         local attemptCount = 0
                         local success = false
 
+                        -- [3] 그 상태에서 타겟 납치 시도 연계
                         while blobLoopT2 and attemptCount < 3 do
                             attemptCount = attemptCount + 1
                             
                             TP(pl) 
-                            task.wait(0.05)
-                            hrp.CFrame = skyCF
+                            task.wait(0.1)
                             
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, skyCF)
-                            task.wait(0.1) 
-
                             if char.Parent == nil or not hrp:IsDescendantOf(workspace) then break end
                             if hum.Health <= 0 then task.wait(0.1) continue end
 
-                            if (hrp.Position - skyCF.Position).Magnitude <= 30 then
+                            -- 타겟이 내 공중 위치(30스터드 이내)로 끌려왔는지 체크
+                            if (hrp.Position - myHrp.Position).Magnitude <= 30 then
                                 success = true
                                 break
                             end
                         end
 
+                        -- [4] 납치 성공하자마자 즉시 그랩 1번 꽂기
                         if success and blobLoopT2 then
-                            if currentBlobS then
-                                local blobRoot = currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart
-                                if blobRoot then
-                                    blobRoot.CFrame = skyCF * CFrame.new(0, 2, 0)
-                                end
-                            end
-                            task.wait(0.05)
-
+                            -- 네트워크 소유권 가져오고 즉시 그랩
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, myHrp.CFrame)
                             BlobGrab(currentBlobS, hrp, "Right")
                             task.wait(0.1)
 
+                            -- 그랩선 파괴 및 원위치 복구 후처리
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                             
+                            -- 나와 타겟, 블롭맨 전부 원래 땅으로 복귀
                             myHrp.CFrame = originCF
                             hrp.CFrame = originCF * CFrame.new(0, 5, 0)
                             BACK(originCF)
 
                             processed[pl] = hum
                             task.wait(0.3)
+                        else
+                            -- 만약 납치 실패했으면 나랑 블롭맨만 원래 위치로 복귀
+                            myHrp.CFrame = originCF
+                            BACK(originCF)
                         end
                     elseif not hum or hum.Health <= 0 then
                         processed[pl] = nil
@@ -7998,6 +8008,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 
 LoopTab:CreateSection("킥")
