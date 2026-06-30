@@ -8002,10 +8002,6 @@ LoopTab:CreateToggle({
         
         if not Value then
             table.clear(playersInLoop2V)
-            local camera = workspace.CurrentCamera
-            if camera then
-                camera.CameraType = Enum.CameraType.Custom
-            end
             return
         end
 
@@ -8026,6 +8022,8 @@ LoopTab:CreateToggle({
                     task.wait(0.5)
                     continue
                 end
+
+                local blobmanModel = seat.Parent
 
                 for _, name in ipairs(playersInLoop2V) do
                     if not blobLoopT3 then break end
@@ -8049,13 +8047,6 @@ LoopTab:CreateToggle({
                     if not myHrp then continue end
 
                     local beforeTP = myHrp.CFrame
-                    local camera = workspace.CurrentCamera
-                    
-                    if camera then
-                        local savedCameraCFrame = camera.CFrame
-                        camera.CameraType = Enum.CameraType.Scriptable
-                        camera.CFrame = savedCameraCFrame
-                    end
 
                     local distance = (myHrp.Position - hrp.Position).Magnitude
                     if distance > 30 then
@@ -8090,6 +8081,28 @@ LoopTab:CreateToggle({
 
                         for i = 1, 4 do
                             if not blobLoopT3 then break end
+
+                            pcall(function()
+                                myHrp.AssemblyLinearVelocity = Vector3.zero
+                                myHrp.AssemblyAngularVelocity = Vector3.zero
+                                if blobmanModel and blobmanModel:FindFirstChild("HumanoidRootPart") then
+                                    blobmanModel.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+                                    blobmanModel.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+                                end
+                                for _, part in ipairs(myChar:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        part.Massless = true
+                                        part.AssemblyLinearVelocity = Vector3.zero
+                                    end
+                                end
+                                for _, part in ipairs(blobmanModel:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        part.Massless = true
+                                        part.AssemblyLinearVelocity = Vector3.zero
+                                    end
+                                end
+                            end)
+
                             BlobGrab(currentBlobS, hrp, "Right")
                             BlobRelease(currentBlobS, hrp, "Right")
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
@@ -8098,17 +8111,16 @@ LoopTab:CreateToggle({
                     end
 
                     if beforeTP and myHrp then
+                        pcall(function()
+                            myHrp.AssemblyLinearVelocity = Vector3.zero
+                            myHrp.AssemblyAngularVelocity = Vector3.zero
+                        end)
                         BACK(beforeTP)
                         task.wait(0.03)
                     end
                 end
                 
                 task.wait(0.05)
-            end
-            
-            local camera = workspace.CurrentCamera
-            if camera then
-                camera.CameraType = Enum.CameraType.Custom
             end
         end)
     end
