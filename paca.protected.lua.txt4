@@ -7906,25 +7906,86 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
-local BlobDesyncKickToggle = LoopTab:CreateToggle({
-    Name = "디싱크 킥    <font color='rgb(255,85,85)'>[NEW]</font>",
+LoopTab:CreateToggle({
+    Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
-    Flag = "BlobDesyncKickFlag",
+    Flag = "21",
     Callback = function(Value)
-        advancedDesyncLoopActive = Value
-        if Value then
+        blobLoopT2 = Value
+        
+        local myChar = game.Players.LocalPlayer.Character
+        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        
+        if not Value then
             table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
-            end
-            executeBlobmanDesyncKick()
-        else
-            advancedDesyncLoopActive = false
-            table.clear(playersInLoop2V)
+            if myHrp then myHrp.Anchored = false end
+            UpdateCurrentBlobman()
+            local blobRoot = currentBlobS and (currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart)
+            if blobRoot then blobRoot.Anchored = false end
+            return
         end
+
+        table.clear(playersInLoop2V)
+        for _, e in ipairs(playersInLoop1V) do
+            table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
+        end
+        
+        if myHrp then
+            myHrp.CFrame = myHrp.CFrame * CFrame.new(0, 40, 0)
+            myHrp.Anchored = true
+            UpdateCurrentBlobman()
+            local blobRoot = currentBlobS and (currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart)
+            if blobRoot then
+                blobRoot.CFrame = myHrp.CFrame
+                blobRoot.Anchored = true
+            end
+        end
+
+        task.spawn(function()
+            local processed = {}
+            local originCF = myHrp and myHrp.CFrame
+            if not originCF then return end
+
+            while blobLoopT2 do
+                UpdateCurrentBlobman()
+
+                for _, name in ipairs(playersInLoop2V) do
+                    if not blobLoopT2 then break end
+                    if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
+
+                    local pl = game.Players:FindFirstChild(name)
+                    local char = pl and pl.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+                    if hum and hum.Health > 0 and hrp and processed[pl] ~= hum then
+                        hrp.CFrame = originCF * CFrame.new(0, 5, 0)
+                        task.wait(0.1)
+
+                        if currentBlobS then
+                            for _ = 1, 10 do
+                                BlobGrab(currentBlobS, hrp, "Right")
+                                task.wait(0.01)
+                                BlobDrop(currentBlobS, hrp, "Right")
+                                task.wait(0.01)
+                            end
+                        end
+
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+
+                        processed[pl] = hum
+                        task.wait(0.2)
+                    elseif not hum or hum.Health <= 0 then
+                        processed[pl] = nil
+                    end
+                end
+                task.wait(0.5)
+            end
+        end)
     end
 })
+
 LoopTab:CreateSection("오너")
 LoopTab:CreateToggle({
     Name = "오너킥V34   <font color='rgb(255,250,255)'>[파카]</font>",
@@ -8070,133 +8131,6 @@ local blobLoop2Toggle = LoopTab:CreateToggle({
 LoopTab:CreateSection("블롭없음")
 local Loop1 = LoopTab:CreateToggle({
     Name = "루프킬   <font color='rgb(0,255,0)'>[그랩]</font>",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        loopPlayerT = Value
-        if loopPlayerT then
-            table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
-            end
-            loopPlayerF()
-        else
-            loopPlayerT = false
-            table.clear(playersInLoop2V)
-        end
-    end
-})
-local Players = game:GetService("Players")
-local localPlayer = game.Players.LocalPlayer
-local rs = game:GetService("ReplicatedStorage")
-
-local GrabEvents = rs:FindFirstChild("GrabEvents")
-local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
-local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
-local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
-
-loopPlayerT = false
-playersInLoop2V = {}
-
-local function killTarget(player)
-    if not player or player == localPlayer then return end
-    
-    local myChar = localPlayer.Character
-    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-    if not myHrp or not myHum or myHum.Health <= 0 then return end
-
-    local targetChar = player.Character
-    local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-    local targetHum = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
-    local torso = targetChar and (targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso"))
-    
-    if not targetRoot or not targetHum or targetHum.Health <= 0 or not torso then return end
-
-    local originCF = myHrp.CFrame
-    local isKilling = true
-
-    local tpThread = task.spawn(function()
-        while isKilling do
-            if not localPlayer.Character or not myHrp or not myHum or myHum.Health <= 0 or not player.Character or not targetRoot then break end
-            
-            if typeof(TP) == "function" then
-                local ok, cf = TP(player)
-                if ok and cf then
-                    myHrp.CFrame = cf * CFrame.new(0, -10, 0)
-                else
-                    myHrp.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
-                end
-            else
-                myHrp.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
-            end
-            task.wait(0.01)
-        end
-    end)
-
-    while isKilling do
-        if not player.Character or not targetRoot or not targetHum or targetHum.Health <= 0 or not localPlayer.Character or not myHrp or not myHum or myHum.Health <= 0 then
-            break
-        end
-
-        if SetNetworkOwner and SetNetworkOwner.FireServer then
-            SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
-            SetNetworkOwner:FireServer(targetRoot, targetRoot.CFrame)
-        end
-        
-        if DestroyGrabLine and DestroyGrabLine.FireServer then
-            DestroyGrabLine:FireServer(targetChar)
-            DestroyGrabLine:FireServer(torso)
-        end
-
-        if EndGrabEarly and EndGrabEarly.FireServer then
-            EndGrabEarly:FireServer()
-        end
-
-        pcall(function()
-            targetRoot.CFrame = CFrame.new(targetRoot.Position.X, -50000, targetRoot.Position.Z)
-            targetRoot.AssemblyLinearVelocity = Vector3.new(0, -10000, 0)
-        end)
-
-        task.wait(0.02)
-    end
-
-    isKilling = false
-    pcall(task.cancel, tpThread)
-
-    if myHrp and myHrp.Parent then
-        if typeof(BACK) == "function" then 
-            BACK(originCF) 
-        else 
-            myHrp.CFrame = originCF 
-        end
-    end
-
-    if myHum and myHum.Parent then
-        myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
-    end
-end
-
-function loopPlayerF()
-    task.spawn(function()
-        while loopPlayerT do
-            local hasTargets = false
-            for _, name in ipairs(playersInLoop2V) do
-                if not loopPlayerT then break end
-                local target = Players:FindFirstChild(name)
-                if target and target.Character and target.Character:FindFirstChildOfClass("Humanoid") and target.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
-                    hasTargets = true
-                    killTarget(target)
-                end
-            end
-            task.wait(hasTargets and 0.05 or 0.1)
-        end
-    end)
-end
-
-LoopTab:CreateToggle({
-    Name = "루프킬   <font color='rgb(255,0,0)'>[그랩]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
