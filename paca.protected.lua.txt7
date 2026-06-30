@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 고속그랩 킥 (하늘 승천 완벽 차단)   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 고속그랩 킥 <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7982,7 +7982,7 @@ LoopTab:CreateToggle({
                         
                         hrp.CFrame = CFrame.new(groundCF.Position.X, groundCF.Position.Y + 5, groundCF.Position.Z)
                         BACK(groundCF)
-                        task.wait(0.05)
+                        task.wait(0.00005)
                     end
 
                     -- [핵심] 초고속 그랩/릴리스 연타 + 내 캐릭터 바닥 고정 루프
