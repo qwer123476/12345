@@ -7907,21 +7907,14 @@ LoopTab:CreateToggle({
 })
 LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 LoopTab:CreateToggle({
-    Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "오너킥V34  <font color='rgb(255,154,123)'>[파카]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT2 = Value
         
-        local myChar = game.Players.LocalPlayer.Character
-        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-        
         if not Value then
             table.clear(playersInLoop2V)
-            if myHrp then myHrp.Anchored = false end
-            UpdateCurrentBlobman()
-            local blobRoot = currentBlobS and (currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart)
-            if blobRoot then blobRoot.Anchored = false end
             return
         end
 
@@ -7929,22 +7922,9 @@ LoopTab:CreateToggle({
         for _, e in ipairs(playersInLoop1V) do
             table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
         end
-        
-        if myHrp then
-            myHrp.CFrame = myHrp.CFrame * CFrame.new(0, 40, 0)
-            myHrp.Anchored = true
-            UpdateCurrentBlobman()
-            local blobRoot = currentBlobS and (currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart)
-            if blobRoot then
-                blobRoot.CFrame = myHrp.CFrame
-                blobRoot.Anchored = true
-            end
-        end
 
         task.spawn(function()
             local processed = {}
-            local originCF = myHrp and myHrp.CFrame
-            if not originCF then return end
 
             while blobLoopT2 do
                 UpdateCurrentBlobman()
@@ -7959,23 +7939,61 @@ LoopTab:CreateToggle({
                     local hrp = char and char:FindFirstChild("HumanoidRootPart")
 
                     if hum and hum.Health > 0 and hrp and processed[pl] ~= hum then
-                        hrp.CFrame = originCF * CFrame.new(0, 5, 0)
-                        task.wait(0.1)
+                        
+                        local myChar = game.Players.LocalPlayer.Character
+                        local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                        if not myHrp then continue end
+                        
+                        local originCF = myHrp.CFrame
+                        local attemptCount = 0
+                        local success = false
 
-                        if currentBlobS then
-                            for _ = 1, 10 do
-                                BlobGrab(currentBlobS, hrp, "Right")
-                                task.wait(0.01)
-                                BlobDrop(currentBlobS, hrp, "Right")
-                                task.wait(0.01)
+                        while blobLoopT2 and attemptCount < 3 do
+                            attemptCount = attemptCount + 1
+                            
+                            TP(pl)
+                            task.wait(0.25)
+
+                            if char.Parent == nil or not hrp:IsDescendantOf(workspace) then
+                                break
+                            end
+
+                            if hum.Health <= 0 then
+                                task.wait(0.1)
+                                continue
+                            end
+
+                            if (hrp.Position - myHrp.Position).Magnitude <= 30 then
+                                success = true
+                                break
                             end
                         end
 
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+                        if success and blobLoopT2 then
+                            BlobGrab(currentBlobS, hrp, "Right")
+                            BlobRelease(currentBlobS, hrp, "Right")
+                            task.wait(0.15)
 
-                        processed[pl] = hum
-                        task.wait(0.2)
+                            hrp.CFrame = originCF * CFrame.new(0, 5, 0)
+                            myHrp.CFrame = originCF
+                            task.wait(0.3)
+
+                            if currentBlobS then
+                                for _ = 1, 10 do
+                                    BlobGrab(currentBlobS, hrp, "Right")
+                                    task.wait(0.01)
+                                    BlobDrop(currentBlobS, hrp, "Right")
+                                    task.wait(0.01)
+                                end
+                            end
+
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+
+                            BACK(originCF)
+                            processed[pl] = hum
+                            task.wait(0.2)
+                        end
                     elseif not hum or hum.Health <= 0 then
                         processed[pl] = nil
                     end
@@ -7985,6 +8003,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 LoopTab:CreateSection("오너")
 LoopTab:CreateToggle({
