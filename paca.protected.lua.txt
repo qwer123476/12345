@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 순정 그랩/릴리스 + 서버 즉사 스팸   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "루프 PLCD 타겟 추적 강제 TP 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7923,8 +7923,6 @@ LoopTab:CreateToggle({
         end
 
         task.spawn(function()
-            local playerState = {}
-
             while blobLoopT2 do
                 UpdateCurrentBlobman()
 
@@ -7933,17 +7931,13 @@ LoopTab:CreateToggle({
                     if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
 
                     local player = game.Players:FindFirstChild(name)
-                    if not player then 
-                        playerState[name] = nil
-                        continue 
-                    end
+                    if not player then continue end
                     
                     local character = player.Character
                     local humanoid = character and character:FindFirstChildOfClass("Humanoid")
                     local hrp = character and character:FindFirstChild("HumanoidRootPart")
-                    local head = character and character:FindFirstChild("Head")
                     
-                    if not character or not humanoid or not hrp or not head or character.Parent == nil or not hrp:IsDescendantOf(workspace) then 
+                    if not character or not humanoid or not hrp or character.Parent == nil or not hrp:IsDescendantOf(workspace) then 
                         continue 
                     end
 
@@ -7951,78 +7945,38 @@ LoopTab:CreateToggle({
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
 
-                    local needToTP = false
-
-                    if not playerState[name] or playerState[name].PlayerInstance ~= player then
-                        needToTP = true
-                        playerState[name] = { PlayerInstance = player, IsDeadBefore = false }
-                    end
-
-                    if humanoid.Health <= 0 then
-                        playerState[name].IsDeadBefore = true
-                    elseif humanoid.Health > 0 and playerState[name].IsDeadBefore then
-                        needToTP = true
-                        playerState[name].IsDeadBefore = false 
-                    end
-
-                    local distance = (hrp.Position - myHrp.Position).Magnitude
-                    if distance > 40 then
-                        needToTP = true
-                    end
-
-                    -- [1] 순정 납치 단계
-                    if needToTP and humanoid.Health > 0 then
-                        local originCF = myHrp.CFrame
-
-                        TP(player)
-                        task.wait(0.25)
-                        BlobGrab(currentBlobS, hrp, "Right")
-                        BlobRelease(currentBlobS, hrp, "Right")
-
-                        task.wait(0.15)
-
-                        if originCF then
-                            hrp.CFrame = originCF * CFrame.new(0, 60, 0)
-                            myHrp.CFrame = originCF
-                        end
-
-                        task.wait(0.3)
-
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
-
-                        if originCF then BACK(originCF) end
+                    -- [1] 내가 타겟에게 강제 TP (집 안, 벽 내부 어디든 좌표 추적해서 밀착)
+                    if humanoid.Health > 0 for _ = 1, 1 do
+                        -- 타겟의 정면/뒤쪽 위치로 내 캐릭터 좌표를 완전히 덮어씌움
+                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
                         task.wait(0.05)
                     end
 
-                    -- [2] 그랩 연사 + 서버 판정 즉사 유도 섹션
+                    -- [2] 밀착한 상태에서 그랩/릴리스 무제한 연사 및 즉사 패킷 유도
                     if humanoid.Health > 0 and currentBlobS then
-                        for _ = 1, 30 do
+                        for _ = 1, 40 do
                             if not blobLoopT2 then break end
                             if humanoid.Health <= 0 then break end
                             
-                            -- 1. 소유권 강탈 및 서버 동기화 위치 고정
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                            -- 내가 타겟에게 붙어있는 상태 유지 (상대가 움직여도 계속 강제 TP 추적)
+                            myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
                             
+                            -- 소유권 강탈 및 물리 파괴 수치 주입
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                             pcall(function()
-                                -- 2. 무한 속도(Velocity) 주입
-                                -- 네트워크 소유권이 넘어온 상태에서 속도를 주입하면 서버가 캐릭터 파괴(데스) 판정을 내립니다.
                                 hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
                                 hrp.AssemblyAngularVelocity = Vector3.new(999999, 999999, 999999)
-                                
-                                -- 3. 공허(FallenPartsDestroyHeight) 강제 좌표 도달 패킷 연타
-                                -- 서버에 "이 캐릭터는 현재 Y축 매장 상태"임을 강제로 인지시킵니다.
-                                hrp.CFrame = CFrame.new(hrp.Position.X, -50000, hrp.Position.Z)
+                                -- 공허 사망 트리거 전송
+                                --rs.GrabEvents.SetNetworkOwner:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                             end)
 
-                            -- 그랩 실행
+                            -- 순정 그랩 실행 후 대기
                             BlobGrab(currentBlobS, hrp, "Right")
                             task.wait(0.01)
                             
-                            -- 4. 그랩 파괴 이벤트를 비정상 좌표로 전송하여 백룸/서버 랙 즉사 유도
+                            -- 릴리스 및 파괴 패킷 전송 후 대기
                             BlobRelease(currentBlobS, hrp, "Right")
-                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(0, -50000, 0))
-                            
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                             task.wait(0.01)
                         end
                     end
@@ -8033,6 +7987,7 @@ LoopTab:CreateToggle({
     end
 })
 
+
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
     Name = "무질량 끄기",
@@ -8040,11 +7995,7 @@ LoopTab:CreateButton({
 
         Players = game:GetService("Players")
 
-        if #playersInLoop1V == 0 then return end
-
-        local Tname = playersInLoop1V[1]
-        local Tplr = Players:FindFirstChild(Tname)
-        if not Tplr or not Tplr.Character then return end
+        if playersInLoop1V == 0 then return end
 
         local Tchar = Tplr.Character
         local THRP = Tchar:FindFirstChild("HumanoidRootPart")
