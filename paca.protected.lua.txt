@@ -8378,7 +8378,7 @@ local function killTarget(player)
         if GrabEvents then
             if GrabEvents:FindFirstChild("SetNetworkOwner") then GrabEvents.SetNetworkOwner:FireServer(torso, targetRoot.CFrame) end
             if GrabEvents:FindFirstChild("DestroyGrabLine") then 
-                激Events.DestroyGrabLine:FireServer(targetChar)
+                Events.DestroyGrabLine:FireServer(targetChar)
                 GrabEvents.DestroyGrabLine:FireServer(torso)
             end
             if GrabEvents:FindFirstChild("EndGrabEarly") then GrabEvents.EndGrabEarly:FireServer() end
