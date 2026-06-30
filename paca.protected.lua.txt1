@@ -12716,10 +12716,7 @@ function PcldViewF()
         redBoxes = {}
         processed = {}
     end
-end
-
-
-local iconEsp = keybindTab:CreateToggle({
+keybindTab:CreateToggle({
     Name = "esp 아이콘<font color='rgb(0,0,255)'>[프리미엄]</font>",
     CurrentValue = false,
     Flag = "",
@@ -12741,7 +12738,7 @@ keybindTab:CreateToggle({
 })
 PCLDView:Set(true)
 
-local ViewTool = keybindTab:CreateToggle({
+keybindTab:CreateToggle({
     Name = "표창,쿠나이 보기",
     CurrentValue = false,
     Flag = "5",
