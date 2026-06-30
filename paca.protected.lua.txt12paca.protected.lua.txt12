@@ -12730,7 +12730,7 @@ local iconEsp = keybindTab:CreateToggle({
 })
 --iconEsp:Set(true)
 
-local PCLDView = keybindTab:CreateToggle({
+keybindTab:CreateToggle({
     Name = "PCLD 보기",
     CurrentValue = false,
     Flag = "PCLDView",
