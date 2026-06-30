@@ -9995,8 +9995,7 @@ AuraTab:CreateToggle({
 
 
 
-
-local AntiJukebox = AuraTab:CreateToggle({
+AuraTab:CreateToggle({
 	Name = "주크박스 고정 아우라",
 	CurrentValue = false,
 	Flag = "AntiJukeboxAura",
@@ -10007,9 +10006,7 @@ local AntiJukebox = AuraTab:CreateToggle({
 		end
 	end
 })
-
-
-local AntiPallet = AuraTab:CreateToggle({
+AuraTab:CreateToggle({
 	Name = "판자 고정 아우라",
 	CurrentValue = false,
 	Flag = "AntiPalletAura",
@@ -10024,7 +10021,6 @@ local AntiPallet = AuraTab:CreateToggle({
 
 
 AuraTab:CreateSection("킬,플링")
-local runningFtapKillAura = false
 
 AuraTab:CreateToggle({
     Name = "래그돌 아우라",
