@@ -7905,79 +7905,6 @@ LoopTab:CreateToggle({
         OwnerKickMODED = Value
     end
 })
-LoopTab:CreateToggle({
-    Name = "블롭킬V2 <font color='rgb(255,154,123)'>[블롭맨]</font>",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        blobLoopT2 = Value
-        
-        if not Value then
-            table.clear(playersInLoop2V)
-            return
-        end
-
-        table.clear(playersInLoop2V)
-        for _, e in ipairs(playersInLoop1V) do
-            table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
-        end
-
-        task.spawn(function()
-            while blobLoopT2 do
-                UpdateCurrentBlobman()
-
-                for _, name in ipairs(playersInLoop2V) do
-                    if not blobLoopT2 then break end
-                    if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
-
-                    local player = game.Players:FindFirstChild(name)
-                    if not player then continue end
-                    
-                    local character = player.Character
-                    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                    local hrp = character and character:FindFirstChild("HumanoidRootPart")
-                    
-                    if not character or not humanoid or not hrp or character.Parent == nil or not hrp:IsDescendantOf(workspace) then 
-                        continue 
-                    end
-
-                    local myChar = plr.Character
-                    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                    if not myHrp then continue end
-
-                    -- [1] 내가 타겟에게 강제 TP (집 안, 벽 내부 어디든 좌표 추적해서 밀착)
-                    if humanoid.Health > 0 then
-                        -- 타겟의 정면 위치로 내 캐릭터 좌표를 완전히 이동
-                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
-                        task.wait(0.05)
-                    end
-
-                    -- [2] 밀착한 상태에서 그랩 ➔ task.wait ➔ 릴리스 순정 연사
-                    if humanoid.Health > 0 and currentBlobS then
-                        for _ = 1, 40 do
-                            if not blobLoopT2 then break end
-                            if humanoid.Health <= 0 then break end
-                            
-                            -- 상대가 움직이거나 밀려나도 실시간으로 계속 따라붙도록 설정
-                            myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2)
-                            
-                            -- 그랩 실행 및 대기
-                            BlobGrab(currentBlobS, hrp, "Right")
-                            task.wait(0.01)
-                            
-                            -- 릴리스 실행 및 대기
-                            BlobRelease(currentBlobS, hrp, "Right")
-                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
-                            task.wait(0.01)
-                        end
-                    end
-                end
-                task.wait(0.1)
-            end
-        end)
-    end
-})
-
 
 
 LoopTab:CreateSection("킥")
@@ -8067,19 +7994,115 @@ local blobLoop3Toggle = LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프킬   <font color='rgb(255,250,255)'>[파카]</font>",
+    Name = "루프 PLCD 타겟 직접 TP + Rig 파괴 즉사 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
+    Flag = "21",
     Callback = function(Value)
-        if Value then
-            Rayfield:Notify({
-                Title = "안내",
-                Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
-            })
+        blobLoopT3 = Value
+        
+        if not Value then
+            table.clear(playersInLoop2V)
+            return
         end
-    end,
+
+        table.clear(playersInLoop2V)
+        for _, e in ipairs(playersInLoop1V) do
+            table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
+        end
+
+        task.spawn(function()
+            while blobLoopT3 do
+                UpdateCurrentBlobman()
+
+                -- [조건 체크] 내가 블롭맨 의자에 앉아있는지 순정 검증
+                local seat = plr.Character
+                    and plr.Character:FindFirstChildOfClass("Humanoid")
+                    and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
+
+                if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
+                    task.wait(0.5)
+                    continue
+                end
+
+                -- 멀티 스레드 꼬임 방지를 위해 순차적으로 한 명씩 타겟팅
+                for _, name in ipairs(playersInLoop2V) do
+                    if not blobLoopT3 then break end
+                    if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
+
+                    local player = game.Players:FindFirstChild(name)
+                    if not player then continue end
+                    
+                    local char = player.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    
+                    if not char or not hum or not hrp or char.Parent == nil or not hrp:IsDescendantOf(workspace) then 
+                        continue 
+                    end
+
+                    -- 타겟이 이미 죽어있다면 패스
+                    if hum.Health <= 0 then continue end
+
+                    local myChar = plr.Character
+                    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                    if not myHrp then continue end
+
+                    -- [출발 전 좌표 백업]
+                    local beforeTP = myHrp.CFrame
+
+                    -- [1] 내가 걔한테 직접 TP (거리 30 이상일 때 강제 밀착)
+                    local distance = (myHrp.Position - hrp.Position).Magnitude
+                    if distance > 30 then
+                        TP(player)
+                        task.wait(0.05)
+                        
+                        -- TP 직후 다시 한번 내 위치 갱신 확인
+                        myChar = plr.Character
+                        myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                        if myHrp then myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) end
+                    end
+
+                    -- [2] 보내주신 즉사 유도 소스 그대로 주입
+                    if hum and hum.Health > 0 and currentBlobS then
+                        hum.BreakJointsOnDeath = false
+                        hum.WalkSpeed = 0
+                        hum.JumpPower = 0
+
+                        -- 관절 파괴 핵심 루프
+                        if hum.SeatPart == nil then
+                            if hum.RigType ~= Enum.HumanoidRigType.R15 then
+                                hum.RigType = Enum.HumanoidRigType.R15
+                            end
+                            if hum.RigType ~= Enum.HumanoidRigType.R6 then
+                                hum.RigType = Enum.HumanoidRigType.R6
+                            end
+                            if hum.RigType ~= Enum.HumanoidRigType.R15 then
+                                hum.RigType = Enum.HumanoidRigType.R15
+                            end
+                        end
+                        task.wait()
+
+                        -- 밀착 상태에서 그랩 / 릴리스 3회 순정 연사
+                        for i = 1, 3 do
+                            if not blobLoopT3 then break end
+                            BlobGrab(currentBlobS, hrp, "Right")
+                            BlobRelease(currentBlobS, hrp, "Right")
+                            task.wait()
+                        end
+                    end
+
+                    -- [3] 한 명 확실하게 조진 후 원래 자리로 BACK
+                    if beforeTP and myHrp then
+                        BACK(beforeTP)
+                        task.wait(0.05)
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end
 })
+
 local blobLoop2Toggle = LoopTab:CreateToggle({
     Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
