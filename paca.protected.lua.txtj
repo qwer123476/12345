@@ -8089,7 +8089,12 @@ local Loop1 = LoopTab:CreateToggle({
 })
 local Players = game:GetService("Players")
 local localPlayer = game.Players.LocalPlayer
-local GrabEvents = game:GetService("ReplicatedStorage"):FindFirstChild("GrabEvents")
+local rs = game:GetService("ReplicatedStorage")
+
+local GrabEvents = rs:FindFirstChild("GrabEvents")
+local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
+local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
 loopPlayerT = false
 playersInLoop2V = {}
@@ -8099,7 +8104,8 @@ local function killTarget(player)
     
     local myChar = localPlayer.Character
     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-    if not myHrp or not myChar:FindFirstChildOfClass("Humanoid") or myChar:FindFirstChildOfClass("Humanoid").Health <= 0 then return end
+    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+    if not myHrp or not myHum or myHum.Health <= 0 then return end
 
     local targetChar = player.Character
     local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
@@ -8113,27 +8119,47 @@ local function killTarget(player)
 
     local tpThread = task.spawn(function()
         while isKilling do
-            if not localPlayer.Character or not myHrp or not myChar:FindFirstChildOfClass("Humanoid") or myChar:FindFirstChildOfClass("Humanoid").Health <= 0 or not player.Character or not targetRoot then break end
-            myHrp.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
+            if not localPlayer.Character or not myHrp or not myHum or myHum.Health <= 0 or not player.Character or not targetRoot then break end
+            
+            if typeof(TP) == "function" then
+                local ok, cf = TP(player)
+                if ok and cf then
+                    myHrp.CFrame = cf * CFrame.new(0, -10, 0)
+                else
+                    myHrp.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
+                end
+            else
+                myHrp.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
+            end
             task.wait(0.01)
         end
     end)
 
     while isKilling do
-        if not player.Character or not targetRoot or not targetHum or targetHum.Health <= 0 or not localPlayer.Character or not myHrp or not myChar:FindFirstChildOfClass("Humanoid") or myChar:FindFirstChildOfClass("Humanoid").Health <= 0 then
+        if not player.Character or not targetRoot or not targetHum or targetHum.Health <= 0 or not localPlayer.Character or not myHrp or not myHum or myHum.Health <= 0 then
             break
         end
 
-        if GrabEvents then
-            if GrabEvents:FindFirstChild("SetNetworkOwner") then GrabEvents.SetNetworkOwner:FireServer(torso, targetRoot.CFrame) end
-            if GrabEvents:FindFirstChild("DestroyGrabLine") then 
-                GrabEvents.DestroyGrabLine:FireServer(targetChar)
-                GrabEvents.DestroyGrabLine:FireServer(torso)
-            end
-            if GrabEvents:FindFirstChild("EndGrabEarly") then GrabEvents.EndGrabEarly:FireServer() end
+        if SetNetworkOwner and SetNetworkOwner.FireServer then
+            SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+            SetNetworkOwner:FireServer(targetRoot, targetRoot.CFrame)
+        end
+        
+        if DestroyGrabLine and DestroyGrabLine.FireServer then
+            DestroyGrabLine:FireServer(targetChar)
+            DestroyGrabLine:FireServer(torso)
         end
 
-        targetHum.Health = 0
+        if EndGrabEarly and EndGrabEarly.FireServer then
+            EndGrabEarly:FireServer()
+        end
+
+        pcall(function()
+            targetRoot.Velocity = Vector3.new(0, -500, 0)
+            targetRoot.AssemblyLinearVelocity = Vector3.new(0, -500, 0)
+            targetHum:ChangeState(Enum.HumanoidStateType.Dead)
+        end)
+
         task.wait(0.02)
     end
 
@@ -8141,11 +8167,15 @@ local function killTarget(player)
     pcall(task.cancel, tpThread)
 
     if myHrp and myHrp.Parent then
-        if typeof(BACK) == "function" then BACK(originCF) else myHrp.CFrame = originCF end
+        if typeof(BACK) == "function" then 
+            BACK(originCF) 
+        else 
+            myHrp.CFrame = originCF 
+        end
     end
 
-    if myChar:FindFirstChildOfClass("Humanoid") and myChar:FindFirstChildOfClass("Humanoid").Parent then
-        myChar:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.GettingUp)
+    if myHum and myHum.Parent then
+        myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
     end
 end
 
@@ -8167,7 +8197,7 @@ function loopPlayerF()
 end
 
 LoopTab:CreateToggle({
-    Name = "루프킬   <font color='rgb(255,0,0)'>[그랩 죽이기]</font>",
+    Name = "루프킬v2   <font color='rgb(0,255,0)'>[그랩]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -8175,14 +8205,17 @@ LoopTab:CreateToggle({
         if loopPlayerT then
             table.clear(playersInLoop2V)
             for i, e in ipairs(playersInLoop1V) do
-                table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
             end
             loopPlayerF()
         else
+            loopPlayerT = false
             table.clear(playersInLoop2V)
         end
     end
 })
+
 
 local Loop2 = LoopTab:CreateToggle({
     Name = "루프킥   <font color='rgb(0,255,0)'>[그랩]</font>",
