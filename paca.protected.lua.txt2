@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateToggle({
-    Name = "루프 PLCD 순정고정 킥   <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "오너킥V34  <font color='rgb(255,154,123)'>[파카전용]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7947,7 +7947,6 @@ LoopTab:CreateToggle({
                         continue 
                     end
 
-                    -- [재접속 / 사망 / 40스터드 반경] 감시 조건 체크
                     local myChar = plr.Character
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
@@ -7972,9 +7971,8 @@ LoopTab:CreateToggle({
                         needToTP = true
                     end
 
-                    -- [1] 납치 단계: 제공해주신 순정 [끌고오기] 프로세스 그대로 실행
+                    -- [1] 납치 단계: 순정 로직 유지하되, 대상을 공중 60스터드 위로 이동
                     if needToTP and humanoid.Health > 0 then
-                        -- 순정 텔포 전 좌표 백업
                         local originCF = myHrp.CFrame
 
                         TP(player)
@@ -7985,7 +7983,8 @@ LoopTab:CreateToggle({
                         task.wait(0.15)
 
                         if originCF then
-                            hrp.CFrame = originCF * CFrame.new(0, 5, 0)
+                            -- 기존 (0, 5, 0)에서 (0, 60, 0)으로 높이 대폭 상향
+                            hrp.CFrame = originCF * CFrame.new(0, 60, 0)
                             myHrp.CFrame = originCF
                         end
 
@@ -7998,34 +7997,34 @@ LoopTab:CreateToggle({
                         task.wait(0.05)
                     end
 
-                    -- [2] 연계 단계: 내 몸은 제자리에 완벽히 얼려두고 오직 그랩/릴리스 패킷만 스팸
+                    -- [2] 연계 단계: 바닥에 내 몸 고정 + 공중 60스터드 위 타겟에게 그랩 난사
                     if humanoid.Health > 0 and currentBlobS then
-                        -- 순정 BACK(originCF) 완료 후 안착한 내 현재 위치를 완벽하게 잠금
                         local finalFreezeCF = myHrp.CFrame
 
-                        for _ = 1, 40 do -- PLCD 물리 에러 유도용 40회 초고속 연타
+                        for _ = 1, 40 do
                             if not blobLoopT2 then break end
                             
-                            -- 내 캐릭터가 하늘로 끌려가는 현상을 여기서 완벽히 차단 (내 몸 절대 고정)
+                            -- 내 몸 절대 고정
                             myHrp.CFrame = finalFreezeCF
                             myHrp.AssemblyLinearVelocity = Vector3.zero
                             myHrp.AssemblyAngularVelocity = Vector3.zero
                             
-                            -- 타겟의 PLCD 정지 상태 유지를 위해 위치 가두기 및 소유권 선점
-                            hrp.CFrame = finalFreezeCF * CFrame.new(0, 5, 0)
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                            -- 타겟을 공중 60스터드 위에 완벽하게 고정 및 네트워크 소유권 유지
+                            local targetAirCF = finalFreezeCF * CFrame.new(0, 60, 0)
+                            hrp.CFrame = targetAirCF
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetAirCF)
                             
                             -- 그랩/릴리스 패킷 초고속 난사
                             BlobGrab(currentBlobS, hrp, "Right")
                             game:GetService("RunService").Heartbeat:Wait()
                             
                             BlobRelease(currentBlobS, hrp, "Right")
-                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, targetAirCF)
                             game:GetService("RunService").Heartbeat:Wait()
                         end
                     end
                 end
-                task.wait()
+                task.wait(0.1)
             end
         end)
     end
