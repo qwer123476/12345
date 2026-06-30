@@ -10141,7 +10141,6 @@ AuraTab:CreateToggle({
         end
     end
 })
-local runningFtapVoidKill = false
 
 AuraTab:CreateToggle({
     Name = "낙사 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
@@ -10214,23 +10213,8 @@ AuraTab:CreateToggle({
         end
     end,
 })
-local VoidInput = funTab:CreateInput({
-   Name = "Y좌표 설정",
-   CurrentValue = "",
-   PlaceholderText = "...",
-   RemoveTextAfterFocusLost = false,
-   Flag = "Input1",
-   Callback = function(Text)
-      local num = tonumber(Text)
-      if num then
-         Value = num
-      else
-         Value = nil
-      end
-   end,
-})
 
-local VoidToggle = funTab:CreateButton({
+ funTab:CreateButton({
    Name = "텔포",
    Callback = function()
       if not Value then return end
