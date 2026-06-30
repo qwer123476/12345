@@ -7905,9 +7905,8 @@ LoopTab:CreateToggle({
         OwnerKickMODED = Value
     end
 })
-LoopTab:CreateSection("디싱크 킥(블롭끌고오기한 후 실행)")
 LoopTab:CreateToggle({
-    Name = "오너킥V34  <font color='rgb(255,154,123)'>[파카]</font>",
+    Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -7944,68 +7943,79 @@ LoopTab:CreateToggle({
                         local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                         if not myHrp then continue end
                         
+                        -- 1. 원래 위치 백업 및 공중 100스터드 타겟 지정
                         local originCF = myHrp.CFrame
+                        local skyCF = originCF * CFrame.new(0, 100, 0)
+                        
                         local attemptCount = 0
                         local success = false
 
                         while blobLoopT2 and attemptCount < 3 do
                             attemptCount = attemptCount + 1
                             
-                            TP(pl)
-                            task.wait(0.25)
+                            -- [수정] 타겟을 공중 100스터드로 텔레포트
+                            TP(pl) 
+                            task.wait(0.1)
+                            hrp.CFrame = skyCF
+                            
+                            -- [추가] 네트워크 소유권을 먼저 가져와서 안티치트 우회
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, skyCF)
+                            task.wait(0.15) 
 
-                            if char.Parent == nil or not hrp:IsDescendantOf(workspace) then
-                                break
-                            end
+                            if char.Parent == nil or not hrp:IsDescendantOf(workspace) then break end
+                            if hum.Health <= 0 then task.wait(0.1) continue end
 
-                            if hum.Health <= 0 then
-                                task.wait(0.1)
-                                continue
-                            end
-
-                            if (hrp.Position - myHrp.Position).Magnitude <= 30 then
+                            -- 공중 위치 확인 (내 원래 위치 기준 위로 100스터드 근처인지)
+                            if (hrp.Position - skyCF.Position).Magnitude <= 30 then
                                 success = true
                                 break
                             end
                         end
 
                         if success and blobLoopT2 then
+                            -- 2. 블롭맨을 즉시 공중 타겟 위치로 소환 및 동기화
+                            if currentBlobS then
+                                local blobRoot = currentBlobS:FindFirstChild("HumanoidRootPart") or currentBlobS.PrimaryPart
+                                if blobRoot then
+                                    blobRoot.CFrame = skyCF * CFrame.new(0, 2, 0)
+                                end
+                            end
+                            task.wait(0.1) -- 블롭맨 위치 잡힐 동안 아주 미세하게 대기
+
+                            -- 3. 최초 그랩 활성화
                             BlobGrab(currentBlobS, hrp, "Right")
                             BlobRelease(currentBlobS, hrp, "Right")
-                            task.wait(0.15)
+                            task.wait(0.1)
 
-                            hrp.CFrame = originCF * CFrame.new(0, 5, 0)
-                            myHrp.CFrame = originCF
-                            task.wait(0.3)
-
-                            if currentBlobS then
-                                -- 1. 왼쪽(Left) 그랩 & 드롭 10번 반복
-                                for _ = 1, 10 do
-                                    BlobGrab(currentBlobS, hrp, "Left")
-                                    task.wait(0.01)
-                                    BlobDrop(currentBlobS, hrp, "Left")
-                                    task.wait(0.01)
-                                end
-
-                                -- 2. 오른쪽(Right) 그랩 & 드롭 9번 반복
-                                for _ = 1, 9 do
-                                    BlobGrab(currentBlobS, hrp, "Right")
-                                    task.wait(0.01)
-                                    BlobDrop(currentBlobS, hrp, "Right")
-                                    task.wait(0.01)
-                                end
-                                
-                                -- 3. 마지막 오른쪽 10번째는 그랩 상태로 유지
-                                BlobGrab(currentBlobS, hrp, "Right")
+                            -- 4. 왼쪽(Left) 그랩 & 드롭 10번 반복
+                            for _ = 1, 10 do
+                                BlobGrab(currentBlobS, hrp, "Left")
+                                task.wait(0.01)
+                                BlobDrop(currentBlobS, hrp, "Left")
                                 task.wait(0.01)
                             end
 
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+                            -- 5. 오른쪽(Right) 그랩 & 드롭 9번 반복
+                            for _ = 1, 9 do
+                                BlobGrab(currentBlobS, hrp, "Right")
+                                task.wait(0.01)
+                                BlobDrop(currentBlobS, hrp, "Right")
+                                task.wait(0.01)
+                            end
+                            
+                            -- 6. 마지막 오른쪽 10번째는 그랩 유지!!
+                            BlobGrab(currentBlobS, hrp, "Right")
+                            task.wait(0.05)
 
+                            -- 7. 마무리 후 원래 위치로 전원 복귀
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
+                            
+                            myHrp.CFrame = originCF
+                            hrp.CFrame = originCF * CFrame.new(0, 5, 0)
                             BACK(originCF)
+
                             processed[pl] = hum
-                            task.wait(0.2)
+                            task.wait(0.3)
                         end
                     elseif not hum or hum.Health <= 0 then
                         processed[pl] = nil
@@ -8016,7 +8026,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 
 LoopTab:CreateSection("킥")
