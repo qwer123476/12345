@@ -8054,7 +8054,7 @@ LoopTab:CreateToggle({
                     local distance = (myHrp.Position - hrp.Position).Magnitude
                     if distance > 30 then
                         TP(player)
-                        task.wait(0.5)
+                        task.wait(0.06)
                         
                         -- TP 직후 다시 한번 내 위치 갱신 확인
                         myChar = plr.Character
