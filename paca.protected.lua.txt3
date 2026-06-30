@@ -12653,38 +12653,7 @@ function PcldViewF()
 end
 
 
-local iconEsp = keybindTab:CreateToggle({
-    Name = "esp 아이콘<font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
-    Flag = "",
-    Callback = function(Value)
-        PlrEspT = Value
-        PlrEspF()
-    end
-})
---iconEsp:Set(true)
 
-local PCLDView = keybindTab:CreateToggle({
-    Name = "PCLD 보기",
-    CurrentValue = false,
-    Flag = "PCLDView",
-    Callback = function(Value)
-        PcldViewT = Value
-        PcldViewF()
-    end
-})
-PCLDView:Set(true)
-
-local ViewTool = keybindTab:CreateToggle({
-    Name = "표창,쿠나이 보기",
-    CurrentValue = false,
-    Flag = "5",
-    Callback = function(Value)
-        ViewToolT = Value
-        ViewToolF()
-    end
-})
-ViewTool:Set(true)
 
 
 
