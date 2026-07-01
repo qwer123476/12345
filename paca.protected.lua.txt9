@@ -386,8 +386,18 @@ function Rayfield:CreateInput(options)
 end
 
 
-local Window = Rayfield:CreateWindow({Name = "파카허브  [프리미엄]", Icon = 0, Theme = paca, ToggleUIKeybind = "T"})
+local Window = Rayfield:CreateWindow({
+    Name = "파카허브 [프리미엄]",
+    Icon = 0,
+    Theme = paca,
+    ToggleUIKeybind = "T",
 
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "PacaHub",
+        FileName = "Premium"
+    }
+})
     
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
@@ -13015,4 +13025,4 @@ BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
-
+Rayfield:LoadConfiguration()
