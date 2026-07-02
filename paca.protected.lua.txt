@@ -7968,23 +7968,18 @@ LoopTab:CreateToggle({
 
                     local beforeTP = myHrp.CFrame
 
-                    pcall(function()
-                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                        hrp.AssemblyLinearVelocity = Vector3.new(0, -10, 0)
-                    end)
-
                     TP(player)
-                    task.wait(0.2)
+                    task.wait(0.3)
                     
                     if myHrp and hrp then 
-                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2.5) 
+                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) 
                     end
                     task.wait(0.1)
 
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.2)
+                    task.wait(0.3)
 
                     if beforeTP and myHrp then
                         BACK(beforeTP)
@@ -7993,18 +7988,17 @@ LoopTab:CreateToggle({
 
                     if currentBlobS then
                         BlobRelease(currentBlobS, hrp, "Right")
+                        task.wait(0.01)
                         
+                        if blobKickT3 and hum.Health > 0 then
+                            BlobGrab(currentBlobS, hrp, "Right")
+                        end
+
                         pcall(function()
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
                             hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                         end)
-                        
-                        task.wait(0.05)
-                        
-                        if blobKickT3 and hum.Health > 0 then
-                            BlobGrab(currentBlobS, hrp, "Right")
-                        end
                     end
 
                     task.wait(0.5)
