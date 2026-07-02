@@ -7957,38 +7957,37 @@ LoopTab:CreateToggle({
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
 
-                    local originCF = myHrp.CFrame
+                    local beforeTP = myHrp.CFrame
 
-                    pcall(function()
-                        for _, v in ipairs(char:GetChildren()) do
-                            if v:IsA("BasePart") then
-                                v.Massless = true
-                                v.CanCollide = false
-                            end
-                        end
-                    end)
+                    hum.BreakJointsOnDeath = false
+                    hum.WalkSpeed = 0
+                    hum.JumpPower = 0
 
-                    TP(player)
-                    task.wait(0.2)
+                    if hum.SeatPart == nil then
+                        if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
+                        if hum.RigType ~= Enum.HumanoidRigType.R6 then hum.RigType = Enum.HumanoidRigType.R6 end
+                        if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
+                    end
 
-                    if originCF then
-                        local targetCF = CFrame.new(originCF.Position.X, 500, originCF.Position.Z)
+                    local distance = (myHrp.Position - hrp.Position).Magnitude
+                    if distance > 30 then
+                        TP(player)
+                        task.wait(0.05)
+                    end
+
+                    if myHrp and hrp then
+                        local targetCF = CFrame.new(beforeTP.Position.X, 500, beforeTP.Position.Z)
                         hrp.CFrame = targetCF
-                        if myHrp then myHrp.CFrame = targetCF end
+                        myHrp.CFrame = targetCF
                     end
                     task.wait(0.15)
 
-                    if currentBlobS and hum.Health > 0 then
-                        BlobGrab(currentBlobS, hrp, "Right")
-                    end
-                    
-                    if currentBlobS then
-                        BlobRelease(currentBlobS, hrp, "Right")
-                    end
+                    BlobGrab(currentBlobS, hrp, "Right")
+                    BlobRelease(currentBlobS, hrp, "Right")
                     task.wait(0.15)
 
-                    if originCF and myHrp then
-                        myHrp.CFrame = originCF
+                    if beforeTP and myHrp then
+                        myHrp.CFrame = beforeTP
                     end
                     task.wait(0.3)
 
@@ -7997,8 +7996,8 @@ LoopTab:CreateToggle({
                         rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                     end)
 
-                    if originCF and myHrp then 
-                        BACK(originCF) 
+                    if beforeTP and myHrp then 
+                        BACK(beforeTP) 
                     end
 
                     task.wait(0.5)
