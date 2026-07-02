@@ -8043,11 +8043,15 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.05)
 
-                    -- 4초 타이머 설정 및 매스리스 제거 버전 공전 루프
+                    if currentBlobS and hrp and hrp.Parent.Name == name then
+                        BlobMassless(currentBlobS, hrp, "Right")
+                    end
+                    task.wait(0.05)
+
+                    -- 메스릴즈 유지 상태로 딱 4초 동안만 스팸 돌기
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
-                        -- 4초 경과 시 강제 종료 후 복귀
                         if os.clock() - startTime >= 9999999.0 then 
                             break 
                         end
@@ -8058,10 +8062,9 @@ LoopTab:CreateToggle({
                             end)
                             hrp.CFrame = targetPosition
                             
-                            -- 반지름 7스터드로 대상 주변 고속 원형 회전
-                            angle = angle + 0.6
-                            local offsetX = math.cos(angle) * 7
-                            local offsetZ = math.sin(angle) * 7
+                            angle = angle + 0.7
+                            local offsetX = math.cos(angle) * 12
+                            local offsetZ = math.sin(angle) * 12
                             
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
@@ -8072,6 +8075,9 @@ LoopTab:CreateToggle({
                             if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
                         end)
 
+                        if currentBlobS and hrp and hrp.Parent.Name == name and hum.Health > 0 then
+                            BlobMassless(currentBlobS, hrp, "Right")
+                        end
                         task.wait()
                     end
 
