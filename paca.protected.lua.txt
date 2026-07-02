@@ -7906,7 +7906,7 @@ LoopTab:CreateToggle({
         OnlyOwner = Value
     end
 })
-
+LoopTab:CreateSection("new")
 LoopTab:CreateToggle({
     Name = "블롭 단일 킥  <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
@@ -7969,11 +7969,12 @@ LoopTab:CreateToggle({
                     end)
 
                     TP(player)
-                    task.wait(0.25)
+                    task.wait(0.2)
 
                     if originCF then
-                        hrp.CFrame = originCF * CFrame.new(0, 100, 0)
-                        if myHrp then myHrp.CFrame = originCF * CFrame.new(0, 100, 0) end
+                        local targetCF = CFrame.new(originCF.Position.X, 500, originCF.Position.Z)
+                        hrp.CFrame = targetCF
+                        if myHrp then myHrp.CFrame = targetCF end
                     end
                     task.wait(0.15)
 
@@ -8009,6 +8010,7 @@ LoopTab:CreateToggle({
     end
 })
 
+LoopTab:CreateSection("루프킥")
 LoopTab:CreateButton({
     Name = "무질량 끄기",
     Callback = function()
