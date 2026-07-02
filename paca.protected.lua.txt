@@ -7909,7 +7909,7 @@ LoopTab:CreateToggle({
 LoopTab:CreateSection("new")
 
 LoopTab:CreateToggle({
-    Name = "레이지봇 킥  <font color='rgb(255,154,123)'>[레인지봇]</font>   <font color='rgb(0,255,0)'>[프리미엄]</font>    <font color='rgb(255,0,1)'>[바이패스]</font>    <font color='rgb(0,154,48)'>[락]</font>",
+    Name = "레이지봇 킥   <font color='rgb(255,154,123)'>[레이지봇]</font>  <font color='rgb(0,255,0)'>[프리미엄]</font>  <font color='rgb(255,0,1)'>[바이패스]</font>  <font color='rgb(0,154,48)'>[락]</font>",
     CurrentValue = false,
     Flag = "22",
     Callback = function(Value)
@@ -7935,8 +7935,9 @@ LoopTab:CreateToggle({
                 local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
                 local seat = myHum and myHum.SeatPart
 
+                -- 탑승 중이 아닐 때 미세 대기 주기를 늘려 평상시 렉(부하)을 완전히 해결
                 if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
-                    task.wait(0.01)
+                    task.wait(0.1)
                     continue
                 end
 
@@ -8048,7 +8049,7 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.0005)
 
-                    -- 끌고 와서 기존처럼 2.6초간 고속 공전 스팸 실행
+                    -- 2.6초간 고속 공전 스팸 실행
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
@@ -8081,35 +8082,35 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- [요청 반영]: 스팸 종료 직후 제공해주신 확실한 원본 룹킥 공식을 티 안 나게 즉시 연계 실행
+                    -- [요청 반영]: 락 유지용 딜레이 소폭 증가 및 최적화 연계
                     if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 then
                         if myHrp and hrp and originCF then
-                            -- 상대 위치를 내 원래 기준 Y+50 좌표로 강제 변환 후 내 몸을 완벽히 밀착 오버랩
                             hrp.CFrame = CFrame.new(originCF.X, originCF.Y + 50, originCF.Z)
                             myHrp.CFrame = hrp.CFrame
                             
-                            -- 이 상태에서 확실한 그랩 락 패킷 꽂아넣기 (PLCD 무조건 생성 유도)
                             if currentBlobS and hrp.Parent.Name == name then
                                 BlobMassless(currentBlobS, hrp, "Right")
                             end
-                            task.wait(0.03) -- 육안 판별 불가능한 초미세 프레임 대기
+                            -- 기존 0.03초에서 판정이 완전히 서버에 각인되도록 안정적인 0.08초로 딜레이 조정
+                            task.wait(0.08)
                         end
                     end
 
-                    -- 공중 락이 각인된 직후 부드럽게 원래 위치로 복귀
+                    -- 공중 락 각인 완료 후 원래 위치 복귀
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    -- 상대가 튕겨 나가거나 리스폰할 때까지 아우터 루프 대기 유기
+                    -- 타겟이 탈주하거나 리스폰하기 전까지 루프가 헛돌지 않게 완벽 격리 대기 (대기 시간 0.2초로 완화하여 렉 방지)
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
-                        task.wait(0.1)
+                        task.wait(0.2)
                     end
 
                     task.wait(0.1)
                     break
                 end
-                task.wait(0.01)
+                -- 포룹 내부 빈 주기 조절하여 비전투 상태 백그라운드 연산 최적화
+                task.wait(0.05)
             end
         end)
     end
