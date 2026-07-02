@@ -7966,6 +7966,7 @@ LoopTab:CreateToggle({
 
                     local originCF = myHrp.CFrame
                     local fixedPosition = CFrame.new(originCF.Position.X, originCF.Position.Y + 50, originCF.Position.Z)
+                    local targetPosition = fixedPosition * CFrame.new(0, 0, 10)
 
                     local tpRunning = true
                     task.spawn(function()
@@ -8025,9 +8026,9 @@ LoopTab:CreateToggle({
 
                     if myHrp and hrp then
                         pcall(function()
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, fixedPosition)
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
                         end)
-                        hrp.CFrame = fixedPosition
+                        hrp.CFrame = targetPosition
                         myHrp.CFrame = fixedPosition
                     end
                     task.wait(0.05)
@@ -8040,9 +8041,9 @@ LoopTab:CreateToggle({
                     while blobKickT3 and hum.Health > 0 and char.Parent ~= nil do
                         if myHrp and hrp then
                             pcall(function()
-                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, fixedPosition)
+                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
                             end)
-                            hrp.CFrame = fixedPosition
+                            hrp.CFrame = targetPosition
                             myHrp.CFrame = fixedPosition
                         end
                         
