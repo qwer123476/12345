@@ -7974,22 +7974,22 @@ LoopTab:CreateToggle({
                     end)
 
                     TP(player)
-                    task.wait(0.1)
+                    task.wait(0.2)
                     
-                    if myHrp then 
-                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 3) 
+                    if myHrp and hrp then 
+                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2.5) 
                     end
-                    task.wait(0.05)
+                    task.wait(0.1)
 
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.1)
+                    task.wait(0.2)
 
                     if beforeTP and myHrp then
                         BACK(beforeTP)
-                        task.wait(0.1)
                     end
+                    task.wait(0.1)
 
                     if currentBlobS then
                         BlobRelease(currentBlobS, hrp, "Right")
@@ -8000,7 +8000,7 @@ LoopTab:CreateToggle({
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                         end)
                         
-                        task.wait(0.02)
+                        task.wait(0.05)
                         
                         if blobKickT3 and hum.Health > 0 then
                             BlobGrab(currentBlobS, hrp, "Right")
@@ -8015,6 +8015,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 
 LoopTab:CreateSection("킥")
