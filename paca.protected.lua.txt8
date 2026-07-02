@@ -7916,6 +7916,104 @@ LoopTab:CreateToggle({
     end
 })
 
+LoopTab:CreateToggle({
+    Name = "블롭 단일 킥  <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    CurrentValue = false,
+    Flag = "22",
+    Callback = function(Value)
+        blobKickT3 = Value
+        
+        if not Value then
+            table.clear(playersInLoop2V)
+            return
+        end
+
+        table.clear(playersInLoop2V)
+        for _, e in ipairs(playersInLoop1V) do
+            table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
+        end
+
+        task.spawn(function()
+            while blobKickT3 do
+                UpdateCurrentBlobman()
+
+                local myChar = plr.Character
+                local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+                local seat = myHum and myHum.SeatPart
+
+                if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
+                    task.wait(0.5)
+                    continue
+                end
+
+                for _, name in ipairs(playersInLoop2V) do
+                    if not blobKickT3 then break end
+                    if table.find(Whitelist, name) or PPs:FindFirstChild(name) then continue end
+
+                    local player = game.Players:FindFirstChild(name)
+                    if not player then continue end
+                    
+                    local char = player.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    
+                    if not char or not hum or not hrp or char.Parent == nil or not hrp:IsDescendantOf(workspace) then 
+                        continue 
+                    end
+
+                    if hum.Health <= 0 then continue end
+
+                    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                    if not myHrp then continue end
+
+                    local beforeTP = myHrp.CFrame
+                    local startTime = tick()
+
+                    while blobKickT3 and hum and hum.Health > 0 and char.Parent ~= nil do
+                        if tick() - startTime >= 10 then
+                            if beforeTP and myHrp then
+                                BACK(beforeTP)
+                                task.wait(0.1)
+                            end
+                            startTime = tick()
+                        end
+
+                        TP(player)
+                        task.wait(0.03)
+                        
+                        if myHrp then 
+                            myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) 
+                        end
+                        task.wait(0.01)
+
+                        if currentBlobS and hum.Health > 0 then
+                            BlobGrab(currentBlobS, hrp, "Right")
+                        end
+
+                        task.wait(0.01)
+
+                        if beforeTP and myHrp then
+                            BACK(beforeTP)
+                        end
+
+                        task.wait(0.02)
+
+                        if currentBlobS then
+                            BlobRelease(currentBlobS, hrp, "Right")
+                        end
+
+                        task.wait(0.1)
+
+                        if hum.SeatPart ~= nil or hum.Health <= 0 or char.Parent == nil then
+                            break
+                        end
+                    end
+                end
+                task.wait(0.05)
+            end
+        end)
+    end
+})
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
