@@ -8081,27 +8081,30 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- [PLCD 확정 생성 수정 구간]
-                    -- 내려가기 전, 대상을 공중에 완전 락 시키기 위해 물리 소유권과 그랩을 재확인 전송합니다.
+                    -- [티 안 나게 유지를 박아넣는 무조건 락 로직]
                     if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 then
-                        pcall(function()
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
-                            rs.GrabEvents.SetNetworkOwner:FireServer(head, targetPosition)
-                        end)
+                        if myHrp and hrp then
+                            -- 복귀 프레임 직전 오프셋을 없애 완벽히 타겟 좌표에 내 몸을 싱크 (티 안 나는 판정 거리)
+                            myHrp.CFrame = CFrame.new(targetPosition.Position, targetPosition.Position + Vector3.new(0,0,1))
+                            pcall(function()
+                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
+                                rs.GrabEvents.SetNetworkOwner:FireServer(head, targetPosition)
+                            end)
+                        end
+                        
+                        -- 아주 짧게 순간 입력 판정만 주고 그랩 락 난사
                         if currentBlobS and hrp and hrp.Parent.Name == name then
                             BlobMassless(currentBlobS, hrp, "Right")
                         end
+                        task.wait(0.03) -- 육안으로 감지 불가능한 미세 대기
                     end
-                    
-                    -- 서버가 공중 생성 및 그랩 판정을 완료할 완벽한 시간 제공
-                    task.wait(0.25)
 
                     -- 원래 위치 복귀
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    -- 상대가 나가거나 리스폰할 때까지 아우터 루프가 재진입하지 못하도록 확실하게 락 스레드 대기
+                    -- 상대가 나가거나 리스폰할 때까지 아우터 루프 완전 격리 대기
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         task.wait(0.1)
                     end
