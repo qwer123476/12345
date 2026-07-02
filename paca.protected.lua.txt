@@ -7973,8 +7973,6 @@ LoopTab:CreateToggle({
 
                     local originCF = myHrp.CFrame
                     local fixedPosition = CFrame.new(originCF.Position.X, originCF.Position.Y + 50, originCF.Position.Z)
-                    
-                    -- 분석 3번 반영: 대상을 확실하게 내 원래 위치 기준 10스터드 뒤 공중에 박제
                     local targetPosition = fixedPosition * CFrame.new(0, 0, 10)
 
                     local tpRunning = true
@@ -8031,7 +8029,6 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- 분석 4번 반영: 타겟팅 직전 내 캐릭터의 그랩라인도 서버단에서 초기화 시도
                     pcall(function()
                         rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
                         if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
@@ -8046,39 +8043,35 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.05)
 
-                    if currentBlobS and hrp and hrp.Parent.Name == name then
-                        BlobMassless(currentBlobS, hrp, "Right")
-                    end
-                    task.wait(0.05)
-
-                    -- 메인 스팸 킥 루프
+                    -- 4초 타이머 설정 및 매스리스 제거 버전 공전 루프
+                    local startTime = os.clock()
+                    
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
+                        -- 4초 경과 시 강제 종료 후 복귀
+                        if os.clock() - startTime >= 9999999.0 then 
+                            break 
+                        end
+
                         if myHrp and hrp then
                             pcall(function()
                                 rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
                             end)
                             hrp.CFrame = targetPosition
                             
-                            -- 분석 2번 반영: 반지름을 7.5스터드로 미세 확장하고 각도 변량을 주어 거리 기반 오인식 방지
-                            angle = angle + 0.55
-                            local offsetX = math.cos(angle) * 7.5
-                            local offsetZ = math.sin(angle) * 7.5
+                            -- 반지름 7스터드로 대상 주변 고속 원형 회전
+                            angle = angle + 0.6
+                            local offsetX = math.cos(angle) * 7
+                            local offsetZ = math.sin(angle) * 7
                             
-                            -- 내 위치를 먼저 완전히 고정 및 동기화 (상대를 정확히 바라보게 하여 내 등뒤 판정 방지)
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
                         end
                         
-                        -- 분석 2, 4번 반영: CFrame 이동 직후 즉시 그랩 라인을 양방향으로 파괴하여 이전 프레임 잔상 제거
                         pcall(function()
                             rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
                             if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
                         end)
 
-                        -- 분석 1번 반영: 오직 타겟 인스턴스 이름과 내 이름이 다를 때만 원격 그랩 호출 보호 처리
-                        if currentBlobS and hrp and hrp.Parent.Name == name and name ~= plr.Name and hum.Health > 0 then
-                            BlobMassless(currentBlobS, hrp, "Right")
-                        end
                         task.wait()
                     end
 
