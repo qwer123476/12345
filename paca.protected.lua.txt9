@@ -8048,58 +8048,46 @@ local blobLoop3Toggle = LoopTab:CreateToggle({
                         continue 
                     end
 
+                    if hum.Health <= 0 then continue end
+
                     local myChar = plr.Character
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
 
                     local beforeTP = myHrp.CFrame
 
-                    while blobLoopT3 and hum and hum.Health > 0 do
+                    local distance = (myHrp.Position - hrp.Position).Magnitude
+                    if distance > 30 then
                         TP(player)
                         task.wait(0.05)
                         
                         myChar = plr.Character
                         myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                         if myHrp then myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) end
-                        task.wait(0.01)
+                    end
 
-                        if hum.Health > 0 and currentBlobS then
-                            hum.BreakJointsOnDeath = false
-                            hum.WalkSpeed = 0
-                            hum.JumpPower = 0
+                    if hum and hum.Health > 0 and currentBlobS then
+                        hum.BreakJointsOnDeath = false
+                        hum.WalkSpeed = 0
+                        hum.JumpPower = 0
 
-                            pcall(function()
-                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
-                            end)
-
-                            for i = 1, 5 do
-                                if not blobLoopT3 or hum.Health <= 0 then break end
-                                
-                                if hum.SeatPart == nil then
-                                    hum.RigType = Enum.HumanoidRigType.R15
-                                    hum.RigType = Enum.HumanoidRigType.R6
-                                    hum.RigType = Enum.HumanoidRigType.R15
-                                end
-
-                                BlobGrab(currentBlobS, hrp, "Right")
-                                task.wait()
-                                BlobRelease(currentBlobS, hrp, "Right")
-                                pcall(function()
-                                    rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
-                                end)
-                                task.wait(0.001)
-                            end
+                        if hum.SeatPart == nil then
+                            hum.RigType = Enum.HumanoidRigType.R15
+                            hum.RigType = Enum.HumanoidRigType.R6
+                            hum.RigType = Enum.HumanoidRigType.R15
                         end
-                        
-                        task.wait(0.01)
-                        
-                        if beforeTP and myHrp then
-                            BACK(beforeTP)
-                            task.wait(0.5)
+                        task.wait()
+
+                        for i = 1, 5 do
+                            if not blobLoopT3 or hum.Health <= 0 then break end
+                            BlobGrab(currentBlobS, hrp, "Right")
+                            BlobRelease(currentBlobS, hrp, "Right")
                         end
-                        
-                        if hum.Health <= 0 then break end
+                    end
+
+                    if beforeTP and myHrp then
+                        BACK(beforeTP)
+                        task.wait(0.05)
                     end
                 end
                 task.wait(0.1)
@@ -8107,7 +8095,6 @@ local blobLoop3Toggle = LoopTab:CreateToggle({
         end)
     end
 })
-
 
 local blobLoop2Toggle = LoopTab:CreateToggle({
     Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
