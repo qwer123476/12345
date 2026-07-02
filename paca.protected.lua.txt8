@@ -7964,6 +7964,8 @@ LoopTab:CreateToggle({
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
 
+                    local fixedPosition = CFrame.new(myHrp.Position.X, myHrp.Position.Y + 50, myHrp.Position.Z)
+
                     while blobKickT3 and hum.Health > 0 and char.Parent ~= nil do
                         TP(player)
                         task.wait()
@@ -8006,14 +8008,12 @@ LoopTab:CreateToggle({
                         rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
 
                         if myHrp and hrp then
-                            local highCF = CFrame.new(myHrp.CFrame.X, myHrp.CFrame.Y + 50, myHrp.CFrame.Z)
-                            
                             pcall(function()
-                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, highCF)
+                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, fixedPosition)
                             end)
                             
-                            hrp.CFrame = highCF
-                            myHrp.CFrame = highCF
+                            hrp.CFrame = fixedPosition
+                            myHrp.CFrame = fixedPosition
                         end
                         task.wait()
 
