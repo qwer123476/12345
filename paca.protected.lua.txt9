@@ -7908,15 +7908,6 @@ LoopTab:CreateToggle({
 })
 
 LoopTab:CreateToggle({
-    Name = "ㄴ 오리지널",
-    CurrentValue = false,
-    Flag = "21",
-    Callback = function(Value)
-        OwnerKickMODED = Value
-    end
-})
-
-LoopTab:CreateToggle({
     Name = "블롭 단일 킥  <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "22",
@@ -7968,6 +7959,14 @@ LoopTab:CreateToggle({
 
                     local beforeTP = myHrp.CFrame
 
+                    pcall(function()
+                        for _, v in ipairs(char:GetChildren()) do
+                            if v:IsA("BasePart") then
+                                v.Massless = true
+                            end
+                        end
+                    end)
+
                     TP(player)
                     task.wait(0.3)
                     
@@ -7979,7 +7978,7 @@ LoopTab:CreateToggle({
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.3)
+                    task.wait(0.4)
 
                     if beforeTP and myHrp then
                         BACK(beforeTP)
@@ -7988,15 +7987,9 @@ LoopTab:CreateToggle({
 
                     if currentBlobS then
                         BlobRelease(currentBlobS, hrp, "Right")
-                        task.wait(0.01)
+                        BlobGrab(currentBlobS, hrp, "Right")
                         
-                        if blobKickT3 and hum.Health > 0 then
-                            BlobGrab(currentBlobS, hrp, "Right")
-                        end
-
                         pcall(function()
-                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                            hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                         end)
                     end
@@ -8009,7 +8002,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 
 LoopTab:CreateSection("킥")
