@@ -7941,7 +7941,6 @@ LoopTab:CreateToggle({
 
                 local isRiding = true
 
-                -- 재설정/재접속 추적을 위해 루프 실행 시마다 리스트 및 상태 동적 동기화
                 table.clear(playersInLoop2V)
                 for _, e in ipairs(playersInLoop1V) do
                     table.insert(playersInLoop2V, e:match("^(.-) %(") or e)
@@ -7974,8 +7973,6 @@ LoopTab:CreateToggle({
 
                     local originCF = myHrp.CFrame
                     local fixedPosition = CFrame.new(originCF.Position.X, originCF.Position.Y + 50, originCF.Position.Z)
-                    
-                    -- 상대방을 내 10스터드 뒤(Z+10) 위치에 고정
                     local targetPosition = fixedPosition * CFrame.new(0, 0, 10)
 
                     local tpRunning = true
@@ -8043,12 +8040,11 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.05)
 
-                    if currentBlobS and hrp then
+                    if currentBlobS and hrp and hrp.Parent.Name == name then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
                     task.wait(0.05)
 
-                    -- 대상이 죽거나 튕길 때까지 땅에 내려가지 않고 고속 원형 공전 스팸 실행
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         if myHrp and hrp then
                             pcall(function()
@@ -8057,19 +8053,19 @@ LoopTab:CreateToggle({
                             
                             hrp.CFrame = targetPosition
                             
-                            -- 각도 변량을 증가시켜 대상 주변을 도는 원 궤적 좌표 산출 (반지름 6스터드 유지)
-                            angle = angle + 0.45 
-                            local offsetX = math.cos(angle) * 6
-                            local offsetZ = math.sin(angle) * 6
+                            -- 공전 반지름 7스터드로 고정 및 고속 각도 연산
+                            angle = angle + 0.5
+                            local offsetX = math.cos(angle) * 7
+                            local offsetZ = math.sin(angle) * 7
                             
-                            -- 대상을 지속적으로 쳐다보도록 CFrame.lookAt 연산 처리
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
                         end
                         
                         rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
 
-                        if currentBlobS and hrp then
+                        -- 내 그랩에 내가 오인식되어 잡히지 않도록 타겟 이름 명확히 검증 후 그랩 실행
+                        if currentBlobS and hrp and hrp.Parent.Name == name and hum.Health > 0 then
                             BlobMassless(currentBlobS, hrp, "Right")
                         end
                         task.wait()
