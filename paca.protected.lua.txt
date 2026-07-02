@@ -8073,6 +8073,11 @@ LoopTab:CreateToggle({
                         hum.WalkSpeed = 0
                         hum.JumpPower = 0
 
+                        pcall(function()
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                            hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
+                        end)
+
                         hum.RigType = Enum.HumanoidRigType.R15
                         hum.RigType = Enum.HumanoidRigType.R6
                         hum.RigType = Enum.HumanoidRigType.R15
@@ -8082,20 +8087,24 @@ LoopTab:CreateToggle({
                             if not blobLoopT3 or hum.Health <= 0 then break end
                             BlobGrab(currentBlobS, hrp, "Right")
                             BlobRelease(currentBlobS, hrp, "Right")
+                            pcall(function()
+                                rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
+                            end)
                         end
                         task.wait()
                     end
 
                     if beforeTP and myHrp then
                         BACK(beforeTP)
-                        task.wait(0.000000005)
+                        task.wait(0.00000000005)
                     end
                 end
-                task.wait(0.00001)
+                task.wait(0.00000001)
             end
         end)
     end
 })
+
 
 local blobLoop2Toggle = LoopTab:CreateToggle({
     Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
