@@ -7963,6 +7963,7 @@ LoopTab:CreateToggle({
                         for _, v in ipairs(char:GetChildren()) do
                             if v:IsA("BasePart") then
                                 v.Massless = true
+                                v.CanCollide = false
                             end
                         end
                     end)
@@ -7971,9 +7972,9 @@ LoopTab:CreateToggle({
                     task.wait(0.3)
                     
                     if myHrp and hrp then 
-                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) 
+                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 3.5) 
                     end
-                    task.wait(0.1)
+                    task.wait(0.15)
 
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
@@ -7983,11 +7984,10 @@ LoopTab:CreateToggle({
                     if beforeTP and myHrp then
                         BACK(beforeTP)
                     end
-                    task.wait(0.1)
+                    task.wait(0.15)
 
                     if currentBlobS then
                         BlobRelease(currentBlobS, hrp, "Right")
-                        BlobGrab(currentBlobS, hrp, "Right")
                         
                         pcall(function()
                             rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
@@ -13116,4 +13116,4 @@ BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
-Rayfield:LoadConfiguration()
+
