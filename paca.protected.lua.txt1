@@ -7990,18 +7990,19 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.4)
 
+                    if currentBlobS then
+                        BlobRelease(currentBlobS, hrp, "Right")
+                    end
+                    task.wait(0.05)
+
                     if beforeTP and myHrp then
                         BACK(beforeTP)
                     end
                     task.wait(0.15)
 
-                    if currentBlobS then
-                        BlobRelease(currentBlobS, hrp, "Right")
-                        
-                        pcall(function()
-                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
-                        end)
-                    end
+                    pcall(function()
+                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
+                    end)
 
                     task.wait(0.5)
                     break
