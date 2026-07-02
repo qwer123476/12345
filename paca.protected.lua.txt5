@@ -8010,6 +8010,12 @@ LoopTab:CreateToggle({
                         if currentBlobS then
                             BlobRelease(currentBlobS, hrp, "Right")
                             
+                            pcall(function()
+                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
+                                rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
+                            end)
+                            
                             local releaseCheckTime = tick()
                             while tick() - releaseCheckTime < 0.5 do
                                 if not blobKickT3 then break end
