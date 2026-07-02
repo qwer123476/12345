@@ -7933,7 +7933,7 @@ LoopTab:CreateToggle({
                 local seat = myHum and myHum.SeatPart
 
                 if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
-                    task.wait(0.5)
+                    task.wait(0.1)
                     continue
                 end
 
@@ -7964,21 +7964,10 @@ LoopTab:CreateToggle({
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
 
-                    local originCF = myHrp.CFrame
-
                     TP(player)
-                    task.wait(0.08)
+                    task.wait()
 
-                    local networkTimeout = 0
-                    while blobKickT3 and networkTimeout < 8 do
-                        rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
-                        local ownerTag = head:FindFirstChild("PartOwner")
-                        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
-                            break
-                        end
-                        networkTimeout = networkTimeout + 1
-                        task.wait()
-                    end
+                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
 
                     local targetNames = { "NinjaKunai", "NinjaShuriken", "NinjaKatana", "ToolCleaver", "ToolDiggingForkRusty", "ToolPencil", "ToolPickaxe" }
                     for _, child in ipairs(workspace:GetChildren()) do
@@ -8015,32 +8004,16 @@ LoopTab:CreateToggle({
 
                     rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
 
-                    if myHrp and hrp then
-                        local angle = math.random() * math.pi * 2
-                        local pushCF = originCF * CFrame.new(math.cos(angle) * 25, 80, math.sin(angle) * 25)
-                        hrp.CFrame = pushCF
-                        myHrp.CFrame = pushCF * CFrame.new(0, 0, 4)
-                    end
-                    task.wait(0.03)
-
-                    if currentBlobS and hrp then
+                    if currentBlobS and hrp and hum.Health > 0 then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.05)
-
-                    if originCF and myHrp then
-                        BACK(originCF)
-                    end
-
-                    task.wait(0.3)
-                    break
+                    task.wait()
                 end
-                task.wait(0.1)
+                task.wait()
             end
         end)
     end
 })
-
 
 LoopTab:CreateSection("루프킥")
 LoopTab:CreateButton({
