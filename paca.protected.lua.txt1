@@ -8048,7 +8048,7 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.0005)
 
-                    -- 스팸 연산 실행 (2.6초 제한)
+                    -- 끌고 와서 기존처럼 2.6초간 고속 공전 스팸 실행
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
@@ -8081,30 +8081,27 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- [티 안 나게 유지를 박아넣는 무조건 락 로직]
+                    -- [요청 반영]: 스팸 종료 직후 제공해주신 확실한 원본 룹킥 공식을 티 안 나게 즉시 연계 실행
                     if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 then
-                        if myHrp and hrp then
-                            -- 복귀 프레임 직전 오프셋을 없애 완벽히 타겟 좌표에 내 몸을 싱크 (티 안 나는 판정 거리)
-                            myHrp.CFrame = CFrame.new(targetPosition.Position, targetPosition.Position + Vector3.new(0,0,1))
-                            pcall(function()
-                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
-                                rs.GrabEvents.SetNetworkOwner:FireServer(head, targetPosition)
-                            end)
+                        if myHrp and hrp and originCF then
+                            -- 상대 위치를 내 원래 기준 Y+50 좌표로 강제 변환 후 내 몸을 완벽히 밀착 오버랩
+                            hrp.CFrame = CFrame.new(originCF.X, originCF.Y + 50, originCF.Z)
+                            myHrp.CFrame = hrp.CFrame
+                            
+                            -- 이 상태에서 확실한 그랩 락 패킷 꽂아넣기 (PLCD 무조건 생성 유도)
+                            if currentBlobS and hrp.Parent.Name == name then
+                                BlobMassless(currentBlobS, hrp, "Right")
+                            end
+                            task.wait(0.03) -- 육안 판별 불가능한 초미세 프레임 대기
                         end
-                        
-                        -- 아주 짧게 순간 입력 판정만 주고 그랩 락 난사
-                        if currentBlobS and hrp and hrp.Parent.Name == name then
-                            BlobMassless(currentBlobS, hrp, "Right")
-                        end
-                        task.wait(0.03) -- 육안으로 감지 불가능한 미세 대기
                     end
 
-                    -- 원래 위치 복귀
+                    -- 공중 락이 각인된 직후 부드럽게 원래 위치로 복귀
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    -- 상대가 나가거나 리스폰할 때까지 아우터 루프 완전 격리 대기
+                    -- 상대가 튕겨 나가거나 리스폰할 때까지 아우터 루프 대기 유기
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         task.wait(0.1)
                     end
