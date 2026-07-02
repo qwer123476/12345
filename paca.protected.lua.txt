@@ -8031,7 +8031,6 @@ LoopTab:CreateToggle({
 
                     pcall(function()
                         rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
-                        if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
                     end)
 
                     if myHrp and hrp then
@@ -8046,13 +8045,13 @@ LoopTab:CreateToggle({
                     if currentBlobS and hrp and hrp.Parent.Name == name then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.005)
+                    task.wait(0.0005)
 
-                    -- 메스릴즈 유지 상태로 딱 4초 동안만 스팸 돌기
+                    -- 4초 동안만 스팸 연산 실행
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
-                        if os.clock() - startTime >= 7.8 then 
+                        if os.clock() - startTime >= 4.0 then 
                             break 
                         end
 
@@ -8062,27 +8061,33 @@ LoopTab:CreateToggle({
                             end)
                             hrp.CFrame = targetPosition
                             
-                            angle = angle + 0.7
-                            local offsetX = math.cos(angle) * 12
-                            local offsetZ = math.sin(angle) * 12
+                            angle = angle + 0.55
+                            local offsetX = math.cos(angle) * 7.5
+                            local offsetZ = math.sin(angle) * 7.5
                             
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
                         end
                         
+                        task.wait()
+
                         pcall(function()
                             rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
-                            if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
                         end)
 
-                        if currentBlobS and hrp and hrp.Parent.Name == name and hum.Health > 0 then
+                        if currentBlobS and hrp and hrp.Parent.Name == name and name ~= plr.Name and hum.Health > 0 then
                             BlobMassless(currentBlobS, hrp, "Right")
                         end
-                        task.wait()
                     end
 
+                    -- 4초 스팸 완료 후 원래 위치 복귀
                     if originCF and myHrp then
                         BACK(originCF)
+                    end
+
+                    -- [핵심 조건 추가] 4초 완료 후, 상대가 서버를 나가거나 디스폰(재설정)할 때까지 아무것도 안 하고 대기
+                    while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
+                        task.wait(0.1)
                     end
 
                     task.wait(0.1)
