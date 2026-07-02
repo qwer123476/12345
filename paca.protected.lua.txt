@@ -7957,8 +7957,7 @@ LoopTab:CreateToggle({
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                     if not myHrp then continue end
 
-                    local beforeTP = myHrp.CFrame
-                    local distance = (myHrp.Position - hrp.Position).Magnitude
+                    local originCF = myHrp.CFrame
 
                     pcall(function()
                         for _, v in ipairs(char:GetChildren()) do
@@ -7969,40 +7968,32 @@ LoopTab:CreateToggle({
                         end
                     end)
 
-                    if distance >= 30 then
-                        TP(player)
-                        task.wait(0.15)
-                        if myHrp and hrp then 
-                            myHrp.CFrame = hrp.CFrame * CFrame.new(0, 40, 0) 
-                        end
-                        task.wait(0.1)
-                    else
-                        if myHrp and hrp then
-                            myHrp.CFrame = CFrame.new(myHrp.Position.X, hrp.Position.Y + 40, myHrp.Position.Z)
-                        end
-                        task.wait(0.1)
-                    end
-
-                    task.wait(0.2)
-
+                    TP(player)
+                    task.wait(0.25)
+                    
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.3)
-
+                    
                     if currentBlobS then
                         BlobRelease(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.1)
-
-                    if beforeTP and myHrp then
-                        BACK(beforeTP)
-                    end
                     task.wait(0.15)
 
+                    if originCF then
+                        hrp.CFrame = originCF * CFrame.new(0, 40, 0)
+                        if myHrp then myHrp.CFrame = originCF end
+                    end
+                    task.wait(0.3)
+
                     pcall(function()
-                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                        rs.GrabEvents.DestroyGrabLine:FireServer(hrp, hrp.CFrame)
                     end)
+
+                    if originCF and myHrp then 
+                        BACK(originCF) 
+                    end
 
                     task.wait(0.5)
                     break
