@@ -8054,7 +8054,6 @@ LoopTab:CreateToggle({
 
                     local beforeTP = myHrp.CFrame
 
-                    -- 타겟이 죽을 때까지 TP와 원위치 반복 (0.5초 간격)
                     while blobLoopT3 and hum and hum.Health > 0 do
                         TP(player)
                         task.wait(0.03)
@@ -8068,18 +8067,26 @@ LoopTab:CreateToggle({
                             hum.WalkSpeed = 0
                             hum.JumpPower = 0
 
-                            if hum.SeatPart == nil then
-                                if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
-                                if hum.RigType ~= Enum.HumanoidRigType.R6 then hum.RigType = Enum.HumanoidRigType.R6 end
-                                if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
-                            end
+                            pcall(function()
+                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
+                            end)
 
-                            -- 릴리스 시간을 충분히 확보한 5회 연사
                             for i = 1, 5 do
                                 if not blobLoopT3 or hum.Health <= 0 then break end
+                                
+                                if hum.SeatPart == nil then
+                                    hum.RigType = Enum.HumanoidRigType.R15
+                                    hum.RigType = Enum.HumanoidRigType.R6
+                                    hum.RigType = Enum.HumanoidRigType.R15
+                                end
+
                                 BlobGrab(currentBlobS, hrp, "Right")
                                 task.wait()
                                 BlobRelease(currentBlobS, hrp, "Right")
+                                pcall(function()
+                                    rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
+                                end)
                                 task.wait()
                             end
                         end
