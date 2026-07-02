@@ -8047,13 +8047,13 @@ LoopTab:CreateToggle({
                     if currentBlobS and hrp and hrp.Parent.Name == name then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.0005)
+                    task.wait()
 
-                    -- 2.6초간 고속 공전 스팸 실행
+                    -- 2.9초간 고속 공전 스팸 실행
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
-                        if os.clock() - startTime >= 2.6 then 
+                        if os.clock() - startTime >= 2.9 then 
                             break 
                         end
 
@@ -8063,9 +8063,9 @@ LoopTab:CreateToggle({
                             end)
                             hrp.CFrame = targetPosition
                             
-                            angle = angle + 0.78
-                            local offsetX = math.cos(angle) * 10.5
-                            local offsetZ = math.sin(angle) * 10.5
+                            angle = angle + 0.88
+                            local offsetX = math.cos(angle) * 11.5
+                            local offsetZ = math.sin(angle) * 11.5
                             
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
