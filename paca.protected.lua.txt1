@@ -7981,7 +7981,7 @@ LoopTab:CreateToggle({
                     task.wait(0.15)
 
                     if originCF then
-                        hrp.CFrame = originCF * CFrame.new(0, 40, 0)
+                        hrp.CFrame = originCF * CFrame.new(0, 100, 0)
                         if myHrp then myHrp.CFrame = originCF end
                     end
                     task.wait(0.3)
@@ -8003,6 +8003,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
