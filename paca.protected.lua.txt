@@ -8003,7 +8003,7 @@ local blobLoop3Toggle = LoopTab:CreateToggle({
         end
     end
 })
-LoopTab:CreateToggle({
+   LoopTab:CreateToggle({
     Name = "블롭 루프킬V2  <font color='rgb(255,154,123)'>[블롭맨]</font>",
     CurrentValue = false,
     Flag = "21",
@@ -8056,11 +8056,12 @@ LoopTab:CreateToggle({
 
                     while blobLoopT3 and hum and hum.Health > 0 do
                         TP(player)
-                        task.wait(0.03)
+                        task.wait(0.05)
                         
                         myChar = plr.Character
                         myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
                         if myHrp then myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) end
+                        task.wait(0.01)
 
                         if hum.Health > 0 and currentBlobS then
                             hum.BreakJointsOnDeath = false
@@ -8087,11 +8088,11 @@ LoopTab:CreateToggle({
                                 pcall(function()
                                     rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                                 end)
-                                task.wait()
+                                task.wait(0.001)
                             end
                         end
                         
-                        task.wait()
+                        task.wait(0.01)
                         
                         if beforeTP and myHrp then
                             BACK(beforeTP)
