@@ -8047,7 +8047,7 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.0005)
 
-                    -- 4초 동안만 스팸 연산 실행
+                    -- 스팸 연산 실행 (2.6초 제한)
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
@@ -8080,12 +8080,15 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- 4초 스팸 완료 후 원래 위치 복귀
+                    -- [버그 해결 핵심]: 복귀 전 서버 패킷 및 공중 생성(PLCD) 판정 완료를 위한 미세 딜레이 보장
+                    task.wait(0.12)
+
+                    -- 원래 위치 복귀
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    -- [핵심 조건 추가] 4초 완료 후, 상대가 서버를 나가거나 디스폰(재설정)할 때까지 아무것도 안 하고 대기
+                    -- 상대가 서버를 나가거나 디스폰(재설정)할 때까지 무한 대기
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         task.wait(0.1)
                     end
@@ -8098,7 +8101,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 LoopTab:CreateSection("루프킥")
 LoopTab:CreateButton({
