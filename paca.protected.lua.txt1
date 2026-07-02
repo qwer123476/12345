@@ -8016,6 +8016,11 @@ LoopTab:CreateToggle({
                                 rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                             end)
                             
+                            task.wait(0.02)
+                            if blobKickT3 and hum.Health > 0 then
+                                BlobGrab(currentBlobS, hrp, "Right")
+                            end
+                            
                             local releaseCheckTime = tick()
                             while tick() - releaseCheckTime < 0.5 do
                                 if not blobKickT3 then break end
