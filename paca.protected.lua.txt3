@@ -7967,62 +7967,48 @@ LoopTab:CreateToggle({
                     if not myHrp then continue end
 
                     local beforeTP = myHrp.CFrame
-                    local startTime = tick()
 
-                    while blobKickT3 and hum and hum.Health > 0 and char.Parent ~= nil do
-                        if tick() - startTime >= 10 then
-                            if beforeTP and myHrp then
-                                BACK(beforeTP)
-                                task.wait(0.2)
-                            end
-                            startTime = tick()
-                        end
+                    pcall(function()
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                        hrp.AssemblyLinearVelocity = Vector3.new(0, -10, 0)
+                    end)
 
+                    TP(player)
+                    task.wait(0.1)
+                    
+                    if myHrp then 
+                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 3) 
+                    end
+                    task.wait(0.05)
+
+                    if currentBlobS and hum.Health > 0 then
+                        BlobGrab(currentBlobS, hrp, "Right")
+                    end
+                    task.wait(0.1)
+
+                    if beforeTP and myHrp then
+                        BACK(beforeTP)
+                        task.wait(0.1)
+                    end
+
+                    if currentBlobS then
+                        BlobRelease(currentBlobS, hrp, "Right")
+                        
                         pcall(function()
                             rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                            hrp.AssemblyLinearVelocity = Vector3.new(0, -10, 0)
+                            hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
+                            rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
                         end)
-
-                        TP(player)
-                        task.wait(0.1)
                         
-                        if myHrp then 
-                            myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 3) 
-                        end
-                        task.wait(0.05)
-
-                        if currentBlobS and hum.Health > 0 then
+                        task.wait(0.02)
+                        
+                        if blobKickT3 and hum.Health > 0 then
                             BlobGrab(currentBlobS, hrp, "Right")
                         end
-                        task.wait(0.1)
-
-                        if beforeTP and myHrp then
-                            BACK(beforeTP)
-                            task.wait(0.1)
-                        end
-
-                        if currentBlobS then
-                            BlobRelease(currentBlobS, hrp, "Right")
-                            
-                            pcall(function()
-                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
-                                rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
-                            end)
-                            
-                            task.wait(0.02)
-                            
-                            if blobKickT3 and hum.Health > 0 then
-                                BlobGrab(currentBlobS, hrp, "Right")
-                            end
-                        end
-
-                        task.wait(0.5)
-
-                        if hum.SeatPart ~= nil or hum.Health <= 0 or char.Parent == nil then
-                            break
-                        end
                     end
+
+                    task.wait(0.5)
+                    break
                 end
                 task.wait(0.1)
             end
