@@ -8046,13 +8046,13 @@ LoopTab:CreateToggle({
                     if currentBlobS and hrp and hrp.Parent.Name == name then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.05)
+                    task.wait(0.005)
 
                     -- 메스릴즈 유지 상태로 딱 4초 동안만 스팸 돌기
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
-                        if os.clock() - startTime >= 9999999.0 then 
+                        if os.clock() - startTime >= 7.8 then 
                             break 
                         end
 
