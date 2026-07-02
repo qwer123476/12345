@@ -8051,7 +8051,7 @@ LoopTab:CreateToggle({
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
-                        if os.clock() - startTime >= 4.0 then 
+                        if os.clock() - startTime >= 2.6 then 
                             break 
                         end
 
@@ -8061,9 +8061,9 @@ LoopTab:CreateToggle({
                             end)
                             hrp.CFrame = targetPosition
                             
-                            angle = angle + 0.55
-                            local offsetX = math.cos(angle) * 7.5
-                            local offsetZ = math.sin(angle) * 7.5
+                            angle = angle + 0.78
+                            local offsetX = math.cos(angle) * 10.5
+                            local offsetZ = math.sin(angle) * 10.5
                             
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
