@@ -7970,7 +7970,13 @@ LoopTab:CreateToggle({
 
                     TP(player)
                     task.wait(0.25)
-                    
+
+                    if originCF then
+                        hrp.CFrame = originCF * CFrame.new(0, 100, 0)
+                        if myHrp then myHrp.CFrame = originCF * CFrame.new(0, 100, 0) end
+                    end
+                    task.wait(0.15)
+
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
                     end
@@ -7980,9 +7986,8 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.15)
 
-                    if originCF then
-                        hrp.CFrame = originCF * CFrame.new(0, 100, 0)
-                        if myHrp then myHrp.CFrame = originCF end
+                    if originCF and myHrp then
+                        myHrp.CFrame = originCF
                     end
                     task.wait(0.3)
 
@@ -8004,8 +8009,6 @@ LoopTab:CreateToggle({
     end
 })
 
-
-LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
     Name = "무질량 끄기",
     Callback = function()
