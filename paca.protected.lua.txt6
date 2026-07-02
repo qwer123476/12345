@@ -7966,16 +7966,11 @@ LoopTab:CreateToggle({
 
                     local originCF = myHrp.CFrame
 
-                    local tpRunning = true
-                    task.spawn(function()
-                        while tpRunning and blobKickT3 do
-                            local ok, cf = TP(player)
-                            task.wait()
-                        end
-                    end)
+                    TP(player)
+                    task.wait(0.08)
 
                     local networkTimeout = 0
-                    while blobKickT3 and networkTimeout < 30 do
+                    while blobKickT3 and networkTimeout < 8 do
                         rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
                         local ownerTag = head:FindFirstChild("PartOwner")
                         if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
@@ -7984,8 +7979,6 @@ LoopTab:CreateToggle({
                         networkTimeout = networkTimeout + 1
                         task.wait()
                     end
-
-                    tpRunning = false
 
                     local targetNames = { "NinjaKunai", "NinjaShuriken", "NinjaKatana", "ToolCleaver", "ToolDiggingForkRusty", "ToolPencil", "ToolPickaxe" }
                     for _, child in ipairs(workspace:GetChildren()) do
@@ -8008,9 +8001,9 @@ LoopTab:CreateToggle({
                                         for _, tPart in ipairs(targetParts) do
                                             if tPart and weld.Part1 == tPart then
                                                 local basePart = item.PrimaryPart or sticky
-                                                if basePart and (basePart.Position - hrp.Position).Magnitude <= 10 then
+                                                if basePart and (basePart.Position - hrp.Position).Magnitude <= 15 then
                                                     rs.GrabEvents.SetNetworkOwner:FireServer(sticky, sticky.CFrame)
-                                                    sticky.CFrame = CFrame.new(0, 9999, 0)
+                                                    sticky.CFrame = CFrame.new(hrp.Position.X, -10000, hrp.Position.Z)
                                                 end
                                             end
                                         end
@@ -8023,21 +8016,23 @@ LoopTab:CreateToggle({
                     rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
 
                     if myHrp and hrp then
-                        hrp.CFrame = CFrame.new(myHrp.CFrame.X, myHrp.CFrame.Y + 50, myHrp.CFrame.Z)
-                        myHrp.CFrame = hrp.CFrame
+                        local angle = math.random() * math.pi * 2
+                        local pushCF = originCF * CFrame.new(math.cos(angle) * 25, 80, math.sin(angle) * 25)
+                        hrp.CFrame = pushCF
+                        myHrp.CFrame = pushCF * CFrame.new(0, 0, 4)
                     end
-                    task.wait(0.05)
+                    task.wait(0.03)
 
                     if currentBlobS and hrp then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.1)
+                    task.wait(0.05)
 
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    task.wait(0.5)
+                    task.wait(0.3)
                     break
                 end
                 task.wait(0.1)
@@ -8045,6 +8040,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 LoopTab:CreateSection("루프킥")
 LoopTab:CreateButton({
