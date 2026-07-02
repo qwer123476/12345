@@ -7971,16 +7971,19 @@ LoopTab:CreateToggle({
 
                     if distance >= 30 then
                         TP(player)
-                        task.wait(0.2)
+                        task.wait(0.15)
                         if myHrp and hrp then 
                             myHrp.CFrame = hrp.CFrame * CFrame.new(0, 40, 0) 
                         end
-                        task.wait(0.15)
+                        task.wait(0.1)
                     else
                         if myHrp and hrp then
-                            myHrp.CFrame = CFrame.new(myHrp.Position, hrp.Position)
+                            myHrp.CFrame = CFrame.new(myHrp.Position.X, hrp.Position.Y + 40, myHrp.Position.Z)
                         end
+                        task.wait(0.1)
                     end
+
+                    task.wait(0.18)
 
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
@@ -8008,7 +8011,6 @@ LoopTab:CreateToggle({
         end)
     end
 })
-
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
