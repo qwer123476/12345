@@ -7973,6 +7973,8 @@ LoopTab:CreateToggle({
 
                     local originCF = myHrp.CFrame
                     local fixedPosition = CFrame.new(originCF.Position.X, originCF.Position.Y + 50, originCF.Position.Z)
+                    
+                    -- 분석 3번 반영: 대상을 확실하게 내 원래 위치 기준 10스터드 뒤 공중에 박제
                     local targetPosition = fixedPosition * CFrame.new(0, 0, 10)
 
                     local tpRunning = true
@@ -8029,7 +8031,11 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
+                    -- 분석 4번 반영: 타겟팅 직전 내 캐릭터의 그랩라인도 서버단에서 초기화 시도
+                    pcall(function()
+                        rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
+                        if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
+                    end)
 
                     if myHrp and hrp then
                         pcall(function()
@@ -8045,37 +8051,33 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.05)
 
-                    -- 메인 킥 루프 시작
+                    -- 메인 스팸 킥 루프
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         if myHrp and hrp then
-                            -- 1. 대상을 고정 좌표에 완벽히 묶어둠 (절대 움직이지 못함)
                             pcall(function()
                                 rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
                             end)
                             hrp.CFrame = targetPosition
                             
-                            -- 2. 나만 회전하는 공전 궤적 좌표 계산 (반지름 7스터드)
-                            angle = angle + 0.5
-                            local offsetX = math.cos(angle) * 7
-                            local offsetZ = math.sin(angle) * 7
+                            -- 분석 2번 반영: 반지름을 7.5스터드로 미세 확장하고 각도 변량을 주어 거리 기반 오인식 방지
+                            angle = angle + 0.55
+                            local offsetX = math.cos(angle) * 7.5
+                            local offsetZ = math.sin(angle) * 7.5
+                            
+                            -- 내 위치를 먼저 완전히 고정 및 동기화 (상대를 정확히 바라보게 하여 내 등뒤 판정 방지)
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
-                            
-                            -- 3. 내 캐릭터를 7스터드 공전 위치로 이동
                             myHrp.CFrame = myOrbitCF
-                            task.wait() -- 위치 동기화 유도
-
-                            -- 4. [자신 그랩 방지 핵심] 그랩 직전 내 캐릭터를 타겟의 그랩 도달 범위 밖 공중 위로 순간 대피
-                            local safeEscapeCF = myOrbitCF * CFrame.new(0, 15, 0)
-                            myHrp.CFrame = safeEscapeCF
-                            
-                            -- 5. 안전 거리가 확보된 상공에서 타겟에게만 그랩 연산 스팸
+                        end
+                        
+                        -- 분석 2, 4번 반영: CFrame 이동 직후 즉시 그랩 라인을 양방향으로 파괴하여 이전 프레임 잔상 제거
+                        pcall(function()
                             rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
-                            if currentBlobS and hrp and hrp.Parent.Name == name then
-                                BlobMassless(currentBlobS, hrp, "Right")
-                            end
-                            
-                            -- 6. 그랩 전송 직후 즉시 다시 원래의 공전 궤도로 복귀
-                            myHrp.CFrame = myOrbitCF
+                            if myHrp then rs.GrabEvents.DestroyGrabLine:FireServer(myHrp, myHrp.CFrame) end
+                        end)
+
+                        -- 분석 1번 반영: 오직 타겟 인스턴스 이름과 내 이름이 다를 때만 원격 그랩 호출 보호 처리
+                        if currentBlobS and hrp and hrp.Parent.Name == name and name ~= plr.Name and hum.Health > 0 then
+                            BlobMassless(currentBlobS, hrp, "Right")
                         end
                         task.wait()
                     end
@@ -8092,6 +8094,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 LoopTab:CreateSection("루프킥")
 LoopTab:CreateButton({
