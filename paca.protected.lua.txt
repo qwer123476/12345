@@ -7908,7 +7908,7 @@ LoopTab:CreateToggle({
 })
 LoopTab:CreateSection("new")
 LoopTab:CreateToggle({
-    Name = "블롭 단일 킥  <font color='rgb(255,154,123)'>[블롭맨]</font>",
+    Name = "레이지봇 킥  <font color='rgb(255,154,123)'>[레인지봇]</font>   <font color='rgb(0,255,0)'>[프리미엄]</font>    <font color='rgb(255,0,1)'>[바이패스]</font>    <font color='rgb(0,154,48)'>[락]</font>",
     CurrentValue = false,
     Flag = "22",
     Callback = function(Value)
@@ -8081,7 +8081,7 @@ LoopTab:CreateToggle({
                     end
 
                     -- [버그 해결 핵심]: 복귀 전 서버 패킷 및 공중 생성(PLCD) 판정 완료를 위한 미세 딜레이 보장
-                    task.wait(0.12)
+                    task.wait(0.22)
 
                     -- 원래 위치 복귀
                     if originCF and myHrp then
