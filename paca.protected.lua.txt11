@@ -7958,6 +7958,7 @@ LoopTab:CreateToggle({
                     if not myHrp then continue end
 
                     local beforeTP = myHrp.CFrame
+                    local distance = (myHrp.Position - hrp.Position).Magnitude
 
                     pcall(function()
                         for _, v in ipairs(char:GetChildren()) do
@@ -7968,13 +7969,18 @@ LoopTab:CreateToggle({
                         end
                     end)
 
-                    TP(player)
-                    task.wait(0.3)
-                    
-                    if myHrp and hrp then 
-                        myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 3.5) 
+                    if distance >= 30 then
+                        TP(player)
+                        task.wait(0.2)
+                        if myHrp and hrp then 
+                            myHrp.CFrame = hrp.CFrame * CFrame.new(0, 40, 0) 
+                        end
+                        task.wait(0.15)
+                    else
+                        if myHrp and hrp then
+                            myHrp.CFrame = CFrame.new(myHrp.Position, hrp.Position)
+                        end
                     end
-                    task.wait(0.15)
 
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
