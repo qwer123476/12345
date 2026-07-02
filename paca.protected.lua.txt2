@@ -7983,17 +7983,17 @@ LoopTab:CreateToggle({
                         task.wait(0.1)
                     end
 
-                    task.wait(0.18)
+                    task.wait(0.2)
 
                     if currentBlobS and hum.Health > 0 then
                         BlobGrab(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.4)
+                    task.wait(0.3)
 
                     if currentBlobS then
                         BlobRelease(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.05)
+                    task.wait(0.1)
 
                     if beforeTP and myHrp then
                         BACK(beforeTP)
