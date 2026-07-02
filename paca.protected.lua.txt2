@@ -7993,14 +7993,8 @@ LoopTab:CreateToggle({
 
                         if currentBlobS and hum.Health > 0 then
                             BlobGrab(currentBlobS, hrp, "Right")
-                            
-                            local grabCheckTime = tick()
-                            while tick() - grabCheckTime < 0.5 do
-                                if not blobKickT3 or hum.Health <= 0 then break end
-                                if hum.SeatPart ~= nil then break end
-                                task.wait(0.02)
-                            end
                         end
+                        task.wait(0.1)
 
                         if beforeTP and myHrp then
                             BACK(beforeTP)
@@ -8017,18 +8011,13 @@ LoopTab:CreateToggle({
                             end)
                             
                             task.wait(0.02)
+                            
                             if blobKickT3 and hum.Health > 0 then
                                 BlobGrab(currentBlobS, hrp, "Right")
                             end
-                            
-                            local releaseCheckTime = tick()
-                            while tick() - releaseCheckTime < 0.5 do
-                                if not blobKickT3 then break end
-                                task.wait(0.02)
-                            end
                         end
 
-                        task.wait(0.2)
+                        task.wait(0.5)
 
                         if hum.SeatPart ~= nil or hum.Health <= 0 or char.Parent == nil then
                             break
@@ -8040,6 +8029,7 @@ LoopTab:CreateToggle({
         end)
     end
 })
+
 
 LoopTab:CreateSection("킥")
 LoopTab:CreateButton({
