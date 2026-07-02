@@ -7907,6 +7907,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("new")
+
 LoopTab:CreateToggle({
     Name = "레이지봇 킥  <font color='rgb(255,154,123)'>[레인지봇]</font>   <font color='rgb(0,255,0)'>[프리미엄]</font>    <font color='rgb(255,0,1)'>[바이패스]</font>    <font color='rgb(0,154,48)'>[락]</font>",
     CurrentValue = false,
@@ -8080,15 +8081,27 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- [버그 해결 핵심]: 복귀 전 서버 패킷 및 공중 생성(PLCD) 판정 완료를 위한 미세 딜레이 보장
-                    task.wait(0.22)
+                    -- [PLCD 확정 생성 수정 구간]
+                    -- 내려가기 전, 대상을 공중에 완전 락 시키기 위해 물리 소유권과 그랩을 재확인 전송합니다.
+                    if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 then
+                        pcall(function()
+                            rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
+                            rs.GrabEvents.SetNetworkOwner:FireServer(head, targetPosition)
+                        end)
+                        if currentBlobS and hrp and hrp.Parent.Name == name then
+                            BlobMassless(currentBlobS, hrp, "Right")
+                        end
+                    end
+                    
+                    -- 서버가 공중 생성 및 그랩 판정을 완료할 완벽한 시간 제공
+                    task.wait(0.25)
 
                     -- 원래 위치 복귀
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    -- 상대가 서버를 나가거나 디스폰(재설정)할 때까지 무한 대기
+                    -- 상대가 나가거나 리스폰할 때까지 아우터 루프가 재진입하지 못하도록 확실하게 락 스레드 대기
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         task.wait(0.1)
                     end
