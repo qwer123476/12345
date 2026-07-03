@@ -3567,7 +3567,7 @@ local AntiKickF = function()
 
             if not success then continue end
 
-            for _ = 0, 10 do
+            for _ = 0, 20 do
                 task.wait(0.05)
                 stickyPartFolder = inv:FindFirstChild(stickyPartName)
                 if stickyPartFolder then break end
@@ -3582,6 +3582,7 @@ local AntiKickF = function()
             if soundPart then soundPart.CanQuery = false end
 
             if not stickyPart then continue end
+            task.wait(0.05)
         end
 
         pcall(function()
@@ -3590,15 +3591,7 @@ local AntiKickF = function()
         end)
 
         local distance = (referencePosition - stickyPart.Position).Magnitude
-        if distance > 8 then
-            pcall(function()
-                DestroyToy:FireServer(stickyPartFolder)
-            end)
-            continue
-        end
-
-        local partOwner = stickyPart:FindFirstChild("PartOwner")
-        if partOwner then
+        if distance > 15 then
             pcall(function()
                 DestroyToy:FireServer(stickyPartFolder)
             end)
@@ -3611,7 +3604,7 @@ local AntiKickF = function()
             StickyPartEvent:FireServer(stickyPart, ragdollHitbox, targetValue)
 
             for _ = 0, 10 do
-                task.wait(0.00005)
+                task.wait(0.01)
                 stickyWeld = stickyPart:FindFirstChild("StickyWeld")
                 if stickyWeld and stickyWeld.Part1 == ragdollHitbox then
                     break
@@ -3647,7 +3640,6 @@ local AntiKickF = function()
         end
     end
 end
-
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
