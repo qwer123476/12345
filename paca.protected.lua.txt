@@ -402,7 +402,7 @@ local Window = Rayfield:CreateWindow({
     
 
 Rayfield:LoadConfiguration()
-local TRTab = Window:CreateTab("설정저장",6023426923 )
+local YRTab = Window:CreateTab("설정저장",6023426923 )
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
 local getTab = Window:CreateTab("알림",649498361)
