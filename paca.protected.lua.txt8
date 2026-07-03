@@ -12878,7 +12878,7 @@ function PcldViewF()
 end
 
 
-POl)
+
 
 local PCLDView = keybindTab:CreateToggle({
     Name = "PCLD 보기",
