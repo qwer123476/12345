@@ -3545,7 +3545,7 @@ local AntiKickF = function()
         if not hrp or not torso then continue end
 
         local myPO = findMyPO()
-        --local referencePosition = hrp.Position
+        local referencePosition = hrp.Position
         if myPO then referencePosition = myPO.Position end
 
         local ragdollHitbox = hrp:FindFirstChild("RagdollTouchedHitbox")
@@ -3560,9 +3560,9 @@ local AntiKickF = function()
 
         if not stickyPart then
             local success = pcall(function()
-            task.spawn(function()
-                SpawnToyRemoteFunction:InvokeServer(stickyPartName, SCF.CFrame, Vector3.new(0, 0, 0))
-            end)
+                task.spawn(function()
+                    SpawnToyRemoteFunction:InvokeServer(stickyPartName, hrp.CFrame, Vector3.new(0, 0, 0))
+                end)
             end)
 
             if not success then continue end
@@ -3586,7 +3586,7 @@ local AntiKickF = function()
 
         pcall(function()
             SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
-            DestroyGrabLine:FireServer(stickyPart)
+            if DestroyGrabLine then DestroyGrabLine:FireServer(stickyPart) end
         end)
 
         local distance = (referencePosition - stickyPart.Position).Magnitude
@@ -3646,6 +3646,8 @@ local AntiKickF = function()
             break
         end
     end
+end
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12875,16 +12877,7 @@ function PcldViewF()
 end
 
 
-local iconEsp = keybindTab:CreateToggle({
-    Name = "esp 아이콘<font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
-    Flag = "",
-    Callback = function(Value)
-        PlrEspT = Value
-        PlrEspF()
-    end
-})
---iconEsp:Set(true)
+POl)
 
 local PCLDView = keybindTab:CreateToggle({
     Name = "PCLD 보기",
@@ -12933,201 +12926,6 @@ Rayfield:Notify({
 })
 
 
-
-
-
-cmdWindowTab:CreateSection("Console Status")
-cmdWindowTab:CreateLabel("명령어 작동중✅")
-
-cmdWindowTab:CreateSection("Command List")
-cmdWindowTab:CreateLabel("1. ;network owner = \"PlayerName\"")
-cmdWindowTab:CreateLabel("2. ;bring \"PlayerName\"")
-cmdWindowTab:CreateLabel("3. ;fling \"PlayerName\"")
-cmdWindowTab:CreateLabel("4. ;unfling")
-cmdWindowTab:CreateLabel("5. ;view \"PlayerName\"")
-cmdWindowTab:CreateLabel("6. ;unview")
-cmdWindowTab:CreateLabel("7. ;tppos \"PlayerName\"")
-cmdWindowTab:CreateLabel("8. ;freeze \"PlayerName\"")
-cmdWindowTab:CreateLabel("9. ;unfreeze \"PlayerName\"")
-cmdWindowTab:CreateLabel("10.;goto \"PlayerName\"")
-cmdWindowTab:CreateLabel("11.;kicklogs or ;kl")
-local function getTargetPlayer(namePart)
-    if not namePart or namePart == "" then return nil end
-    local cleanPart = namePart:lower():gsub('"', ""):gsub("%s+", "")
-    for _, p in ipairs(game.Players:GetPlayers()) do
-        if string.find(p.Name:lower(), cleanPart) then
-            return p
-        end
-    end
-    return nil
-end
-
-local function runChatCommand(msg)
-    if msg:sub(1, 1) ~= ";" then return end
-    
-    local cleanMsg = msg:sub(2)
-    
-    if cleanMsg:sub(1, 14) == "network owner " then
-        local targetStr = cleanMsg:sub(15)
-        local targetName = targetStr:match('=%s*"([^"]+)"') or targetStr:match("=%s*(.-)$")
-        if targetName then
-            local targetPlr = getTargetPlayer(targetName)
-            if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") then
-                local hrp = targetPlr.Character.HumanoidRootPart
-                game:GetService("ReplicatedStorage").GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                Rayfield:Notify({
-                    Title = "Network Owner",
-                    Content = "네트워크 오너가 " .. targetPlr.Name .. "으로 설정되었습니다.",
-                    Duration = 5,
-                    Image = 4483362458
-                })
-            end
-        end
-        
-    elseif cleanMsg:sub(1, 6) == "bring " then
-        local targetStr = cleanMsg:sub(7)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local tHrp = targetPlr.Character.HumanoidRootPart
-            local myHrp = game.Players.LocalPlayer.Character.HumanoidRootPart
-            game:GetService("ReplicatedStorage").GrabEvents.SetNetworkOwner:FireServer(tHrp, tHrp.CFrame)
-            task.wait(0.05)
-            tHrp.CFrame = myHrp.CFrame * CFrame.new(0, 0, -3)
-            Rayfield:Notify({
-                Title = "Bring",
-                Content = targetPlr.Name .. "님을 소환했습니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-        
-    elseif cleanMsg:sub(1, 6) == "fling " then
-        local targetStr = cleanMsg:sub(7)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") then
-            _G.FlingTargetPlayer = targetPlr
-            _G.FlingLoopActive = true
-            Rayfield:Notify({
-                Title = "Fling Start",
-                Content = targetPlr.Name .. "님에게 플링을 시작합니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-            task.spawn(function()
-                while _G.FlingLoopActive and _G.FlingTargetPlayer == targetPlr do
-                    pcall(function()
-                        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") then
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(9999, 9999, 9999)
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlr.Character.HumanoidRootPart.CFrame
-                        end
-                        pcall(function() game.Players.LocalPlayer.Character.Humanoid.PlatformStand = true end)
-                    end)
-                    task.wait()
-                end
-            end)
-        end
-        
-    elseif cleanMsg == "unfling" then
-        _G.FlingLoopActive = false
-        _G.FlingTargetPlayer = nil
-        pcall(function()
-            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-                game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
-                game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-            end
-        end)
-        Rayfield:Notify({
-            Title = "Fling Stop",
-            Content = "플링을 중지했습니다.",
-            Duration = 5,
-            Image = 4483362458
-        })
-        
-    elseif cleanMsg:sub(1, 5) == "view " then
-        local targetStr = cleanMsg:sub(6)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("Humanoid") then
-            workspace.CurrentCamera.CameraSubject = targetPlr.Character.Humanoid
-            Rayfield:Notify({
-                Title = "View",
-                Content = targetPlr.Name .. "님을 관전합니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-        
-    elseif cleanMsg == "unview" then
-        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-            workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
-            Rayfield:Notify({
-                Title = "Unview",
-                Content = "시점을 원래대로 돌렸습니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-        
-    elseif cleanMsg:sub(1, 6) == "tppos " then
-        local targetStr = cleanMsg:sub(7)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
-            Rayfield:Notify({
-                Title = "Teleport",
-                Content = targetPlr.Name .. "님 위치로 텔레포트했습니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-        
-    elseif cleanMsg:sub(1, 7) == "freeze " then
-        local targetStr = cleanMsg:sub(8)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") then
-            local tHrp = targetPlr.Character.HumanoidRootPart
-            game:GetService("ReplicatedStorage").GrabEvents.SetNetworkOwner:FireServer(tHrp, tHrp.CFrame)
-            task.wait(0.05)
-            tHrp.Anchored = true
-            Rayfield:Notify({
-                Title = "Freeze",
-                Content = targetPlr.Name .. "님을 고정했습니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-        
-    elseif cleanMsg:sub(1, 9) == "unfreeze " then
-        local targetStr = cleanMsg:sub(10)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") then
-            local tHrp = targetPlr.Character.HumanoidRootPart
-            game:GetService("ReplicatedStorage").GrabEvents.SetNetworkOwner:FireServer(tHrp, tHrp.CFrame)
-            task.wait(0.05)
-            tHrp.Anchored = false
-            Rayfield:Notify({
-                Title = "Unfreeze",
-                Content = targetPlr.Name .. "님의 고정을 해제했습니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-
-    elseif cleanMsg:sub(1, 5) == "goto " then
-        local targetStr = cleanMsg:sub(6)
-        local targetPlr = getTargetPlayer(targetStr)
-        if targetPlr and targetPlr.Character and targetPlr.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlr.Character.HumanoidRootPart.CFrame
-            Rayfield:Notify({
-                Title = "Goto",
-                Content = targetPlr.Name .. "님에게 이동했습니다.",
-                Duration = 5,
-                Image = 4483362458
-            })
-        end
-    end
-end
-
-game.Players.LocalPlayer.Chatted:Connect(runChatCommand)
 
 
 
@@ -13226,6 +13024,5 @@ lagTab:CreateInput({
 })
 BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초   <font color='rgb(255,0,0)'>[개 씨발 보지창녀]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/paca bot"))()
 Logger()
 
