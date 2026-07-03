@@ -731,7 +731,7 @@ function updateJumpPowerF()
          hum = char:WaitForChild("Humanoid")
 
         if jumpPowerT then
-            hum.JumpPower = jumpPowerV
+            --hum.JumpPower = jumpPowerV
             hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
                 if jumpPowerT then
                     hum.JumpPower = jumpPowerV
@@ -3287,11 +3287,11 @@ function AntiGrabF(enable)
         isvs = hum and hum.SeatPart ~= nil
 
         local isHeld = plr:FindFirstChild("IsHeld")
-        if not isHeld then return end
+        --if not isHeld then return end
 
         local head = char:FindFirstChild("Head")
         local POR = head and head:FindFirstChild("PartOwner")
-        local hrp = char:FindFirstChild("HumanoidRootPart")
+        --local hrp = char:FindFirstChild("HumanoidRootPart")
         local hrp2 = char:FindFirstChild("Torso")
         if not hum then return end
 
