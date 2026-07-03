@@ -1,6 +1,4 @@
--- 語言選擇GUI（LocalScript推薦）
--- Made by akkii
--- loaderv3
+
 
 local player = game.Players.LocalPlayer
 local GUI = Instance.new("ScreenGui")
