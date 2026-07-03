@@ -9533,7 +9533,7 @@ local AntiKick = antiTab:CreateToggle({
         task.spawn(AntiKickF)
     end
 })
---AntiKick:Set(true)
+AntiKick:Set(true)
 antiTab:CreateToggle({
    Name = "안티킥",
    CurrentValue = false,
