@@ -5820,56 +5820,10 @@ UtilityTab:CreateButton({
     end,
 })
 
-UtilityTab:CreateSection("캐릭터 비주얼")
 
--- 4. 캐릭터 반투명화
-UtilityTab:CreateToggle({
-    Name = "유령 모드 (반투명)",
-    CurrentValue = false,
-    Callback = function(Value)
-        pcall(function()
-            local char = plr.Character
-            if char then
-                for _, v in pairs(char:GetChildren()) do
-                    if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
-                        v.Transparency = Value and 0.5 or 0
-                    end
-                end
-            end
-        end)
-    end,
-})
 
--- 5. 머리 크기 변경 (시각용)
-UtilityTab:CreateSlider({
-    Name = "머리 크기 조절",
-    Range = {0, 100},
-    Increment = 1,
-    CurrentValue = 1,
-    Callback = function(Value)
-        pcall(function()
-            local head = plr.Character and plr.Character:FindFirstChild("Head")
-            if head then
-                head.Size = Vector3.new(Value, Value, Value)
-            end
-        end)
-    end,
-})
 
--- 6. 내 이름 숨기기 (로컬 전용)
-UtilityTab:CreateToggle({
-    Name = "내 머리위 이름표 제거",
-    CurrentValue = false,
-    Callback = function(Value)
-        pcall(function()
-            local head = plr.Character and plr.Character:FindFirstChild("Head")
-            if head then
-                local bgui = head:FindFirstChildOfClass("BillboardGui")
-                if bgui then bgui.Enabled = not Value end
-            end
-        end)
-    end,
-})
+
 
 UtilityTab:CreateSection("시스템 유틸")
 
@@ -5957,16 +5911,6 @@ UtilityTab:CreateButton({
 
 UtilityTab:CreateSection("플레이어 특수 조작")
 
--- 4. 1인칭 강제 고정 (조준 시 유용)
-UtilityTab:CreateToggle({
-    Name = "강제 1인칭 시점",
-    CurrentValue = false,
-    Callback = function(Value)
-        pcall(function()
-            game.Players.LocalPlayer.CameraMode = Value and Enum.CameraMode.LockFirstPerson or Enum.CameraMode.Classic
-        end)
-    end,
-})
 
 
 UtilityTab:CreateSlider({
@@ -6010,48 +5954,7 @@ UtilityTab:CreateButton({
     end,
 })
 
-UtilityTab:CreateSection("이동 최적화")
 
-UtilityTab:CreateToggle({
-    Name = "관성 제거   <font color='rgb(0,255,0)'>[굳]</font>",
-    CurrentValue = true,
-    Callback = function(Value)
-        _G.NoInertia = Value
-        pcall(function()
-            local char = game.Players.LocalPlayer.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            
-            if _G.NoInertia then
-                
-                for _, v in pairs(char:GetChildren()) do
-                    if v:IsA("BasePart") then
-                        v.CustomPhysicalProperties = PhysicalProperties.new(100, 0.3, 0.5)
-                    end
-                end
-                
-                
-                task.spawn(function()
-                    while _G.NoInertia do
-                        if hum and hum.MoveDirection.Magnitude <= 0 then
-                            local hrp = char:FindFirstChild("HumanoidRootPart")
-                            if hrp then
-                                hrp.Velocity = Vector3.new(0, hrp.Velocity.Y, 0)
-                            end
-                        end
-                        task.wait()
-                    end
-                end)
-            else
-                
-                for _, v in pairs(char:GetChildren()) do
-                    if v:IsA("BasePart") then
-                        v.CustomPhysicalProperties = nil
-                    end
-                end
-            end
-        end)
-    end,
-})
 
 
 
@@ -8795,7 +8698,7 @@ local AntiGrab = antiTab:CreateToggle({
         AntiGrabF(Value)
     end
 })
-AntiGrab:Set(true)
+--AntiGrab:Set(true)
 antiTab:CreateToggle({
     Name = "안티그랩V2   <font color='rgb(255,0,0)'>[프라임오너쉽]</font>",
     Default = false,
@@ -9180,7 +9083,7 @@ local AntiBlob = antiTab:CreateToggle({
 		end
 	end
 })
-AntiBlob:Set(true)
+--AntiBlob:Set(true)
 if not AntiCheatStates then
     _G.AntiCheatStates = { blobConn = nil }
 end
@@ -9239,7 +9142,7 @@ local AntiMassless = antiTab:CreateToggle({
         masslessF()
     end
 })
-AntiMassless:Set(true)
+--AntiMassless:Set(true)
 antiTab:CreateSection("안티 에어 서스펜션")
 antiTab:CreateToggle({
     Name = "디펜스 / 에어 서브펜션",
@@ -9296,7 +9199,7 @@ local AntiInPlots = antiTab:CreateToggle({
         end
     end
 })
-AntiInPlots:Set(true)
+--AntiInPlots:Set(true)
 
 
 local AntiVoid = antiTab:CreateToggle({
@@ -9310,7 +9213,7 @@ local AntiVoid = antiTab:CreateToggle({
         end
     end,
 })
-AntiVoid:Set(true)
+--AntiVoid:Set(true)
 
 local AntiExplode = antiTab:CreateToggle({
     Name = "안티 폭탄",
@@ -9326,7 +9229,7 @@ local AntiExplode = antiTab:CreateToggle({
         end
     end
 })
-AntiExplode:Set(true)
+--AntiExplode:Set(true)
 function setupAntiExplosion(character)
     if not character then return end
     local humanoid = character:WaitForChild("Humanoid", 5)
@@ -9399,7 +9302,7 @@ local AntiBurn = antiTab:CreateToggle({
         AntiBurn()
     end
 })
-AntiBurn:Set(true)
+--AntiBurn:Set(true)
 
 local AntiPaint = antiTab:CreateToggle({
     Name = "안티 페인트",
@@ -9409,7 +9312,7 @@ local AntiPaint = antiTab:CreateToggle({
         antiPaintF(Value)
     end
 })
-AntiPaint:Set(true)
+--AntiPaint:Set(true)
 
 AntiLagF()
 local AntiLag = antiTab:CreateToggle({
@@ -9420,7 +9323,7 @@ local AntiLag = antiTab:CreateToggle({
         antiLagEnabled = Value
     end
 })
-AntiLag:Set(true)
+--AntiLag:Set(true)
 function antiLagF()
     local char = plr.Character
     local hrp = char:WaitForChild("HumanoidRootPart")
@@ -9533,7 +9436,7 @@ resetProtectionConn = plr.CharacterAdded:Connect(function(char)
     end
 end)
 
-FlyingReset:Set(true)
+--FlyingReset:Set(true)
 
 
 
@@ -9706,7 +9609,7 @@ local AntiPCLD = antiTab:CreateToggle({
         task.spawn(AntiPCLDF)
     end
 })
-if not TESTPP then AntiPCLD:Set(true) end
+--if not TESTPP then AntiPCLD:Set(true) end
 
 antiTab:CreateSection("래그돌")
 local PermRag = antiTab:CreateToggle({
@@ -9813,7 +9716,7 @@ local walkSpeedInput = playerTab:CreateInput({
         updateWalkSpeedF()
     end
 })
-walkSpeedInput:Set(80)
+--walkSpeedInput:Set(80)
 
 
 
@@ -9840,7 +9743,7 @@ local jumpPowerInput = playerTab:CreateInput({
         updateJumpPowerF()
     end
 })
-jumpPowerInput:Set(60)
+--jumpPowerInput:Set(60)
 
 local realisticFP = false
 local fpConnection = nil
@@ -9940,7 +9843,7 @@ local flyInput = playerTab:CreateInput({
         flyV = Value
     end
 })
-flyInput:Set(80)
+--flyInput:Set(80)
 playerTab:CreateSection("모바일플라이")
 local function mflyF()
     if not mflyT then return end
@@ -13228,3 +13131,4 @@ BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
 
+Rayfield:LoadConfiguration()
