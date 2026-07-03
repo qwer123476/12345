@@ -739,7 +739,7 @@ function updateJumpPowerF()
             --hum.JumpPower = jumpPowerV
             hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
                 if jumpPowerT then
-                    hum.JumpPower = jumpPowerV
+                    --hum.JumpPower = jumpPowerV
                 end
             end)
         else
