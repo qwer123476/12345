@@ -392,13 +392,18 @@ local Window = Rayfield:CreateWindow({
     Theme = paca,
     ToggleUIKeybind = "T",
 
+    -- [ 저장 기능 설정 부분 수정 ]
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "PacaHub",
-        FileName = "Premium"
+        FolderName = "PacaHub", -- 폴더 이름 (workspace/PacaHub)
+        FileName = "PremiumConfig", -- 파일 이름 (PremiumConfig.json)
+        AutoSave = true -- 토글이나 슬라이더 변경 시 자동 저장 활성화
     }
 })
-    
+
+-- 구동 시 이전에 저장된 설정을 불러오는 함수를 반드시 호출해야 합니다.
+Rayfield:LoadConfiguration()
+
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
 local getTab = Window:CreateTab("알림",649498361)
