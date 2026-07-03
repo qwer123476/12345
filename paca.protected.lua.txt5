@@ -398,7 +398,7 @@ local Window = Rayfield:CreateWindow({
         FileName = "Premium"
     }
 })
-local STTab = Window:CreateTab("MUSIC",6023426923 )    
+local KTab = Window:CreateTab("MUSIC",6023426923 )    
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
 local getTab = Window:CreateTab("알림",649498361)
@@ -13007,7 +13007,7 @@ lagTab:CreateInput({
         LineLagV = Value
     end
 })
-STTab:CreateToggle({
+KTab:CreateToggle({
     Name = "파카허브 메인 음악",
     CurrentValue = true,
     Flag = "MusicToggle",
