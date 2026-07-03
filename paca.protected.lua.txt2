@@ -392,18 +392,10 @@ local Window = Rayfield:CreateWindow({
     Theme = paca,
     ToggleUIKeybind = "T",
 
-    -- [ 저장 기능 설정 부분 수정 ]
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "PacaHub", -- 폴더 이름 (workspace/PacaHub)
-        FileName = "PremiumConfig", -- 파일 이름 (PremiumConfig.json)
-        AutoSave = true -- 토글이나 슬라이더 변경 시 자동 저장 활성화
-    }
-})
+    
 
--- 구동 시 이전에 저장된 설정을 불러오는 함수를 반드시 호출해야 합니다.
 Rayfield:LoadConfiguration()
-
+local TRTab = Window:CreateTab("설정저장",6023426923 )
 local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
 local passTab = Window:CreateTab("패스잠금해제")
 local getTab = Window:CreateTab("알림",649498361)
@@ -423,7 +415,6 @@ local DevTab = Window:CreateTab("잡기능", 3944680095)
 local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
 local lagTab = Window:CreateTab("렉", 6023426923)   
 local BlacklistTab = Window:CreateTab("블랙리스트(좆장애창녀 모음집)", 6034831332)  
-local cmdWindowTab = Window:CreateTab("명령어 콘솔",6023426923 )
 local CreditsTab = Window:CreateTab("제작자 한정")
 
 
@@ -12876,6 +12867,37 @@ lagTab:CreateInput({
         LineLagV = Value
     end
 })
+
+-- [맨 앞에 추가] Rayfield 폴더 이름과 파일 이름을 아래 적어주세요.
+local folderName = "PacaHub"  -- 본인의 ConfigurationSaving 폴더 이름
+local fileName = "PremiumConfig"    -- 본인의 ConfigurationSaving 파일 이름
+
+if isfile(folderName.."/"..fileName..".json") then
+    if isfile(folderName.."/"..fileName.."-backup.json") then
+        -- 자체 저장 파일이 깨질 걸 대비해, 안전한 백업 파일을 메인 파일로 덮어씁니다.
+        local backup = readfile(folderName.."/"..fileName.."-backup.json")
+        writefile(folderName.."/"..fileName..".json", backup)
+    end
+end
+
+-- [맨 뒤에 추가] UI 조작이 다 끝나고 꺼지기 전에 수동으로 백업하는 버튼
+-- 본인이 사용하는 탭 이름(예: playerTab 등) 중 하나를 넣어주세요.
+YRTab:CreateButton({
+    Name = "설정저장하기",
+    Callback = function()
+        local folderName = "PacaHub"
+        local fileName = "PremiumConfig"
+        
+        if isfile(folderName.."/"..fileName..".json") then
+            local currentData = readfile(folderName.."/"..fileName..".json")
+            -- 현재 정상적으로 굴러가는 텍스트 데이터를 별도 백업 파일로 저장
+            writefile(folderName.."/"..fileName.."-backup.json", currentData)
+            Rayfield:Notify({Name = "백업 완료", Content = "설정이 안전하게 저장되었습니다.", Duration = 3})
+        end
+    end,
+})
+
+
 BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초   <font color='rgb(255,0,0)'>[개 씨발 보지창녀]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
