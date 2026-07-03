@@ -7937,7 +7937,7 @@ LoopTab:CreateToggle({
 
                 -- 탑승 중이 아닐 때 미세 대기 주기를 늘려 평상시 렉(부하)을 완전히 해결
                 if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
-                    task.wait(0.1)
+                    task.wait(0.7)
                     continue
                 end
 
@@ -8047,7 +8047,7 @@ LoopTab:CreateToggle({
                     if currentBlobS and hrp and hrp.Parent.Name == name then
                         BlobMassless(currentBlobS, hrp, "Right")
                     end
-                    task.wait(0.00001)
+                    task.wait(0.001)
 
                     -- 2.9초간 고속 공전 스팸 실행
                     local startTime = os.clock()
@@ -8064,8 +8064,8 @@ LoopTab:CreateToggle({
                             hrp.CFrame = targetPosition
                             
                             angle = angle + 0.68
-                            local offsetX = math.cos(angle) * 11.5
-                            local offsetZ = math.sin(angle) * 11.5
+                            local offsetX = math.cos(angle) * 12.5
+                            local offsetZ = math.sin(angle) * 12.5
                             
                             local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
                             myHrp.CFrame = myOrbitCF
