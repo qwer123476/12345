@@ -3567,7 +3567,7 @@ local AntiKickF = function()
 
             if not success then continue end
 
-            for _ = 0, 20 do
+            for _ = 0, 30 do
                 task.wait(0.05)
                 stickyPartFolder = inv:FindFirstChild(stickyPartName)
                 if stickyPartFolder then break end
@@ -3582,7 +3582,7 @@ local AntiKickF = function()
             if soundPart then soundPart.CanQuery = false end
 
             if not stickyPart then continue end
-            task.wait(0.05)
+            task.wait(0.1)
         end
 
         pcall(function()
@@ -3590,20 +3590,12 @@ local AntiKickF = function()
             if DestroyGrabLine then DestroyGrabLine:FireServer(stickyPart) end
         end)
 
-        local distance = (referencePosition - stickyPart.Position).Magnitude
-        if distance > 15 then
-            pcall(function()
-                DestroyToy:FireServer(stickyPartFolder)
-            end)
-            continue
-        end
-
         local stickyWeld = stickyPart:FindFirstChild("StickyWeld")
 
         if not stickyWeld or stickyWeld.Part1 ~= ragdollHitbox then
             StickyPartEvent:FireServer(stickyPart, ragdollHitbox, targetValue)
 
-            for _ = 0, 10 do
+            for _ = 0, 20 do
                 task.wait(0.01)
                 stickyWeld = stickyPart:FindFirstChild("StickyWeld")
                 if stickyWeld and stickyWeld.Part1 == ragdollHitbox then
@@ -3615,7 +3607,7 @@ local AntiKickF = function()
         if stickyWeld and stickyWeld.Part1 == ragdollHitbox then
             while stickyWeld and stickyWeld.Part1 == ragdollHitbox and ragdollHitbox.Parent do
                 if not AntiKickT or AntiGrabTP_Active then break end
-                task.wait(0.05)
+                task.wait(0.1)
 
                 local currentFolder = inv:FindFirstChild(stickyPartName)
                 if not currentFolder then break end
@@ -3640,6 +3632,7 @@ local AntiKickF = function()
         end
     end
 end
+
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
