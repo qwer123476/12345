@@ -393,7 +393,7 @@ local Window = Rayfield:CreateWindow({
     ToggleUIKeybind = "T",
 
     ConfigurationSaving = {
-        Enabled = true,
+        Enabled = flase,
         FolderName = "PacaHub",
         FileName = "Premium"
     }
