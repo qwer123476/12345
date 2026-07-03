@@ -3568,7 +3568,7 @@ local AntiKickF = function()
             if not success then continue end
 
             for _ = 0, 30 do
-                task.wait(0.05)
+                task.wait(0.0005)
                 stickyPartFolder = inv:FindFirstChild(stickyPartName)
                 if stickyPartFolder then break end
             end
@@ -3582,7 +3582,7 @@ local AntiKickF = function()
             if soundPart then soundPart.CanQuery = false end
 
             if not stickyPart then continue end
-            task.wait(0.1)
+            task.wait(0.01)
         end
 
         pcall(function()
