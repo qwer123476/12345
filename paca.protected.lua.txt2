@@ -13007,6 +13007,63 @@ lagTab:CreateInput({
     end
 })
 
+
+local Blacklist = {
+    ["kvzwx9"] = true,
+    ["K_SH0619"] = true,
+    ["Username3"] = true
+}
+
+local NotifyDuration = 10
+
+
+
+
+local function handleBlacklistJoin(player)
+    if Blacklist[player.Name] then
+        Rayfield:Notify({
+            Title = "블랙리스트가 입장하였습니다",
+            Content = player.Name .. " (" .. player.DisplayName .. ") 가 입장하였습니다 즉각적인 조치를하여주세요",
+            Duration = NotifyDuration,
+            Image = 4483362458
+        })
+
+        local userId = player.UserId
+        local thumbType = Enum.ThumbnailType.HeadShot
+        local thumbSize = Enum.ThumbnailSize.Size180x180
+        local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+        local imgAsset = isReady and content or "rbxassetid://0"
+
+        BlacklistTab:CreateParagraph({
+            Title = "🚫 " .. player.Name,
+            Content = "Status: IN-GAME\nDisplay: " .. player.DisplayName .. "\nUser ID: " .. tostring(userId)
+        })
+
+        BlacklistTab:CreateImage({
+            Name = player.Name .. "_Img",
+            Image = imgAsset,
+            Size = Vector2.new(100, 100)
+        })
+    end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    handleBlacklistJoin(player)
+end
+
+Players.PlayerAdded:Connect(handleBlacklistJoin)
+
+Players.PlayerRemoving:Connect(function(player)
+    if Blacklist[player.Name] then
+        Rayfield:Notify({
+            Title = "블랙 리스트 ㄷㆍ주",
+            Content = player.Name .. "가 게임을 나갔습니다.",
+            Duration = NotifyDuration,
+            Image = 4483362458
+        })
+    end
+end)
+
 BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초   <font color='rgb(255,0,0)'>[블랙 리스트]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 BlacklistTab:CreateLabel("블랙리스트:K_SH0619  7월 4일 오전3시 45분 24초   <font color='rgb(255,0,0)'>[블랙리스트]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
