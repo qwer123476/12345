@@ -416,7 +416,7 @@ local keybindTab = Window:CreateTab("설정", 6031094678)
 local DevTab = Window:CreateTab("잡기능", 3944680095)             
 local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
 local lagTab = Window:CreateTab("렉", 6023426923)   
-local BlacklistTab = Tab4
+local BlacklistTab = Window:CreateTab("블랙 리스트")
 local CreditsTab = Window:CreateTab("제작자 한정")
 
 
