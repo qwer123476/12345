@@ -13011,57 +13011,35 @@ lagTab:CreateInput({
 local Players = game:GetService("Players")
 
 local Blacklist = {
-    ["kvzwx9"] = true,
-    ["k_sh0619"] = true,
-    ["username3"] = true
+    kvzwx9 = true,
+    K_SH0619 = true,
+    Username3 = true
 }
 
-local NotifyDuration = 10
-local ActiveLabels = {}
+local function AddLabel(player)
+    BlacklistTab:CreateLabel(
+        string.format("🚨 %s (@%s) - 접속중", player.Name, player.DisplayName)
+    )
 
-local function createOrUpdateLabel(player, status)
-    local text = status .. " " .. player.Name .. " (@" .. player.DisplayName .. ")"
-
-    if ActiveLabels[player.Name] then
-        pcall(function()
-            ActiveLabels[player.Name]:Destroy()
-        end)
-    end
-
-    ActiveLabels[player.Name] = BlacklistTab:CreateLabel(text)
+    Rayfield:Notify({
+        Title = "블랙리스트 감지",
+        Content = player.Name .. " 님이 서버에 있습니다.",
+        Duration = 10,
+        Image = 4483362458
+    })
 end
 
-local function handleBlacklistJoin(player)
-    if Blacklist[player.Name:lower()] then
-        Rayfield:Notify({
-            Title = "블랙리스트 감지",
-            Content = player.Name .. " (" .. player.DisplayName .. ") 가 블랙리스트에 등록되어 있습니다.",
-            Duration = NotifyDuration,
-            Image = 4483362458
-        })
-
-        createOrUpdateLabel(player, "🚨 접속중 -")
+local function CheckPlayer(player)
+    if Blacklist[player.Name] then
+        AddLabel(player)
     end
 end
 
 for _, player in ipairs(Players:GetPlayers()) do
-    task.spawn(handleBlacklistJoin, player)
+    CheckPlayer(player)
 end
 
-Players.PlayerAdded:Connect(handleBlacklistJoin)
-
-Players.PlayerRemoving:Connect(function(player)
-    if Blacklist[player.Name:lower()] then
-        Rayfield:Notify({
-            Title = "블랙리스트 퇴장",
-            Content = player.Name .. " (" .. player.DisplayName .. ") 가 게임을 나갔습니다.",
-            Duration = NotifyDuration,
-            Image = 4483362458
-        })
-
-        createOrUpdateLabel(player, "❌ 퇴장 -")
-    end
-end)
+Players.PlayerAdded:Connect(CheckPlayer)
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
