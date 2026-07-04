@@ -13012,52 +13012,56 @@ local Players = game:GetService("Players")
 
 local Blacklist = {
     ["kvzwx9"] = true,
-    ["K_SH0619"] = true,
-    ["Username3"] = true
+    ["k_sh0619"] = true,
+    ["username3"] = true
 }
 
 local NotifyDuration = 10
 local ActiveLabels = {}
 
+local function createOrUpdateLabel(player, status)
+    local text = status .. " " .. player.Name .. " (@" .. player.DisplayName .. ")"
+
+    if ActiveLabels[player.Name] then
+        pcall(function()
+            ActiveLabels[player.Name]:Destroy()
+        end)
+    end
+
+    ActiveLabels[player.Name] = BlacklistTab:CreateLabel(text)
+end
+
 local function handleBlacklistJoin(player)
-    if Blacklist[player.Name] then
+    if Blacklist[player.Name:lower()] then
         Rayfield:Notify({
             Title = "블랙리스트 감지",
-            Content = player.Name .. " (" .. player.DisplayName .. ") 가 블랙리스트에 등록되어 있습니다",
+            Content = player.Name .. " (" .. player.DisplayName .. ") 가 블랙리스트에 등록되어 있습니다.",
             Duration = NotifyDuration,
             Image = 4483362458
         })
 
-        if not ActiveLabels[player.Name] then
-            local label = BlacklistTab:CreateLabel("🚨 " .. player.Name .. " (@" .. player.DisplayName .. ") - 접속중")
-            ActiveLabels[player.Name] = label
-        else
-            ActiveLabels[player.Name]:Set("🚨 " .. player.Name .. " (@" .. player.DisplayName .. ") - 접속중")
-        end
+        createOrUpdateLabel(player, "🚨 접속중 -")
     end
 end
 
 for _, player in ipairs(Players:GetPlayers()) do
-    handleBlacklistJoin(player)
+    task.spawn(handleBlacklistJoin, player)
 end
 
 Players.PlayerAdded:Connect(handleBlacklistJoin)
 
 Players.PlayerRemoving:Connect(function(player)
-    if Blacklist[player.Name] then
+    if Blacklist[player.Name:lower()] then
         Rayfield:Notify({
-            Title = "블랙 리스트 도주",
-            Content = player.Name .. "가 게임을 나갔습니다.",
+            Title = "블랙리스트 퇴장",
+            Content = player.Name .. " (" .. player.DisplayName .. ") 가 게임을 나갔습니다.",
             Duration = NotifyDuration,
             Image = 4483362458
         })
 
-        if ActiveLabels[player.Name] then
-            ActiveLabels[player.Name]:Set("❌ " .. player.Name .. " (@" .. player.DisplayName .. ") - 퇴장함")
-        end
+        createOrUpdateLabel(player, "❌ 퇴장 -")
     end
 end)
-
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
