@@ -13008,39 +13008,11 @@ lagTab:CreateInput({
 })
 
 
-local Players = game:GetService("Players")
+BlacklistTab:CreateLabel("kvzwx9")
+BlacklistTab:CreateLabel("K_SH0619")
 
-local Blacklist = {
-    kvzwx9 = true,
-    K_SH0619 = true,
-    Username3 = true
-}
-
-local function AddLabel(player)
-    BTab:CreateLabel(
-        string.format("🚨 %s (@%s) - 접속중", player.Name, player.DisplayName)
-    )
-
-    Rayfield:Notify({
-        Title = "블랙리스트 감지",
-        Content = player.Name .. " 님이 서버에 있습니다.",
-        Duration = 10,
-        Image = 4483362458
-    })
-end
-
-local function CheckPlayer(player)
-    if Blacklist[player.Name] then
-        AddLabel(player)
-    end
-end
-
-for _, player in ipairs(Players:GetPlayers()) do
-    CheckPlayer(player)
-end
-
-Players.PlayerAdded:Connect(CheckPlayer)
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
 
+ 
