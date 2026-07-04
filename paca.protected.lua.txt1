@@ -13008,6 +13008,10 @@ lagTab:CreateInput({
 })
 
 
+local Players = game:GetService("Players")
+
+local BlacklistTab = 기존_탭_변수명 
+
 local Blacklist = {
     ["kvzwx9"] = true,
     ["K_SH0619"] = true,
@@ -13026,10 +13030,16 @@ local function handleBlacklistJoin(player)
         })
 
         local userId = player.UserId
-        local thumbType = Enum.ThumbnailType.HeadShot
-        local thumbSize = Enum.ThumbnailSize.Size180x180
-        local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
-        local imgAsset = isReady and content or "rbxassetid://0"
+        local imgAsset = "rbxassetid://0"
+        
+        pcall(function()
+            local thumbType = Enum.ThumbnailType.HeadShot
+            local thumbSize = Enum.ThumbnailSize.Size180x180
+            local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+            if isReady then
+                imgAsset = content
+            end
+        end)
 
         BlacklistTab:CreateParagraph({
             Title = "🚫 " .. player.Name,
@@ -13060,6 +13070,7 @@ Players.PlayerRemoving:Connect(function(player)
         })
     end
 end)
+
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
