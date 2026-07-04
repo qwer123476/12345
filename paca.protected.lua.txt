@@ -13016,9 +13016,6 @@ local Blacklist = {
 
 local NotifyDuration = 10
 
-
-
-
 local function handleBlacklistJoin(player)
     if Blacklist[player.Name] then
         Rayfield:Notify({
