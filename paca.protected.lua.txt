@@ -13007,7 +13007,8 @@ lagTab:CreateInput({
     end
 })
 
-BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초   <font color='rgb(255,0,0)'>[개 씨발 보지창녀]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
+BlacklistTab:CreateLabel("블랙리스트:kvzwx9  6월 27일 오후7시 39분 42초   <font color='rgb(255,0,0)'>[블랙 리스트]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
+BlacklistTab:CreateLabel("블랙리스트:K_SH0619  7월 4일 오전3시 45분 24초   <font color='rgb(255,0,0)'>[블랙리스트]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
 
