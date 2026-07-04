@@ -13010,8 +13010,6 @@ lagTab:CreateInput({
 
 local Players = game:GetService("Players")
 
-local BlacklistTab = Tab4
-
 local Blacklist = {
     ["kvzwx9"] = true,
     ["K_SH0619"] = true,
@@ -13019,38 +13017,23 @@ local Blacklist = {
 }
 
 local NotifyDuration = 10
+local ActiveLabels = {}
 
 local function handleBlacklistJoin(player)
     if Blacklist[player.Name] then
         Rayfield:Notify({
-            Title = "블랙리스트가 입장하였습니다",
-            Content = player.Name .. " (" .. player.DisplayName .. ") 가 입장하였습니다 즉각적인 조치를하여주세요",
+            Title = "블랙리스트 감지",
+            Content = player.Name .. " (" .. player.DisplayName .. ") 가 블랙리스트에 등록되어 있습니다",
             Duration = NotifyDuration,
             Image = 4483362458
         })
 
-        local userId = player.UserId
-        local imgAsset = "rbxassetid://0"
-        
-        pcall(function()
-            local thumbType = Enum.ThumbnailType.HeadShot
-            local thumbSize = Enum.ThumbnailSize.Size180x180
-            local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
-            if isReady then
-                imgAsset = content
-            end
-        end)
-
-        BlacklistTab:CreateParagraph({
-            Title = "🚫 " .. player.Name,
-            Content = "Status: IN-GAME\nDisplay: " .. player.DisplayName .. "\nUser ID: " .. tostring(userId)
-        })
-
-        BlacklistTab:CreateImage({
-            Name = player.Name .. "_Img",
-            Image = imgAsset,
-            Size = Vector2.new(100, 100)
-        })
+        if not ActiveLabels[player.Name] then
+            local label = BlacklistTab:CreateLabel("🚨 " .. player.Name .. " (@" .. player.DisplayName .. ") - 접속중")
+            ActiveLabels[player.Name] = label
+        else
+            ActiveLabels[player.Name]:Set("🚨 " .. player.Name .. " (@" .. player.DisplayName .. ") - 접속중")
+        end
     end
 end
 
@@ -13068,6 +13051,10 @@ Players.PlayerRemoving:Connect(function(player)
             Duration = NotifyDuration,
             Image = 4483362458
         })
+
+        if ActiveLabels[player.Name] then
+            ActiveLabels[player.Name]:Set("❌ " .. player.Name .. " (@" .. player.DisplayName .. ") - 퇴장함")
+        end
     end
 end)
 
