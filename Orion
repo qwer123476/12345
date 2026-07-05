@@ -3880,5 +3880,5 @@ Main_Tab:AddToggle({
 Window:AddConfigTab()
 ]]--
 
-Window:Render()
+
 return OrionLib
