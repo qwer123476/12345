@@ -9556,7 +9556,7 @@ local function runAnchorLogic()
         if not found then return end
     end
 end
-Local existing = targetModel:FindFirstChild("Force")
+local existing = targetModel:FindFirstChild("Force")
     if existing then
         local existingHighlight = targetModel:FindFirstChild("AnchorHighlight")
         if existingHighlight then existingHighlight:Destroy() end
