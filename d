@@ -11461,5 +11461,10 @@ end)
 
 Logger()
 
-
+bdTab:AddButton({
+    Name = "TEST",
+    Callback = function()
+        print("WORK")
+    end
+})
 OrionLib:Init()
