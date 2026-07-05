@@ -3879,5 +3879,6 @@ Main_Tab:AddToggle({
 
 Window:AddConfigTab()
 ]]--
-
+Tab.ContentFrame = someFrame
+Window:Render()
 return OrionLib
