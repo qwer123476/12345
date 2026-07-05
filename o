@@ -9331,6 +9331,7 @@ local antiGrabProcessing = {}
 local antiGrabThreads = {}
 
 local function processAntiGrabPlayer(player)
+    end
     if not player then return false end
 
     local myChar = localPlayer.Character
