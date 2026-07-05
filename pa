@@ -3608,6 +3608,8 @@ local AntiKickF = function()
             end
         end
 
+        
+
         if not AntiKickT or AntiGrabTP_Active then
             if stickyPartFolder and stickyPartFolder.Parent then
                 pcall(function()
@@ -3616,8 +3618,11 @@ local AntiKickF = function()
             end
             break
         end
-    end
-end
+    end -- while AntiKickT 루프가 끝나는 end
+end -- Local AntiKickF = function() 함수 전체가 끝나는 end
+
+
+
 
 
 local Players = game:GetService("Players")
