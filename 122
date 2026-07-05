@@ -14758,8 +14758,49 @@ bdTab:AddButton({
 
         for _, obj in ipairs(Lighting:GetChildren()) do
             if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
 
+        Lighting.Ambient = Color3.fromRGB(20, 20, 40)
+        Lighting.Brightness = 1.4
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 255, 180)
+        Lighting.ColorShift_Top = Color3.fromRGB(130, 0, 255)
+        Lighting.EnvironmentDiffuseScale = 0.6
+        Lighting.EnvironmentSpecularScale = 1.1
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(22, 22, 45)
+        Lighting.ShadowSoftness = 0.25
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 0
+        Lighting.GeographicLatitude = -45
+        Lighting.FogColor = Color3.fromRGB(8, 8, 20)
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 1200
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.SkyboxBk = "rbxassetid://152285141"
+        sky.SkyboxDn = "rbxassetid://152285108"
+        sky.SkyboxFt = "rbxassetid://152285161"
+        sky.SkyboxLf = "rbxassetid://152285191"
+        sky.SkyboxRt = "rbxassetid://152285122"
+        sky.SkyboxUp = "rbxassetid://152285175"
+        sky.StarCount = 7500
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 2.2
+        bloom.Size = 45
+        bloom.Threshold = 0.5
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.02
+        cc.Contrast = 0.28
+        cc.Saturation = 0.45
+        cc.TintColor = Color3.fromRGB(230, 240, 255)
+    end
+})
 
 
 Window:AddConfigTab()
