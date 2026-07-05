@@ -364,12 +364,7 @@ local lagTab = Window:MakeTab({
     PremiumOnly = false
 })
 print(Window.AddConfigTab)
-local BTab = Window:MakeTab({
-    Name = "블랙 리스트",
-    Icon = "rbxassetid://0",
-    PremiumOnly = false
-})
-print(Window.AddConfigTab)
+
 local CreditsTab = Window:MakeTab({
     Name = "제작자 한정",
     Icon = "rbxassetid://0",
@@ -11444,8 +11439,6 @@ lagTab:AddInput({
     end
 })
 
-BlacklistTab:AddLabel("kvzwx9")
-BlacklistTab:AddLabel("K_SH0619")
 
 local H = game.Players.LocalPlayer.PlayerScripts.CharacterAndBeamMove
 local v = 0
@@ -11462,11 +11455,6 @@ end)
 
 Logger()
 
-bdTab:AddButton({
-    Name = "TEST",
-    Callback = function()
-        print("WORK")
-    end
-})
+
 	Window:AddConfigTab()
 OrionLib:Init()
