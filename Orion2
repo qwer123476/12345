@@ -1624,7 +1624,22 @@ function OrionLib:MakeWindow(WindowConfig)
 		
 
 		local function GetElements(ItemParent)
-			local ElementFunction = {}
+			    function ElementFunction:AddToggle(ToggleConfig)
+        ToggleConfig = ToggleConfig or {}
+        --여기에 기존 순정 토글 생성 코드를 복사해서 넣으세요
+    end
+
+    function ElementFunction:AddInput(InputConfig)
+        InputConfig = InputConfig or {}
+        --여기에 기존 순정 인풋 생성 코드를 복사해서 넣으세요
+    end
+
+    function ElementFunction:AddSection(SectionConfig)
+        SectionConfig = SectionConfig or {}
+        --여기에 기존 순정 섹션 생성 코드를 복사해서 넣으세요
+    end
+
+           local ElementFunction = {}
 			function ElementFunction:AddLabel(Text)
 				local LabelFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
 					Size = UDim2.new(1, 0, 0, 30),
