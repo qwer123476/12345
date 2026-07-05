@@ -1,7 +1,4 @@
-
-
-
-print("AP FTAP Script 시작 - 설정 저장 활성화")
+Print("AP FTAP Script 시작 - 설정 저장 활성화")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 Players = game:GetService("Players")
@@ -249,7 +246,7 @@ G = rs.GrabEvents
 G:WaitForChild("EndGrabEarly"):Destroy()
 Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
- local Rayfield =   loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexsoftware/Orion/main/source')))()
 
 local paca = {
     TextColor = Color3.fromRGB(255,255,255),
@@ -296,14 +293,6 @@ local paca = {
     PlaceholderColor = Color3.fromRGB(120,110,80),
 }
 
-local oldCreateToggle = Rayfield.CreateToggle
-local oldCreateButton = Rayfield.CreateButton
-local oldCreateLabel = Rayfield.CreateLabel
-local oldCreateDropdown = Rayfield.CreateDropdown
-local oldCreateSlider = Rayfield.CreateSlider
-local oldCreateInput = Rayfield.CreateInput
-
--- 텍스트 내부에서 특정 단어를 찾아 그라데이션으로 쪼개주는 내부 함수
 local function autoGradient(text, target, startColor, endColor)
     if not string.find(text, target, 1, true) then return text end
     
@@ -325,100 +314,85 @@ local function autoGradient(text, target, startColor, endColor)
 end
 
 local function applyRichTextAndEffects(element)
-    if not element then return end
+    if not element then return element end
     task.spawn(function()
-        for _, v in pairs(element:GetDescendants()) do
-            if v:IsA("TextLabel") then
-                local currentText = v.Text
-                
-                -- 이미 작성되어 있던 특정 문구들을 자동으로 그라데이션 텍스트로 변환
-                -- 예: [라인]을 주황->노랑 그라데이션으로 변경
-                currentText = autoGradient(currentText, "[라인]", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
-                -- 예: [프리미엄]을 빨강->파랑 그라데이션으로 변경
-                currentText = autoGradient(currentText, "[프리미엄]", Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255))
-                
-                v.Text = currentText
-                v.RichText = true
-                
-                -- 글자 뒤에 은은하게 깔리는 검은색 안개(번짐) 효과
-                v.TextStrokeTextColor3 = Color3.fromRGB(0, 0, 0)
-                v.TextStrokeThickness = 2.5
-                v.TextStrokeTransparency = 0.5
+        local inst = type(element) == "table" and (element.Instance or element.Frame or element.TextLabel) or element
+        if typeof(inst) == "Instance" then
+            for _, v in pairs(inst:GetDescendants()) do
+                if v:IsA("TextLabel") then
+                    local currentText = v.Text
+                    
+                    currentText = autoGradient(currentText, "[라인]", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
+                    currentText = autoGradient(currentText, "[프리미엄]", Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255))
+                    
+                    v.Text = currentText
+                    v.RichText = true
+                    
+                    v.TextStrokeTextColor3 = Color3.fromRGB(0, 0, 0)
+                    v.TextStrokeThickness = 2.5
+                    v.TextStrokeTransparency = 0.5
+                end
             end
         end
     end)
-end
-
-function Rayfield:CreateToggle(options)
-    local element = oldCreateToggle(self, options)
-    applyRichTextAndEffects(element)
     return element
 end
 
-function Rayfield:CreateButton(options)
-    local element = oldCreateButton(self, options)
-    applyRichTextAndEffects(element)
-    return element
+local oldMakeWindow = OrionLib.MakeWindow
+function OrionLib:MakeWindow(...)
+    local Window = oldMakeWindow(self, ...)
+    local oldMakeTab = Window.MakeTab
+    
+    function Window:MakeTab(...)
+        local tab = oldMakeTab(self, ...)
+        
+        local oldAddToggle = tab.AddToggle
+        local oldAddButton = tab.AddButton
+        local oldAddLabel = tab.AddLabel
+        local oldAddDropdown = tab.AddDropdown
+        local oldAddSlider = tab.AddSlider
+        local oldAddTextbox = tab.AddTextbox
+
+        function tab:AddToggle(opts) return applyRichTextAndEffects(oldAddToggle(self, opts)) end
+        function tab:AddButton(opts) return applyRichTextAndEffects(oldAddButton(self, opts)) end
+        function tab:AddLabel(opts) return applyRichTextAndEffects(oldAddLabel(self, opts)) end
+        function tab:AddDropdown(opts) return applyRichTextAndEffects(oldAddDropdown(self, opts)) end
+        function tab:AddSlider(opts) return applyRichTextAndEffects(oldAddSlider(self, opts)) end
+        function tab:AddTextbox(opts) return applyRichTextAndEffects(oldAddTextbox(self, opts)) end
+        
+        return tab
+    end
+    return Window
 end
 
-function Rayfield:CreateLabel(options)
-    local element = oldCreateLabel(self, options)
-    applyRichTextAndEffects(element)
-    return element
-end
-
-function Rayfield:CreateDropdown(options)
-    local element = oldCreateDropdown(self, options)
-    applyRichTextAndEffects(element)
-    return element
-end
-
-function Rayfield:CreateSlider(options)
-    local element = oldCreateSlider(self, options)
-    applyRichTextAndEffects(element)
-    return element
-end
-
-function Rayfield:CreateInput(options)
-    local element = oldCreateInput(self, options)
-    applyRichTextAndEffects(element)
-    return element
-end
-
-
-local Window = Rayfield:CreateWindow({
+local Window = OrionLib:MakeWindow({
     Name = "파카허브 [프리미엄]",
-    Icon = 0,
-    Theme = paca,
-    ToggleUIKeybind = "T",
-
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "PacaHub",
-        FileName = "Premium"
-    }
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "PacaHub",
+    IntroEnabled = false
 })
-local playerTab = Window:CreateTab("플레이어 설정", 6034281935)    
-local passTab = Window:CreateTab("패스잠금해제")
-local getTab = Window:CreateTab("알림",649498361)
-local grabTab = Window:CreateTab("컴뱃", 6026568198)               
-local UtilityTab = Window:CreateTab("유틸리티", 6031094678) 
-local plotTab = Window:CreateTab("집")
-local DDTab = Window:CreateTab("티배깅")
-local FDTab = Window:CreateTab("친구 보호", 6026568198)        
-local antiTab = Window:CreateTab("안전", 6034831332)               
-local ListTab = Window:CreateTab("명단", 3572491301)              
-local LoopTab = Window:CreateTab("조지기", 6023426923)             
-local AuraTab = Window:CreateTab("아우라", 6031068423)   
-local bdTab = Window:CreateTab("배경체인저")
-local funTab = Window:CreateTab("찌끄레기", 4483345998)            
-local keybindTab = Window:CreateTab("설정", 6031094678)            
-local DevTab = Window:CreateTab("잡기능", 3944680095)             
-local RankTab = Window:CreateTab("제작자 친구", 6034281935)       
-local lagTab = Window:CreateTab("렉", 6023426923)   
-local BTab = Window:CreateTab("블랙 리스트")
-local CreditsTab = Window:CreateTab("제작자 한정")
 
+local playerTab = Window:MakeTab({Name = "플레이어 설정", Icon = "rbxassetid://6034281935", PremiumOnly = false})    
+local passTab = Window:MakeTab({Name = "패스잠금해제", Icon = "rbxassetid://0", PremiumOnly = false})
+local getTab = Window:MakeTab({Name = "알림", Icon = "rbxassetid://649498361", PremiumOnly = false})
+local grabTab = Window:MakeTab({Name = "컴뱃", Icon = "rbxassetid://6026568198", PremiumOnly = false})               
+local UtilityTab = Window:MakeTab({Name = "유틸리티", Icon = "rbxassetid://6031094678", PremiumOnly = false}) 
+local plotTab = Window:MakeTab({Name = "집", Icon = "rbxassetid://0", PremiumOnly = false})
+local DDTab = Window:MakeTab({Name = "티배깅", Icon = "rbxassetid://0", PremiumOnly = false})
+local FDTab = Window:MakeTab({Name = "친구 보호", Icon = "rbxassetid://6026568198", PremiumOnly = false})        
+local antiTab = Window:MakeTab({Name = "안전", Icon = "rbxassetid://6034831332", PremiumOnly = false})               
+local ListTab = Window:MakeTab({Name = "명단", Icon = "rbxassetid://3572491301", PremiumOnly = false})              
+local LoopTab = Window:MakeTab({Name = "조지기", Icon = "rbxassetid://6023426923", PremiumOnly = false})             
+local AuraTab = Window:MakeTab({Name = "아우라", Icon = "rbxassetid://6031068423", PremiumOnly = false})   
+local bdTab = Window:MakeTab({Name = "배경체인저", Icon = "rbxassetid://0", PremiumOnly = false})
+local funTab = Window:MakeTab({Name = "찌끄레기", Icon = "rbxassetid://4483345998", PremiumOnly = false})            
+local keybindTab = Window:MakeTab({Name = "설정", Icon = "rbxassetid://6031094678", PremiumOnly = false})            
+local DevTab = Window:MakeTab({Name = "잡기능", Icon = "rbxassetid://3944680095", PremiumOnly = false})             
+local RankTab = Window:MakeTab({Name = "제작자 친구", Icon = "rbxassetid://6034281935", PremiumOnly = false})       
+local lagTab = Window:MakeTab({Name = "렉", Icon = "rbxassetid://6023426923", PremiumOnly = false})   
+local BTab = Window:MakeTab({Name = "블랙 리스트", Icon = "rbxassetid://0", PremiumOnly = false})
+local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid://0", PremiumOnly = false})
 
 ----------------------------------------------------------------------------------------- [ 기능들 ]
 
@@ -896,7 +870,7 @@ function AntiLagF()
 
         if data.count >= AntiLagV and not data.isDecreasing then
             data.isDecreasing = true
-            Rayfield:Notify({Title = "[ ✏️ ]", Content = "by: " .. fromPlr.Name, Duration = 3, Image = 0})
+            OrionLib:MakeNotification({Name = "[ ✏️ ]", Content = "by: " .. fromPlr.Name, Time = 3, Image = "rbxassetid://0"})
             plr.PlayerScripts.CharacterAndBeamMove.Enabled = false
 
             task.spawn(function()
@@ -1056,7 +1030,7 @@ function AutoGucciF()
 
             if not successCheck then
                  blobHRP = blobmanInstanceS and blobmanInstanceS:FindFirstChild("HumanoidRootPart")
-                Rayfield:Notify({Title = "[ 🔓 ]",Content = "구찌실패 | 기다려 씨발",Duration = 1,Image = nil,})
+                OrionLib:MakeNotification({Name = "[ 🔓 ]", Content = "구찌실패 | 기다려 씨발", Time = 1, Image = "rbxassetid://0"})
                 if hum then
                     rs.CharacterEvents.Struggle:FireServer(plr)
                     hum.Sit = true
@@ -1085,6 +1059,7 @@ function sitJumpFV2()
     sitJumpT = false
 end
 end
+
 
 function AutoGucciFV2()
      char = plr.Character
