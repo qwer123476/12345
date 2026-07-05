@@ -11436,3 +11436,4 @@ Window:AddConfigTab()
 
 
 return OrionLib
+OrionLib:Init()
