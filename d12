@@ -371,65 +371,7 @@ local CreditsTab = Window:MakeTab({
     PremiumOnly = false
 })
 print(Window.AddConfigTab)
-local function autoGradient(text, target, startColor, endColor)
-    if not string.find(text, target, 1, true) then return text end
 
-    local len = utf8.len(target)
-    local result = ""
-    local count = 0
-
-    for _, code in utf8.codes(target) do
-        local char = utf8.char(code)
-        count = count + 1
-
-        local ratio = (len > 1) and ((count - 1) / (len - 1)) or 0
-
-        local r = math.floor(startColor.R * 255 + (endColor.R - startColor.R) * 255 * ratio)
-        local g = math.floor(startColor.G * 255 + (endColor.G - startColor.G) * 255 * ratio)
-        local b = math.floor(startColor.B * 255 + (endColor.B - startColor.B) * 255 * ratio)
-
-        result = result .. string.format("<font color='rgb(%d,%d,%d)'>%s</font>", r, g, b, char)
-    end
-
-    return string.gsub(
-        text,
-        string.gsub(target, "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1"),
-        result
-    )
-end
-
-local function applyRichTextAndEffects(gui)
-    if not gui then return end
-
-    task.spawn(function()
-        for _, v in pairs(gui:GetDescendants()) do
-            if v:IsA("TextLabel") then
-                local currentText = v.Text
-
-                currentText = autoGradient(
-                    currentText,
-                    "[라인]",
-                    Color3.fromRGB(255, 100, 0),
-                    Color3.fromRGB(255, 255, 0)
-                )
-
-                currentText = autoGradient(
-                    currentText,
-                    "[프리미엄]",
-                    Color3.fromRGB(255, 0, 0),
-                    Color3.fromRGB(0, 0, 255)
-                )
-
-                v.Text = currentText
-                v.RichText = true
-
-                v.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                v.TextStrokeThickness = 2.5
-                v.TextStrokeTransparency = 0.5
-            end
-        end
-    end)
-end
 function ForWhiteList(enable)
     WhiteListMode = enable
 
