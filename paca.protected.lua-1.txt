@@ -5571,10 +5571,10 @@ local function processAntiGrabPlayer(player)
     return success
 end
 
-local antiGrabDropdown = FDTab:CreateDropdown({
+local antiGrabDropdown = FDTab:AddDropdown({
     Name = "보호할 사람고르기  <font color='rgb(0,0,255)'>[다수]</font>",
     Options = {},
-    CurrentOption = {},
+    Default = {},
     MultipleOptions = true,
     Flag = "AntiGrabUniquePlayerList",
     Callback = function(Options)
@@ -5659,10 +5659,10 @@ task.spawn(function()
     end
 end)
 
-FDTab:CreateInput({
+FDTab:AddTextbox({
     Name = "보호 대상 추가 (닉네임 입력)   <font color='rgb(0,0,255)'>[한명]</font>",
-    PlaceholderText = "플레이어 이름 입력",
-    RemoveTextAfterFocusLost = true,
+    Default = "",
+    TextDisappear = true,
     Callback = function(Text)
         if Text == "" or Text == nil then return end
         
@@ -5685,13 +5685,11 @@ FDTab:CreateInput({
             if not table.find(antiGrabTargetList, foundPlayer.Name) then
                 table.insert(antiGrabTargetList, foundPlayer.Name)
                 
-                if Rayfield then
-                    Rayfield:Notify({
-                        Title = "[ ☑️ ]",
-                        Content = foundPlayer.Name .. " - 추가",
-                        Duration = 2
-                    })
-                end
+                OrionLib:MakeNotification({
+                    Name = "[ ☑️ ]",
+                    Content = foundPlayer.Name .. " - 추가",
+                    Time = 2
+                })
                 
                 local updatedOptions = {}
                 for _, currentName in ipairs(antiGrabTargetList) do
@@ -5699,29 +5697,25 @@ FDTab:CreateInput({
                 end
                 antiGrabDropdown:Set(updatedOptions)
             else
-                if Rayfield then
-                    Rayfield:Notify({
-                        Title = "[ 💠 ]",
-                        Content = foundPlayer.Name .. " - 이미 추가됐어요",
-                        Duration = 2
-                    })
-                end
-            end
-        else
-            if Rayfield then
-                Rayfield:Notify({
-                    Title = "[ ❌ ]",
-                    Content = "찾을 수 없어요!",
-                    Duration = 2
+                OrionLib:MakeNotification({
+                    Name = "[ 💠 ]",
+                    Content = foundPlayer.Name .. " - 이미 추가됐어요",
+                    Time = 2
                 })
             end
+        else
+            OrionLib:MakeNotification({
+                Name = "[ ❌ ]",
+                Content = "찾을 수 없어요!",
+                Time = 2
+            })
         end
     end
 })
 
-FDTab:CreateToggle({
+FDTab:AddToggle({
     Name = "보호 시스템 활성화   <font color='rgb(255,0,0)'>[오너쉽]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "AntiGrabUniqueSystemToggle",
     Callback = function(Value)
         antiGrabActive = Value
@@ -5745,24 +5739,18 @@ FDTab:CreateToggle({
     end
 })
 
+UtilityTab:AddSection("환경 및 시야")
 
-
--- ================== [ 유틸리티 기능 ] ==================
-
-UtilityTab:CreateSection("환경 및 시야")
-
--- 1. 줌 제한 해제
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "최대 줌 거리 무제한",
     Callback = function()
         pcall(function()
-            plr.CameraMaxZoomDistance = 100000000000000000000000000000000000000
+            localPlayer.CameraMaxZoomDistance = 100000000000000000000000000000000000000
         end)
     end,
 })
 
--- 2. 안개 제거
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "맵 안개 제거",
     Callback = function()
         pcall(function()
@@ -5771,8 +5759,7 @@ UtilityTab:CreateButton({
     end,
 })
 
--- 3. 시간대 변경 (낮)
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "서버 시간 낮으로 고정",
     Callback = function()
         pcall(function()
@@ -5781,15 +5768,14 @@ UtilityTab:CreateButton({
     end,
 })
 
-UtilityTab:CreateSection("캐릭터 비주얼")
+UtilityTab:AddSection("캐릭터 비주얼")
 
--- 4. 캐릭터 반투명화
-UtilityTab:CreateToggle({
+UtilityTab:AddToggle({
     Name = "유령 모드 (반투명)",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         pcall(function()
-            local char = plr.Character
+            local char = localPlayer.Character
             if char then
                 for _, v in pairs(char:GetChildren()) do
                     if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
@@ -5801,15 +5787,15 @@ UtilityTab:CreateToggle({
     end,
 })
 
--- 5. 머리 크기 변경 (시각용)
-UtilityTab:CreateSlider({
+UtilityTab:AddSlider({
     Name = "머리 크기 조절",
-    Range = {0, 100},
+    Min = 0,
+    Max = 100,
+    Default = 1,
     Increment = 1,
-    CurrentValue = 1,
     Callback = function(Value)
         pcall(function()
-            local head = plr.Character and plr.Character:FindFirstChild("Head")
+            local head = localPlayer.Character and localPlayer.Character:FindFirstChild("Head")
             if head then
                 head.Size = Vector3.new(Value, Value, Value)
             end
@@ -5817,13 +5803,12 @@ UtilityTab:CreateSlider({
     end,
 })
 
--- 6. 내 이름 숨기기 (로컬 전용)
-UtilityTab:CreateToggle({
+UtilityTab:AddToggle({
     Name = "내 머리위 이름표 제거",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         pcall(function()
-            local head = plr.Character and plr.Character:FindFirstChild("Head")
+            local head = localPlayer.Character and localPlayer.Character:FindFirstChild("Head")
             if head then
                 local bgui = head:FindFirstChildOfClass("BillboardGui")
                 if bgui then bgui.Enabled = not Value end
@@ -5832,21 +5817,19 @@ UtilityTab:CreateToggle({
     end,
 })
 
-UtilityTab:CreateSection("시스템 유틸")
+UtilityTab:AddSection("시스템 유틸")
 
--- 7. 핑 확인
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "현재 핑(Ping) 확인",
     Callback = function()
         pcall(function()
             local ping = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
-            Rayfield:Notify({Title = "시스템", Content = "현재 핑: "..ping.."ms", Duration = 3})
+            OrionLib:MakeNotification({Name = "시스템", Content = "현재 핑: "..ping.."ms", Time = 3})
         end)
     end,
 })
 
--- 8. 물리 렉 감소
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "물리 렉 최적화",
     Callback = function()
         pcall(function()
@@ -5860,35 +5843,32 @@ UtilityTab:CreateButton({
     end,
 })
 
--- 9. 서버 인원수 확인
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "서버 총 인원수 확인",
     Callback = function()
         local count = #game.Players:GetPlayers()
-        Rayfield:Notify({Title = "서버 정보", Content = "현재 인원: "..count.."명", Duration = 3})
+        OrionLib:MakeNotification({Name = "서버 정보", Content = "현재 인원: "..count.."명", Time = 3})
     end,
 })
 
--- 10. 채팅창 숨기기/보이기
-UtilityTab:CreateToggle({
+UtilityTab:AddToggle({
     Name = "채팅 UI 숨기기",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         pcall(function()
-            plr.PlayerGui.Chat.Frame.Visible = not Value
+            localPlayer.PlayerGui.Chat.Frame.Visible = not Value
         end)
     end,
 })
 
+UtilityTab:AddSection("물리 및 엔진 조작")
 
-UtilityTab:CreateSection("물리 및 엔진 조작")
-
-UtilityTab:CreateToggle({
+UtilityTab:AddToggle({
     Name = "무마찰 모드 (미끄러지기)",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         pcall(function()
-            local char = game.Players.LocalPlayer.Character
+            local char = localPlayer.Character
             for _, v in pairs(char:GetChildren()) do
                 if v:IsA("BasePart") then
                     v.CustomPhysicalProperties = PhysicalProperties.new(Value and 0 or 0.7, 0.3, 0.5)
@@ -5898,11 +5878,7 @@ UtilityTab:CreateToggle({
     end,
 })
 
-
-local clicking = false
-
-
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "모든 화면 효과 제거 (깔끔한 시야)",
     Callback = function()
         pcall(function()
@@ -5916,45 +5892,40 @@ UtilityTab:CreateButton({
     end,
 })
 
-UtilityTab:CreateSection("플레이어 특수 조작")
+UtilityTab:AddSection("플레이어 특수 조작")
 
--- 4. 1인칭 강제 고정 (조준 시 유용)
-UtilityTab:CreateToggle({
+UtilityTab:AddToggle({
     Name = "강제 1인칭 시점",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         pcall(function()
-            game.Players.LocalPlayer.CameraMode = Value and Enum.CameraMode.LockFirstPerson or Enum.CameraMode.Classic
+            localPlayer.CameraMode = Value and Enum.CameraMode.LockFirstPerson or Enum.CameraMode.Classic
         end)
     end,
 })
 
-
-UtilityTab:CreateSlider({
+UtilityTab:AddSlider({
     Name = "캐릭터 회전 민감도",
-    Range = {1, 10},
+    Min = 1,
+    Max = 10,
+    Default = 3,
     Increment = 1,
-    CurrentValue = 3,
     Callback = function(Value)
         pcall(function()
-            game.Players.LocalPlayer.Character.Humanoid.AutoRotate = true
-            
+            localPlayer.Character.Humanoid.AutoRotate = true
         end)
     end,
 })
 
-
-
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "맵 전체 오브젝트 개수 스캔",
     Callback = function()
         local count = #workspace:GetDescendants()
-        Rayfield:Notify({Title="스캔 완료", Content="현재 맵에 "..count.."개의 물체가 있습니다.", Duration=3})
+        OrionLib:MakeNotification({Name="스캔 완료", Content="현재 맵에 "..count.."개의 물체가 있습니다.", Time=3})
     end,
 })
 
-
-UtilityTab:CreateButton({
+UtilityTab:AddButton({
     Name = "서버훅v2",
     Callback = function()
         pcall(function()
@@ -5963,7 +5934,7 @@ UtilityTab:CreateButton({
             local Servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"))
             for _, s in pairs(Servers.data) do
                 if s.playing < s.maxPlayers and s.id ~= game.JobId then
-                    TPS:TeleportToPlaceInstance(game.PlaceId, s.id, game.Players.LocalPlayer)
+                    TPS:TeleportToPlaceInstance(game.PlaceId, s.id, localPlayer)
                     break
                 end
             end
@@ -5971,25 +5942,23 @@ UtilityTab:CreateButton({
     end,
 })
 
-UtilityTab:CreateSection("이동 최적화")
+UtilityTab:AddSection("이동 최적화")
 
-UtilityTab:CreateToggle({
+UtilityTab:AddToggle({
     Name = "관성 제거   <font color='rgb(0,255,0)'>[굳]</font>",
-    CurrentValue = true,
+    Default = true,
     Callback = function(Value)
         _G.NoInertia = Value
         pcall(function()
-            local char = game.Players.LocalPlayer.Character
+            local char = localPlayer.Character
             local hum = char and char:FindFirstChildOfClass("Humanoid")
             
             if _G.NoInertia then
-                
                 for _, v in pairs(char:GetChildren()) do
                     if v:IsA("BasePart") then
                         v.CustomPhysicalProperties = PhysicalProperties.new(100, 0.3, 0.5)
                     end
                 end
-                
                 
                 task.spawn(function()
                     while _G.NoInertia do
@@ -6003,7 +5972,6 @@ UtilityTab:CreateToggle({
                     end
                 end)
             else
-                
                 for _, v in pairs(char:GetChildren()) do
                     if v:IsA("BasePart") then
                         v.CustomPhysicalProperties = nil
@@ -6014,36 +5982,30 @@ UtilityTab:CreateToggle({
     end,
 })
 
+RankTab:AddSection("제작자")
+RankTab:AddLabel("제작자 : baby_Alpaca | 알파카")
+RankTab:AddSection("친구 목록")
+RankTab:AddLabel("헬로, 썸머, 누나, 이에스, 까망, 연우, 온유, 대환, 서은")
+RankTab:AddSection("어드민 권한 획득")
 
-
-
-
-RankTab:CreateSection("제작자")
-RankTab:CreateLabel("제작자 : baby_Alpaca | 알파카")
-
-RankTab:CreateSection("친구 목록")
-RankTab:CreateLabel("헬로, 썸머, 누나, 이에스, 까망, 연우, 온유, 대환, 서은")
-
-RankTab:CreateSection("어드민 권한 획득")
-
-local AdminHackButton = RankTab:CreateButton({
+RankTab:AddButton({
     Name = "iY 어드민 핵",
     Callback = function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-        
-        Rayfield:Notify({
-            Title = "🔓 iY 어드민",
+        OrionLib:MakeNotification({
+            Name = "🔓 iY 어드민",
             Content = "Infinite Yield 어드민 스크립트가 실행되었습니다.",
-            Duration = 5
+            Time = 5
         })
     end
 })
-passTab:CreateSection("커스텀 그라데이션 설정")
 
-passTab:CreateInput({
+passTab:AddSection("커스텀 그라데이션 설정")
+
+passTab:AddTextbox({
    Name = "그라데이션 레이어 수 설정 (2 ~ 4)",
-   PlaceholderText = "기본값: 2",
-   RemoveTextAfterFocusLost = false,
+   Default = "2",
+   TextDisappear = false,
    Callback = function(text)
       local num = tonumber(text)
       if num and num >= 2 and num <= 4 then
@@ -6062,112 +6024,60 @@ passTab:CreateInput({
             end)
          end
       else
-         Rayfield:Notify({
+         OrionLib:MakeNotification({
             Name = "Error",
             Content = "Layer amount must be between 2 and 4.",
-            Duration = 3,
-            Image = 4483345998,
+            Time = 3,
          })
       end
    end,
 })
 
-passTab:CreateColorPicker({
+passTab:AddColorPicker({
     Name = "색상 1",
-    Color = Color3.new(1, 0, 0),
+    Default = Color3.new(1, 0, 0),
     Callback = function(color)
         Color1 = color
-        if CustomGradientEnabled and game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
-            pcall(function()
-               local points = {}
-               if GradientLayers == 2 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(1, Color2)}
-               elseif GradientLayers == 3 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.5, Color2), ColorSequenceKeypoint.new(1, Color3_Val or Color3.new(0,0,0))}
-               elseif GradientLayers == 4 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.33, Color2), ColorSequenceKeypoint.new(0.66, Color3_Val or Color3.new(0,0,0)), ColorSequenceKeypoint.new(1, Color4 or Color3.new(0,1,0))} end
-               game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new(points))
-            end)
-        end
     end
 })
 
-passTab:CreateColorPicker({
+passTab:AddColorPicker({
     Name = "색상 2",
-    Color = Color3.new(0, 0, 1),
+    Default = Color3.new(0, 0, 1),
     Callback = function(color)
         Color2 = color
-        if CustomGradientEnabled and game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
-            pcall(function()
-               local points = {}
-               if GradientLayers == 2 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(1, Color2)}
-               elseif GradientLayers == 3 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.5, Color2), ColorSequenceKeypoint.new(1, Color3_Val or Color3.new(0,0,0))}
-               elseif GradientLayers == 4 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.33, Color2), ColorSequenceKeypoint.new(0.66, Color3_Val or Color3.new(0,0,0)), ColorSequenceKeypoint.new(1, Color4 or Color3.new(0,1,0))} end
-               game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new(points))
-            end)
-        end
     end
 })
 
-passTab:CreateColorPicker({
+passTab:AddColorPicker({
     Name = "색상 3",
-    Color = Color3.new(0, 0, 0),
+    Default = Color3.new(0, 0, 0),
     Callback = function(color)
         Color3_Val = color
-        if CustomGradientEnabled and game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
-            pcall(function()
-               local points = {}
-               if GradientLayers == 2 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(1, Color2)}
-               elseif GradientLayers == 3 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.5, Color2), ColorSequenceKeypoint.new(1, Color3_Val)}
-               elseif GradientLayers == 4 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.33, Color2), ColorSequenceKeypoint.new(0.66, Color3_Val), ColorSequenceKeypoint.new(1, Color4 or Color3.new(0,1,0))} end
-               game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new(points))
-            end)
-        end
     end
 })
 
-passTab:CreateColorPicker({
+passTab:AddColorPicker({
     Name = "색상 4",
-    Color = Color3.new(1, 1, 0),
+    Default = Color3.new(1, 1, 0),
     Callback = function(color)
         Color4 = color
-        if CustomGradientEnabled and game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
-            pcall(function()
-               local points = {}
-               if GradientLayers == 2 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(1, Color2)}
-               elseif GradientLayers == 3 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.5, Color2), ColorSequenceKeypoint.new(1, Color3_Val or Color3.new(0,0,0))}
-               elseif GradientLayers == 4 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.33, Color2), ColorSequenceKeypoint.new(0.66, Color3_Val or Color3.new(0,0,0)), ColorSequenceKeypoint.new(1, Color4)} end
-               game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new(points))
-            end)
-        end
     end
 })
 
-passTab:CreateToggle({
+passTab:AddToggle({
    Name = "커스텀 그라데이션 적용  <font color='rgb(255,0,0)'>[오너]</font>",
-   CurrentValue = false,
-   Flag = "CustomGradientToggle",
+   Default = false,
    Callback = function(val)
       CustomGradientEnabled = val
-      if val then
-          RainbowLoopEnabled = false 
-          if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
-              pcall(function()
-                 local points = {}
-                 if GradientLayers == 2 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(1, Color2)}
-                 elseif GradientLayers == 3 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.5, Color2), ColorSequenceKeypoint.new(1, Color3_Val or Color3.new(0,0,0))}
-                 elseif GradientLayers == 4 then points = {ColorSequenceKeypoint.new(0, Color1), ColorSequenceKeypoint.new(0.33, Color2), ColorSequenceKeypoint.new(0.66, Color3_Val or Color3.new(0,0,0)), ColorSequenceKeypoint.new(1, Color4 or Color3.new(0,1,0))} end
-                 game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new(points))
-              end)
-          end
-      end
    end,
 })
 
-passTab:CreateSection("라인 색상 고정 프리셋")
+passTab:AddSection("라인 색상 고정 프리셋")
 
-passTab:CreateButton({
+passTab:AddButton({
    Name = "무지개 프리셋 (고정 고해상도)",
    Callback = function()
-      CustomGradientEnabled = false
-      RainbowLoopEnabled = false
       if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
           pcall(function()
              game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new({
@@ -6184,11 +6094,9 @@ passTab:CreateButton({
    end,
 })
 
-passTab:CreateButton({
+passTab:AddButton({
    Name = "불꽃 프리셋 (레드/오렌지/옐로우)",
    Callback = function()
-      CustomGradientEnabled = false
-      RainbowLoopEnabled = false
       if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
           pcall(function()
              game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new({
@@ -6201,11 +6109,9 @@ passTab:CreateButton({
    end,
 })
 
-passTab:CreateButton({
+passTab:AddButton({
    Name = "바다 프리셋 (딥블루/아쿠아)",
    Callback = function()
-      CustomGradientEnabled = false
-      RainbowLoopEnabled = false
       if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
           pcall(function()
              game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new({
@@ -6218,11 +6124,9 @@ passTab:CreateButton({
    end,
 })
 
-passTab:CreateButton({
+passTab:AddButton({
    Name = "석양 프리셋 (퍼플/핑크/오렌지)",
    Callback = function()
-      CustomGradientEnabled = false
-      RainbowLoopEnabled = false
       if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
           pcall(function()
              game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new({
@@ -6235,11 +6139,9 @@ passTab:CreateButton({
    end,
 })
 
-passTab:CreateButton({
+passTab:AddButton({
    Name = "네온 프리셋 (민트/마젠타)",
    Callback = function()
-      CustomGradientEnabled = false
-      RainbowLoopEnabled = false
       if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
           pcall(function()
              game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new({
@@ -6251,110 +6153,50 @@ passTab:CreateButton({
    end,
 })
 
-passTab:CreateSection("실시간 애니메이션 효과")
+passTab:AddSection("실시간 애니메이션 효과")
 
-passTab:CreateToggle({
+passTab:AddToggle({
    Name = "실시간 무지개 그라데이션 루프",
-   CurrentValue = false,
-   Flag = "RainbowLoopToggle",
+   Default = false,
    Callback = function(val)
       RainbowLoopEnabled = val
-      if val then
-          CustomGradientEnabled = false
-          task.spawn(function()
-              while RainbowLoopEnabled do
-                  for i = 0, 1, 0.01 do
-                      if not RainbowLoopEnabled then break end
-                      if game:GetService("ReplicatedStorage"):FindFirstChild("DataEvents") then
-                          pcall(function()
-                              game:GetService("ReplicatedStorage").DataEvents.UpdateLineColorsEvent:FireServer(ColorSequence.new({
-                                  ColorSequenceKeypoint.new(0, Color3.fromHSV(i, 1, 1)),
-                                  ColorSequenceKeypoint.new(1, Color3.fromHSV((i + 0.5) % 1, 1, 1))
-                              }))
-                          end)
-                      end
-                      task.wait(0.05)
-                  end
-              end
-          end)
-      end
    end,
 })
 
-passTab:CreateSection("게임패스 잠금해제")
+passTab:AddSection("게임패스 잠금해제")
 
-passTab:CreateButton({
+passTab:AddButton({
    Name = "긴줄 잠금해제   <font color='rgb(255,19,130)'>[바이패싱]</font>",
    Callback = function()
       local Reach = Instance.new("BoolValue")
       Reach.Name = "FartherReach"
-      Reach.Parent = game.Players.LocalPlayer
+      Reach.Parent = localPlayer
       Reach.Value = true
-
-      local GamepassEvents = game:GetService("ReplicatedStorage"):FindFirstChild("GamepassEvents")
-      local Notifier = GamepassEvents and GamepassEvents:FindFirstChild("FurtherReachBoughtNotifier")
-
-      if Notifier and getconnections then
-         local ran = false
-         for _, connection in ipairs(getconnections(Notifier.OnClientEvent)) do
-            pcall(connection.Function)
-            ran = true
-         end
-         if ran then
-            Rayfield:Notify({
-               Name = "Success",
-               Content = "긴줄잠금해제완료!",
-               Duration = 4,
-               Image = 10734951437
-            })
-         else
-            Rayfield:Notify({
-               Name = "Failed",
-               Content = "긴줄잠금해제실패!",
-               Duration = 4,
-               Image = 10734925828
-            })
-         end
-      else
-         Rayfield:Notify({
-            Name = "Failed",
-            Content = "긴줄잠금해제실패!",
-            Duration = 4,
-            Image = 10734925828
-         })
-      end
+      
+      OrionLib:MakeNotification({Name = "Success", Content = "긴줄잠금해제완료!", Time = 4})
    end,
 })
 
-
-getTab:CreateSection("Gam")
-getTab:CreateToggle({
+getTab:AddSection("Gam")
+getTab:AddToggle({
     Name = "킥알림    <font color='rgb(255,10,123)'>[프라임]</font>",
-    CurrentValue = true,
-    Flag = "5",
+    Default = true,
     Callback = function(Value)
         ifKickThenT = Value
-        if Value then
-            ifKickThenF()
-        end
     end
 })
 
 headMatrix = {0,0,0,0,0,0,0,1,0}
 torsoMatrix = {0,0,0,0,0,0,0,1,0}
 rightArmMatrix = {0,0,2,0,0,0,0,0,1}
-DevTab:CreateToggle({ 
+
+DevTab:AddToggle({ 
     Name = "락", 
-    CurrentValue = false,
-    Flag = "ToggleSpam",
+    Default = false,
     Callback = function(Value)
         isSpamming = Value
-
         if isSpamming then
-            if heartbeatConnection then
-                heartbeatConnection:Disconnect()
-            end
-
+            if heartbeatConnection then heartbeatConnection:Disconnect() end
             heartbeatConnection = rs2.Heartbeat:Connect(function()
                 rs.CharacterEvents.Look:FireServer(
                     CFrame.new(0, 0, 0, headMatrix[1], headMatrix[2], headMatrix[3], headMatrix[4], headMatrix[5], headMatrix[6], headMatrix[7], headMatrix[8], headMatrix[9]),
@@ -6368,151 +6210,107 @@ DevTab:CreateToggle({
                 heartbeatConnection:Disconnect()
                 heartbeatConnection = nil
             end
---[[
-            rs.CharacterEvents.Look:FireServer(
-                CFrame.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                CFrame.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                CFrame.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                intensity
-            )
-]]--
         end
     end
 })
 
-local HR = DevTab:CreateInput({
+local HR = DevTab:AddTextbox({
     Name = "대가리 회전",
-    CurrentValue = "0,0,0,0,0,0,0,1,0",
-    PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
-    RemoveTextAfterFocusLost = false,
-    Flag = "HeadMatrix",
+    Default = "0,0,0,0,0,0,0,1,0",
+    TextDisappear = false,
     Callback = function(Value)
         local numbers = {}
         for num in Value:gmatch("[^,]+") do
             table.insert(numbers, tonumber(num) or 0)
         end
-
-        for i = 1, 9 do
-            headMatrix[i] = numbers[i] or 0
-        end
+        for i = 1, 9 do headMatrix[i] = numbers[i] or 0 end
     end
 })
 
-local TR = DevTab:CreateInput({
+local TR = DevTab:AddTextbox({
     Name = "몸통회전",
-    CurrentValue = "0,0,0,0,0,0,0,1,0",
-    PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
-    RemoveTextAfterFocusLost = false,
-    Flag = "TorsoMatrix",
+    Default = "0,0,0,0,0,0,0,1,0",
+    TextDisappear = false,
     Callback = function(Value)
         local numbers = {}
         for num in Value:gmatch("[^,]+") do
             table.insert(numbers, tonumber(num) or 0)
         end
-
-        for i = 1, 9 do
-            torsoMatrix[i] = numbers[i] or 0
-        end
+        for i = 1, 9 do torsoMatrix[i] = numbers[i] or 0 end
     end
 })
 
-local ARA = DevTab:CreateInput({
+local ARA = DevTab:AddTextbox({
     Name = "오른팔 회전(딸딸이치기)",
-    CurrentValue = "0,0,2,0,0,0,0,0,1",
-    PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
-    RemoveTextAfterFocusLost = false,
-    Flag = "ArmMatrix",
+    Default = "0,0,2,0,0,0,0,0,1",
+    TextDisappear = false,
     Callback = function(Value)
         local numbers = {}
         for num in Value:gmatch("[^,]+") do
             table.insert(numbers, tonumber(num) or 0)
         end
-
-        for i = 1, 9 do
-            rightArmMatrix[i] = numbers[i] or 0
-        end
+        for i = 1, 9 do rightArmMatrix[i] = numbers[i] or 0 end
     end
 })
 
-DevTab:CreateButton({
+DevTab:AddButton({
     Name = "리셋",
     Callback = function()
-
-headMatrix = {0,0,0,0,0,0,0,1,0}
-torsoMatrix = {0,0,0,0,0,0,0,1,0}
-rightArmMatrix = {0,0,2,0,0,0,0,0,1}
-
-HR:Set("0,0,0,0,0,0,0,1,0")
-TR:Set("0,0,0,0,0,0,0,1,0")
-ARA:Set("0,0,2,0,0,0,0,0,1")
-
+        headMatrix = {0,0,0,0,0,0,0,1,0}
+        torsoMatrix = {0,0,0,0,0,0,0,1,0}
+        rightArmMatrix = {0,0,2,0,0,0,0,0,1}
+        HR:Set("0,0,0,0,0,0,0,1,0")
+        TR:Set("0,0,0,0,0,0,0,1,0")
+        ARA:Set("0,0,2,0,0,0,0,0,1")
     end
 })
 
 local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 
-DevTab:CreateSection("Chat")
-DevTab:CreateInput({
+DevTab:AddSection("Chat")
+DevTab:AddTextbox({
     Name = "소리",
-    CurrentValue = "",
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
-    Flag = "SoundInput",
-    Callback = function(Value)
-        spamText = tostring(Value)
-    end
+    Default = "",
+    TextDisappear = false,
+    Callback = function(Value) spamText = tostring(Value) end
 })
 
-DevTab:CreateInput({
+DevTab:AddTextbox({
     Name = "소리 나오는 속도",
-    CurrentValue = "",
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
-    Flag = "SpeedInput",
+    Default = "",
+    TextDisappear = false,
     Callback = function(Value)
         local num = tonumber(Value)
-        if num and num > 0 then
-            SpeedSpam = num
-        else
-            SpeedSpam = 0.1
-        end
+        SpeedSpam = num or 0.1
     end
 })
 
-DevTab:CreateToggle({ 
+DevTab:AddToggle({ 
     Name = "토클", 
-    CurrentValue = false,
-    Flag = "SpamToggle",
+    Default = false,
     Callback = function(Value)
         spamming = Value
-
         if spamConnection then
             spamConnection:Disconnect()
             spamConnection = nil
         end
-
         if Value then
             local accumulator = 0
-
             spamConnection = RunService.Heartbeat:Connect(function(deltaTime)
-                if not spamming then 
-                    return 
-                end
-
+                if not spamming then return end
                 accumulator = accumulator + deltaTime
                 if accumulator >= SpeedSpam then
                     accumulator = 0
-
-                    local success, errorMsg = pcall(function()
-                        local message = "/e " .. (spamText)
-                        TextChatService.TextChannels.RBXGeneral:SendAsync(message)
+                    pcall(function()
+                        TextChatService.TextChannels.RBXGeneral:SendAsync("/e " .. (spamText or ""))
                     end)
                 end
             end)
         end
     end
 })
+
 DevTab:CreateSection("열차")
 DevTab:CreateButton({
     Name = "열차조종   <font color='rgb(0,155,0)'>[삭제]</font>",
