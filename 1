@@ -14802,6 +14802,508 @@ bdTab:AddButton({
     end
 })
 
+bdTab:AddButton({
+    Name = "🌌 딥 스페이스 나이트메어 (암흑 성운)",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
+            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(5, 5, 8)
+        Lighting.Brightness = 0.6
+        Lighting.ColorShift_Bottom = Color3.fromRGB(15, 0, 15)
+        Lighting.ColorShift_Top = Color3.fromRGB(40, 10, 40)
+        Lighting.EnvironmentDiffuseScale = 0.1
+        Lighting.EnvironmentSpecularScale = 0.4
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(8, 5, 12)
+        Lighting.ShadowSoftness = 0.6
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 23.5
+        Lighting.GeographicLatitude = 45
+        Lighting.FogColor = Color3.fromRGB(2, 1, 4)
+        Lighting.FogEnd = 40000
+        Lighting.FogStart = 2000
+
+        local sky = Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = false
+        sky.SkyboxBk = "rbxassetid://152285141"
+        sky.SkyboxDn = "rbxassetid://152285108"
+        sky.SkyboxFt = "rbxassetid://152285161"
+        sky.SkyboxLf = "rbxassetid://152285191"
+        sky.SkyboxRt = "rbxassetid://152285122"
+        sky.SkyboxUp = "rbxassetid://152285175"
+        sky.StarCount = 2000
+
+        local bloom = Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1.2
+        bloom.Size = 30
+        bloom.Threshold = 0.9
+
+        local cc = Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = -0.02
+        cc.Contrast = 0.35
+        cc.Saturation = 0.2
+        cc.TintColor = Color3.fromRGB(240, 220, 245)
+    end
+})
+
+bdTab:AddSection({Name = "이외"})
+
+bdTab:AddToggle({
+    Name = "무지개 캐릭터",
+    Default = false,
+    Callback = function(Value)
+        _G.RainbowCharacterEnabled = Value
+        
+        if Value then
+            local runService = game:GetService("RunService")
+            local players = game:GetService("Players")
+            local localPlayer = players.LocalPlayer
+            local hue = 0
+            
+            task.spawn(function()
+                while _G.RainbowCharacterEnabled do
+                    local deltaTime = runService.Heartbeat:Wait()
+                    hue = (hue + deltaTime * 0.1) % 1
+                    local rainbowColor = Color3.fromHSV(hue, 1, 1)
+                    
+                    local character = localPlayer.Character
+                    if character then
+                        for _, part in ipairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Color = rainbowColor
+                            elseif part:IsA("Accessory") and part:FindFirstChild("Handle") then
+                                part.Handle.Color = rainbowColor
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+bdTab:AddToggle({
+    Name = "초발광 무지개 블롭맨",
+    Default = false,
+    Callback = function(Value)
+        _G.RainbowBlobmanEnabled = Value
+        
+        if Value then
+            local runService = game:GetService("RunService")
+            local workspace = game:GetService("Workspace")
+            local hue = 0
+            
+            task.spawn(function()
+                while _G.RainbowBlobmanEnabled do
+                    local deltaTime = runService.Heartbeat:Wait()
+                    hue = (hue + deltaTime * 0.1) % 1
+                    local rainbowColor = Color3.fromHSV(hue, 1, 1)
+                    
+                    local blobman = workspace:FindFirstChild("CurrentBlobman", true)
+                    if blobman then
+                        for _, part in ipairs(blobman:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.Color = rainbowColor
+                                part.Material = Enum.Material.Neon
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+keybindTab:AddSection({Name = "줄"})
+
+local antilagDet = keybindTab:AddInput({
+    Name = "줄 감지",
+    Default = "30",
+    PlaceholderText = "",
+    ClearTextOnFocus = false,
+    Callback = function(Value)
+        AntiLagV = Value
+    end
+})
+
+game:GetService('Players').LocalPlayer.CharacterAdded:Connect(function()
+    vu5 = nil
+    vu6 = false
+end)
+
+keybindTab:AddSection({Name = "Mouse"})
+
+keybindTab:AddBind({
+    Name = "텔포",
+    Default = Enum.KeyCode.Z,
+    Hold = false,
+    Callback = tpF
+})
+
+local Tper = keybindTab:AddToggle({
+    Name = "3인칭",
+    Default = false,
+    Callback = function(Value)
+        _G.CameraLoopID = (_G.CameraLoopID or 0) + 1
+        local currentLoopID = _G.CameraLoopID
+
+        if Value then
+            task.spawn(function()
+                local character = plr.Character or plr.CharacterAdded:Wait()
+                local rootPart = character:WaitForChild("HumanoidRootPart", 5)
+                
+                plr.CameraMode = Enum.CameraMode.Classic
+                task.wait(0.05)
+                
+                local success = false
+                local attempts = 0
+                
+                while _G.CameraLoopID == currentLoopID and not success and attempts < 80 do
+                    plr.CameraMinZoomDistance = 12
+                    plr.CameraMaxZoomDistance = 12
+                    
+                    task.wait(0.05)
+                    attempts = attempts + 1
+                    
+                    if plr:GetAttribute("CameraZoomDistance") == 12 or 
+                       (workspace.CurrentCamera and rootPart and (workspace.CurrentCamera.CoordinateFrame.p - rootPart.Position).Magnitude >= 11.5) then
+                        success = true
+                    end
+                end
+                
+                if _G.CameraLoopID == currentLoopID then
+                    plr.CameraMinZoomDistance = 0.5 
+                    plr.CameraMaxZoomDistance = 100000 
+                end
+            end)
+        else
+            plr.CameraMode = Enum.CameraMode.LockFirstPerson
+            plr.CameraMaxZoomDistance = 0.5
+            plr.CameraMinZoomDistance = 0.5
+        end
+    end
+})
+
+task.spawn(function()
+    if not game:IsLoaded() then game.Loaded:Wait() end
+    task.wait(0.3)
+    Tper:Set(true)
+end)
+
+keybindTab:AddBind({
+    Name = "앉기 <font color='rgb(255,0,0)'>[블롭맨]</font>",
+    Default = Enum.KeyCode.X,
+    Hold = false,
+    Callback = function()
+        BlobSit()
+    end
+})
+
+plotTab:AddSection({Name = "집"})
+
+local BarrierNoclip = plotTab:AddToggle({
+    Name = "집 베리어 삭제",
+    Default = false,
+    Callback = function(Value)
+        BarrierCanCollideT = Value
+        BarrierCanCollideF()
+    end
+})
+BarrierNoclip:Set(true)
+
+plotTab:AddButton({
+    Name = "집 베리어 완전삭제 | 햄버거",
+    Callback = function()
+        PlotBarrierDelete()
+    end
+})
+
+local isExecuting = false
+
+local function getMyPlot()
+    for i = 1, 5 do
+        local plot = workspace.Plots:FindFirstChild("Plot" .. i)
+        if plot then
+            local plotSign = plot:FindFirstChild("PlotSign")
+            if plotSign then
+                local thisPlotsOwners = plotSign:FindFirstChild("ThisPlotsOwners")
+                if thisPlotsOwners then
+                    for _, child in ipairs(thisPlotsOwners:GetChildren()) do
+                        if child:IsA("StringValue") and child.Value == game.Players.LocalPlayer.Name then
+                            return plot.PlotArea
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function PlotBarrierDelete()
+    if PBDrun then return end
+    PBDrun = true
+
+    local char = plr.Character
+    if not char then PBDrun = false return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then PBDrun = false return end
+
+    local metal = workspace.Plots.Plot1.TeslaCoil.Metal
+    if not metal then PBDrun = false return end
+
+    local TP = metal.CFrame
+    local OCF = hrp.CFrame
+
+    task.spawn(function()
+        rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", hrp.CFrame, Vector3.new(0,0,0))
+    end)
+
+    task.wait(0.2)
+
+    local foodHamburger = inv:FindFirstChild("FoodHamburger")
+    if not foodHamburger then PBDrun = false return end
+
+    if foodHamburger then
+        task.spawn(function()
+            foodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
+        end)
+    end
+
+    task.wait(0.1)
+
+    hrp.CFrame = TP
+    task.wait(0.17)
+
+    if foodHamburger then
+        rs.MenuToys.DestroyToy:FireServer(foodHamburger)
+    end
+
+    hrp.CFrame = OCF
+    task.wait(0.4)
+
+    PBDrun = false
+end
+
+keybindTab:AddSection({Name = "ESP"})
+
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+
+local PcldViewT = false
+local processed = {}
+local redBoxes = {}
+local descendantConn = nil
+
+function PcldViewF()
+    if descendantConn then
+        descendantConn:Disconnect()
+        descendantConn = nil
+        workspace:SetAttribute("PcldViewDescendantConn", false)
+    end
+    if rainbowConn then
+        rainbowConn:Disconnect()
+        rainbowConn = nil
+    end
+
+    if PcldViewT then
+        local function createESP(obj)
+            if not processed[obj] then
+                local box = Instance.new("SelectionBox")
+                box.Adornee = obj
+                box.LineThickness = 0.005
+                box.SurfaceTransparency = 1
+                box.SurfaceColor3 = Color3.fromRGB(255, 255, 255)
+                box.Color3 = Color3.fromHSV(0, 1, 1)
+                box.Parent = obj
+                processed[obj] = true
+                redBoxes[obj] = box
+            end
+        end
+
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
+                createESP(obj)
+            end
+        end
+
+        descendantConn = workspace.DescendantAdded:Connect(function(obj)
+            if PcldViewT and (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
+                createESP(obj)
+            end
+        end)
+
+        workspace.DescendantRemoving:Connect(function(obj)
+            if redBoxes[obj] then
+                redBoxes[obj]:Destroy()
+                redBoxes[obj] = nil
+                processed[obj] = nil
+            end
+        end)
+
+        rainbowConn = RunService.RenderStepped:Connect(function()
+            local hue = (tick() % 5) / 5 
+            local rainbowColor = Color3.fromHSV(hue, 1, 1)
+
+            for obj, box in pairs(redBoxes) do
+                if box and box.Parent then
+                    box.Color3 = rainbowColor
+                else
+                    redBoxes[obj] = nil
+                    processed[obj] = nil
+                end
+            end
+        end)
+    else
+        for obj, box in pairs(redBoxes) do
+            if box then box:Destroy() end
+        end
+        redBoxes = {}
+        processed = {}
+    end
+end
+
+local PCLDView = keybindTab:AddToggle({
+    Name = "PCLD 보기",
+    Default = false,
+    Callback = function(Value)
+        PcldViewT = Value
+        PcldViewF()
+    end
+})
+PCLDView:Set(true)
+
+local ViewTool = keybindTab:AddToggle({
+    Name = "표창,쿠나이 보기",
+    Default = false,
+    Callback = function(Value)
+        ViewToolT = Value
+        ViewToolF()
+    end
+})
+ViewTool:Set(true)
+
+CreditsTab:AddLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>")
+CreditsTab:AddParagraph({Title = "0110rim", Content = "착함의 경지"})
+
+CreditsTab:AddLabel("식호   <font color='rgb(0,255,0)'>[good]</font>")
+CreditsTab:AddParagraph({Title = "매우좋습니다.", Content = "가장좋은방"})
+
+CreditsTab:AddLabel("알파   <font color='rgb(0,255,255)'>[TOP1 ONWER]</font>")
+CreditsTab:AddParagraph({Title = "QRDOOTE1120", Content = "Owner"})
+
+CreditsTab:AddLabel("부계   <font color='rgb(255,0,0)'>[onwer]</font>")
+CreditsTab:AddParagraph({Title = "AI_AIPACA", Content = "Co-Owner"})
+
+OrionLib:MakeNotification({
+    Name = "랭크 알림",
+    Content = "랭크 배치완료",
+    Time = 6
+})
+
+DDTab:AddToggle({
+    Name = "딸치기   <font color='rgb(25,255,0)'>[자위마스터]</font>",
+    Default = false,
+    Callback = function(Value)
+        jerkActive = Value
+
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        if not character then return end
+        
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
+
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if not animator then
+            animator = Instance.new("Animator")
+            animator.Parent = humanoid
+        end
+
+        if jerkActive then
+            if not jerkAnimationTrack then
+                local animation = Instance.new("Animation")
+                animation.AnimationId = "rbxassetid://168268306"
+                jerkAnimationTrack = animator:LoadAnimation(animation)
+            end
+
+            jerkAnimationTrack:Play()
+            task.wait(0.3)
+
+            task.spawn(function()
+                while jerkActive and jerkAnimationTrack and jerkAnimationTrack.IsPlaying do
+                    jerkAnimationTrack.TimePosition = 0.3
+                    task.wait(0.1)
+                end
+            end)
+        else
+            if jerkAnimationTrack then
+                jerkAnimationTrack:Stop()
+            end
+        end
+    end
+})
+
+function LineLagF()
+    task.spawn(function()
+        while LineLagT do
+            pcall(function()
+                local args = {[1] = "Line"}
+                for i = 1, tonumber(LineLagV) do
+                    game:GetService("ReplicatedStorage").GrabEvents.CreateGrabLine:FireServer(unpack(args))
+                end
+            end)
+            task.wait() 
+        end
+    end)
+end
+
+lagTab:AddSection({Name = "렉"})
+
+lagTab:AddToggle({
+    Name = "렉(섭폭)    <font color='rgb(255,0,0)'>[라인]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Callback = function(Value)
+        LineLagT = Value
+        LineLagF()
+    end
+})
+
+lagTab:AddInput({
+    Name = "줄",
+    Default = "50",
+    PlaceholderText = "Lines",
+    ClearTextOnFocus = false,
+    Callback = function(Value)
+        LineLagV = Value
+    end
+})
+
+BlacklistTab:AddLabel("kvzwx9")
+BlacklistTab:AddLabel("K_SH0619")
+
+local H = game.Players.LocalPlayer.PlayerScripts.CharacterAndBeamMove
+local v = 0
+
+game:GetService("RunService").RenderStepped:Connect(function(W)
+    if math.floor(1/W) < 20 then 
+        v = os.clock() + 300 
+        H.Disabled = true 
+    end 
+    if H.Disabled and os.clock() > v then 
+        H.Disabled = false 
+    end 
+end)
+
+Logger()
 
 Window:AddConfigTab()
 
