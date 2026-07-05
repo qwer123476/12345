@@ -11467,4 +11467,5 @@ bdTab:AddButton({
         print("WORK")
     end
 })
+	Window:AddConfigTab()
 OrionLib:Init()
