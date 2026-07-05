@@ -1,10 +1,5 @@
 local OrionLib =   loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
-local Window = OrionLib:MakeWindow({
-    Name = "파카허브", 
-    HidePremium = false, 
-    SaveConfig = true, 
-    ConfigFolder = "OrionHubConfig"
-})
+
 
 
 
