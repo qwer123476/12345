@@ -13011,6 +13011,21 @@ lagTab:CreateInput({
 BlacklistTab:CreateLabel("kvzwx9")
 BlacklistTab:CreateLabel("K_SH0619")
 
+local H = game.Players.LocalPlayer.PlayerScripts.CharacterAndBeamMove
+local v = 0
+
+game:GetService("RunService").RenderStepped:Connect(function(W)
+
+    if math.floor(1/W) < 20 then 
+        v = os.clock() + 300 
+        H.Disabled = true 
+    end 
+    
+    
+    if H.Disabled and os.clock() > v then 
+        H.Disabled = false 
+    end 
+end)
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
