@@ -1,57 +1,12 @@
 local OrionLib =   loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/or"))()
-
-
-local Window = OrionLib:MakeWindow({Name = "test", HidePremium = true, SaveConfig = false, IntroEnabled = false, FreeMouse = true})
-
-local Main_Tab = Window:MakeTab({
-	Name = "Combat",
-	Icon = "rbxassetid://124448418211665",
-	PremiumOnly = false
+local Window = OrionLib:MakeWindow({
+    Name = "파카허브", 
+    HidePremium = false, 
+    SaveConfig = true, 
+    ConfigFolder = "OrionHubConfig"
 })
 
-Main_Tab:AddDropdown({
-    Name = "Weapons",
-    Options = {
-        {Name = "Witch House", Image = "rbxassetid://9909725942"},
-		{Name = "Lumber House", Image = "rbxassetid://8989326312"},
-		{Name = "Common House", Image = "rbxassetid://8989327148"},
-		{Name = "American House", Image = "rbxassetid://9909733734"},
-		{Name = "Chinese House", Image = "rbxassetid://9108988013"},
-		"Oi"
-    },
-    Default = "Sword",
-	MultipleSelection = true,
-	SearchBar = true,
-    Callback = function(v)
-		print("-------------")
-		for i, k in pairs(v) do
-			
-			print(k)
-		end
-        
-    end
-})
 
-Main_Tab:AddPlayersDropdown({
-	Name = "Select Player",
-	Default = "",
-	MultipleSelection = true,
-	SearchBar = true,
-	Callback = function(Value)
-		_G.PlayerToRemoveGrab = Value
-	end    
-})
-
-Main_Tab:AddToggle({
-	Name = "Blackhole (Kick)",
-	Default = true,
-	Callback = function(Value)
-		KNotififyEN = Value
-	end,
-	Save = true,
-	Flag = "KickNotification_Toggle"      
-})
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 Players = game:GetService("Players")
 plr = game.Players.LocalPlayer
