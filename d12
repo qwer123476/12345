@@ -254,127 +254,128 @@ local Window = OrionLib:MakeWindow({
     SaveConfig = true,
     ConfigFolder = "PacaHub"
 })
-
+print(Window.AddConfigTab)
 -- Tabs
 local playerTab = Window:MakeTab({
     Name = "플레이어 설정",
     Icon = "rbxassetid://6034281935",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local passTab = Window:MakeTab({
     Name = "패스잠금해제",
     Icon = "rbxassetid://0",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local getTab = Window:MakeTab({
     Name = "알림",
     Icon = "rbxassetid://649498361",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local grabTab = Window:MakeTab({
     Name = "컴뱃",
     Icon = "rbxassetid://6026568198",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local UtilityTab = Window:MakeTab({
     Name = "유틸리티",
     Icon = "rbxassetid://6031094678",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local plotTab = Window:MakeTab({
     Name = "집",
     Icon = "rbxassetid://0",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local DDTab = Window:MakeTab({
     Name = "티배깅",
     Icon = "rbxassetid://0",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local FDTab = Window:MakeTab({
     Name = "친구 보호",
     Icon = "rbxassetid://6026568198",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local antiTab = Window:MakeTab({
     Name = "안전",
     Icon = "rbxassetid://6034831332",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local ListTab = Window:MakeTab({
     Name = "명단",
     Icon = "rbxassetid://3572491301",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local LoopTab = Window:MakeTab({
     Name = "조지기",
     Icon = "rbxassetid://6023426923",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local AuraTab = Window:MakeTab({
     Name = "아우라",
     Icon = "rbxassetid://6031068423",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local bdTab = Window:MakeTab({
     Name = "배경체인저",
     Icon = "rbxassetid://0",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local funTab = Window:MakeTab({
     Name = "찌끄레기",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local keybindTab = Window:MakeTab({
     Name = "설정",
     Icon = "rbxassetid://6031094678",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local DevTab = Window:MakeTab({
     Name = "잡기능",
     Icon = "rbxassetid://3944680095",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local RankTab = Window:MakeTab({
     Name = "제작자 친구",
     Icon = "rbxassetid://6034281935",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local lagTab = Window:MakeTab({
     Name = "렉",
     Icon = "rbxassetid://6023426923",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local BTab = Window:MakeTab({
     Name = "블랙 리스트",
     Icon = "rbxassetid://0",
     PremiumOnly = false
 })
-
+print(Window.AddConfigTab)
 local CreditsTab = Window:MakeTab({
     Name = "제작자 한정",
     Icon = "rbxassetid://0",
     PremiumOnly = false
 })
+print(Window.AddConfigTab)
 local function autoGradient(text, target, startColor, endColor)
     if not string.find(text, target, 1, true) then return text end
 
