@@ -1622,29 +1622,6 @@ function OrionLib:MakeWindow(WindowConfig)
 		end)
 
 		
-local function GetElements(ItemParent)
-    local ElementFunction = {}
-
-    -- 1. 토글 생성 함수
-    function ElementFunction:AddToggle(ToggleConfig)
-        ToggleConfig = ToggleConfig or {}
-        --여기에 기존 순정 토글 생성 코드를 복사해서 넣으세요
-        --내부 UI 오브젝트들의 Parent는 반드시 ItemParent로 지정해야 합니다!
-    end
-
-    -- 2. 인풋 생성 함수
-    function ElementFunction:AddInput(InputConfig)
-        InputConfig = InputConfig or {}
-        --여기에 기존 순정 인풋 생성 코드를 복사해서 넣으세요
-    end
-
-    -- 3. 섹션 생성 함수
-    function ElementFunction:AddSection(SectionConfig)
-        SectionConfig = SectionConfig or {}
-        --여기에 기존 순정 섹션 생성 코드를 복사해서 넣으세요
-    end
-
-    -- 기존에 있던 AddDropdown이나 AddTextbox는 이 아래에 그대로 두시면 됩니다.
 
 		local function GetElements(ItemParent)
 			    
