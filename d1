@@ -1,4 +1,4 @@
-local OrionLib =   loadstring(game:HttpGet("https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X"))()
+local OrionLib =    loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion0"))()
 
 
 
