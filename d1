@@ -11396,7 +11396,7 @@ game:GetService("RunService").RenderStepped:Connect(function(W)
 end)
 
 Logger()
+Window:Render()
 
-
-	Window:AddConfigTab()
+	
 OrionLib:Init()
