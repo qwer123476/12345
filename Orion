@@ -5,7 +5,7 @@ local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 local PlayerService = game:GetService("Players")
 local UserService = game:GetService("UserService")
-GetElements
+
 
 local vgs = {
     MS  =  game:GetService("Players").LocalPlayer:GetMouse(),
