@@ -11437,8 +11437,5 @@ end)
 
 Logger()
 
-Window:AddConfigTab()
 
-
-return OrionLib
 OrionLib:Init()
