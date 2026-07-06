@@ -5620,7 +5620,7 @@ UtilityTab:AddSlider({
 -- 6. 내 이름 숨기기 (로컬 전용)
 UtilityTab:AddToggle({
     Name = "내 머리위 이름표 제거",
-    save = true
+    save = true,
     Default = false,
     Flag = "2",
     Callback = function(Value)
