@@ -9727,9 +9727,10 @@ keybindTab:AddBind({
     Callback = tpF
 })
 
-local Tper = keybindTab:AddToggle("AutoSitBlobman", {
-    Text = "3인칭",
-    Default = false,
+local Tper = keybindTab:AddToggle({
+    Name = "3인칭",
+    CurrentValue = false,
+    Flag = "AutoSitBlobman",
     Callback = function(Value)
         _G.CameraLoopID = (_G.CameraLoopID or 0) + 1
         local currentLoopID = _G.CameraLoopID
@@ -9750,11 +9751,12 @@ local Tper = keybindTab:AddToggle("AutoSitBlobman", {
                     plr.CameraMaxZoomDistance = 12
 
                     task.wait(0.05)
-                    attempts += 1
+                    attempts = attempts + 1
 
                     if plr:GetAttribute("CameraZoomDistance") == 12
-                        or (workspace.CurrentCamera and rootPart
-                        and (workspace.CurrentCamera.CFrame.Position - rootPart.Position).Magnitude >= 11.5) then
+                    or (workspace.CurrentCamera
+                    and rootPart
+                    and (workspace.CurrentCamera.CFrame.Position - rootPart.Position).Magnitude >= 11.5) then
                         success = true
                     end
                 end
@@ -9766,8 +9768,8 @@ local Tper = keybindTab:AddToggle("AutoSitBlobman", {
             end)
         else
             plr.CameraMode = Enum.CameraMode.LockFirstPerson
-            plr.CameraMaxZoomDistance = 0.5
             plr.CameraMinZoomDistance = 0.5
+            plr.CameraMaxZoomDistance = 0.5
         end
     end
 })
@@ -9776,11 +9778,15 @@ task.spawn(function()
     if not game:IsLoaded() then
         game.Loaded:Wait()
     end
+
     task.wait(0.3)
-    Tper:SetValue(true)
+
+    if Tper.Set then
+        Tper:Set(true)
+    elseif Tper.SetValue then
+        Tper:SetValue(true)
+    end
 end)
-
-
 
 keybindTab:AddBind({
     Text = "앉기 <font color='rgb(255,0,0)'>[블롭맨]</font>",
