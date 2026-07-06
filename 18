@@ -7097,7 +7097,7 @@ local function updateDropdown(flag, list)
 end
 
 
-local DropdownWhitelist = ListTab:CreateDropdown({
+local DropdownWhitelist = ListTab:AddDropdown({
     Name = "친구 [프렌드]",
     Options = getPlayerNames(),
     CurrentOption = {},
@@ -7107,7 +7107,7 @@ local DropdownWhitelist = ListTab:CreateDropdown({
 })
 
 
-local DropdownV1 = ListTab:CreateDropdown({
+local DropdownV1 = ListTab:AddDropdown({
     Name = "족칠 새끼 고르기 [타겟]",
     Options = getPlayerNames(),
     CurrentOption = {},
