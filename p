@@ -250,21 +250,7 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 local OrionLib =  loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
 local HttpService = game:GetService("HttpService")
 local FILE = "config.txt"
-
 local data = {}
-
--- 상태 직접 스캔해서 저장 (핵심)
-local function Save()
-    writefile(FILE, HttpService:JSONEncode(data))
-end
-
--- 1초마다 강제 저장 (핵심)
-task.spawn(function()
-    while true do
-        task.wait(1)
-        Save()
-    end
-end)
 -- [기존 코드 훼손 및 누락 방지를 위한 Rayfield 더미 테이블 및 원본 테마 테이블 유지]
 local Rayfield = {
     CreateToggle = function() end,
@@ -386,7 +372,9 @@ local RankTab = Window:MakeTab({Name = "제작자 친구", Icon = "rbxassetid://
 local lagTab = Window:MakeTab({Name = "렉", Icon = "rbxassetid://6023426923", PremiumOnly = false})   
 local BTab = Window:MakeTab({Name = "블랙 리스트", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid://4483345998", PremiumOnly = false})
-
+local Tab1 = Window:MakeTab({
+    Name = "1"
+})
 
 ----------------------------------------------------------------------------------------- [ 기능들 ]
 
@@ -11392,6 +11380,42 @@ lagTab:AddTextbox({
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger() 
 Window:AddConfigTab()
+local function Save()
+    local all = {}
+
+    for _, v in pairs(OrionLib.Flags) do
+        all[v.Flag] = v.Value
+    end
+
+    writefile(FILE, HttpService:JSONEncode(all))
+end
+local function Load()
+    if isfile(FILE) then
+        local data = HttpService:JSONDecode(readfile(FILE))
+
+        for flag, value in pairs(data) do
+            if OrionLib.Flags[flag] then
+                OrionLib.Flags[flag]:Set(value)
+            end
+        end
+    end
+end
+Tab1:AddButton({
+    Name = "저장",
+    Callback = function()
+        Save()
+    end
+})
+
+Tab1:AddButton({
+    Name = "불러오기",
+    Callback = function()
+        Load()
+    end
+})
+
+
+
 
 function OrionLib:Destroy()
 	Orion:Destroy()
