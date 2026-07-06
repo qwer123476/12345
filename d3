@@ -739,7 +739,7 @@ function AutoGucciF()
 
             if not successCheck then
                  blobHRP = blobmanInstanceS and blobmanInstanceS:FindFirstChild("HumanoidRootPart")
-                Rayfield:Notify({Title = "[ 🔓 ]",Content = "구찌실패 | 기다려 씨발",Duration = 1,Image = nil,})
+                OrionLib:MakeNotification({Name = "[ 🔓 ]", Content = "구찌실패 | 기다려 씨발", Time = 1})
                 if hum then
                     rs.CharacterEvents.Struggle:FireServer(plr)
                     hum.Sit = true
@@ -2491,7 +2491,7 @@ function CheckBlob(blob, myHRP, myAttach, source)
 
             if not notifyCooldowns[msg] or (now - notifyCooldowns[msg]) >= 2 then
                 notifyCooldowns[msg] = now
-                Rayfield:Notify({Title = "[ ✊ ]", Content = msg, Duration = 3, Image = 0})
+                OrionLib:MakeNotification({Name = "[ ✊ ]", Content = msg, Time = 3})
             end
 
             local success, errorMsg = pcall(function()
