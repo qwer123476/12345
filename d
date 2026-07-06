@@ -593,7 +593,7 @@ function antiInPlotsLoop()
 end
 
 -- Orion UI 초기화 및 렌더링 실행 (필수 코드 추가)
-OrionLib:Init()
+
 
 
 function spawnBlobmanF()
