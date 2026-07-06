@@ -247,7 +247,7 @@ G:WaitForChild("EndGrabEarly"):Destroy()
 Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
 -- [Rayfield 라이브러리 로드를 Orion 라이브러리 로드로 변경]
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X')))()
 
 -- [기존 코드 훼손 및 누락 방지를 위한 Rayfield 더미 테이블 및 원본 테마 테이블 유지]
 local Rayfield = {
