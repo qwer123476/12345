@@ -5602,7 +5602,7 @@ UtilityTab:AddToggle({
 -- 5. 머리 크기 변경 (시각용)
 UtilityTab:AddSlider({
     Name = "머리 크기 조절",
-    save = true
+    save = true,
     Min = 0,
     Max = 100,
     Increment = 1,
