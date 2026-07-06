@@ -7255,12 +7255,9 @@ local BreakHouseBarrierToggle = antiTab:AddToggle({
         end
     end
 })
-local WhitelistDropdown = ListTab:AddDropdown({
-    Name = "삭제할 친구 선택",
+local WhitelistDropdown = ListTab:AddDropdown("삭제할 친구 선택", {
     Options = Whitelist,
     Default = "",
-    Save = false,
-    Flag = "WhitelistDropdown",
     Callback = function(Option)
         if Option then
             removeFromList(Whitelist, WhitelistDropdown, Option, false)
@@ -7277,16 +7274,11 @@ ListTab:AddButton({
     end
 })
 
-ListTab:AddSection({
-    Name = "타겟 관리"
-})
+ListTab:AddSection("타겟 관리")
 
-local TargetDropdown = ListTab:AddDropdown({
-    Name = "삭제할 타겟 선택",
+local TargetDropdown = ListTab:AddDropdown("삭제할 타겟 선택", {
     Options = playersInLoop1V,
     Default = "",
-    Save = false,
-    Flag = "TargetDropdown",
     Callback = function(Option)
         if Option then
             removeFromList(playersInLoop1V, TargetDropdown, Option, true)
@@ -7311,7 +7303,6 @@ ListTab:AddButton({
         end
     end
 })
-
 
 
 
