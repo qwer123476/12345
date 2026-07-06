@@ -7886,16 +7886,7 @@ LoopTab:AddToggle({
     end
 })
 
-LoopTab:AddToggle({
-    Name = "ㄴ 안티 인플레이스 모드",
-    Default = false,
-    Flag = "21",
-    Callback = function(Value)
-        LoopReleaseMODED = Value
-    end
-LoopTab:AddSection({
-    Name = "루프 블롭맨"
-})
+
 local blobLoop3Toggle = LoopTab:AddToggle({
     Name = "루프킬   <font color='rgb(0,0,255)'>[프라임 오너쉽]</font>   <font color='rgb(255,0,0)'>[프리미엄]</font>",
     Default = false,
