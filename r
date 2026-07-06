@@ -716,7 +716,7 @@ function updateWalkSpeedF()
                 end
             end)
         else
-            hum.WalkSpeed = 80
+            hum.WalkSpeed = 100
         end
     end
 
