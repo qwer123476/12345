@@ -732,7 +732,7 @@ function updateJumpPowerF()
             hum.JumpPower = jumpPowerV
             hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
                 if jumpPowerT then
-                    --hum.JumpPower = jumpPowerV
+                    hum.JumpPower = jumpPowerV
                 end
             end)
         else
@@ -9662,7 +9662,7 @@ playerTab:AddToggle({
 
 local walkSpeedTextbox = playerTab:AddTextbox({
     Name = "값",
-    Default = "",
+    Default = "100",
     save = true,
     Placeholder = "Value",
     RemoveTextAfterFocusLost = true,
@@ -9687,7 +9687,7 @@ playerTab:AddToggle({
 
 local jumpPowerTextbox = playerTab:AddTextbox({
     Name = "값",
-    Default = "",
+    Default = "60",
     save = true,
     Placeholder = "Value",
     RemoveTextAfterFocusLost = false,
