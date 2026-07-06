@@ -7281,9 +7281,7 @@ ListTab:AddButton({
 })
 end
 
-ListTab:AddSection({
-	Name = "White"
-})
+
 local Dropdown = ListTab:AddDropdown({
     Name = "친구  <font color='rgb(255,255,100)'>[프렌드]</font>",
     Options = Whitelist,
@@ -7312,9 +7310,7 @@ ListTab:AddInput({
     end
 })
 
-ListTab:AddSection({
-	Name = "명단"
-})
+
 local DropdownV1 = ListTab:AddDropdown({
     Name = "족칠 새끼 고르기  <font color='rgb(255,0,0)'>[타겟]</font>",
     Options = playersInLoop1V,
@@ -8536,7 +8532,7 @@ local AntiGrab = antiTab:AddToggle({
         AntiGrabF(Value)
     end
 })
-AntiGrab:Set(true)
+--AntiGrab:Set(true)
 
 antiTab:AddToggle({
     Name = "안티그랩V2   <font color='rgb(255,0,0)'>[프라임오너쉽]</font>",
@@ -8912,7 +8908,7 @@ local AntiBlob = antiTab:AddToggle({
 		end
 	end
 })
-AntiBlob:Set(true)
+--AntiBlob:Set(true)
 if not AntiCheatStates then
     _G.AntiCheatStates = { blobConn = nil }
 end
@@ -8969,7 +8965,7 @@ local AntiMassless = antiTab:AddToggle({
         masslessF()
     end
 })
-AntiMassless:Set(true)
+--AntiMassless:Set(true)
 
 antiTab:AddSection("안티 에어 서스펜션")
 antiTab:AddToggle({
@@ -9026,7 +9022,7 @@ local AntiInPlots = antiTab:AddToggle({
         end
     end
 })
-AntiInPlots:Set(true)
+--AntiInPlots:Set(true)
 
 local AntiVoid = antiTab:AddToggle({
     Name = "안티 보이드",
@@ -9039,7 +9035,7 @@ local AntiVoid = antiTab:AddToggle({
         end
     end,
 })
-AntiVoid:Set(true)
+--AntiVoid:Set(true)
 
 local AntiExplode = antiTab:AddToggle({
     Name = "안티 폭탄",
@@ -9055,7 +9051,7 @@ local AntiExplode = antiTab:AddToggle({
         end
     end
 })
-AntiExplode:Set(true)
+--AntiExplode:Set(true)
 
 function setupAntiExplosion(character)
     if not character then return end
@@ -9128,7 +9124,7 @@ local AntiBurn = antiTab:AddToggle({
         AntiBurn()
     end
 })
-AntiBurn:Set(true)
+--AntiBurn:Set(true)
 
 local AntiPaint = antiTab:AddToggle({
     Name = "안티 페인트",
@@ -9138,9 +9134,9 @@ local AntiPaint = antiTab:AddToggle({
         antiPaintF(Value)
     end
 })
-AntiPaint:Set(true)
+--AntiPaint:Set(true)
 
-AntiLagF()
+
 local AntiLag = antiTab:AddToggle({
     Name = "안티 렉",
     Default = false,
@@ -9149,7 +9145,7 @@ local AntiLag = antiTab:AddToggle({
         antiLagEnabled = Value
     end
 })
-AntiLag:Set(true)
+--AntiLag:Set(true)
 
 function antiLagF()
     local char = plr.Character
@@ -9265,7 +9261,7 @@ resetProtectionConn = plr.CharacterAdded:Connect(function(char)
     end
 end)
 
-FlyingReset:Set(true)
+--FlyingReset:Set(true)
 
 local AntiKick = antiTab:AddToggle({
     Name = "안티 킥 <font color='rgb(255,146,132)'>[표창]</font>",
@@ -9275,7 +9271,7 @@ local AntiKick = antiTab:AddToggle({
         task.spawn(AntiKickF)
     end
 })
-AntiKick:Set(true)
+--AntiKick:Set(true)
 
 antiTab:AddToggle({
    Name = "안티킥",
@@ -9437,7 +9433,7 @@ local AntiPCLD = antiTab:AddToggle({
         task.spawn(AntiPCLDF)
     end
 })
-if not TESTPP then AntiPCLD:Set(true) end
+--if not TESTPP then AntiPCLD:Set(true) end
 
 antiTab:AddSection("래그돌")
 local PermRag = antiTab:AddToggle({
@@ -9540,7 +9536,7 @@ local walkSpeedInput = playerTab:AddInput({
         updateWalkSpeedF()
     end
 })
-walkSpeedInput:Set("80")
+--walkSpeedInput:Set("80")
 
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
@@ -9563,7 +9559,7 @@ local jumpPowerInput = playerTab:AddInput({
         updateJumpPowerF()
     end
 })
-jumpPowerInput:Set("60")
+--jumpPowerInput:Set("60")
 
 local realisticFP = false
 local fpConnection = nil
@@ -9666,7 +9662,7 @@ local flyInput = playerTab:AddInput({
         flyV = Value
     end
 })
-flyInput:Set("80")
+--flyInput:Set("80")
 
 playerTab:AddSection("모바일플라이")
 local function mflyF()
@@ -9730,7 +9726,7 @@ local antilagDet = keybindTab:AddInput("linesInputFlag", {
     end
 })
 
-antilagDet:SetValue("30")
+--antilagDet:SetValue("30")
 
 game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
     vu5 = nil
@@ -9825,7 +9821,7 @@ local BarrierNoclip = plotTab:AddToggle("BarrierNoclipToggle", {
     end
 })
 
-BarrierNoclip:SetValue(true)
+--BarrierNoclip:SetValue(true)
 
 plotTab:AddButton({
     Text = "집 베리어 완전삭제 | 햄버거",
@@ -10002,7 +9998,7 @@ local PCLDView = keybindTab:AddToggle("PCLDView", {
     end
 })
 
-PCLDView:SetValue(true)
+--PCLDView:SetValue(true)
 
 local ViewTool = keybindTab:AddToggle("ViewTool", {
     Text = "표창,쿠나이 보기",
@@ -10013,7 +10009,7 @@ local ViewTool = keybindTab:AddToggle("ViewTool", {
     end
 })
 
-ViewTool:SetValue(true)
+--ViewTool:SetValue(true)
 
 
 
