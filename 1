@@ -1,0 +1,1122 @@
+
+playerTab:CreateToggle({ 
+    Name = "플라이   <font color='rgb(0,255,0)'>[모바일]</font>", 
+    CurrentValue = false,
+    Flag = "5",
+    Callback = function(Value)
+        mflyT = Value
+        mflyF()
+    end
+})
+playerTab:CreateInput({
+    Name = "속도",
+    CurrentValue = 50,
+    PlaceholderText = "Value",
+    RemoveTextAfterFocusLost = false,
+    Flag = "37",
+    Callback = function(Value)
+        mflyV = Value
+    end
+})
+
+playerTab:CreateSection("엑스트라")
+
+-- 1. Server Hop
+playerTab:CreateButton({
+    Name = "서버 훅",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+    end
+})
+
+-- 2. Rejoin
+playerTab:CreateButton({
+    Name = "제접ㅋ",
+    Callback = function()
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
+    end
+})
+
+-- 3. FPS Unlock
+playerTab:CreateButton({
+    Name = "FPS 최대치",
+    Callback = function()
+        setfpscap(9999)
+    end
+})
+
+-- 4. Full Bright
+playerTab:CreateToggle({
+    Name = "어둠 씨발 꺼져!!!!!",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            game:GetService("Lighting").Brightness = 2
+            game:GetService("Lighting").ClockTime = 14
+            game:GetService("Lighting").FogEnd = 100000
+            game:GetService("Lighting").GlobalShadows = false
+        else
+            game:GetService("Lighting").Brightness = 1
+            game:GetService("Lighting").GlobalShadows = true
+        end
+    end
+})
+playerTab:CreateSection("쓰잘때기없는 기능")
+
+-- 1. 
+playerTab:CreateToggle({
+    Name = "FOV 변경",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            workspace.CurrentCamera.FieldOfView = 120
+        else
+            workspace.CurrentCamera.FieldOfView = 70
+        end
+    end
+})
+
+-- 2. 
+playerTab:CreateButton({
+    Name = "모든 장신구 제거",
+    Callback = function()
+        pcall(function()
+            for _, item in pairs(plr.Character:GetChildren()) do
+                if item:IsA("Accessory") or item.Name:find("Hat") or item.Name:find("Hair") then
+                    item:Destroy()
+                end
+            end
+        end)
+    end
+})
+
+-- 3. 
+playerTab:CreateToggle({
+    Name = "중력 변경",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            workspace.Gravity = 50
+        else
+            workspace.Gravity = 196.2
+        end
+    end
+})
+
+AuraTab:CreateSection("안티 아우라들")
+AuraTab:CreateToggle({
+    Name = "안티 붐박스 아우라   <font color='rgb(0,200,0)'>[all]</font>",
+    CurrentValue = false,
+    Flag = "5",
+    Callback = function(Value)
+        AntiBoxT = Value
+        AntiBoxF()
+    end
+})
+
+AuraTab:CreateToggle({
+    Name = "안티 바나나 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    CurrentValue = false,
+    Flag = "5",
+    Callback = function(Value)
+        AntiBananaAuraT = Value
+        AntiBananaAuraF()
+    end
+})
+
+AuraTab:CreateToggle({
+    Name = "안티 파트 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    CurrentValue = false,
+    Flag = "5",
+    Callback = function(Value)
+        ViewAuraT = Value
+        ViewAuraF()
+    end
+})
+
+
+
+AuraTab:CreateToggle({
+	Name = "주크박스 고정 아우라",
+	CurrentValue = false,
+	Flag = "AntiJukeboxAura",
+	Callback = function(Value)
+		_G.AntiJukeboxT = Value
+		if Value then
+			AntiJukeboxF()
+		end
+	end
+})
+AuraTab:CreateToggle({
+	Name = "판자 고정 아우라",
+	CurrentValue = false,
+	Flag = "AntiPalletAura",
+	Callback = function(Value)
+		_G.AntiPalletT = Value
+		if Value then
+			AntiPalletF()
+		end
+	end
+})
+
+
+
+AuraTab:CreateSection("킬,플링")
+
+AuraTab:CreateToggle({
+    Name = "Kill All",
+    CurrentValue = false,
+    Flag = "21",
+    Callback = function(Value)
+        blobLoopT3 = Value
+        
+        if not Value then
+            return
+        end
+
+        task.spawn(function()
+            while blobLoopT3 do
+                local myChar = plr.Character
+                local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+                
+                if myChar and myHum then
+                    local currentSeat = myHum.SeatPart
+                    if not (currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman") then
+                        if not workspace:FindFirstChild("CreatureBlobman") then
+                            rs.BlobEvents.SpawnBlobman:FireServer()
+                            task.wait(0.2)
+                        end
+                        
+                        local targetBlob = workspace:FindFirstChild("CreatureBlobman")
+                        if targetBlob then
+                            local targetSeat = targetBlob:FindFirstChildOfClass("Seat") or targetBlob:FindFirstChild("DriveSeat")
+                            if targetSeat then
+                                targetSeat:Sit(myHum)
+                                task.wait(0.1)
+                            end
+                        end
+                    end
+                end
+
+                UpdateCurrentBlobman()
+
+                local seat = plr.Character
+                    and plr.Character:FindFirstChildOfClass("Humanoid")
+                    and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
+
+                if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
+                    task.wait(0.5)
+                    continue
+                end
+
+                local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                if not myHrp then 
+                    task.wait(0.1)
+                    continue 
+                end
+
+                local initialCFrame = myHrp.CFrame
+                local teleportedToAny = false
+
+                for _, player in ipairs(game.Players:GetPlayers()) do
+                    if not blobLoopT3 then break end
+                    if player == plr then continue end
+                    if table.find(Whitelist, player.Name) or (PPs and PPs:FindFirstChild(player.Name)) then continue end
+
+                    local char = player.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    
+                    if not char or not hum or not hrp or char.Parent == nil or not hrp:IsDescendantOf(workspace) then 
+                        continue 
+                    end
+
+                    if hum.Health <= 0 then continue end
+
+                    local distance = (myHrp.Position - hrp.Position).Magnitude
+                    if distance <= 200 then
+                        teleportedToAny = true
+                        local startTime = tick()
+
+                        if distance > 30 then
+                            TP(player)
+                            task.wait(0.01)
+                            
+                            myChar = plr.Character
+                            myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                            if myHrp then myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) end
+                        end
+
+                        while blobLoopT3 and hum and hum.Health > 0 and char.Parent ~= nil do
+                            local timePassed = tick() - startTime
+                            
+                            if timePassed >= 4 then
+                                break
+                            end
+
+                            pcall(function()
+                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
+                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
+                                rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
+                            end)
+
+                            if currentBlobS then
+                                hum.BreakJointsOnDeath = false
+                                hum.WalkSpeed = 0
+                                hum.JumpPower = 0
+
+                                if hum.SeatPart == nil then
+                                    if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
+                                    if hum.RigType ~= Enum.HumanoidRigType.R6 then hum.RigType = Enum.HumanoidRigType.R6 end
+                                    if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
+                                end
+
+                                for i = 1, 3 do
+                                    if not blobLoopT3 or hum.Health <= 0 then break end
+                                    BlobGrab(currentBlobS, hrp, "Right")
+                                    BlobRelease(currentBlobS, hrp, "Right")
+                                end
+                            end
+                            
+                            if timePassed >= 2 then
+                                task.wait()
+                            else
+                                task.wait(0.02)
+                            end
+                        end
+                    end
+                end
+
+                if blobLoopT3 and teleportedToAny then
+                    myChar = plr.Character
+                    myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                    if myHrp then
+                        BACK(initialCFrame)
+                        task.wait(0.05)
+                    end
+                end
+
+                task.wait(0.05)
+            end
+        end)
+    end
+})
+
+
+AuraTab:CreateToggle({
+    Name = "래그돌 아우라",
+    Default = false,
+    Save = false,
+    Flag = "FtapKillAura",
+    Callback = function(enabled)
+        runningFtapKillAura = enabled
+        if enabled then
+            task.spawn(function()
+                local Players = game:GetService("Players")
+                local localPlayer = game.Players.LocalPlayer
+                local rs = game:GetService("ReplicatedStorage")
+                
+               
+                local GrabEvents = rs:FindFirstChild("GrabEvents")
+                local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+                
+                
+                local DamageEvent = rs:FindFirstChild("DamageEvent") or (GrabEvents and GrabEvents:FindFirstChild("Struggle"))
+
+                while runningFtapKillAura do
+                    pcall(function()
+                        local character = localPlayer.Character
+                        local root = character and character:FindFirstChild("HumanoidRootPart")
+                        if root then
+                            
+                            local currentRadius = tonumber(auraRadius) or 30
+                            
+                            for _, player in pairs(Players:GetPlayers()) do
+                                if player ~= localPlayer and player.Character then
+                                    
+                                    local isFriend = _G.Aurahowait and localPlayer:IsFriendsWith(player.UserId)
+                                    if not isFriend then
+                                        local targetChar = player.Character
+                                        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+                                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+                                        local humanoid = targetChar:FindFirstChildOfClass("Humanoid")
+                                        
+                                        if torso and targetRoot and humanoid then
+                                            local distance = (torso.Position - root.Position).Magnitude
+                                            if distance <= currentRadius then
+                                                
+                                                
+                                                if SetNetworkOwner and SetNetworkOwner.FireServer then
+                                                    SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+                                                end
+                                                
+                                                
+                                                if DamageEvent and DamageEvent.FireServer then
+                                                    
+                                                    DamageEvent:FireServer(humanoid, 0)
+                                                else
+                                                    
+                                                    humanoid.Health = 100
+                                                end
+                                                
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait() 
+                end
+            end)
+        end
+    end
+})
+local runningCombinedAura = false
+
+AuraTab:CreateInput({
+    Name = "아우라지름[반경]인풋",
+    PlaceholderText = "기본값: 30",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local num = tonumber(Text)
+        if num then
+            if num < 5 then
+                auraRadius = 5
+            else
+                auraRadius = num
+            end
+        else
+            auraRadius = 30
+        end
+    end
+})
+
+AuraTab:CreateToggle({
+    Name = "필링 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Save = false,
+    Flag = "CombinedFlingAura",
+    Callback = function(enabled)
+        runningCombinedAura = enabled
+        if enabled then
+            task.spawn(function()
+                local Players = game:GetService("Players")
+                local localPlayer = game.Players.LocalPlayer
+                local Debris = game:GetService("Debris")
+                local rs = game:GetService("ReplicatedStorage")
+                local SetNetworkOwner = rs:FindFirstChild("GrabEvents") and rs.GrabEvents:FindFirstChild("SetNetworkOwner")
+                
+                while runningCombinedAura do
+                    pcall(function()
+                        local character = localPlayer.Character
+                        local root = character and character:FindFirstChild("HumanoidRootPart")
+                        if root then
+                            local currentRadius = tonumber(auraRadius) or 30
+                            
+                            for _, player in pairs(Players:GetPlayers()) do
+                                if player ~= localPlayer and player.Character then
+                                    local isFriend = _G.Aurahowait and localPlayer:IsFriendsWith(player.UserId)
+                                    if not isFriend then
+                                        local targetChar = player.Character
+                                        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+                                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+                                        
+                                        if torso and targetRoot then
+                                            local distance = (torso.Position - root.Position).Magnitude
+                                            if distance <= currentRadius then
+                                                if SetNetworkOwner and SetNetworkOwner.FireServer then
+                                                    SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+                                                end
+                                                
+                                                local velocity = torso:FindFirstChild("l")
+                                                if not velocity then
+                                                    velocity = Instance.new("BodyVelocity")
+                                                    velocity.Name = "l"
+                                                    velocity.Parent = torso
+                                                end
+                                                velocity.Velocity = Vector3.new(5e10, 5e15, 5e10)
+                                                velocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                                Debris:AddItem(velocity, 0.05) 
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+AuraTab:CreateToggle({
+    Name = "낙사 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Save = false,
+    Flag = "FtapVoidKill",
+    Callback = function(enabled)
+        runningFtapVoidKill = enabled
+        if enabled then
+            task.spawn(function()
+                local Players = game:GetService("Players")
+                local localPlayer = game.Players.LocalPlayer
+                local rs = game:GetService("ReplicatedStorage")
+                
+                local GrabEvents = rs:FindFirstChild("GrabEvents")
+                local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwner")
+
+                while runningFtapVoidKill do
+                    pcall(function()
+                        local character = localPlayer.Character
+                        local root = character and character:FindFirstChild("HumanoidRootPart")
+                        if root then
+                            local currentRadius = tonumber(auraRadius) or 30
+                            
+                            for _, player in pairs(Players:GetPlayers()) do
+                                if player ~= localPlayer and player.Character then
+                                    local isFriend = _G.Aurahowait and localPlayer:IsFriendsWith(player.UserId)
+                                    if not isFriend then
+                                        local targetChar = player.Character
+                                        local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+                                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+                                        
+                                        if torso and targetRoot then
+                                            local distance = (torso.Position - root.Position).Magnitude
+                                            if distance <= currentRadius then
+                                                
+                                                -- 1단계: 물리 오너십 박탈
+                                                if SetNetworkOwner and SetNetworkOwner.FireServer then
+                                                    SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+                                                end
+                                                
+                                                -- 2단계: 딜레이 없이 Y축 -10000 낭떠러지로 강제 사출 (시스템 즉사 유도)
+                                                targetRoot.CFrame = CFrame.new(targetRoot.Position.X, -10000, targetRoot.Position.Z)
+                                                
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+AuraTab:CreateToggle({
+    Name = "토이 플링   <font color='rgb(0,195,0)'>[파카]</font>",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
+
+ funTab:CreateButton({
+   Name = "텔포",
+   Callback = function()
+      if not Value then return end
+      local hrp = plr.Character:WaitForChild("HumanoidRootPart")
+      local pos = hrp.Position
+      hrp.CFrame = CFrame.new(pos.X, Value, pos.Z)
+   end,
+})
+
+funTab:CreateSection("이동할곳")
+local teleportLocations = {
+    ["스폰"] = {0, -7, 0},
+    ["스폰산"] = {494, 163, 175},
+    ["설산"] = {-394, 230, 509},
+    ["헛간(농지)"] = {-156, 59, -291},
+    ["위험구역"] = {125, -7, 241},
+    ["하늘섬"] = {63, 346, 309},
+    ["큰동굴"] = {-240, 29, 554},
+    ["작은동굴"] = {-84, 14, -310},
+    ["열차동굴"] = {602, 45, -175},
+    ["광산"] = {-308, -7, 506},
+    ["초록집"] = {-352, 98, 353},
+    ["(초록집)"] = {-532, -7, 92},
+    ["(분홍집)"] = {-484, -7, -165},
+    ["(보라집)"] = {249, -7, 461},
+    ["(파랑집)"] = {513, 83, -341},
+    ["(빨강집)"] = {551, 123, -73},
+    ["슬롯1"] = {51, 11, -118},
+    ["슬롯2"] = {-543, 11, -40},
+    ["슬롯3"] = {169, 11, 530},
+    ["슬롯4"] = {-214, 102, 423},
+    ["슬롯5"] = {563, 102, -218},
+    ["독우물 아래"] = {121, -56, 251},
+}
+
+local selectedLocation = "스폰"
+
+local Dropdown = plotTab:CreateDropdown({
+    Name = "위치 고르기",
+    Options = {"스폰","스폰산","광산","큰동굴","작은동굴","열차동굴","위험구역","설산","헛간(농지)","하늘섬","초록집","(초록집)","(분홍집)","(보라집)","(파랑집)","(빨강집)","슬롯1","슬롯2","슬롯3","슬롯4","슬롯5","독우물 아래"},
+    CurrentOption = "스폰",
+    MultipleOptions = false,
+    Callback = function(Value)
+        if typeof(Value) == "table" then
+            selectedLocation = Value[1] or "스폰"
+        else
+            selectedLocation = Value
+        end
+    end,
+})
+
+local Button = plotTab:CreateButton({
+    Name = "텔포",
+    Callback = function()
+        local plr = game.Players.LocalPlayer
+        local char = plr.Character or plr.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        local pos = teleportLocations[selectedLocation]
+        if not pos then
+            return
+        end
+
+        hrp.CFrame = CFrame.new(pos[1], pos[2], pos[3])
+    end,
+})
+
+
+
+
+
+FunTab:AddSection({
+    Name = "꼬추 만들기"
+})
+
+local PencilInput = FunTab:AddTextbox({
+    Name = "연필 [dick]",
+    Default = "",
+    TextDisappear = false,
+    Callback = function(Value)
+        -- 입력값은 변수에 저장됨
+    end
+})
+
+FunTab:AddButton({
+    Name = "만들기",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local pencilCountText = PencilInput.Value -- Orion의 Textbox 값 호출 방식
+        local TNUM = tonumber(pencilCountText)
+
+        if not TNUM or TNUM <= 0 then  
+            warn("Please enter a valid number!")  
+            OrionLib:MakeNotification({
+                Name = "[ ✏️ ]",
+                Content = "유효한 숫자를 입력하세요.",
+                Image = "rbxassetid://4483345998",
+                Time = 3
+            })
+            return  
+        end  
+
+        local character = plr.Character or plr.CharacterAdded:Wait()  
+        local hrp = character:WaitForChild("HumanoidRootPart")  
+        local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")  
+        local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
+
+        -- 내부 함수 정의
+        local function GetPlotNumber()
+            local char = plr.Character
+            if not char then return nil end
+            if char.Parent == workspace then return nil end
+            if char.Parent.Name == "PlayersInPlots" then
+                for _, plot in workspace.Plots:GetChildren() do  
+                    for _, owner in plot.PlotSign.ThisPlotsOwners:GetChildren() do  
+                        if owner.Value == plr.Name then
+                            return tonumber(string.match(plot.Name, "%d+"))
+                        end
+                    end
+                end
+            end
+            return nil
+        end
+
+        local function GetInventory()
+            local plotNumber = GetPlotNumber()
+            if plotNumber then
+                local plotItems = workspace:FindFirstChild("PlotItems")
+                if plotItems and plotItems:FindFirstChild("Plot" .. plotNumber) then
+                    return plotItems["Plot" .. plotNumber]
+                end
+            end
+            return workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+        end
+
+        local function createPencil(index)
+            while not plr.CanSpawnToy.Value do task.wait() end
+            task.spawn(function()  
+                SpawnToy:InvokeServer("ToolPencil", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0,0,0))  
+            end)  
+            task.wait(0.3)  
+            local inv = GetInventory()  
+            local pencil
+            for _, item in pairs(inv:GetChildren()) do
+                if item.Name == "ToolPencil" then pencil = item break end
+            end
+            if not pencil then return nil end  
+
+            local stickyPart = pencil:WaitForChild("StickyPart")  
+            local SoundPart = pencil:WaitForChild("SoundPart")  
+            if stickyPart and SoundPart then  
+                ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)  
+                ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, character.Torso.CFrame)  
+            end  
+
+            if SoundPart:FindFirstChild("PartOwner") then SoundPart.CFrame = CFrame.new(0, 599999, 999) end  
+            stickyPart.Name = "w" .. index  
+            for _, part in pairs(pencil:GetDescendants()) do  
+                if part:IsA("BasePart") and part.Color == Color3.fromRGB(158, 108, 141) then part.Name = "a" .. index end  
+            end  
+            return pencil
+        end
+
+        -- 생성 및 연결 로직
+        local pencils = {}
+        for i = 1, TNUM do
+            local p = createPencil(i)
+            if p then table.insert(pencils, p) end
+            task.wait(0.1)
+        end
+
+        for i = 1, #pencils - 1 do
+            local cur, nxt = pencils[i], pencils[i + 1]
+            if cur and nxt then  
+                local aF = cur:FindFirstChild("w" .. i)  
+                local aT = nxt:FindFirstChild("a" .. (i + 1))  
+                if aF and aT then StickyPartEvent:FireServer(aF, aT, CFrame.Angles(0, math.rad(-90), 0)) end  
+            end  
+            task.wait(0.05)
+        end
+
+        local torso2 = character:WaitForChild("HumanoidRootPart"):WaitForChild("RagdollTouchedHitbox")
+        if torso2 and #pencils >= TNUM then
+            local lastP = pencils[TNUM]
+            local wLast = lastP:FindFirstChild("w" .. TNUM)
+            if wLast then
+                local relCF = torso2.CFrame:ToObjectSpace(torso2.CFrame * CFrame.new(0, -1.1, 0.1) * CFrame.Angles(0, math.rad(180), 0))
+                StickyPartEvent:FireServer(wLast, torso2, relCF)
+            end
+        end
+    end
+})
+
+
+
+
+funTab:CreateSection("떠있는것들 무력화")
+funTab:AddTextbox({
+   Name = "쿠나이",
+   CurrentValue = "",
+   PlaceholderText = "Value",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input1",
+   Callback = function(Text)
+   end
+})
+
+funTab:AddSection({
+    Name = "UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요."
+})
+local Ctratee = funTab:AddButton({
+   Name = "무력화   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+   Callback = function()
+       local ReplicatedStorage = game:GetService("ReplicatedStorage")
+       local Players = game:GetService("Players")
+       local plr = Players.LocalPlayer
+       
+       local kunaiCountText = Inputt.CurrentValue
+       local TNUM = tonumber(kunaiCountText)
+
+       if not TNUM or TNUM <= 0 or TNUM > 100 then
+           Rayfield:Notify({Title = "[ 🥷 ]", Content = "Invalid Value", Duration = 3, Image = 0})
+           return
+       end
+
+       local character = plr.Character or plr.CharacterAdded:Wait()
+       local hrp = character:WaitForChild("HumanoidRootPart")
+       local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+       
+       if not torso then
+           return
+       end
+       
+       local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
+       local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
+
+       function GetTargetPartFromGrabParts()
+           local grabPartsModel = workspace:FindFirstChild("GrabParts")
+           if not grabPartsModel then return nil end
+
+           local grabPart = grabPartsModel:FindFirstChild("GrabPart")
+           if not grabPart then return nil end
+
+           local weldConstraint = grabPart:FindFirstChild("WeldConstraint")
+           if not weldConstraint or not weldConstraint:IsA("WeldConstraint") then return nil end
+
+           if not weldConstraint.Part1 then return nil end
+
+           return weldConstraint.Part1
+       end
+
+       function GetPlotNumber()
+           local char = plr.Character
+           if not char then return nil end
+
+           if char.Parent == workspace then 
+               return nil
+           elseif char.Parent.Name == "PlayersInPlots" then
+               for _, plot in workspace.Plots:GetChildren() do
+                   local plotSign = plot:FindFirstChild("PlotSign")
+                   if plotSign and plotSign:FindFirstChild("ThisPlotsOwners") then
+                       for _, owner in plotSign.ThisPlotsOwners:GetChildren() do
+                           if owner.Value == plr.Name then
+                               if plot.Name == "Plot1" then
+                                   return 1
+                               elseif plot.Name == "Plot2" then
+                                   return 2
+                               elseif plot.Name == "Plot3" then
+                                   return 3
+                               elseif plot.Name == "Plot4" then
+                                   return 4
+                               elseif plot.Name == "Plot5" then
+                                   return 5
+                               end
+                           end
+                       end
+                   end
+               end
+           end
+           return nil
+       end
+
+       function GetInventory()
+           local plotNumber = GetPlotNumber()
+
+           if plotNumber then
+               local plotItems = workspace:FindFirstChild("PlotItems")
+               if plotItems then
+                   local plotFolder = plotItems:FindFirstChild("Plot" .. plotNumber)
+                   if plotFolder then
+                       return plotFolder
+                   end
+               end
+           end
+           
+           local defaultInv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+           if defaultInv then
+               return defaultInv
+           end
+           
+           return nil
+       end
+
+       local targetPart = GetTargetPartFromGrabParts()
+       if not targetPart then
+           return
+       end
+
+       function createAndAttachKunai()
+           while not plr.CanSpawnToy.Value do 
+               task.wait(0.1) 
+           end
+
+           local position = hrp.CFrame
+
+           local success, result = pcall(function()
+ task.spawn(function()
+               return SpawnToy:InvokeServer("NinjaKunai", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0, 0, 0))
+           end)
+           end)
+           
+           if not success then
+               return nil
+           end
+
+           task.wait(0.2)
+
+           local inv = GetInventory()
+           if not inv then
+               return nil
+           end
+
+           local kunai
+           local children = inv:GetChildren()
+           for i = #children, 1, -1 do
+               if children[i].Name == "NinjaKunai" then
+                   kunai = children[i]
+                   break
+               end
+           end
+
+           if not kunai then 
+               return nil 
+           end
+
+           local stickyPart = kunai:WaitForChild("StickyPart")
+           local SoundPart = kunai:WaitForChild("SoundPart")
+
+           if stickyPart and SoundPart then
+               pcall(function()
+                   ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)
+                   ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, torso.CFrame)
+               end)
+           end
+
+           if stickyPart then
+               local attachPosition = targetPart.CFrame
+               local relativeCF = targetPart.CFrame:ToObjectSpace(attachPosition)
+
+               pcall(function()
+                   StickyPartEvent:FireServer(stickyPart, targetPart, relativeCF)
+               end)
+           end
+
+           task.wait(0.1)
+           return kunai
+       end
+
+       for i = 1, TNUM do
+           createAndAttachKunai()
+           task.wait(0.1)
+       end
+   end
+})
+
+bdTab:AddSection({
+    Name = "배경"
+})
+bdTab:AddButton({
+    Name = "기본값",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        for _, obj in ipairs(Lighting:GetChildren()) do
+            if obj:IsA("Sky") or obj:IsA("Atmosphere") 
+            or obj:IsA("BloomEffect") or obj:IsA("ColorCorrectionEffect") 
+            or obj:IsA("SunRaysEffect") then
+                obj:Destroy()
+            end
+        end
+
+        Lighting.Ambient = Color3.fromRGB(120, 120, 120)
+        Lighting.Brightness = 2
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+        Lighting.ColorShift_Top = Color3.fromRGB(0, 0, 0)
+        Lighting.EnvironmentDiffuseScale = 0
+        Lighting.EnvironmentSpecularScale = 0.25
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(200, 200, 200)
+        Lighting.ShadowSoftness = 0.2
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 14
+        Lighting.GeographicLatitude = 41.735
+        Lighting.FogColor = Color3.fromRGB(192, 192, 192)
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 0
+
+        local sky = Instance.new("Sky")
+        sky.Parent = Lighting
+        sky.CelestialBodiesShown = true
+        sky.MoonAngularSize = 0
+        sky.MoonTextureId = "rbxasset://sky/moon.jpg"
+        sky.SkyboxBk = "rbxassetid://8995816670"
+        sky.SkyboxDn = "rbxassetid://8995686153"
+        sky.SkyboxFt = "rbxassetid://8995816670"
+        sky.SkyboxLf = "rbxassetid://8995816670"
+        sky.SkyboxRt = "rbxassetid://8995816670"
+        sky.SkyboxUp = "rbxassetid://8995814929"
+        sky.StarCount = 3000
+        sky.SunAngularSize = 30
+        sky.SunTextureId = "rbxassetid://8923082571"
+    end
+})
+
+bdTab:AddButton({
+    Name = "낮시간",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+        Lighting.Brightness = 3.13
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+        Lighting.ColorShift_Top = Color3.fromRGB(188, 141, 1)
+        Lighting.EnvironmentDiffuseScale = 0.583
+        Lighting.EnvironmentSpecularScale = 1
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(145, 128, 95)
+        Lighting.ShadowSoftness = 0.04
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 14.5
+        Lighting.GeographicLatitude = 143
+        Lighting.FogColor = Color3.fromRGB(146, 208, 255)
+        Lighting.FogEnd = 3000
+        Lighting.FogStart = 300
+
+        local sky = Lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.MoonAngularSize = 11
+        sky.MoonTextureId = "rbxassetid://6444320592"
+        sky.SkyboxBk = "rbxassetid://6444884337"
+        sky.SkyboxDn = "rbxassetid://6444884785"
+        sky.SkyboxFt = "rbxassetid://6444884337"
+        sky.SkyboxLf = "rbxassetid://6444884337"
+        sky.SkyboxRt = "rbxassetid://6444884337"
+        sky.SkyboxUp = "rbxassetid://6412503613"
+        sky.StarCount = 0
+        sky.SunAngularSize = 11
+        sky.SunTextureId = "rbxassetid://1084351190"
+
+        local bloom = Lighting:FindFirstChildOfClass("BloomEffect") or Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1
+        bloom.Size = 90
+        bloom.Threshold = 2
+
+        local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.04
+        cc.Contrast = 0.19
+        cc.Saturation = 0.12
+        cc.TintColor = Color3.fromRGB(255, 255, 255)
+    end
+})
+
+bdTab:AddButton({
+    Name = "새벽",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        Lighting.Ambient = Color3.fromRGB(109, 117, 135)
+        Lighting.Brightness = 1.921
+        Lighting.ColorShift_Bottom = Color3.fromRGB(248, 165, 159)
+        Lighting.ColorShift_Top = Color3.fromRGB(226, 75, 0)
+        Lighting.EnvironmentDiffuseScale = 0.172
+        Lighting.EnvironmentSpecularScale = 0.738
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(36, 47, 58)
+        Lighting.ShadowSoftness = 0.25
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.TimeOfDay = "-06:23:59"
+        Lighting.GeographicLatitude = 0
+        Lighting.FogColor = Color3.fromRGB(192, 192, 192)
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 0
+
+        local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere", Lighting)
+        atmosphere.Density = 0.359
+        atmosphere.Offset = 0
+        atmosphere.Color = Color3.fromRGB(255, 216, 194)
+        atmosphere.Decay = Color3.fromRGB(123, 151, 182)
+        atmosphere.Glare = 2.97
+        atmosphere.Haze = 1.52
+
+        local sky = Lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.MoonAngularSize = 0
+        sky.MoonTextureId = "rbxasset://sky/moon.jpg"
+        sky.SkyboxBk = "rbxassetid://88585370973398"
+        sky.SkyboxDn = "rbxassetid://128014535205529"
+        sky.SkyboxFt = "rbxassetid://85323615042244"
+        sky.SkyboxLf = "rbxassetid://77415797450913"
+        sky.SkyboxRt = "rbxassetid://127566931602371"
+        sky.SkyboxUp = "rbxassetid://102320981098060"
+        sky.StarCount = 5000
+        sky.SunAngularSize = 4
+        sky.SunTextureId = "rbxasset://sky/sun.jpg"
+
+        local bloom = Lighting:FindFirstChildOfClass("BloomEffect") or Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1
+        bloom.Size = 50
+        bloom.Threshold = 2.291
+
+        local blur = Lighting:FindFirstChildOfClass("BlurEffect") or Instance.new("BlurEffect", Lighting)
+        blur.Enabled = false
+        blur.Size = 4
+
+        local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0
+        cc.Contrast = 0.2
+        cc.Saturation = 0
+        cc.TintColor = Color3.fromRGB(255, 255, 255)
+
+        local sunrays = Lighting:FindFirstChildOfClass("SunRaysEffect") or Instance.new("SunRaysEffect", Lighting)
+        sunrays.Intensity = 0.024
+        sunrays.Spread = 0.463
+    end
+})
+
+bdTab:AddButton({
+    Name = "아침",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+
+        Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+        Lighting.Brightness = 5.63
+        Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+        Lighting.ColorShift_Top = Color3.fromRGB(207, 114, 0)
+        Lighting.EnvironmentDiffuseScale = 0.583
+        Lighting.EnvironmentSpecularScale = 1
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(89, 68, 47)
+        Lighting.ShadowSoftness = 0.04
+        Lighting.Technology = Enum.Technology.Future
+        Lighting.ClockTime = 17.629
+        Lighting.GeographicLatitude = 21.589
+        Lighting.FogColor = Color3.fromRGB(146, 208, 255)
+        Lighting.FogEnd = 3000
+        Lighting.FogStart = 300
+
+        local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere", Lighting)
+        atmosphere.Density = 0.357
+        atmosphere.Offset = 0
+        atmosphere.Color = Color3.fromRGB(165, 165, 165)
+        atmosphere.Decay = Color3.fromRGB(16, 16, 16)
+        atmosphere.Glare = 0.21
+        atmosphere.Haze = 1.46
+
+        local sky = Lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky", Lighting)
+        sky.CelestialBodiesShown = true
+        sky.MoonAngularSize = 1.5
+        sky.MoonTextureId = "rbxassetid://1075087760"
+        sky.SkyboxBk = "rbxassetid://2177969403"
+        sky.SkyboxDn = "rbxassetid://2177972406"
+        sky.SkyboxFt = "rbxassetid://2177970251"
+        sky.SkyboxLf = "rbxassetid://2177969836"
+        sky.SkyboxRt = "rbxassetid://2177968823"
+        sky.SkyboxUp = "rbxassetid://2177971305"
+        sky.StarCount = 500
+        sky.SunAngularSize = 3
+        sky.SunTextureId = "rbxasset://sky/sun.jpg"
+
+        local bloom = Lighting:FindFirstChildOfClass("BloomEffect") or Instance.new("BloomEffect", Lighting)
+        bloom.Intensity = 1
+        bloom.Size = 90
+        bloom.Threshold = 2
+
+        local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
+        cc.Brightness = 0.04
+        cc.Contrast = 0.15
+        cc.Saturation = 0.2
+        cc.TintColor = Color3.fromRGB(255, 255, 255)
+
+        local sunrays = Lighting:FindFirstChildOfClass("SunRaysEffect") or Instance.new("SunRaysEffect", Lighting)
+        sunrays.Intensity = 0.004
+        sunrays.Spread = 0.167
+    end
+})
