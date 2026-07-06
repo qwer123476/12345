@@ -10020,13 +10020,7 @@ CreditsTab:AddSection({
     Name = "AI_AIPACA\nCo-Owner"
 })
 
--- ================== 랭크 알림 ==================
-Rayfield:Notify({
-    Title = "랭크 알림",
-    Content = "랭크 배치완료",
-    Duration = 6,
-    Image = 0
-})
+
 
 
 
@@ -10128,9 +10122,7 @@ lagTab:AddTextbox({
 	end
 })
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
-Logger()
-
- Window:AddConfigTab()
+Logger() Window:AddConfigTab()
 Window:AddConfigTab()
 Window:AddConfigTab()
 Window:AddConfigTab()
