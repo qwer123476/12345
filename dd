@@ -5314,7 +5314,7 @@ grabTab:AddToggle({
 })
 
 grabTab:AddToggle({
-    Name = 킬그랩 [오너쉽] [프리미엄]",
+    Name = "킬그랩 [오너쉽] [프리미엄]",
     Default = false,
     Callback = function(Value)
         KillGrabT = Value
