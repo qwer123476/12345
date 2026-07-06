@@ -660,11 +660,11 @@ function updateWalkSpeedF()
             hum.WalkSpeed = walkSpeedV
             hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
                 if walkSpeedT then
-                    hum.WalkSpeed = walkSpeedV
+                 --hum.WalkSpeed = walkSpeedV
                 end
             end)
         else
-            hum.WalkSpeed = 16
+            hum.WalkSpeed = 80
         end
     end
 
@@ -683,11 +683,11 @@ function updateJumpPowerF()
             hum.JumpPower = jumpPowerV
             hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
                 if jumpPowerT then
-                    hum.JumpPower = jumpPowerV
+                    --hum.JumpPower = jumpPowerV
                 end
             end)
         else
-            hum.JumpPower = 26
+            hum.JumpPower = 60
         end
     end
 
