@@ -10000,19 +10000,25 @@ local ViewTool = keybindTab:AddToggle({
         ViewToolF()
     end
 })
+CreditsTab:AddLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>")
+CreditsTab:AddSection({
+    Name = "0110rim\n착함의 경지"
+})
 
-CreditsTab:CreateLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>", 96897864871400, Color3.fromRGB(255, 255, 255), true)
-CreditsTab:CreateParagraph({Title = "0110rim", Content = "착함의 경지"})
+CreditsTab:AddLabel("식호   <font color='rgb(0,255,0)'>[good]</font>")
+CreditsTab:AddSection({
+    Name = "매우좋습니다.\n가장좋은방"
+})
 
-CreditsTab:CreateLabel("식호   <font color='rgb(0,255,0)'>[good]</font>", 113854105043977, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "매우좋습니다.", Content = "가장좋은방"})
+CreditsTab:AddLabel("알파   <font color='rgb(0,255,255)'>[TOP1 OWNER]</font>")
+CreditsTab:AddSection({
+    Name = "QRDOOTE1120\nOwner"
+})
 
-CreditsTab:CreateLabel("알파   <font color='rgb(0,255,255)'>[TOP1 ONWER]</font>", 3572491301, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "QRDOOTE1120", Content = "Owner"})
-
-CreditsTab:CreateLabel("부계   <font color='rgb(255,0,0)'>[onwer]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
-CreditsTab:CreateParagraph({Title = "AI_AIPACA", Content = "Co-Owner"})
-
+CreditsTab:AddLabel("부계   <font color='rgb(255,0,0)'>[onwer]</font>")
+CreditsTab:AddSection({
+    Name = "AI_AIPACA\nCo-Owner"
+})
 
 -- ================== 랭크 알림 ==================
 Rayfield:Notify({
