@@ -6518,7 +6518,7 @@ local flingToggle = grabTab:AddToggle({
     end
 })
 
-local strengthInput = grabTab:AddInput({
+local strengthTextBox = grabTab:AddTextBox({
     Name = "던지는 힘 V1",
     Default = 0,
     PlaceholderText = "Value",
@@ -6583,7 +6583,7 @@ grabTab:AddToggle({
     end
 })
 
-grabTab:AddInput({
+grabTab:AddTextBox({
     Name = "던지는 힘 V2",
     PlaceholderText = "숫자 입력 (기본값: 800)",
     Default = "800",
@@ -6615,7 +6615,7 @@ local extendLineToggle = grabTab:AddToggle({
     end
 })
 
-local extendLineInput = grabTab:AddInput({
+grabTab:AddTextBox({
     Name = "휠속도",
     Default = 0,
     PlaceholderText = "Value",
@@ -7264,7 +7264,7 @@ local Dropdown = ListTab:AddDropdown({
     end
 })
 
-ListTab:AddInput({
+ListTab:AddTextBox({
     Name = "추가",
     PlaceholderText = "...",
     Flag = "AddInput_Whitelist",
@@ -7273,7 +7273,7 @@ ListTab:AddInput({
     end
 })
 
-ListTab:AddInput({
+ListTab:AddTextBox({
     Name = "제거",
     PlaceholderText = "...",
     Flag = "RemoveInput_Whitelist",
@@ -7293,7 +7293,7 @@ local DropdownV1 = ListTab:AddDropdown({
     end
 })
 
-ListTab:AddInput({
+ListTab:AddTextBox({
     Name = "추가",
     PlaceholderText = "...",
     Flag = "AddInput_LoopBlob",
@@ -7302,7 +7302,7 @@ ListTab:AddInput({
     end
 })
 
-ListTab:AddInput({
+ListTab:AddTextBox({
     Name = "제거",
     PlaceholderText = "...",
     Flag = "RemoveInput_LoopBlob",
@@ -7578,7 +7578,7 @@ LoopTab:AddButton({
     LoopTab:AddSection({
     Name = "오너킥"
 })
-    local OLTPInput = LoopTab:AddInput({
+    local OLTPTextBox = LoopTab:AddTextBox({
         Name = "X Y Z",
         Default = "0,40,0",
         PlaceholderText = "",
@@ -9535,7 +9535,7 @@ playerTab:AddToggle({
     end
 })
 
-local walkSpeedInput = playerTab:AddInput({
+local walkSpeedTextBox = playerTab:AddTextBox({
     Name = "값",
     Default = "16",
     Placeholder = "Value",
@@ -9558,7 +9558,7 @@ playerTab:AddToggle({
     end
 })
 
-local jumpPowerInput = playerTab:AddInput({
+local jumpPowerTextBox = playerTab:AddTextBox({
     Name = "값",
     Default = "24",
     Placeholder = "Value",
@@ -9664,7 +9664,7 @@ local Fly = playerTab:AddToggle({
     end
 })
 
-local flyInput = playerTab:AddInput({
+local flyTextBox = playerTab:AddTextBox({
     Name = "속도",
     Default = "50",
     Placeholder = "Value",
@@ -9729,7 +9729,7 @@ keybindTab:AddSection({
     Name = "줄"
 })
 
-local antilagDet = keybindTab:AddInput("linesInputFlag", {
+local antilagDet = keybindTab:AddTextBox("linesTextBoxFlag", {
     Text = "줄 감지",
     Default = "30",
     Placeholder = "",
