@@ -7096,7 +7096,7 @@ local function updateDropdown(flag, list)
     if OrionLib and OrionLib.Flags[flag] then OrionLib.Flags[flag]:Set(list) end
 end
 
-ListTab:CreateSection("White")
+
 local DropdownWhitelist = ListTab:CreateDropdown({
     Name = "친구 [프렌드]",
     Options = getPlayerNames(),
@@ -7106,7 +7106,7 @@ local DropdownWhitelist = ListTab:CreateDropdown({
     Callback = function(Options) Whitelist = Options end
 })
 
-ListTab:CreateSection("명단")
+
 local DropdownV1 = ListTab:CreateDropdown({
     Name = "족칠 새끼 고르기 [타겟]",
     Options = getPlayerNames(),
