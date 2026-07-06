@@ -6518,7 +6518,7 @@ local flingToggle = grabTab:AddToggle({
     end
 })
 
-local strengthTextBox = grabTab:AddTextBox({
+local strengthTextbox = grabTab:AddTextbox({
     Name = "던지는 힘 V1",
     Default = 0,
     PlaceholderText = "Value",
@@ -6583,7 +6583,7 @@ grabTab:AddToggle({
     end
 })
 
-grabTab:AddTextBox({
+grabTab:AddTextbox({
     Name = "던지는 힘 V2",
     PlaceholderText = "숫자 입력 (기본값: 800)",
     Default = "800",
@@ -6615,7 +6615,7 @@ local extendLineToggle = grabTab:AddToggle({
     end
 })
 
-grabTab:AddTextBox({
+grabTab:AddTextbox({
     Name = "휠속도",
     Default = 0,
     PlaceholderText = "Value",
@@ -7264,7 +7264,7 @@ local Dropdown = ListTab:AddDropdown({
     end
 })
 
-ListTab:AddTextBox({
+ListTab:AddTextbox({
     Name = "추가",
     PlaceholderText = "...",
     Flag = "AddInput_Whitelist",
@@ -7273,7 +7273,7 @@ ListTab:AddTextBox({
     end
 })
 
-ListTab:AddTextBox({
+ListTab:AddTextbox({
     Name = "제거",
     PlaceholderText = "...",
     Flag = "RemoveInput_Whitelist",
@@ -7293,7 +7293,7 @@ local DropdownV1 = ListTab:AddDropdown({
     end
 })
 
-ListTab:AddTextBox({
+ListTab:AddTextbox({
     Name = "추가",
     PlaceholderText = "...",
     Flag = "AddInput_LoopBlob",
@@ -7302,7 +7302,7 @@ ListTab:AddTextBox({
     end
 })
 
-ListTab:AddTextBox({
+ListTab:AddTthebox({
     Name = "제거",
     PlaceholderText = "...",
     Flag = "RemoveInput_LoopBlob",
@@ -9535,7 +9535,7 @@ playerTab:AddToggle({
     end
 })
 
-local walkSpeedTextBox = playerTab:AddTextBox({
+local walkSpeedTextbox = playerTab:AddTextbox({
     Name = "값",
     Default = "16",
     Placeholder = "Value",
@@ -9558,7 +9558,7 @@ playerTab:AddToggle({
     end
 })
 
-local jumpPowerTextBox = playerTab:AddTextBox({
+local jumpPowerTextbox = playerTab:AddTextBox({
     Name = "값",
     Default = "24",
     Placeholder = "Value",
@@ -9664,7 +9664,7 @@ local Fly = playerTab:AddToggle({
     end
 })
 
-local flyTextBox = playerTab:AddTextBox({
+local flyTextbox = playerTab:AddTextbox({
     Name = "속도",
     Default = "50",
     Placeholder = "Value",
@@ -9729,7 +9729,7 @@ keybindTab:AddSection({
     Name = "줄"
 })
 
-local antilagDet = keybindTab:AddTextBox("linesTextBoxFlag", {
+local antilagDet = keybindTab:AddTextbox("linesTextBoxFlag", {
     Text = "줄 감지",
     Default = "30",
     Placeholder = "",
