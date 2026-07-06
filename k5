@@ -660,7 +660,7 @@ function updateWalkSpeedF()
             hum.WalkSpeed = walkSpeedV
             hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
                 if walkSpeedT then
-                 --hum.WalkSpeed = walkSpeedV
+                 hum.WalkSpeed = walkSpeedV
                 end
             end)
         else
