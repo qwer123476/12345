@@ -316,7 +316,7 @@ local function processAntiGrabPlayer(player)
     local tpRunning = true
     local tpThread = task.spawn(function()
    end)
-        while tpRunning do
+        while tpRunning 
             if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
                (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
                 break
