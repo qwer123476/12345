@@ -395,7 +395,7 @@ end
 
 -- [Orion UI Window 생성으로 교체]
 local Window = OrionLib:MakeWindow({
-    Name = "파카허브 [프리미엄]",
+    Name = "PACA HUB [Premium]",
     HidePremium = false,
     SaveConfig = false,
     ConfigFolder = "PacaHub",
