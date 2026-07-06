@@ -10439,7 +10439,7 @@ funTab:AddButton({
 
 
 
-funTab:CreateSection("떠있는것들 무력화")
+
 funTab:AddTextbox({
    Name = "쿠나이",
    CurrentValue = "",
