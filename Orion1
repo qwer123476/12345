@@ -3825,8 +3825,13 @@ function OrionLib:Destroy()
 	Orion:Destroy()
 end
 
-
-local Window = OrionLib:MakeWindow({Name = "test", HidePremium = true, SaveConfig = false, IntroEnabled = false, FreeMouse = true})
+local Window = OrionLib:MakeWindow({
+    Name = "파카허브 [프리미엄]",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "PacaHub",
+    IntroText = "파카허브 [프리미엄]"
+})
 
 local Main_Tab = Window:MakeTab({
 	Name = "Combat",
