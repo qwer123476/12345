@@ -8749,3 +8749,1633 @@ local function monitorCharacter(character)
 end
 
 LocalPlayer.CharacterAdded:Connect(monitorCharacter)
+antiTab:AddToggle({
+    Name = "안티 오너쉽 스팸   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "AntiFlingToggle",
+    Callback = function(Value)
+        _G.AntiFlingEnabled = Value
+        if Value then
+            if LocalPlayer.Character then
+                monitorCharacter(LocalPlayer.Character)
+            end
+        else
+            cleanupCharacterConnections(LocalPlayer.UserId)
+        end
+    end,
+})
+
+antiTab:AddSection("그랩 | 토클")
+local AntiGrab = antiTab:AddToggle({
+    Name = "안티 그랩   <font color='rgb(0,255,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "5",
+    Callback = function(Value)
+        AntiGrabF(Value)
+    end
+})
+AntiGrab:Set(true)
+
+antiTab:AddToggle({
+    Name = "안티그랩V2   <font color='rgb(255,0,0)'>[프라임오너쉽]</font>",
+    Default = false,
+    Save = false,
+    Flag = "antiGrab",
+    Callback = function(enabled)
+        if enabled then
+            autoStruggleCoroutine = RunService.Heartbeat:Connect(function()
+                local character = localPlayer.Character
+                if character and character:FindFirstChild("Head") then
+                    local head = character.Head
+                    local partOwner = head:FindFirstChild("PartOwner")
+                    if partOwner then
+                        Struggle:FireServer()
+                        if game:GetService("ReplicatedStorage"):FindFirstChild("GameCorrectionEvents") and game:GetService("ReplicatedStorage").GameCorrectionEvents:FindFirstChild("StopAllVelocity") then
+                            game:GetService("ReplicatedStorage").GameCorrectionEvents.StopAllVelocity:FireServer()
+                        end
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Anchored = true
+                            end
+                        end
+                        if localPlayer:FindFirstChild("IsHeld") and localPlayer.IsHeld:IsA("ValueObject") then
+                            while localPlayer.IsHeld.Value do
+                                task.wait()
+                            end
+                        end
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Anchored = false
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if autoStruggleCoroutine then
+                autoStruggleCoroutine:Disconnect()
+                autoStruggleCoroutine = nil
+            end
+        end
+    end
+})
+
+blobmanInstanceS = nil
+task.spawn(function()
+    task.wait(0.5)
+    if AntiGrabToggle and AntiGrabToggle.Set then
+        AntiGrabToggle:Set(true)
+    end
+end)
+
+antiTab:AddToggle({
+    Name = "안티그랩V3   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "AutoStruggle", 
+    Callback = function(enabled)
+        if enabled then
+            autoStruggleCoroutine = RunService.Heartbeat:Connect(function()
+                local character = localPlayer.Character
+                if character and character:FindFirstChild("Head") then
+                    local head = character.Head
+                    local partOwner = head:FindFirstChild("PartOwner")
+                    if partOwner then
+                        Struggle:FireServer()
+                        ReplicatedStorage.GameCorrectionEvents.StopAllVelocity:FireServer()
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Anchored = true
+                            end
+                        end
+                        while localPlayer.IsHeld.Value do
+                            wait()
+                        end
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.Anchored = false
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if autoStruggleCoroutine then
+                autoStruggleCoroutine:Disconnect()
+                autoStruggleCoroutine = nil
+            end
+        end
+    end
+})
+
+local AntiGrabSticky = antiTab:AddToggle({
+    Name = "안티그랩 |  StickyPart",
+    Default = false,
+    Callback = function(Value)
+        AntiGrabStickyT = Value
+        if Value then
+            AntiGrabStickyF()
+        end
+    end
+})
+
+local itemTranslation = {
+    ["바나나"] = "FoodBanana",
+    ["빵"] = "FoodBread",
+    ["브로콜리"] = "FoodBroccoli",
+    ["케이크"] = "FoodCakePink",
+    ["코코넛"] = "FoodCoconut",
+    ["계란 후라이"] = "FoodDippyEgg",
+    ["도넛"] = "FoodDonut",
+    ["감자튀김"] = "FoodFrenchFries",
+    ["햄버거"] = "FoodHamburger",
+    ["핫도그"] = "FoodHotdog",
+    ["마요네즈"] = "FoodMayonnaise",
+    ["고기꼬치"] = "FoodMeatStick",
+    ["독버섯"] = "FoodMushroomPoison",
+    ["치즈 피자"] = "FoodPizzaCheese",
+    ["페페로니 피자"] = "FoodPizzaPepperoni",
+    ["음료수 캔"] = "FoodSodaCan",
+    ["나팔"] = "InstrumentBrassBugle",
+    ["트럼펫"] = "InstrumentBrassTrumpet",
+    ["봉고 드럼"] = "InstrumentDrumBongos",
+    ["스네어 드럼"] = "InstrumentDrumSnare",
+    ["어쿠스틱 기타"] = "InstrumentGuitarAcoustic",
+    ["벤조"] = "InstrumentGuitarBanjo",
+    ["리라"] = "InstrumentGuitarLyre",
+    ["우쿨렐레"] = "InstrumentGuitarUkulele",
+    ["바이올린"] = "InstrumentGuitarViolin",
+    ["전자 피아노"] = "InstrumentPianoKeyboard",
+    ["멜로디카"] = "InstrumentPianoMelodica",
+    ["마이크"] = "InstrumentVoiceMicrophone",
+    ["오카리나"] = "InstrumentWoodwindOcarina",
+    ["색소폰"] = "InstrumentWoodwindSaxophone",
+    ["부부젤라"] = "InstrumentBrassVuvuzela"
+}
+
+function AntiDeathF(itemName)
+    if activeConnection then
+        activeConnection:Disconnect()
+        activeConnection = nil
+    end
+
+    activeConnection = rs2.Heartbeat:Connect(function()
+        if not AntiDeathT then
+            if activeConnection then
+                activeConnection:Disconnect()
+                activeConnection = nil
+            end
+            return
+        end
+
+        local Character = plr.Character
+        if not Character then return end
+
+        local donut = inv:FindFirstChild(itemName)
+
+        if not donut then
+            pcall(function()
+                rs.MenuToys.SpawnToyRemoteFunction:InvokeServer(itemName, CFrame.new(0,0,0), Vector3.new(0,0,0))
+            end)
+            return
+        end
+
+        if not donut:FindFirstChild("HoldPart") then return end
+
+        local HoldItemRemoteFunction = donut.HoldPart:FindFirstChild("HoldItemRemoteFunction")
+        local DropItemRemoteFunction = donut.HoldPart:FindFirstChild("DropItemRemoteFunction")
+
+        if HoldItemRemoteFunction and DropItemRemoteFunction then
+            HoldItemRemoteFunction:InvokeServer(donut, Character)
+            DropItemRemoteFunction:InvokeServer(donut, CFrame.new(99999, 99999, 99999), Vector3.new(99999, 99999, 99999))
+        end
+    end)
+end
+
+RunService = game:GetService("RunService")
+Camera = workspace.CurrentCamera
+
+local currentSelectedOption = "FoodMayonnaise"
+
+antiTab:AddToggle({
+    Name = "안티 인풋   <font color='rgb(255,0,0)'>[NETWORK OWNER]</font>  <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "AntiDeathToggleFlag",
+    Callback = function(Value)
+        AntiDeathT = Value
+        if AntiDeathT then
+            task.spawn(function()
+                AntiDeathF(currentSelectedOption)
+            end)
+        else
+            if activeConnection then
+                activeConnection:Disconnect()
+                activeConnection = nil
+            end
+        end
+    end,
+})
+
+antiTab:AddDropdown({
+    Name = "사용할 아이템 선택(누나 빵 추천)",
+    Options = {
+        "마요네즈", "바나나", "빵", "브로콜리", "핑크 케이크", "코코넛", "반숙란", "도넛", 
+        "감자튀김", "햄버거", "핫도그", "우쿨렐레", "고기꼬치", "독버섯", "치즈 피자", 
+        "페페로니 피자", "음료수 캔", "나팔", "트럼펫", "봉고 드럼", "스네어 드럼", 
+        "어쿠스틱 기타", "벤조", "리라", "바이올린", "전자 피아노", "멜로디카", 
+        "마이크", "오카리나", "색소폰", "부부젤라"
+    },
+    Default = "마요네즈", 
+    Flag = "ItemDropdownFlag",
+    Callback = function(Option)
+        local rawSelection = type(Option) == "table" and Option[1] or Option
+        if type(rawSelection) == "string" then
+            local englishName = itemTranslation[rawSelection]
+            if englishName then
+                currentSelectedOption = englishName
+                if AntiDeathT then
+                    task.spawn(function()
+                        AntiDeathF(englishName)
+                    end)
+                end
+            end
+        end
+    end,
+})
+
+antiTab:AddToggle({
+    Name = "안티킥 <font color='rgb(0,255,0)'>[그랩]</font>",
+    Default = false,
+    Flag = "AntiKickGrab", 
+    Callback = function(enabled)
+        if enabled then
+            local character = localPlayer.Character
+
+            antiKickCoroutine = RunService.Heartbeat:Connect(function()
+                local character = localPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("HumanoidRootPart"):FindFirstChild("FirePlayerPart") then
+                    local partOwner = character:FindFirstChild("HumanoidRootPart"):FindFirstChild("FirePlayerPart"):FindFirstChild("PartOwner")
+                    if partOwner and partOwner.Value ~= localPlayer.Name then
+                        local args = {[1] = character:WaitForChild("HumanoidRootPart"), [2] = 0}
+                        game:GetService("ReplicatedStorage"):WaitForChild("CharacterEvents"):WaitForChild("RagdollRemote"):FireServer(unpack(args))
+                        print("grabbity shap!")
+                        wait(0.1)
+                        Struggle:FireServer()
+                    end
+                end
+            end)
+        else
+            if antiKickCoroutine then
+                antiKickCoroutine:Disconnect()
+                antiKickCoroutine = nil
+            end
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local characterConnections = {}
+local activeCharacters = setmetatable({}, { __mode = "k" })
+
+local MAX_VELOCITY_THRESHOLD = 150
+local MAX_ROT_VELOCITY_THRESHOLD = 150
+_G.AntiFlingEnabled = false
+
+local function cleanupCharacterConnections(userId)
+    if characterConnections[userId] then
+        for connection in pairs(characterConnections[userId]) do
+            if connection then connection:Disconnect() end
+        end
+        characterConnections[userId] = nil
+    end
+    activeCharacters[userId] = nil
+end
+
+local function monitorCharacter(character)
+    if not _G.AntiFlingEnabled then return end
+    
+    local userId = LocalPlayer.UserId
+    cleanupCharacterConnections(userId)
+    
+    local rootPart = character:WaitForChild("HumanoidRootPart", 5)
+    local humanoid = character:WaitForChild("Humanoid", 5)
+    if not rootPart or not humanoid then return end
+
+    characterConnections[userId] = {}
+    local registry = characterConnections[userId]
+
+    local charData = {
+        RootPart = rootPart,
+        Humanoid = humanoid,
+        LastSafeCFrame = rootPart.CFrame,
+        Parts = {}
+    }
+    activeCharacters[userId] = charData
+
+    local function refreshParts()
+        table.clear(charData.Parts)
+        for _, descendant in ipairs(character:GetDescendants()) do
+            if descendant:IsA("BasePart") and not descendant.Anchored then
+                table.insert(charData.Parts, descendant)
+            end
+        end
+    end
+
+    local addedConnection = character.DescendantAdded:Connect(function(descendant)
+        if descendant:IsA("BasePart") then
+            refreshParts()
+        end
+    end)
+    registry[addedConnection] = true
+
+    refreshParts()
+
+    local mainPhysicsConnection
+    mainPhysicsConnection = RunService.Heartbeat:Connect(function()
+        if not _G.AntiFlingEnabled then
+            cleanupCharacterConnections(userId)
+            return
+        end
+
+        if not character or not character.Parent or humanoid.Health <= 0 then
+            cleanupCharacterConnections(userId)
+            return
+        end
+
+        local anomalyDetected = false
+
+        for _, part in ipairs(charData.Parts) do
+            if part and part.Parent then
+                local velocity = part.AssemblyLinearVelocity.Magnitude
+                local rotVelocity = part.AssemblyAngularVelocity.Magnitude
+
+                if velocity > MAX_VELOCITY_THRESHOLD or rotVelocity > MAX_ROT_VELOCITY_THRESHOLD then
+                    anomalyDetected = true
+                    part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                    part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+
+        if anomalyDetected then
+            if charData.LastSafeCFrame then
+                rootPart.CFrame = charData.LastSafeCFrame
+            end
+        else
+            charData.LastSafeCFrame = rootPart.CFrame
+        end
+    end)
+    registry[mainPhysicsConnection] = true
+
+    local removingConnection
+    removingConnection = character.AncestryChanged:Connect(function(_, parent)
+        if not parent then cleanupCharacterConnections(userId) end
+    end)
+    registry[removingConnection] = true
+end
+
+LocalPlayer.CharacterAdded:Connect(monitorCharacter)
+
+antiTab:AddSection("블롭")
+local AntiBlob = antiTab:AddToggle({
+	Name = "안티 블롭맨",
+	Default = false,
+	Flag = "16",
+	Callback = function(Value)
+		AntiBlobT = Value
+		if Value then
+			AntiBlobF()
+		end
+	end
+})
+AntiBlob:Set(true)
+if not AntiCheatStates then
+    _G.AntiCheatStates = { blobConn = nil }
+end
+
+function SetAntiBlobman(enabled)
+    local localPlayer = game.Players.LocalPlayer
+    if not localPlayer then return end
+    
+    local function processPart(part)
+        local invalid = part.Name == "LeftWeld" or part.Name == "RightWeld" or part.Name == "LeftAlignOrientation" or
+                            part.Name == "RightAlignOrientation"
+
+        if invalid and part.Parent and part.Parent.Parent and part.Parent.Parent.Parent ~=
+            workspace:FindFirstChild(localPlayer.Name) then
+            part.Enabled = not enabled
+        end
+    end
+    for _, part in pairs(workspace:GetDescendants()) do
+        processPart(part)
+    end
+    if enabled then
+        if _G.AntiCheatStates.blobConn then
+            _G.AntiCheatStates.blobConn:Disconnect()
+        end
+        _G.AntiCheatStates.blobConn = workspace.DescendantAdded:Connect(function(part)
+            processPart(part)
+        end)
+    elseif _G.AntiCheatStates.blobConn then
+        _G.AntiCheatStates.blobConn:Disconnect()
+        _G.AntiCheatStates.blobConn = nil
+    end
+end
+
+antiTab:AddToggle({
+    Name = "안티 블롭맨V2<font color='rgb(0,255,0)'>[오너쉽]</font>",
+    Default = false,
+    Callback = function(Value)
+        SetAntiBlobman(Value)
+    end
+})
+task.spawn(function()
+    task.wait(0.5)
+    if AntiBlobmanToggle and AntiBlobmanToggle.Set then
+        AntiBlobmanToggle:Set(true)
+    end
+end)
+
+local AntiMassless = antiTab:AddToggle({
+    Name = "안티 메슬리즈  <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "17",
+    Callback = function(Value)
+    masslessT = Value
+        masslessF()
+    end
+})
+AntiMassless:Set(true)
+
+antiTab:AddSection("안티 에어 서스펜션")
+antiTab:AddToggle({
+    Name = "디펜스 / 에어 서브펜션",
+    Default = false,
+    Flag = "SelfDefenseAirSuspend", 
+    Callback = function(enabled)
+        if enabled then
+            autoDefendCoroutine = coroutine.create(function()
+                while wait(0.02) do
+                    local character = localPlayer.Character
+                    if character and character:FindFirstChild("Head") then
+                        local head = character.Head
+                        local partOwner = head:FindFirstChild("PartOwner")
+                        if partOwner then
+                            local attacker = Players:FindFirstChild(partOwner.Value)
+                            if attacker and attacker.Character then
+                                Struggle:FireServer()
+                                SetNetworkOwner:FireServer(attacker.Character.Head or attacker.Character.Torso, attacker.Character.HumanoidRootPart.FirePlayerPart.CFrame)
+                                task.wait(0.1)
+                                local target = attacker.Character:FindFirstChild("Torso")
+                                if target then
+                                    local velocity = target:FindFirstChild("l") or Instance.new("BodyVelocity")
+                                    velocity.Name = "l"
+                                    velocity.Parent = target
+                                    velocity.Velocity = Vector3.new(0, 50, 0)
+                                    velocity.MaxForce = Vector3.new(0, math.huge, 0)
+                                    Debris:AddItem(velocity, 100)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+            coroutine.resume(autoDefendCoroutine)
+        else
+            if autoDefendCoroutine then
+                coroutine.close(autoDefendCoroutine)
+                autoDefendCoroutine = nil
+            end
+        end
+    end
+})
+
+antiTab:AddSection("")
+
+local AntiInPlots = antiTab:AddToggle({
+    Name = "안티 인플레이스",
+    Default = true,
+    Callback = function(Value)
+    antiInPlotsEnabled = Value
+         if Value then
+            task.spawn(antiInPlotsLoop)
+        end
+    end
+})
+AntiInPlots:Set(true)
+
+local AntiVoid = antiTab:AddToggle({
+    Name = "안티 보이드",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            workspace.FallenPartsDestroyHeight = -50000
+        else
+            workspace.FallenPartsDestroyHeight = -100
+        end
+    end,
+})
+AntiVoid:Set(true)
+
+local AntiExplode = antiTab:AddToggle({
+    Name = "안티 폭탄",
+    Default = false,
+    Flag = "antiExplodeToggleFlag",
+    Callback = function(Value)
+        AntiExplosionT = Value
+        if Value then
+            AntiExplosionF()
+        elseif AntiExplosionC then
+            AntiExplosionC:Disconnect()
+            AntiExplosionC = nil
+        end
+    end
+})
+AntiExplode:Set(true)
+
+function setupAntiExplosion(character)
+    if not character then return end
+    local humanoid = character:WaitForChild("Humanoid", 5)
+    if humanoid then
+        local partOwner = humanoid:FindFirstChild("Ragdolled")
+        if partOwner then
+            if antiExplosionConnection then antiExplosionConnection:Disconnect() end
+            antiExplosionConnection = partOwner:GetPropertyChangedSignal("Value"):Connect(function()
+                if partOwner.Value then
+                    for _, part in ipairs(character:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.Anchored = true
+                        end
+                    end
+                else
+                    for _, part in ipairs(character:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.Anchored = false
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end
+
+antiTab:AddToggle({
+    Name = "안티 폭발V2  <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Save = false,
+    Flag = "AntiExplosion",
+    Callback = function(enabled)
+        local localPlayer = game.Players.LocalPlayer
+        if not localPlayer then return end
+
+        if enabled then
+            if localPlayer.Character then
+                setupAntiExplosion(localPlayer.Character)
+            end
+            if characterAddedConn then characterAddedConn:Disconnect() end
+            characterAddedConn = localPlayer.CharacterAdded:Connect(function(character)
+                setupAntiExplosion(character)
+            end)
+        else
+            if antiExplosionConnection then
+                antiExplosionConnection:Disconnect()
+                antiExplosionConnection = nil
+            end
+            if characterAddedConn then
+                characterAddedConn:Disconnect()
+                characterAddedConn = nil
+            end
+        end
+    end
+})
+task.spawn(function()
+    task.wait(0.5)
+    if AntiExplosionToggle and AntiExplosionToggle.Set then
+        AntiExplosionToggle:Set(true)
+    end
+end)
+
+local AntiBurn = antiTab:AddToggle({
+    Name = "불 무적",
+    Default = false,
+    Flag = "",
+    Callback = function(Value)
+        AntiBurnV = Value
+        AntiBurn()
+    end
+})
+AntiBurn:Set(true)
+
+local AntiPaint = antiTab:AddToggle({
+    Name = "안티 페인트",
+    Default = false,
+    Callback = function(Value)
+        AntiPaintT = Value
+        antiPaintF(Value)
+    end
+})
+AntiPaint:Set(true)
+
+AntiLagF()
+local AntiLag = antiTab:AddToggle({
+    Name = "안티 렉",
+    Default = false,
+    Flag = "AntiLagToggle",
+    Callback = function(Value)
+        antiLagEnabled = Value
+    end
+})
+AntiLag:Set(true)
+
+function antiLagF()
+    local char = plr.Character
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local hum = char:WaitForChild("Humanoid")
+    if antiLagT == true then
+        plr.PlayerScripts.CharacterAndBeamMove.Disabled = true
+    elseif antiLagT == false then
+        plr.PlayerScripts.CharacterAndBeamMove.Enabled = true
+    end
+end
+
+antiTab:AddToggle({
+    Name = "안티 렉V2<font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Callback = function(Value)
+        antiLagT = Value
+        antiLagF()
+    end
+})
+antiTab:AddToggle({
+    Name = "안티렉V3[파카]",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
+
+local AutoAttack = antiTab:AddToggle({
+    Name = "오토어택 | 킬",
+    Default = false,
+    Flag = "AutoAttack",
+    Callback = function(Value)
+        AutoAttackT = Value
+        AutoAttackF()
+    end
+})
+
+local AntiHoldPart = antiTab:AddToggle({
+    Name = "음식소환 막기",
+    Default = false,
+    Callback = function(Value)
+        AntiBananaT = Value
+        task.spawn(AntiBananaF)
+    end
+})
+
+antiTab:AddLabel("동료핵이 있을경우 동료핵도 사용이 막힙니다.")
+local AntiBlobUse = antiTab:AddToggle({
+    Name = "블롭맨 사용 막기   <font color='rgb(255,0,0)'>[gucci]</font>",
+    Default = false,
+    Callback = function(Value)
+        AntiBlobUseT = Value
+        if Value then
+            AntiBlobUseF()
+        end
+    end
+})
+
+antiTab:AddSection("킥")
+
+local flyingResetConn = nil
+local resetProtectionConn = nil
+local FlyingReset = antiTab:AddToggle({
+    Name = "킥 방지리셋  <font color='rgb(50,0,50)'>[셀프 킬]</font>",
+    Default = false,
+    Callback = function(Value)
+        if flyingResetConn then
+            flyingResetConn:Disconnect()
+            flyingResetConn = nil
+        end
+        if Value then
+            flyingResetConn = rs.GameCorrectionEvents.GameCorrectionsNotify.OnClientEvent:Connect(function(Type)
+                if Type == "Flying" then
+                    local char = plr.Character
+                    if char then
+                        local hum = char:FindFirstChildOfClass("Humanoid")
+                        if hum then
+                            pcall(function()
+                                rs.CharacterEvents.Struggle:FireServer()
+                            end)
+                            hum.Health = 0
+                            hum:ChangeState(Enum.HumanoidStateType.Dead)
+                            char:BreakJoints()
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+resetProtectionConn = plr.CharacterAdded:Connect(function(char)
+    task.wait(0.2)
+    local hum = char:WaitForChild("Humanoid", 5)
+    if hum then
+        hum.MaxHealth = math.huge
+        hum.Health = math.huge
+        hum.BreakJointsOnDeath = false
+        hum.PlatformStand = false
+        hum.HealthChanged:Connect(function(health)
+            if health < hum.MaxHealth then
+                hum.Health = hum.MaxHealth
+            end
+        end)
+    end
+end)
+
+FlyingReset:Set(true)
+
+local AntiKick = antiTab:AddToggle({
+    Name = "안티 킥 <font color='rgb(255,146,132)'>[표창]</font>",
+    Default = false,
+    Callback = function(Value)
+        AntiKickT = Value
+        task.spawn(AntiKickF)
+    end
+})
+AntiKick:Set(true)
+
+antiTab:AddToggle({
+   Name = "안티킥",
+   Default = false,
+   Callback = function(Value)
+      AntiGrabStickyT = Value
+      if Value then
+          task.spawn(AntiGrabStickyF)
+      end
+   end,
+})
+
+antiTab:AddButton({
+    Name = "안티킥   <font color='rgb(90,200,10)'>[TP]</font>",
+    Callback = function()
+        House()
+
+        local plotItemsFolder = workspace.PlotItems:FindFirstChild("Plot"..Plot)
+        local TP = workspace.Plots["Plot"..Plot].PlotArea
+        local targetCFrame = CFrame.new(TP.Position)
+
+        local char = plr.Character
+        if not char then return end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        local ragdollHitbox = hrp:FindFirstChild("RagdollTouchedHitbox")
+        if ragdollHitbox then
+            hrp = ragdollHitbox
+        end
+
+        local originalPosition = hrp.CFrame
+
+        local targetValue = CFrame.new(0.05, -0.3, 0.3) * CFrame.Angles(190, 0, 0)
+        local stickyPartName = "NinjaShuriken"
+
+        if plotItemsFolder then
+
+            local closestShuriken = nil
+            local closestDistance = math.huge
+
+            for _, item in pairs(plotItemsFolder:GetChildren()) do
+                if item.Name == "NinjaShuriken" then
+                    local stickyPart = item:FindFirstChild("StickyPart")
+                    if stickyPart then
+                        local distance = (hrp.Position - stickyPart.Position).Magnitude
+                        if distance < closestDistance then
+                            closestDistance = distance
+                            closestShuriken = item
+                        end
+                    end
+                end
+            end
+
+            if closestShuriken and closestDistance <= 30 then
+                local stickyPart = closestShuriken:FindFirstChild("StickyPart")
+                if stickyPart then
+                    local FIND2 = stickyPart:FindFirstChild("StickyWeld")
+
+                    if not FIND2 or (FIND2 and FIND2.Part1 ~= hrp) then
+
+                        if not plr.InPlot.Value then
+                            hrp.CFrame = targetCFrame
+                            task.wait(0.5)
+                        end
+
+                        pcall(function()
+                            SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
+                        end)
+
+                        pcall(function()
+                            rs.PlayerEvents.StickyPartEvent:FireServer(stickyPart, hrp, targetValue)
+                        end)
+
+                        hrp.CFrame = originalPosition
+                    end
+                end
+            else
+                if not plr.InPlot.Value then
+                    hrp.CFrame = targetCFrame
+                    task.wait(0.5)
+                end
+
+                task.spawn(function()
+                    rs.MenuToys.SpawnToyRemoteFunction:InvokeServer(stickyPartName, hrp.CFrame * CFrame.new(0,20,15), Vector3.new(0,0,0))
+                end)
+
+                task.wait(0.15)
+
+                local newFind = plotItemsFolder:FindFirstChild("NinjaShuriken")
+                if newFind then
+                    local stickyPart = newFind:FindFirstChild("StickyPart")
+                    if stickyPart then
+                        pcall(function()
+                            SetNetworkOwner:FireServer(stickyPart, stickyPart.CFrame)
+                        end)
+
+                        pcall(function()
+                            rs.PlayerEvents.StickyPartEvent:FireServer(stickyPart, hrp, targetValue)
+                        end)
+                    end
+                end
+
+                hrp.CFrame = originalPosition
+            end
+        end
+    end
+})
+
+function AntiPCLDF()
+    local targetValueName = "[ " .. plr.DisplayName .. " ] ( @" .. plr.Name .. " )"
+    
+    while AntiPCLDT do
+        task.wait(1) 
+        
+        local character = plr.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        
+           if not character or not humanoid or humanoid.Health <= 0 or not hrp then
+            continue
+        end
+        
+        
+        local isDetected = false
+        for _, item in ipairs(workspace:GetChildren()) do
+            if item.Name == "PlayerCharacterLocationDetector" then
+                local foundValue = item:FindFirstChild(targetValueName)
+                if foundValue and foundValue:IsA("BoolValue") then
+                    isDetected = true
+                    break
+                end
+            end
+        end
+        
+           if isDetected then
+            pcall(function()
+                
+                hrp.CFrame = CFrame.new(0, 999999, 0)
+                task.wait(0.5)
+                
+                       humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+            end)
+            
+                    local currentCharacter = plr.Character
+            plr.CharacterAdded:Wait() 
+            task.wait(2) 
+        end
+    end
+end
+
+local AntiPCLD = antiTab:AddToggle({
+    Name = "안티 킥   <font color='rgb(255,0,0)'>[PCLD 감지]</font>",
+    Default = false,
+    Flag = "16",
+    Callback = function(Value)
+        AntiPCLDT = Value
+        task.spawn(AntiPCLDF)
+    end
+})
+if not TESTPP then AntiPCLD:Set(true) end
+
+antiTab:AddSection("래그돌")
+local PermRag = antiTab:AddToggle({
+    Name = "래그돌",
+    Default = false,
+    Flag = "34",
+    Callback = function(Value)
+        permRagdollT = Value
+        if permRagdollT and not permRagdollRunningS then
+            coroutine.wrap(permRagdollLoopF)()
+        elseif not permRagdollT then
+            permRagdollRunningS = false
+        end
+    end
+})
+
+antiTab:AddSection("구찌")
+local AutoGucci = antiTab:AddToggle({
+    Name = "오토구찌(킥위험 약간 있음!)  <font color='rgb(255,146,123)'>[블롭맨]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "autoGucciToggleFlag",
+    Callback = function(Value)
+        AutoGucciT = Value
+        if AutoGucciT then
+            task.spawn(AutoGucciF)
+        else
+            if plr.Character.Humanoid then
+                    plr.Character.Humanoid.Sit = true
+                    task.wait(0.1)
+                    plr.Character.Humanoid.Sit = false
+                end
+            end
+
+            sitJumpT = false
+
+            if blobmanInstanceS then
+            RepStorage.MenuToys.DestroyToy:FireServer(blobmanInstanceS)
+            blobmanInstanceS = nil
+        end
+    end
+})
+
+local AutoGucciV2 = antiTab:AddToggle({
+    Name = "기차 구찌",
+    Default = false,
+    Flag = "autoGucciToggleFlag",
+    Callback = function(Value)
+        AutoGucciTV2 = Value
+        if AutoGucciTV2 then
+            task.spawn(AutoGucciFV2)
+        else
+            local char = plr.Character
+            if char then
+                local hum = char:FindFirstChild("Humanoid")
+                if hum then
+                    hum.Sit = true
+                    task.wait(0.1)
+                    hum.Sit = false
+                 end
+	    end
+    	 sitJumpT = false
+     end
+end
+})
+
+antiTab:AddToggle({
+    Name = "구찌V3   <font color='rgb(0,0,250)'>[파카]</font>",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            Rayfield:Notify({
+                Title = "안내",
+                Content = "이 기능은 파카전용기능입니다",
+                Duration = 3,
+                Image = nil,
+            })
+        end
+    end,
+})
+
+playerTab:AddSection("플레이어")
+playerTab:AddToggle({
+    Name = "이동 속도   <font color='rgb(1,1,255)'>[스피드]</font>",
+    Default = false,
+    Flag = "28",
+    Callback = function(Value)
+        walkSpeedT = Value 
+        updateWalkSpeedF()
+    end
+})
+
+local walkSpeedInput = playerTab:AddInput({
+    Name = "값",
+    Default = "16",
+    Placeholder = "Value",
+    RemoveTextAfterFocusLost = true,
+    Flag = "29",
+    Callback = function(Value)
+        walkSpeedV = Value
+        updateWalkSpeedF()
+    end
+})
+walkSpeedInput:Set("80")
+
+playerTab:AddToggle({
+    Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
+    Default = false,
+    Flag = "30",
+    Callback = function(Value)
+        jumpPowerT = Value
+        updateJumpPowerF()
+    end
+})
+
+local jumpPowerInput = playerTab:AddInput({
+    Name = "값",
+    Default = "24",
+    Placeholder = "Value",
+    RemoveTextAfterFocusLost = false,
+    Flag = "31",
+    Callback = function(Value)
+        jumpPowerV = Value
+        updateJumpPowerF()
+    end
+})
+jumpPowerInput:Set("60")
+
+local realisticFP = false
+local fpConnection = nil
+
+local function updateFirstPerson()
+    local char = plr.Character
+    if not char then return end
+
+    for _, part in pairs(char:GetChildren()) do
+        if part:IsA("BasePart") then
+            if part.Name == "Head" then
+                part.LocalTransparencyModifier = 1          
+            elseif part.Name:find("Arm") or part.Name:find("Hand") then
+                part.LocalTransparencyModifier = 0          
+            elseif part.Name:find("Torso") or part.Name == "UpperTorso" or part.Name == "LowerTorso" then
+                part.LocalTransparencyModifier = 1        
+            else
+                part.LocalTransparencyModifier = 0
+            end
+        end
+    end
+end
+
+local function startRealisticFP()
+    if fpConnection then fpConnection:Disconnect() end
+    fpConnection = RunService.RenderStepped:Connect(updateFirstPerson)
+end
+
+local function stopRealisticFP()
+    if fpConnection then 
+        fpConnection:Disconnect() 
+        fpConnection = nil 
+    end
+    
+    local char = plr.Character
+    if char then
+        for _, part in pairs(char:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.LocalTransparencyModifier = 0
+            end
+        end
+    end
+end
+
+playerTab:AddToggle({
+    Name = "1인칭 리얼뷰",
+    Default = false,
+    Callback = function(Value)
+        realisticFP = Value
+        if Value then
+            startRealisticFP()
+        else
+            stopRealisticFP()
+        end
+    end
+})
+
+playerTab:AddSection("나머지")
+local NoClipToggle = playerTab:AddToggle({
+    Name = "노클립",
+    Default = false,
+    Flag = "32",
+    Callback = function(Value)
+        noClipT = Value
+        updateNoClipF()
+    end
+})
+
+playerTab:AddToggle({
+    Name = "무한 점프",
+    Default = false,
+    Callback = function(v)
+        _G.InfiniteJump = v
+    end
+})
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if _G.InfiniteJump then
+        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+local Fly = playerTab:AddToggle({ 
+    Name = "플라이   <font color='rgb(255,0,0)'>[데스크톱]</font>", 
+    Default = false,
+    Flag = "5",
+    Callback = function(Value)
+        flyT = Value
+        flyF()
+    end
+})
+
+local flyInput = playerTab:AddInput({
+    Name = "속도",
+    Default = "50",
+    Placeholder = "Value",
+    RemoveTextAfterFocusLost = false,
+    Flag = "37",
+    Callback = function(Value)
+        flyV = Value
+    end
+})
+flyInput:Set("80")
+
+playerTab:AddSection("모바일플라이")
+local function mflyF()
+    if not mflyT then return end
+    
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local humanoid = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
+
+    local BV = Instance.new("BodyVelocity")
+    local BG = Instance.new("BodyGyro")
+
+    BG.P = 9e4
+    BG.Parent = hrp
+    BV.Parent = hrp
+    BG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    BG.CFrame = hrp.CFrame
+    BV.Velocity = Vector3.new(0,0,0)
+    BV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+    if mflyConnection then mflyConnection:Disconnect() end
+
+    mflyConnection = RunService.Heartbeat:Connect(function()
+        if not mflyT then
+            mflyConnection:Disconnect()
+            BV:Destroy()
+            BG:Destroy()
+            return
+        end
+        
+        local camera = workspace.CurrentCamera
+        local SPEED = mflyV or 100
+        
+        if humanoid.MoveDirection.Magnitude > 0 then
+            local localMove = camera.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
+            
+            local forwardVelocity = camera.CFrame.LookVector * -localMove.Z
+            local sideVelocity = camera.CFrame.RightVector * localMove.X
+            
+            BV.Velocity = (forwardVelocity + sideVelocity).Unit * SPEED
+        else
+            BV.Velocity = Vector3.new(0, 0, 0)
+        end
+        
+        BG.CFrame = camera.CFrame
+    end)
+end
+
+keybindTab:AddSection({
+    Name = "줄"
+})
+
+local antilagDet = keybindTab:AddInput("linesInputFlag", {
+    Text = "줄 감지",
+    Default = "30",
+    Placeholder = "",
+    Numeric = true,
+    Finished = false,
+    Callback = function(Value)
+        AntiLagV = Value
+    end
+})
+
+antilagDet:SetValue("30")
+
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+    vu5 = nil
+    vu6 = false
+end)
+
+keybindTab:AddSection({
+    Name = "Mouse"
+})
+
+keybindTab:AddBind({
+    Text = "텔포",
+    Default = Enum.KeyCode.Z,
+    Hold = false,
+    Callback = tpF
+})
+
+local Tper = keybindTab:AddToggle("AutoSitBlobman", {
+    Text = "3인칭",
+    Default = false,
+    Callback = function(Value)
+        _G.CameraLoopID = (_G.CameraLoopID or 0) + 1
+        local currentLoopID = _G.CameraLoopID
+
+        if Value then
+            task.spawn(function()
+                local character = plr.Character or plr.CharacterAdded:Wait()
+                local rootPart = character:WaitForChild("HumanoidRootPart", 5)
+
+                plr.CameraMode = Enum.CameraMode.Classic
+                task.wait(0.05)
+
+                local success = false
+                local attempts = 0
+
+                while _G.CameraLoopID == currentLoopID and not success and attempts < 80 do
+                    plr.CameraMinZoomDistance = 12
+                    plr.CameraMaxZoomDistance = 12
+
+                    task.wait(0.05)
+                    attempts += 1
+
+                    if plr:GetAttribute("CameraZoomDistance") == 12
+                        or (workspace.CurrentCamera and rootPart
+                        and (workspace.CurrentCamera.CFrame.Position - rootPart.Position).Magnitude >= 11.5) then
+                        success = true
+                    end
+                end
+
+                if _G.CameraLoopID == currentLoopID then
+                    plr.CameraMinZoomDistance = 0.5
+                    plr.CameraMaxZoomDistance = 100000
+                end
+            end)
+        else
+            plr.CameraMode = Enum.CameraMode.LockFirstPerson
+            plr.CameraMaxZoomDistance = 0.5
+            plr.CameraMinZoomDistance = 0.5
+        end
+    end
+})
+
+task.spawn(function()
+    if not game:IsLoaded() then
+        game.Loaded:Wait()
+    end
+    task.wait(0.3)
+    Tper:SetValue(true)
+end)
+
+
+
+keybindTab:AddBind({
+    Text = "앉기 <font color='rgb(255,0,0)'>[블롭맨]</font>",
+    Default = Enum.KeyCode.X,
+    Hold = false,
+    Callback = function()
+        BlobSit()
+    end
+})
+
+plotTab:AddSection({
+    Name = "집"
+})
+
+local BarrierNoclip = plotTab:AddToggle("BarrierNoclipToggle", {
+    Text = "집 베리어 삭제",
+    Default = false,
+    Callback = function(Value)
+        BarrierCanCollideT = Value
+        BarrierCanCollideF()
+    end
+})
+
+BarrierNoclip:SetValue(true)
+
+plotTab:AddButton({
+    Text = "집 베리어 완전삭제 | 햄버거",
+    Callback = function()
+        PlotBarrierDelete()
+    end
+})
+
+
+local isExecuting = false
+
+local function getMyPlot()
+    for i = 1, 5 do
+        local plot = workspace.Plots:FindFirstChild("Plot" .. i)
+        if plot then
+            local plotSign = plot:FindFirstChild("PlotSign")
+            if plotSign then
+                local thisPlotsOwners = plotSign:FindFirstChild("ThisPlotsOwners")
+                if thisPlotsOwners then
+                    for _, child in ipairs(thisPlotsOwners:GetChildren()) do
+                        if child:IsA("StringValue") and child.Value == game.Players.LocalPlayer.Name then
+                            return plot.PlotArea
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function PlotBarrierDelete()
+if PBDrun then return end
+PBDrun = true
+
+local char = plr.Character
+if not char then PBDrun = false return end
+
+local hrp = char:FindFirstChild("HumanoidRootPart")
+if not hrp then PBDrun = false return end
+
+local metal = workspace.Plots.Plot1.TeslaCoil.Metal
+if not metal then PBDrun = false return end
+
+local TP = metal.CFrame
+local OCF = hrp.CFrame
+
+task.spawn(function()
+rs.MenuToys.SpawnToyRemoteFunction:InvokeServer("FoodHamburger", hrp.CFrame, Vector3.new(0,0,0))
+end)
+
+task.wait(0.2)
+
+local foodHamburger = inv:FindFirstChild("FoodHamburger")
+if not foodHamburger then PBDrun = false return end
+
+if foodHamburger then
+task.spawn(function()
+foodHamburger.HoldPart.HoldItemRemoteFunction:InvokeServer(foodHamburger, char)
+end)
+end
+
+task.wait(0.1)
+
+hrp.CFrame = TP
+task.wait(0.17)
+
+if foodHamburger then
+rs.MenuToys.DestroyToy:FireServer(foodHamburger)
+end
+
+hrp.CFrame = OCF
+task.wait(0.4)
+
+PBDrun = false
+end
+
+
+keybindTab:CreateSection("ESP")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+local RunService = game:GetService("RunService")
+
+local PcldViewT = false
+local processed = {}
+local redBoxes = {}
+local descendantConn = nil
+
+
+function PcldViewF()
+    if descendantConn then
+        descendantConn:Disconnect()
+        descendantConn = nil
+        workspace:SetAttribute("PcldViewDescendantConn", false)
+    end
+    if rainbowConn then
+        rainbowConn:Disconnect()
+        rainbowConn = nil
+    end
+
+    if PcldViewT then
+
+        local function createESP(obj)
+            if not processed[obj] then
+                local box = Instance.new("SelectionBox")
+                box.Adornee = obj
+                box.LineThickness = 0.005
+                box.SurfaceTransparency = 1
+                box.SurfaceColor3 = Color3.fromRGB(255, 255, 255)
+                box.Color3 = Color3.fromHSV(0, 1, 1) -- 초기 색상 (빨간색)
+                box.Parent = obj
+                processed[obj] = true
+                redBoxes[obj] = box
+            end
+        end
+
+        
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
+                createESP(obj)
+            end
+        end
+
+    
+        descendantConn = workspace.DescendantAdded:Connect(function(obj)
+            if PcldViewT and (obj.Name == "PlayerCharacterLocationDetector" or obj.Name == "me") and obj:IsA("BasePart") then
+                createESP(obj)
+            end
+        end)
+
+        
+        workspace.DescendantRemoving:Connect(function(obj)
+            if redBoxes[obj] then
+                redBoxes[obj]:Destroy()
+                redBoxes[obj] = nil
+                processed[obj] = nil
+            end
+        end)
+
+        
+        rainbowConn = RunService.RenderStepped:Connect(function()
+            
+            local hue = (tick() % 5) / 5 
+            local rainbowColor = Color3.fromHSV(hue, 1, 1)
+
+            for obj, box in pairs(redBoxes) do
+                if box and box.Parent then
+                    box.Color3 = rainbowColor
+                else
+                    redBoxes[obj] = nil
+                    processed[obj] = nil
+                end
+            end
+        end)
+
+    else
+                for obj, box in pairs(redBoxes) do
+            if box then box:Destroy() end
+        end
+        redBoxes = {}
+        processed = {}
+    end
+end
+
+
+
+
+local PCLDView = keybindTab:AddToggle("PCLDView", {
+    Text = "PCLD 보기",
+    Default = false,
+    Callback = function(Value)
+        PcldViewT = Value
+        PcldViewF()
+    end
+})
+
+PCLDView:SetValue(true)
+
+local ViewTool = keybindTab:AddToggle("ViewTool", {
+    Text = "표창,쿠나이 보기",
+    Default = false,
+    Callback = function(Value)
+        ViewToolT = Value
+        ViewToolF()
+    end
+})
+
+ViewTool:SetValue(true)
+
+
+
+CreditsTab:CreateLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>", 96897864871400, Color3.fromRGB(255, 255, 255), true)
+CreditsTab:CreateParagraph({Title = "0110rim", Content = "착함의 경지"})
+
+CreditsTab:CreateLabel("식호   <font color='rgb(0,255,0)'>[good]</font>", 113854105043977, Color3.fromRGB(255, 255, 255), false)
+CreditsTab:CreateParagraph({Title = "매우좋습니다.", Content = "가장좋은방"})
+
+CreditsTab:CreateLabel("알파   <font color='rgb(0,255,255)'>[TOP1 ONWER]</font>", 3572491301, Color3.fromRGB(255, 255, 255), false)
+CreditsTab:CreateParagraph({Title = "QRDOOTE1120", Content = "Owner"})
+
+CreditsTab:CreateLabel("부계   <font color='rgb(255,0,0)'>[onwer]</font>", 78390276296494, Color3.fromRGB(255, 255, 255), false)
+CreditsTab:CreateParagraph({Title = "AI_AIPACA", Content = "Co-Owner"})
+
+
+-- ================== 랭크 알림 ==================
+Rayfield:Notify({
+    Title = "랭크 알림",
+    Content = "랭크 배치완료",
+    Duration = 6,
+    Image = 0
+})
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+        DDTab:AddToggle("JerkMotionToggle", {
+    Text = "딸치기   <font color='rgb(25,255,0)'>[자위마스터]</font>",
+    Default = false,
+    Callback = function(Value)
+        jerkActive = Value
+
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        if not character then return end
+
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
+
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if not animator then
+            animator = Instance.new("Animator")
+            animator.Parent = humanoid
+        end
+
+        if jerkActive then
+            if not jerkAnimationTrack then
+                local animation = Instance.new("Animation")
+                animation.AnimationId = "rbxassetid://168268306"
+                jerkAnimationTrack = animator:LoadAnimation(animation)
+            end
+
+            jerkAnimationTrack:Play()
+            task.wait(0.3)
+
+            task.spawn(function()
+                while jerkActive and jerkAnimationTrack and jerkAnimationTrack.IsPlaying do
+                    jerkAnimationTrack.TimePosition = 0.3
+                    task.wait(0.1)
+                end
+            end)
+        else
+            if jerkAnimationTrack then
+                jerkAnimationTrack:Stop()
+            end
+        end
+    end
+})
+
+--local LineLagT = false
+--local LineLagV = 50
+
+function LineLagF()
+    task.spawn(function()
+        while LineLagT do
+            pcall(function()
+                local args = {
+                    [1] = "Line"
+                }
+        
+                for i = 1, tonumber(LineLagV) do
+                    game:GetService("ReplicatedStorage").GrabEvents.CreateGrabLine:FireServer(unpack(args))
+                end
+            end)
+            task.wait() 
+        end
+    end)
+end
+
+
+lagTab:AddSection({
+	Name = "렉"
+})
+
+lagTab:AddToggle({
+	Name = "렉(섭폭)    <font color='rgb(255,0,0)'>[라인]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
+	Default = false,
+	Flag = "lagToggleFlag",
+	Callback = function(Value)
+		LineLagT = Value
+		LineLagF()
+	end
+})
+
+lagTab:AddTextbox({
+	Name = "줄",
+	Default = "50",
+	TextDisappear = false,
+	Callback = function(Value)
+		LineLagV = Value
+	end
+})
+---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
+Logger()
+
+ 
