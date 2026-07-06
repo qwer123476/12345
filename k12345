@@ -3637,67 +3637,7 @@ function BarrierCanCollideF()
     end
 end
 
-function AntiExplosionF()
-    if AntiExplosionC then
-        AntiExplosionC:Disconnect()
-        AntiExplosionC = nil
-    end
 
-    if AntiExplosionH then
-        AntiExplosionH:Disconnect()
-        AntiExplosionH = nil
-    end
-
-    if not AntiExplosionT then
-        return
-    end
-
-    local char = plr.Character
-    if not char then
-        return
-    end
-
-    local hrp = char:WaitForChild("HumanoidRootPart")
-    local hum = char:WaitForChild("Humanoid")
-
-    AntiExplosionC = workspace.ChildAdded:Connect(function(model)
-        if not char or not hrp or not hum then
-            return
-        end
-
-        if model:IsA("BasePart") and (model.Position - hrp.Position).Magnitude <= 20 then
-            if hum.SeatPart then
-                hrp.Anchored = true
-                task.wait(0.03)
-                hrp.AssemblyLinearVelocity = Vector3.zero
-                hrp.AssemblyAngularVelocity = Vector3.zero
-                hrp.Anchored = false
-            else
-                hrp.Anchored = true
-                task.wait()
-
-                hum:ChangeState(Enum.HumanoidStateType.Running)
-
-                hrp.Anchored = false
-                hum.AutoRotate = true
-
-                for _, limb in ipairs(char:GetDescendants()) do
-                    if limb:IsA("BasePart") and limb.Name == "RagdollLimbPart" then
-                        limb.CanCollide = false
-                    end
-                end
-            end
-        end
-    end)
-end
-plr.CharacterAdded:Connect(function(char)
-    char:WaitForChild("Humanoid")
-    char:WaitForChild("HumanoidRootPart")
-    task.wait(0.2)
-    if AntiExplosionT then
-        AntiExplosionF()
-    end
-end)
 
 function AutoAttackF()
     task.spawn(function()
