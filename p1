@@ -9825,7 +9825,7 @@ playerTab:AddToggle({
 })
 playerTab:AddTextbox({
     Name = "속도",
-    Default = ,
+    Default = "",
     PlaceholderText = "Value",
     RemoveTextAfterFocusLost = false,
     Flag = "3hdhs7",
