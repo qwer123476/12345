@@ -7158,7 +7158,7 @@ end
 -- =========================================================
 
 DropdownV1 = ListTab:AddDropdown({
-    Name = "Loop1 Target List",
+    Name = "타겟리스트",
     Options = playersInLoop1V,
     MultipleOptions = true,
     Callback = function(options)
@@ -7169,8 +7169,8 @@ DropdownV1 = ListTab:AddDropdown({
     end
 })
 
-ListTab:AddInput({
-    Name = "Add Target",
+ListTab:AddTextbox({
+    Name = "타겟추가",
     PlaceholderText = "username",
     RemoveTextAfterFocusLost = true,
     Callback = function(value)
@@ -7178,8 +7178,8 @@ ListTab:AddInput({
     end
 })
 
-ListTab:AddInput({
-    Name = "Remove Target",
+ListTab:AddTextbox({
+    Name = "타겟 삭제",
     PlaceholderText = "username",
     RemoveTextAfterFocusLost = true,
     Callback = function(value)
