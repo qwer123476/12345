@@ -7110,8 +7110,8 @@ DropdownV1 = ListTab:AddDropdown({
     end
 })
 
-ListTab:AddInput({
-    Name = "Add Target",
+ListTab:AddTextbox({
+    Name = "추가",
     PlaceholderText = "Username...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value) 
@@ -7130,8 +7130,8 @@ ListTab:AddInput({
     end
 })
 
-ListTab:AddInput({
-    Name = "Remove Target",
+ListTab:AddTextbox({
+    Name = "제거",
     PlaceholderText = "Username...",
     RemoveTextAfterFocusLost = true,
     Callback = function(Value)
