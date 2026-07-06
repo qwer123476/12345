@@ -11251,7 +11251,7 @@ lagTab:AddTextbox({
 	end
 })
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
-Logger() Window:AddConfigTab()
+Logger() 
 Window:AddConfigTab()
 
 function OrionLib:Destroy()
