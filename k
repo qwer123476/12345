@@ -341,7 +341,13 @@ end
 
 
 -- [Orion UI Window 생성으로 교체]
-
+local Window = OrionLib:MakeWindow({
+    Name = "파카허브 [프리미엄]",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "PacaHub",
+    IntroText = "파카허브 [프리미엄]"
+})
 -- [Orion UI 탭 생성 문법으로 교체]
 local playerTab = Window:MakeTab({Name = "플레이어 설정", Icon = "rbxassetid://6034281935", PremiumOnly = false})    
 local passTab = Window:MakeTab({Name = "패스잠금해제", Icon = "rbxassetid://4483345998", PremiumOnly = false})
@@ -10317,4 +10323,29 @@ lagTab:AddTextbox({
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger()
 
- 
+ Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+Window:AddConfigTab()
+
+function OrionLib:Destroy()
+	Orion:Destroy()
+end
+
