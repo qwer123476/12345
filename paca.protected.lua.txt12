@@ -11732,3 +11732,4 @@ game:GetService("RunService").RenderStepped:Connect(function(W)
 end)
 
 Logger()
+return OrionLib
