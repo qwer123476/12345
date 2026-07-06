@@ -6527,7 +6527,7 @@ local strengthTextbox = grabTab:AddTextbox({
         strengthV = Value
     end
 })
-strengthInput:Set(9999)
+--strengthInput:Set(9999)
 grabTab:AddLabel("모바일의경우 작동하지 않습니다.")
 local strengthConnection = nil
 local nageru = 800
