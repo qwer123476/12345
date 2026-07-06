@@ -9889,7 +9889,7 @@ PBDrun = false
 end
 
 
-keybindTab:CreateSection("ESP")
+
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 
@@ -9977,7 +9977,9 @@ function PcldViewF()
 end
 
 
-
+keybindTab:AddSection({
+	Name = "ESP"
+})
 
 local PCLDView = keybindTab:AddToggle("PCLDView", {
     Text = "PCLD 보기",
