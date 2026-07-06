@@ -10318,7 +10318,7 @@ funTab:AddSection({
     Name = "꼬추 만들기"
 })
 
-local PencilInput = FunTab:AddTextbox({
+local PencilInput = funTab:AddTextbox({
     Name = "연필 [dick]",
     Default = "",
     TextDisappear = false,
@@ -10327,7 +10327,7 @@ local PencilInput = FunTab:AddTextbox({
     end
 })
 
-FunTab:AddButton({
+funTab:AddButton({
     Name = "만들기",
     Callback = function()
         local ReplicatedStorage = game:GetService("ReplicatedStorage")
