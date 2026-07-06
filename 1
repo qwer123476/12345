@@ -1,5 +1,5 @@
 
-playerTab:CreateToggle({ 
+playerTab:AddToggle({ 
     Name = "플라이   <font color='rgb(0,255,0)'>[모바일]</font>", 
     CurrentValue = false,
     Flag = "5",
@@ -8,7 +8,7 @@ playerTab:CreateToggle({
         mflyF()
     end
 })
-playerTab:CreateInput({
+playerTab:AddTextbox({
     Name = "속도",
     CurrentValue = 50,
     PlaceholderText = "Value",
@@ -19,10 +19,11 @@ playerTab:CreateInput({
     end
 })
 
-playerTab:CreateSection("엑스트라")
-
+playerTab:AddSection({
+    Name = "엑스트라"
+})
 -- 1. Server Hop
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "서버 훅",
     Callback = function()
         game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
@@ -30,7 +31,7 @@ playerTab:CreateButton({
 })
 
 -- 2. Rejoin
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "제접ㅋ",
     Callback = function()
         game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
@@ -38,7 +39,7 @@ playerTab:CreateButton({
 })
 
 -- 3. FPS Unlock
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "FPS 최대치",
     Callback = function()
         setfpscap(9999)
@@ -46,7 +47,7 @@ playerTab:CreateButton({
 })
 
 -- 4. Full Bright
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "어둠 씨발 꺼져!!!!!",
     CurrentValue = false,
     Callback = function(Value)
@@ -61,10 +62,12 @@ playerTab:CreateToggle({
         end
     end
 })
-playerTab:CreateSection("쓰잘때기없는 기능")
+playerTab:AddSection({
+    Name = "쓰잘떼기 없는 기능"
+})
 
 -- 1. 
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "FOV 변경",
     CurrentValue = false,
     Callback = function(Value)
@@ -77,7 +80,7 @@ playerTab:CreateToggle({
 })
 
 -- 2. 
-playerTab:CreateButton({
+playerTab:AddButton({
     Name = "모든 장신구 제거",
     Callback = function()
         pcall(function()
@@ -91,7 +94,7 @@ playerTab:CreateButton({
 })
 
 -- 3. 
-playerTab:CreateToggle({
+playerTab:AddToggle({
     Name = "중력 변경",
     CurrentValue = false,
     Callback = function(Value)
@@ -103,8 +106,10 @@ playerTab:CreateToggle({
     end
 })
 
-AuraTab:CreateSection("안티 아우라들")
-AuraTab:CreateToggle({
+AuraTab:AddSection({
+    Name = "안티 아우라"
+})
+AuraTab:AddToggle({
     Name = "안티 붐박스 아우라   <font color='rgb(0,200,0)'>[all]</font>",
     CurrentValue = false,
     Flag = "5",
@@ -114,7 +119,7 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "안티 바나나 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
     CurrentValue = false,
     Flag = "5",
@@ -124,7 +129,7 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "안티 파트 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
     CurrentValue = false,
     Flag = "5",
@@ -136,7 +141,7 @@ AuraTab:CreateToggle({
 
 
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
 	Name = "주크박스 고정 아우라",
 	CurrentValue = false,
 	Flag = "AntiJukeboxAura",
@@ -147,7 +152,7 @@ AuraTab:CreateToggle({
 		end
 	end
 })
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
 	Name = "판자 고정 아우라",
 	CurrentValue = false,
 	Flag = "AntiPalletAura",
@@ -161,10 +166,12 @@ AuraTab:CreateToggle({
 
 
 
-AuraTab:CreateSection("킬,플링")
+AuraTab:AddSection({
+    Name = "킬,플링"
+})
 
-AuraTab:CreateToggle({
-    Name = "Kill All",
+AuraTab:AddToggle({
+    Name = "킬 All  (베타)",
     CurrentValue = false,
     Flag = "21",
     Callback = function(Value)
@@ -303,7 +310,7 @@ AuraTab:CreateToggle({
 })
 
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "래그돌 아우라",
     Default = false,
     Save = false,
@@ -374,7 +381,7 @@ AuraTab:CreateToggle({
 })
 local runningCombinedAura = false
 
-AuraTab:CreateInput({
+AuraTab:AddTextbox({
     Name = "아우라지름[반경]인풋",
     PlaceholderText = "기본값: 30",
     RemoveTextAfterFocusLost = false,
@@ -392,7 +399,7 @@ AuraTab:CreateInput({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "필링 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
     Save = false,
@@ -452,7 +459,7 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "낙사 아우라   <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
     Save = false,
@@ -509,7 +516,7 @@ AuraTab:CreateToggle({
     end
 })
 
-AuraTab:CreateToggle({
+AuraTab:AddToggle({
     Name = "토이 플링   <font color='rgb(0,195,0)'>[파카]</font>",
     CurrentValue = false,
     Callback = function(Value)
@@ -524,7 +531,7 @@ AuraTab:CreateToggle({
     end,
 })
 
- funTab:CreateButton({
+ funTab:AddButton({
    Name = "텔포",
    Callback = function()
       if not Value then return end
@@ -534,7 +541,9 @@ AuraTab:CreateToggle({
    end,
 })
 
-funTab:CreateSection("이동할곳")
+funTab:AddSection({
+    Name = "이동할 곳"
+})
 local teleportLocations = {
     ["스폰"] = {0, -7, 0},
     ["스폰산"] = {494, 163, 175},
@@ -562,7 +571,7 @@ local teleportLocations = {
 
 local selectedLocation = "스폰"
 
-local Dropdown = plotTab:CreateDropdown({
+local Dropdown = plotTab:AddDropdown({
     Name = "위치 고르기",
     Options = {"스폰","스폰산","광산","큰동굴","작은동굴","열차동굴","위험구역","설산","헛간(농지)","하늘섬","초록집","(초록집)","(분홍집)","(보라집)","(파랑집)","(빨강집)","슬롯1","슬롯2","슬롯3","슬롯4","슬롯5","독우물 아래"},
     CurrentOption = "스폰",
@@ -576,7 +585,7 @@ local Dropdown = plotTab:CreateDropdown({
     end,
 })
 
-local Button = plotTab:CreateButton({
+local Button = plotTab:AddButton({
     Name = "텔포",
     Callback = function()
         local plr = game.Players.LocalPlayer
