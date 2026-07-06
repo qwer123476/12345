@@ -7255,138 +7255,66 @@ local BreakHouseBarrierToggle = antiTab:AddToggle({
         end
     end
 })
-
-
-
-if plr.UserId == 1 then AddAll = true end
-
-if AddAll then
-SelectedList = nil
-local AddAllList = ListTab:AddDropdown({
-    Name = "추가",
-    Options = {"블롭", "오너", "래그돌"},
-    Default = "OPEN",
-    Flag = "Dropdown_AllList",
-    Callback = function(Value)
-        SelectedList = Value
-    end
-})
-
-ListTab:AddButton({
-    Name = "모두 추가",
-    Callback = function()
-        if SelectedList == "블롭" then
-            for _, plr in ipairs(Players:GetPlayers()) do
-                addToList(playersInLoop1V, DropdownV1, plr.Name, true)
-            end
-
-        elseif SelectedList == "오너" then
-            for _, plr in ipairs(Players:GetPlayers()) do
-                addToList(playersInLoop1V, DropdownV2, plr.Name, true)
-            end
-
-        elseif SelectedList == "ragdol" then
-            for _, plr in ipairs(Players:GetPlayers()) do
-                addToList(playersInLoop1V, DropdownV3, plr.Name, true)
-            end
-        end
-    end
-})
-
-ListTab:AddButton({
-    Name = "모두 재설정",
-    Callback = function()
-        if SelectedList == "블롭" then
-            for key in pairs(playersInLoop1V) do
-                removeFromList(playersInLoop1V, DropdownV1, tostring(key))
-            end
-
-        elseif SelectedList == "오너" then
-            for key in pairs(playersInLoop1V) do
-                removeFromList(playersInLoop1V, DropdownV2, tostring(key))
-            end
-
-        elseif SelectedList == "래그돌" then
-            for key in pairs(playersInLoop1V) do
-                removeFromList(playersInLoop1V, DropdownV3, tostring(key))
-            end
-        end
-    end
-})
-end
-
-
-local Dropdown = ListTab:AddDropdown({
-    Name = "친구  <font color='rgb(255,255,100)'>[프렌드]</font>",
+local WhitelistDropdown = ListTab:AddDropdown({
+    Name = "삭제할 친구 선택",
     Options = Whitelist,
-    Default = "OPEN",
+    Default = "",
+    Save = false,
     Flag = "WhitelistDropdown",
-    Callback = function(Value)
-        Whitelist = Value
-    end
-})
-
-ListTab:AddTextbox({
-    Name = "추가",
-    PlaceholderText = "...",
-    Flag = "AddInput_Whitelist",
-    Callback = function(Value)
-        addToList(Whitelist, Dropdown, Value, false) 
-    end
-})
-
-ListTab:AddTextbox({
-    Name = "제거",
-    PlaceholderText = "...",
-    Flag = "RemoveInput_Whitelist",
-    Callback = function(Value)
-        removeFromList(Whitelist, Dropdown, Value)
-    end
-})
-
-
-local DropdownV1 = ListTab:AddDropdown({
-    Name = "족칠 새끼 고르기  <font color='rgb(255,0,0)'>[타겟]</font>",
-    Options = playersInLoop1V,
-    Default = "OPEN",
-    Flag = "LoopBlobDropdown",
-    Callback = function(Value)
-        playersInLoop1V = Value
-    end
-})
-
-ListTab:AddTextbox({
-    Name = "추가",
-    PlaceholderText = "...",
-    Flag = "AddInput_LoopBlob",
-    Callback = function(Value)
-        addToList(playersInLoop1V, DropdownV1, Value, true)
-    end
-})
-
-ListTab:AddTextbox({
-    Name = "제거",
-    PlaceholderText = "...",
-    Flag = "RemoveInput_LoopBlob",
-    Callback = function(Value)
-        removeFromList(playersInLoop1V, DropdownV1, Value)
-    end
-})
-
-
-ListTab:AddToggle({
-    Name = "루프  TP  <font color='rgb(100,150,250)'>[파카]</font>",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            OrionLib:MakeNotification({
-                Name = "안내",
-                Content = "이 기능은 파카전용기능입니다",
-                Time = 3
-            })
+    Callback = function(Option)
+        if Option then
+            removeFromList(Whitelist, WhitelistDropdown, Option, false)
         end
-    end,
+    end
 })
+
+ListTab:AddButton({
+    Name = "모든 플레이어 친구 추가",
+    Callback = function()
+        for _, p in ipairs(game.Players:GetPlayers()) do
+            addToList(Whitelist, WhitelistDropdown, p.Name, false)
+        end
+    end
+})
+
+ListTab:AddSection({
+    Name = "타겟 관리"
+})
+
+local TargetDropdown = ListTab:AddDropdown({
+    Name = "삭제할 타겟 선택",
+    Options = playersInLoop1V,
+    Default = "",
+    Save = false,
+    Flag = "TargetDropdown",
+    Callback = function(Option)
+        if Option then
+            removeFromList(playersInLoop1V, TargetDropdown, Option, true)
+        end
+    end
+})
+
+ListTab:AddButton({
+    Name = "모든 플레이어 타겟 추가",
+    Callback = function()
+        for _, p in ipairs(game.Players:GetPlayers()) do
+            addToList(playersInLoop1V, TargetDropdown, p.Name, true)
+        end
+    end
+})
+
+ListTab:AddButton({
+    Name = "모든 타겟 초기화",
+    Callback = function()
+        for i = #playersInLoop1V, 1, -1 do
+            removeFromList(playersInLoop1V, TargetDropdown, playersInLoop1V[i], true)
+        end
+    end
+})
+
+
+
+
 LoopTab:AddSection({
     Name = "오토블롭"
 })
