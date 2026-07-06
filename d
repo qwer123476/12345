@@ -294,7 +294,6 @@ local antiGrabProcessing = {}
 local antiGrabThreads = {}
 
 local function processAntiGrabPlayer(player)
-    end
     if not player then return false end
 
     local myChar = localPlayer.Character
@@ -312,12 +311,12 @@ local function processAntiGrabPlayer(player)
     if not targetRoot or not head or not torso then return false end
 
     local originCF = myHrp.CFrame
-
     local tpRunning = true
+
     local tpThread = task.spawn(function()
-   end)
-        while tpRunning 
-             not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
+        while tpRunning do
+            task.wait()
+            if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
                (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
                 break
             end
@@ -333,6 +332,10 @@ local function processAntiGrabPlayer(player)
                     ok, cf = true, player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -10, 0)
                 end
             end
+        end
+    end)
+end
+
 grabTab:AddSection({Name = "Fling"})
 
 grabTab:AddToggle({
