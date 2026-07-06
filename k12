@@ -5711,8 +5711,7 @@ UtilityTab:AddButton({
     end,
 })
 
--- 9. 서버 인원수 확인
-l
+
 -- 10. 채팅창 숨기기/보이기
 UtilityTab:AddToggle({
     Name = "채팅 UI 숨기기",
