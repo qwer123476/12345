@@ -7893,8 +7893,7 @@ LoopTab:AddToggle({
     Callback = function(Value)
         LoopReleaseMODED = Value
     end
-})
-Tab:AddSection({
+LoopTab:AddSection({
     Name = "루프 블롭맨"
 })
 local blobLoop3Toggle = LoopTab:AddToggle({
