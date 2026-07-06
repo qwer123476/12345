@@ -250,35 +250,27 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 local OrionLib =  loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
 local HttpService = game:GetService("HttpService")
 
--- =========================
--- 📂 파일 & 데이터
--- =========================
 local FILE = "config.txt"
 
 -- =========================
--- 💾 저장 함수
+-- 💾 저장
 -- =========================
 local function SaveAll()
     local saveTable = {}
 
-    -- Orion UI 전체 스냅샷
     for flag, obj in pairs(OrionLib.Flags or {}) do
         if obj and obj.Value ~= nil then
             saveTable[flag] = obj.Value
         end
     end
 
-    local success, err = pcall(function()
+    pcall(function()
         writefile(FILE, HttpService:JSONEncode(saveTable))
     end)
-
-    if not success then
-        warn("SAVE ERROR:", err)
-    end
 end
 
 -- =========================
--- 📂 불러오기 함수
+-- 📂 로드
 -- =========================
 local function LoadAll()
     if not isfile(FILE) then return end
@@ -297,8 +289,6 @@ local function LoadAll()
         end
     end
 end
-
-
 local Rayfield = {
     CreateToggle = function() end,
     CreateButton = function() end,
@@ -11429,11 +11419,35 @@ local SettingsTab = Window:MakeTab({
     Name = "Settings"
 })
 
+task.spawn(function()
+    local last = ""
+
+    while true do
+        task.wait(2)
+
+        local current = HttpService:JSONEncode((function()
+            local t = {}
+            for flag, obj in pairs(OrionLib.Flags or {}) do
+                if obj and obj.Value ~= nil then
+                    t[flag] = obj.Value
+                end
+            end
+            return t
+        end)())
+
+        -- 변화 있을 때만 저장 (렉 방지)
+        if current ~= last then
+            last = current
+            SaveAll()
+        end
+    end
+end)
+
 -- =========================
--- 🔘 버튼 (여기에 위치)
+-- 버튼 (옵션)
 -- =========================
 SettingsTab:AddButton({
-    Name = "저장",
+    Name = "수동 저장",
     Callback = function()
         SaveAll()
     end
@@ -11447,7 +11461,7 @@ SettingsTab:AddButton({
 })
 
 -- =========================
--- 자동 복구
+-- 시작 복구
 -- =========================
 LoadAll()
 function OrionLib:Destroy()
