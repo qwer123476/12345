@@ -5514,7 +5514,7 @@ FDTab:AddTextbox({
 
 FDTab:AddToggle({
     Name = "보호 시스템 활성화   <font color='rgb(255,0,0)'>[오너쉽]</font>",
-    Default = false,
+    
     save = true,
     Flag = "AntiGrabUniqueSystemToggle",
     Callback = function(Value)
@@ -5582,7 +5582,7 @@ UtilityTab:AddButton({
 -- 4. 캐릭터 반투명화
 UtilityTab:AddToggle({
     Name = "유령 모드 (반투명)",
-    Default = false,
+    
     save = true,
     Flag = "1",
     Callback = function(Value)
@@ -5621,7 +5621,7 @@ UtilityTab:AddSlider({
 UtilityTab:AddToggle({
     Name = "내 머리위 이름표 제거",
     save = true,
-    Default = false,
+    
     Flag = "2",
     Callback = function(Value)
         pcall(function()
@@ -5668,7 +5668,7 @@ UtilityTab:AddButton({
 -- 10. 채팅창 숨기기/보이기
 UtilityTab:AddToggle({
     Name = "채팅 UI 숨기기",
-    Default = false,
+    
     save = true,
     Flag = "3",
     Callback = function(Value)
@@ -5721,7 +5721,7 @@ UtilityTab:AddButton({
 -- 4. 1인칭 강제 고정 (조준 시 유용)
 UtilityTab:AddToggle({
     Name = "강제 1인칭 시점",
-    Default = false,
+    
     save = true,
      Flag = "5",
     Callback = function(Value)
@@ -5808,7 +5808,7 @@ passTab:AddSection({
 })
 passTab:AddTextbox({
    Name = "그라데이션 레이어 수 설정 (2 ~ 4)",
-   Default = "",
+   
    PlaceholderText = "기본값: 2",
    TextDisappear = false,
    Callback = function(text)
@@ -5841,7 +5841,7 @@ passTab:AddTextbox({
 
 passTab:AddColorpicker({
     Name = "색상 1",
-    Default = Color3.new(1, 0, 0),
+    
     save = true,
     Flag = "5",
     Callback = function(color)
@@ -5860,7 +5860,7 @@ passTab:AddColorpicker({
 
 passTab:AddColorpicker({
     Name = "색상 2",
-    Default = Color3.new(0, 0, 1),
+    
     save = true,
     Flag = "6",
     Callback = function(color)
@@ -5879,7 +5879,6 @@ passTab:AddColorpicker({
 
 passTab:AddColorpicker({
     Name = "색상 3",
-    Default = Color3.new(0, 0, 0),
     save = true,
     Flag = "7",
     Callback = function(color)
@@ -5898,7 +5897,7 @@ passTab:AddColorpicker({
 
 passTab:AddColorpicker({
     Name = "색상 4",
-    Default = Color3.new(1, 1, 0),
+    
     save = true,
     Flag = "8",
     Callback = function(color)
@@ -5917,7 +5916,7 @@ passTab:AddColorpicker({
 
 passTab:AddToggle({
    Name = "커스텀 그라데이션 적용  <font color='rgb(255,0,0)'>[오너]</font>",
-   Default = false,
+   
     save = true,
    Flag = "CustomGradientToggle",
    Callback = function(val)
@@ -6034,7 +6033,7 @@ passTab:AddSection({
 
 passTab:AddToggle({
    Name = "실시간 무지개 그라데이션 루프",
-   Default = false,
+   
     save = true,
    Flag = "RainbowLoopToggle",
    Callback = function(val)
@@ -6111,7 +6110,7 @@ passTab:AddButton({
 
 getTab:AddToggle({
     Name = "킥알림    <font color='rgb(255,10,123)'>[프라임]</font>",
-    Default = true,
+    
     save = true,
     Flag = "5",
     Callback = function(Value)
@@ -6127,7 +6126,7 @@ torsoMatrix = {0,0,0,0,0,0,0,1,0}
 rightArmMatrix = {0,0,2,0,0,0,0,0,1}
 DevTab:AddToggle({ 
     Name = "락", 
-    Default = false,
+    
     save = true,
     Flag = "ToggleSpam",
     Callback = function(Value)
@@ -6165,7 +6164,7 @@ DevTab:AddToggle({
 
 local HR = DevTab:AddTextbox({
     Name = "대가리 회전",
-    Default = "0,0,0,0,0,0,0,1,0",
+    
     PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
     TextDisappear = false,
     save = true,
@@ -6184,7 +6183,7 @@ local HR = DevTab:AddTextbox({
 
 local TR = DevTab:AddTextbox({
     Name = "몸통회전",
-    Default = "0,0,0,0,0,0,0,1,0",
+    
     PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
     TextDisappear = false,
     save = true,
@@ -6203,7 +6202,7 @@ local TR = DevTab:AddTextbox({
 
 local ARA = DevTab:AddTextbox({
     Name = "오른팔 회전(딸딸이치기)",
-    Default = "0,0,2,0,0,0,0,0,1",
+    
     PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
     TextDisappear = false,
     save = true,
@@ -6241,7 +6240,7 @@ local RunService = game:GetService("RunService")
 
 DevTab:AddTextbox({
     Name = "소리",
-    Default = "",
+    
     PlaceholderText = "Value",
     TextDisappear = false,
     Flag = "SoundInput",
@@ -6252,7 +6251,7 @@ DevTab:AddTextbox({
 
 DevTab:AddTextbox({
     Name = "소리 나오는 속도",
-    Default = "",
+    
     PlaceholderText = "Value",
     TextDisappear = false,
     Flag = "SpeedInput",
@@ -6268,7 +6267,7 @@ DevTab:AddTextbox({
 
 DevTab:AddToggle({ 
     Name = "토클", 
-    Default = false,
+    
     save = true,
     Flag = "SpamToggle1",
     Callback = function(Value)
@@ -6305,7 +6304,7 @@ LoopTab:AddSection({
 })
 local Loop1 = LoopTab:AddToggle({
     Name = "PTM",
-    Default = false,
+    
     save = true,
     Flag = "2991",
     Callback = function(Value)
@@ -6541,7 +6540,7 @@ grabTab:AddSection({
 })
 local flingToggle = grabTab:AddToggle({
     Name = "던지기 V1   <font color='rgb(255,0,0)'>[데스크톱]</font>",
-    Default = false,
+    
     save = true,
     Flag = "99999999",
     Callback = function(Value)
@@ -6552,7 +6551,7 @@ local flingToggle = grabTab:AddToggle({
 
 local strengthTextbox = grabTab:AddTextbox({
     Name = "던지는 힘 V1",
-    Default = 0,
+    
     PlaceholderText = "Value",
     save = true,
     Flag = "20000",
@@ -6568,7 +6567,7 @@ local lastThrowTime = 0
 
 grabTab:AddToggle({
     Name = "던지기 V2   <font color='rgb(0,255,0)'>[모바일]</font>",
-    Default = false,
+    
     save = true,
     Flag = "SuperThrow",
     Callback = function(enabled)
@@ -6620,7 +6619,7 @@ grabTab:AddToggle({
 grabTab:AddTextbox({
     Name = "던지는 힘 V2",
     PlaceholderText = "숫자 입력 (기본값: 800)",
-    Default = "800",
+    
     save = true,
     Flag = "ieie",
     Callback = function(value)
@@ -6643,7 +6642,7 @@ grabTab:AddSection({
 })
 local extendLineToggle = grabTab:AddToggle({
     Name = "줄길이",
-    Default = false,
+    
     Flag = "3uw",
     save = true,
     Callback = function(Value)
@@ -6654,7 +6653,7 @@ local extendLineToggle = grabTab:AddToggle({
 
 grabTab:AddTextbox({
     Name = "줄길이",
-    Default = 0,
+    
     save = true,
     PlaceholderText = "Value",
     Flag = "4hdj",
@@ -6669,7 +6668,7 @@ grabTab:AddSection({
 })
 local AntiStruggleGrab = grabTab:AddToggle({
     Name = "루프 그랩  <font color='rgb(255,0,0)'>[오너쉽]</font>",
-    Default = false,
+    
     save = true,
     Flag = "ty1",
     Callback = function(Value)
@@ -6682,7 +6681,7 @@ local AntiStruggleGrab = grabTab:AddToggle({
 
 local RagdollGrabToggle = grabTab:AddToggle({
     Name = "래그돌 그랩  <font color='rgb(25,60,10)'>[판자]</font>",
-    Default = false,
+    
     save = true,
     Flag = "1ppp",
     Callback = function(Value)
@@ -6695,7 +6694,7 @@ local RagdollGrabToggle = grabTab:AddToggle({
 
 local MasslessGrab = grabTab:AddToggle({ 
     Name = "무질량 그랩", 
-    Default = false,
+    
     save = true,
     Flag = "1qty",
     Callback = function(Value)
@@ -6708,7 +6707,7 @@ local MasslessGrab = grabTab:AddToggle({
 
 local NoClipGrab = grabTab:AddToggle({ 
     Name = "노클립 그랩", 
-    Default = false,
+    
     save = true,
     Flag = "1yriti",
     Callback = function(Value)
@@ -6721,7 +6720,7 @@ local NoClipGrab = grabTab:AddToggle({
 
 grabTab:AddToggle({ 
     Name = "드럼통(킬)그랩  <font color='rgb(255,0,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>", 
-    Default = false,
+    
     save = true,
     Flag = "1mbmbmb",
     Callback = function(Value)
@@ -6735,7 +6734,7 @@ grabTab:AddSection({
 })
 grabTab:AddToggle({
     Name = "킥그랩(더럽게 안됨)  <font color='rgb(255,0,0)'>[오너쉽]</font>  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "99999j",
     Callback = function(Value)
@@ -7202,7 +7201,7 @@ antiTab:AddSection({
 })
 local WhiteListToggle = antiTab:AddToggle({
     Name = "친구 빼기",
-    Default = false,
+    
     save = true,
     Flag = "78945",
     Callback = function(Value)
@@ -7217,7 +7216,7 @@ antiTab:AddSection({
 
 local BreakHouseBarrierToggle = antiTab:AddToggle({
     Name = " 집 베리어 무력화",
-    Default = false,
+    
     save = true,
     Flag = "BreakHouseBarrier",
     Callback = function(Value)
@@ -7370,7 +7369,7 @@ LoopTab:AddSection({
 })
 local AutoSit = LoopTab:AddToggle({
     Name = "자동블롭앉기",
-    Default = false,
+    
     save = true,
     Flag = "AutoSitBlobmanjj",
     Callback = function(Value)
@@ -7657,7 +7656,7 @@ LoopTab:AddButton({
     })
 LoopTab:AddToggle({
     Name = "ㄴ 고정",
-    Default = false,
+    
     save = true,
     Flag = "21jkj",
     Callback = function(Value)
@@ -7667,7 +7666,7 @@ LoopTab:AddToggle({
 
 LoopTab:AddToggle({
     Name = "ㄴ 그랩파괴 없이",
-    Default = false,
+    
     save = true,
     Flag = "pyuyjd",
     Callback = function(Value)
@@ -7931,7 +7930,7 @@ local blobLoopToggle = LoopTab:AddToggle({
 })
 LoopTab:AddToggle({
     Name = "ㄴ 앉기",
-    Default = false,
+    
     save = true,
     Flag = "21gshjb",
     Callback = function(Value)
@@ -8311,7 +8310,7 @@ antiTab:AddSection({
 })
 local AntiGrabV1 = antiTab:AddToggle({
     Name = "무질량 이동 | TP",
-    Default = false,
+    
     save = true,
     Flag = "FakeTP",
     Callback = function(Value)
@@ -8383,7 +8382,7 @@ local AntiGrabV1 = antiTab:AddToggle({
 
 local AntiGrabV1 = antiTab:AddToggle({
     Name = "루프 TP | 랜덤",
-    Default = false,
+    
     save = true,
     Flag = "afcihwh",
     Callback = function(Value)
@@ -8536,7 +8535,7 @@ end
 LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 antiTab:AddToggle({
     Name = "안티 오너쉽 스팸   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "AntiFlingToggle",
     Callback = function(Value)
@@ -8556,7 +8555,7 @@ antiTab:AddSection({
 })
 local AntiGrab = antiTab:AddToggle({
     Name = "안티 그랩   <font color='rgb(0,255,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "9264",
     Callback = function(Value)
@@ -8567,7 +8566,7 @@ local AntiGrab = antiTab:AddToggle({
 
 antiTab:AddToggle({
     Name = "안티그랩V2   <font color='rgb(255,0,0)'>[프라임오너쉽]</font>",
-    Default = false,
+    
     Save = true,
     Flag = "antiGrab33",
     Callback = function(enabled)
@@ -8619,7 +8618,7 @@ end)
 
 antiTab:AddToggle({
     Name = "안티그랩V3   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "AutoStruggle", 
     Callback = function(enabled)
@@ -8659,7 +8658,7 @@ antiTab:AddToggle({
 
 local AntiGrabSticky = antiTab:AddToggle({
     Name = "안티그랩 |  StickyPart",
-    Default = false,
+    
     save = true,
     Flag = "kqhxusi",
     Callback = function(Value)
@@ -8750,7 +8749,7 @@ local currentSelectedOption = "FoodMayonnaise"
 
 antiTab:AddToggle({
     Name = "안티 인풋   <font color='rgb(255,0,0)'>[NETWORK OWNER]</font>  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "AntiDeathToggleFlag",
     Callback = function(Value)
@@ -8798,7 +8797,7 @@ antiTab:AddDropdown({
 
 antiTab:AddToggle({
     Name = "안티킥 <font color='rgb(0,255,0)'>[그랩]</font>",
-    Default = false,
+    
     save = true,
     Flag = "AntiKickG1rab", 
     Callback = function(enabled)
@@ -8938,7 +8937,7 @@ antiTab:AddSection({
 })
 local AntiBlob = antiTab:AddToggle({
 	Name = "안티 블롭맨",
-	Default = false,
+	
     save = true,
 	Flag = "1525",
 	Callback = function(Value)
@@ -8984,7 +8983,7 @@ end
 
 antiTab:AddToggle({
     Name = "안티 블롭맨V2<font color='rgb(0,255,0)'>[오너쉽]</font>",
-    Default = false,
+    
     save = true,
     Flag = "4597676",
     Callback = function(Value)
@@ -9002,7 +9001,7 @@ antiTab:AddSection({
 })
 local AntiMassless = antiTab:AddToggle({
     Name = "안티 메슬리즈  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "17yeydywi",
     Callback = function(Value)
@@ -9017,7 +9016,7 @@ antiTab:AddSection({
 })
 antiTab:AddToggle({
     Name = "디펜스 / 에어 서브펜션",
-    Default = false,
+
     save = true,
     Flag = "SelfDefenseAirSuspend", 
     Callback = function(enabled)
@@ -9064,7 +9063,7 @@ antiTab:AddSection({
 
 local AntiInPlots = antiTab:AddToggle({
     Name = "안티 인플레이스",
-    Default = false,
+    
     save = true,
     Flag = "yquidjsj",
     Callback = function(Value)
@@ -9078,7 +9077,7 @@ local AntiInPlots = antiTab:AddToggle({
 
 local AntiVoid = antiTab:AddToggle({
     Name = "안티 보이드",
-    Default = false,
+    
     save = true,
     Flag = "uwwuiwiw",
     Callback = function(Value)
@@ -9095,7 +9094,7 @@ antiTab:AddSection({
 })
 local AntiExplode = antiTab:AddToggle({
     Name = "안티 폭탄",
-    Default = false,
+    
     save = true,
     Flag = "antiExplodeToggleFlag",
     Callback = function(Value)
@@ -9138,7 +9137,7 @@ end
 
 antiTab:AddToggle({
     Name = "안티 폭발V2  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    ,
     Save = true,
     Flag = "AntiExplosion",
     Callback = function(enabled)
@@ -9174,7 +9173,7 @@ end)
 
 local AntiBurn = antiTab:AddToggle({
     Name = "불 무적",
-    Default = false,
+    
     save = true,
     Flag = "twuwhshu",
     Callback = function(Value)
@@ -9186,7 +9185,7 @@ local AntiBurn = antiTab:AddToggle({
 
 local AntiPaint = antiTab:AddToggle({
     Name = "안티 페인트",
-    Default = false,
+    
     save = true,
     Flag = "dhdksdjxh",
     Callback = function(Value)
@@ -9199,7 +9198,7 @@ local AntiPaint = antiTab:AddToggle({
 
 local AntiLag = antiTab:AddToggle({
     Name = "안티 렉",
-    Default = false,
+    
     save = true,
     Flag = "AntiLagToggle",
     Callback = function(Value)
@@ -9221,7 +9220,7 @@ end
 
 antiTab:AddToggle({
     Name = "안티 렉V2<font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "shsujsj",
     Callback = function(Value)
@@ -9246,7 +9245,7 @@ antiTab:AddToggle({
 
 local AutoAttack = antiTab:AddToggle({
     Name = "오토어택 | 킬",
-    Default = false,
+    
     save = true,
     Flag = "AutoAttack",
     Callback = function(Value)
@@ -9257,7 +9256,7 @@ local AutoAttack = antiTab:AddToggle({
 
 local AntiHoldPart = antiTab:AddToggle({
     Name = "음식소환 막기",
-    Default = false,
+    
     save = true,
     Flag = "ewes",
     Callback = function(Value)
@@ -9269,7 +9268,7 @@ local AntiHoldPart = antiTab:AddToggle({
 antiTab:AddLabel("동료핵이 있을경우 동료핵도 사용이 막힙니다.")
 local AntiBlobUse = antiTab:AddToggle({
     Name = "블롭맨 사용 막기   <font color='rgb(255,0,0)'>[gucci]</font>",
-    Default = false,
+    
     save = true,
     Flag = "heyeue",
     Callback = function(Value)
@@ -9288,7 +9287,7 @@ local flyingResetConn = nil
 local resetProtectionConn = nil
 local FlyingReset = antiTab:AddToggle({
     Name = "킥 방지리셋  <font color='rgb(50,0,50)'>[셀프 킬]</font>",
-    Default = false,
+    
     save = true,
     Flag = "owiduxj",
     Callback = function(Value)
@@ -9337,7 +9336,7 @@ end)
 
 local AntiKick = antiTab:AddToggle({
     Name = "안티 킥 <font color='rgb(255,146,132)'>[표창]</font>",
-    Default = false,
+    
     save = true,
     Flag = "su2iisiisi",
     Callback = function(Value)
@@ -9349,7 +9348,7 @@ local AntiKick = antiTab:AddToggle({
 
 antiTab:AddToggle({
    Name = "안티킥",
-   Default = false,
+   
     save = true,
     Flag = "iiwiwow9w9",
    Callback = function(Value)
@@ -9502,7 +9501,7 @@ end
 
 local AntiPCLD = antiTab:AddToggle({
     Name = "안티 킥   <font color='rgb(255,0,0)'>[PCLD 감지]</font>",
-    Default = false,
+    
     save = true,
     Flag = "1f6",
     Callback = function(Value)
@@ -9517,7 +9516,7 @@ antiTab:AddSection({
 })
 local PermRag = antiTab:AddToggle({
     Name = "래그돌",
-    Default = false,
+    
     save = true,
     Flag = "36764",
     Callback = function(Value)
@@ -9535,7 +9534,7 @@ antiTab:AddSection({
 })
 local AutoGucci = antiTab:AddToggle({
     Name = "오토구찌(킥위험 약간 있음!)  <font color='rgb(255,146,123)'>[블롭맨]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    Default = false,
+    
     save = true,
     Flag = "autoGucciToggleFlag",
     Callback = function(Value)
@@ -9561,7 +9560,7 @@ local AutoGucci = antiTab:AddToggle({
 
 local AutoGucciV2 = antiTab:AddToggle({
     Name = "기차 구찌",
-    Default = false,
+    
     save = true,
     Flag = "autoGucciToggleFla1g",
     Callback = function(Value)
@@ -9585,7 +9584,7 @@ end
 
 antiTab:AddToggle({
     Name = "구찌V3   <font color='rgb(0,0,250)'>[파카]</font>",
-    Default = false,
+    
     Callback = function(Value)
         if Value then
             Rayfield:Notify({
@@ -9603,7 +9602,7 @@ playerTab:AddSection({
 })
 playerTab:AddToggle({
     Name = "이동 속도   <font color='rgb(1,1,255)'>[스피드]</font>",
-    Default = false,
+    
     save = true,
     Flag = "2949498",
     Callback = function(Value)
