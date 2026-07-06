@@ -3672,7 +3672,7 @@ function AutoAttackF()
                         if v == player then exists = true; break end
                     end
                     if not exists then
-                        table.insert(savedTargets, player)
+                        --table.insert(savedTargets, player)
                     end
                 end
             end
