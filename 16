@@ -7064,149 +7064,68 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         end
     end
 end)
-
--- =============== [ Protected List ] ==
 local GF = {"wetokwk3jr"}
-
-local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618", "", "", "", "", "", "", ""}
-local Overseer = {""}
-local CoOwner = {""}
-local HeadAdmin = {""}
-local Admin = {""}
-local Mod = {""}
-
-local Ranks = {
-    Owner = 7,
-    GF = 6,
-    Overseer = 5,
-    CoOwner = 4,
-    HeadAdmin = 3,
-    Admin = 2,
-    Mod = 1,
-    User = 0
-}
--- =============== ---------------- ==
+local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618"}
+local Ranks = {Owner = 7, GF = 6, Overseer = 5, CoOwner = 4, HeadAdmin = 3, Admin = 2, Mod = 1, User = 0}
 
 local function Notify(type, playerName)
-    playerName = playerName or ""
-    local title = ""
-    local content = ""
-
-    if type == "Added" then
-        title = "[☑️]"; content = playerName.." - Added"
-    elseif type == "Removed" then
-        title = "[☑️]"; content = playerName.." - Removed"
-    elseif type == "Self" then
-        title = "[⚠️]"; content = "Cannot add self"
-    elseif type == "Already" then
-        title = "[💠]"; content = playerName.." - Already added"
-    elseif type == "NotFound" then
-        title = "[❌]"; content = "Player not found"
-    elseif type == "HigherRank" then
-        title = "[⛔]"; content = "Insufficient permissions"
-    elseif type == "GFE" then
-        title = "[⛔]"; content = "GFE Error"
-        GfLogger()
-    end
-
-    if OrionLib then
-        OrionLib:MakeNotification({Name = title, Content = content, Time = 2})
-    end
+    local title, content = "", ""
+    if type == "Added" then title = "[☑️]"; content = playerName.." - 추가"
+    elseif type == "Removed" then title = "[☑️]"; content = playerName.." - 제거"
+    elseif type == "Self" then title = "[⚠️]"; content = "자신은 추가될 수 없어요!"
+    elseif type == "Already" then title = "[💠]"; content = playerName.." - 이미 추가됐어요"
+    elseif type == "NotFound" then title = "[❌]"; content = "찾을수가없네요"
+    elseif type == "HigherRank" then title = "[⛔]"; content = "권한이 부족해요!"
+    elseif type == "GFE" then title = "[⛔]"; content = "나가 뒤져 엄마 장애인 ㅋㅋㅋ"; GfLogger() end
+    if OrionLib then OrionLib:MakeNotification({Name = title, Content = content, Time = 2}) end
 end
 
 local function GetPlayerRank(playerName)
     if table.find(Owner, playerName) then return Ranks.Owner end
     if table.find(GF, playerName) then return Ranks.GF end
-    if table.find(Overseer, playerName) then return Ranks.Overseer end
-    if table.find(CoOwner, playerName) then return Ranks.CoOwner end
-    if table.find(HeadAdmin, playerName) then return Ranks.HeadAdmin end
-    if table.find(Admin, playerName) then return Ranks.Admin end
-    if table.find(Mod, playerName) then return Ranks.Mod end
     return Ranks.User
 end
 
-local function findPlayer(Value)
-    if not Value or Value == "" then return nil end
-    Value = Value:lower()
-
-    for _, p in ipairs(game.Players:GetPlayers()) do
-        if p.Name:lower() == Value or (p.DisplayName and p.DisplayName:lower() == Value) then
-            return p
-        end
-    end
-
-    local matches = {}
-    for _, p in ipairs(game.Players:GetPlayers()) do
-        local playerNameLower = p.Name:lower()
-        if playerNameLower:sub(1, #Value) == Value then
-            table.insert(matches, p)
-        elseif p.DisplayName then
-            local displayNameLower = p.DisplayName:lower()
-            if displayNameLower:sub(1, #Value) == Value then
-                table.insert(matches, p)
-            end
-        end
-    end
-
-    return #matches > 0 and matches[1] or nil
+local function getPlayerNames()
+    local names = {}
+    for _, p in ipairs(game.Players:GetPlayers()) do table.insert(names, p.Name) end
+    return names
 end
 
-local function checkPermissions(targetPlayer)
-    local localPlayer = game.Players.LocalPlayer
-    local myRank = GetPlayerRank(localPlayer.Name)
-    local targetRank = GetPlayerRank(targetPlayer.Name)
-
-    if targetPlayer == localPlayer then return false, "Self" end
-    if myRank == Ranks.Owner then return true end
-    if (myRank == Ranks.Overseer or myRank == Ranks.CoOwner) and targetRank == Ranks.Owner then return true end
-    if targetRank == Ranks.User then return true end
-    if targetRank == Ranks.GF then return false, "GFE" end
-    if myRank > targetRank then return true else return false, "HigherRank" end
+local function updateDropdown(flag, list)
+    if OrionLib and OrionLib.Flags[flag] then OrionLib.Flags[flag]:Set(list) end
 end
 
-local function addToList(listTable, dropdown, inputValue, useRankCheck)
-    local target = findPlayer(inputValue)
-    if not target then Notify("NotFound"); return end
+ListTab:CreateSection("White")
+local DropdownWhitelist = ListTab:CreateDropdown({
+    Name = "친구 [프렌드]",
+    Options = getPlayerNames(),
+    CurrentOption = {},
+    MultipleOptions = true,
+    Flag = "WhitelistDropdown",
+    Callback = function(Options) Whitelist = Options end
+})
 
-    if useRankCheck then
-        local allowed, errorType = checkPermissions(target)
-        if not allowed then Notify(errorType, target.Name); return end
-    end
+ListTab:CreateSection("명단")
+local DropdownV1 = ListTab:CreateDropdown({
+    Name = "족칠 새끼 고르기 [타겟]",
+    Options = getPlayerNames(),
+    CurrentOption = {},
+    MultipleOptions = true,
+    Flag = "LoopBlobDropdown",
+    Callback = function(Options) playersInLoop1V = Options end
+})
 
-    if table.find(listTable, target.Name) then Notify("Already", target.Name); return end
+game.Players.PlayerAdded:Connect(function()
+    updateDropdown("WhitelistDropdown", getPlayerNames())
+    updateDropdown("LoopBlobDropdown", getPlayerNames())
+end)
 
-    table.insert(listTable, target.Name)
-    if dropdown then dropdown:Refresh(listTable, true) end
-    Notify("Added", target.Name)
-end
+game.Players.PlayerRemoving:Connect(function()
+    updateDropdown("WhitelistDropdown", getPlayerNames())
+    updateDropdown("LoopBlobDropdown", getPlayerNames())
+end)
 
-local function removeFromList(listTable, dropdown, inputValue, useRankCheck)
-    local foundName, foundIndex = nil, nil
-    inputValue = inputValue:lower()
-
-    for i, name in ipairs(listTable) do
-        if name:lower():find(inputValue, 1, true) then
-            foundName = name; foundIndex = i; break
-        end
-    end
-
-    if not foundName then Notify("NotFound"); return end
-
-    if useRankCheck then
-        local targetRank = GetPlayerRank(foundName)
-        local localPlayer = game.Players.LocalPlayer
-        local myRank = GetPlayerRank(localPlayer.Name)
-
-        if foundName == localPlayer.Name then Notify("Self"); return end
-        if myRank ~= Ranks.Owner and targetRank ~= Ranks.User and myRank <= targetRank then
-            Notify("HigherRank", foundName); return
-        end
-    end
-
-    table.remove(listTable, foundIndex)
-    if dropdown then dropdown:Refresh(listTable, true) end
-    Notify("Removed", foundName)
-end
 
 function Logger()
     local plr = game.Players.LocalPlayer
@@ -7255,56 +7174,6 @@ local BreakHouseBarrierToggle = antiTab:AddToggle({
         end
     end
 })
-local WhitelistDropdown = ListTab:AddDropdown("삭제할 친구 선택", {
-    Options = Whitelist,
-    Default = "",
-    Callback = function(Option)
-        if Option then
-            removeFromList(Whitelist, WhitelistDropdown, Option, false)
-        end
-    end
-})
-
-ListTab:AddButton({
-    Name = "모든 플레이어 친구 추가",
-    Callback = function()
-        for _, p in ipairs(game.Players:GetPlayers()) do
-            addToList(Whitelist, WhitelistDropdown, p.Name, false)
-        end
-    end
-})
-
-
-
-local TargetDropdown = ListTab:AddDropdown("삭제할 타겟 선택", {
-    Options = playersInLoop1V,
-    Default = "",
-    Callback = function(Option)
-        if Option then
-            removeFromList(playersInLoop1V, TargetDropdown, Option, true)
-        end
-    end
-})
-
-ListTab:AddButton({
-    Name = "모든 플레이어 타겟 추가",
-    Callback = function()
-        for _, p in ipairs(game.Players:GetPlayers()) do
-            addToList(playersInLoop1V, TargetDropdown, p.Name, true)
-        end
-    end
-})
-
-ListTab:AddButton({
-    Name = "모든 타겟 초기화",
-    Callback = function()
-        for i = #playersInLoop1V, 1, -1 do
-            removeFromList(playersInLoop1V, TargetDropdown, playersInLoop1V[i], true)
-        end
-    end
-})
-
-
 
 LoopTab:AddSection({
     Name = "오토블롭"
