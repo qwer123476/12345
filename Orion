@@ -3824,7 +3824,7 @@ end
 function OrionLib:Destroy()
 	Orion:Destroy()
 end
-
+--[[
 local Window = OrionLib:MakeWindow({
     Name = "파카허브 [프리미엄]",
     HidePremium = false,
@@ -3882,7 +3882,7 @@ Main_Tab:AddToggle({
 	Flag = "KickNotification_Toggle"      
 })
 
-
+]]--
 
 
 return OrionLib
