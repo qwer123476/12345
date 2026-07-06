@@ -248,8 +248,8 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
 -- [Rayfield 라이브러리 로드를 Orion 라이브러리 로드로 변경]
 -- URL을 변수로 먼저 지정하여 호출
-local url = "https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X"
-local OrionLib = loadstring(game:HttpGet(url, true))()
+
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion X.txt"))()
 
 local HttpService = game:GetService("HttpService")
 
