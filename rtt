@@ -705,37 +705,48 @@ end
 
 
 function updateWalkSpeedF()
-     function apply(char)
-         hum = char:WaitForChild("Humanoid")
+    local function apply(char)
+        local hum = char:WaitForChild("Humanoid")
+        -- walkSpeedV 값이 없으면 자동으로 80을 사용합니다.
+        local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
 
         if walkSpeedT then
-            hum.WalkSpeed = walkSpeedV
-            hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+            hum.WalkSpeed = speed
+            local conn
+            conn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
                 if walkSpeedT then
-                 hum.WalkSpeed = walkSpeedV
+                    if hum.WalkSpeed ~= speed then
+                        hum.WalkSpeed = speed
+                    end
+                else
+                    conn:Disconnect()
                 end
             end)
         else
-            hum.WalkSpeed = 100
+            hum.WalkSpeed = 80
         end
     end
 
-    if plr.Character then
-        apply(plr.Character)
-    end
-
+    if plr.Character then apply(plr.Character) end
     plr.CharacterAdded:Connect(apply)
 end
 
 function updateJumpPowerF()
-     function apply(char)
-         hum = char:WaitForChild("Humanoid")
+    local function apply(char)
+        local hum = char:WaitForChild("Humanoid")
+        -- jumpPowerV 값이 없으면 자동으로 60을 사용합니다.
+        local power = (type(jumpPowerV) == "number") and jumpPowerV or 60
 
         if jumpPowerT then
-            hum.JumpPower = jumpPowerV
-            hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
+            hum.JumpPower = power
+            local conn
+            conn = hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
                 if jumpPowerT then
-                    hum.JumpPower = jumpPowerV
+                    if hum.JumpPower ~= power then
+                        hum.JumpPower = power
+                    end
+                else
+                    conn:Disconnect()
                 end
             end)
         else
@@ -743,10 +754,7 @@ function updateJumpPowerF()
         end
     end
 
-    if plr.Character then
-        apply(plr.Character)
-    end
-
+    if plr.Character then apply(plr.Character) end
     plr.CharacterAdded:Connect(apply)
 end
 
