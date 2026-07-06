@@ -3882,7 +3882,7 @@ Main_Tab:AddToggle({
 	Flag = "KickNotification_Toggle"      
 })
 
-Window:AddConfigTab()
+
 
 
 return OrionLib
