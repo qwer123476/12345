@@ -3761,22 +3761,22 @@ function OrionLib:MakeWindow(WindowConfig)
     
     function TabFunction:AddConfigTab()
         local config_tab = TabFunction:MakeTab({
-            Name = "UI Config",
+            Name = "스크 콘픽",
             Icon = "rbxassetid://15911231575",
             PremiumOnly = false
         })
 
 		local select_theme = config_tab:AddSection({
-			Name = "Theme"
+			Name = "내 스크"
 		})
 
 		local windowstroke = config_tab:AddSection({
-			Name = "Window Stroke"
+			Name = "윈도우 스톡"
 		})
 
 
 		windowstroke:AddSlider({
-			Name = "Stroke",
+			Name = "스톡",
 			Min = 1,
 			Max = 3,
 			Default = 1.5,
@@ -3789,7 +3789,7 @@ function OrionLib:MakeWindow(WindowConfig)
 		})
 
 		select_theme:AddColorpicker({
-			Name = "Base Color",
+			Name = "베이스 색깔",
 			Default = OrionLib.Themes[OrionLib.SelectedTheme].Main,
 			Mode = 2,
 			Callback = function(Value)
@@ -3804,7 +3804,7 @@ function OrionLib:MakeWindow(WindowConfig)
 		})
 
 		select_theme:AddButton({
-			Name = "Reset Theme",
+			Name = "리셋",
 			Callback = function()
 				OrionLib.Themes.Custom = OrionLib:GenTheme(Color3.fromRGB(25, 25, 25))
 				OrionLib.SelectedTheme = "Custom"
@@ -3812,8 +3812,8 @@ function OrionLib:MakeWindow(WindowConfig)
 			end
 		})
 
-		--OrionLib.SelectedTheme = "Default"
-		--OrionLib:SetTheme()
+		OrionLib.SelectedTheme = "Default"
+		OrionLib:SetTheme()
 		
 		LoadThemeCfg(FILE_PATH)
     end
