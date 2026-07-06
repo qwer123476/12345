@@ -7570,7 +7570,7 @@ LoopTab:AddButton({
     LoopTab:AddSection({
     Name = "오너킥"
 })
-    local OLTPTextBox = LoopTab:AddTextBox({
+    local OLTPTextbox = LoopTab:AddTextbox({
         Name = "X Y Z",
         Default = "0,40,0",
         PlaceholderText = "",
