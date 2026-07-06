@@ -9137,7 +9137,7 @@ end
 
 antiTab:AddToggle({
     Name = "안티 폭발V2  <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    ,
+    
     Save = true,
     Flag = "AntiExplosion",
     Callback = function(enabled)
