@@ -9801,9 +9801,10 @@ plotTab:AddSection({
     Name = "집"
 })
 
-local BarrierNoclip = plotTab:AddToggle("BarrierNoclipToggle", {
-    Text = "집 베리어 삭제",
-    Default = false,
+local BarrierNoclip = plotTab:AddToggle({
+    Name = "집 베리어 삭제",
+    CurrentValue = false,
+    Flag = "BarrierNoclipToggle",
     Callback = function(Value)
         BarrierCanCollideT = Value
         BarrierCanCollideF()
@@ -9987,8 +9988,6 @@ local PCLDView = keybindTab:AddToggle("PCLDView", {
     end
 })
 
---PCLDView:SetValue(true)
-
 local ViewTool = keybindTab:AddToggle("ViewTool", {
     Text = "표창,쿠나이 보기",
     Default = false,
@@ -9997,8 +9996,6 @@ local ViewTool = keybindTab:AddToggle("ViewTool", {
         ViewToolF()
     end
 })
-
---ViewTool:SetValue(true)
 
 
 
@@ -10036,9 +10033,10 @@ Rayfield:Notify({
 
 
 
-        DDTab:AddToggle("JerkMotionToggle", {
-    Text = "딸치기   <font color='rgb(25,255,0)'>[자위마스터]</font>",
-    Default = false,
+        DDTab:AddToggle({
+    Name = "딸치기   <font color='rgb(25,255,0)'>[자위마스터]</font>",
+    CurrentValue = false,
+    Flag = "JerkMotionToggle",
     Callback = function(Value)
         jerkActive = Value
 
@@ -10078,7 +10076,6 @@ Rayfield:Notify({
         end
     end
 })
-
 --local LineLagT = false
 --local LineLagV = 50
 
