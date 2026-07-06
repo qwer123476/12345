@@ -7294,7 +7294,7 @@ ListTab:AddTextbox({
     end
 })
 
-ListTab:AddTthebox({
+ListTab:AddTextbox({
     Name = "제거",
     PlaceholderText = "...",
     Flag = "RemoveInput_LoopBlob",
