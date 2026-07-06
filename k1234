@@ -7166,15 +7166,7 @@ antiTab:AddSection({
 	Name = "하우스 브레이커"
 })
 
-local HouseBreakToggle = antiTab:AddToggle({
-    Name = "하우스 브레이크 (집안 물건 들이기)",
-    Default = false,
-    Flag = "HouseBreakToggle",
-    Callback = function(Value)
-        HouseBreakT = Value
-        HouseBreakF()
-    end
-})
+
 
 local BreakHouseBarrierToggle = antiTab:AddToggle({
     Name = " 집 베리어 무력화",
