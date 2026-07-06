@@ -3672,7 +3672,7 @@ function AntiExplosionF()
                 hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                 hrp.Anchored = false
             else
-            if model:IsA("BasePart") and (model.Position - hrp.Position).Magnitude <= 20 then
+            --if model:IsA("BasePart") and (model.Position - hrp.Position).Magnitude <= 20 then
                 hrp.Anchored = true
                 task.wait()
                 hum:ChangeState(Enum.HumanoidStateType.Running)
