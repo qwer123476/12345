@@ -6005,7 +6005,9 @@ passTab:AddButton({
    end,
 })
 
-passTab:AddSection("실시간 애니메이션 효과")
+passTab:AddSection({
+    Name = "무지개"
+})
 
 passTab:AddToggle({
    Name = "실시간 무지개 그라데이션 루프",
