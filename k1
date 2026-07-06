@@ -7584,7 +7584,7 @@ LoopTab:AddButton({
             end
         end
     })
-    OLTPInput:Set("0,40,0")
+    --OLTPInput:Set("0,40,0")
     
     local blobLoop4Toggle = LoopTab:AddToggle({
         Name = "스팸킥    <font color='rgb(255,0,255)'>[스팸]</font>    <font color='rgb(0,0,255)'>[프리미엄]</font>",
