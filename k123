@@ -6624,7 +6624,7 @@ grabTab:AddTextbox({
         increaseLineExtendV = Value
     end
 })
-extendLineInput:Set(1.7)
+--extendLineInput:Set(1.7)
 
 grabTab:AddSection({
 	Name = "Other"
