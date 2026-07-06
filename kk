@@ -9981,25 +9981,25 @@ keybindTab:AddSection({
 	Name = "ESP"
 })
 
-local PCLDView = keybindTab:AddToggle("PCLDView", {
-    Text = "PCLD 보기",
-    Default = false,
+local PCLDView = keybindTab:AddToggle({
+    Name = "PCLD 보기",
+    CurrentValue = false,
+    Flag = "PCLDView",
     Callback = function(Value)
         PcldViewT = Value
         PcldViewF()
     end
 })
 
-local ViewTool = keybindTab:AddToggle("ViewTool", {
-    Text = "표창,쿠나이 보기",
-    Default = false,
+local ViewTool = keybindTab:AddToggle({
+    Name = "표창,쿠나이 보기",
+    CurrentValue = false,
+    Flag = "ViewTool",
     Callback = function(Value)
         ViewToolT = Value
         ViewToolF()
     end
 })
-
-
 
 CreditsTab:CreateLabel("누나   <font color='rgb(255,0,0)'>[onwer]</font>", 96897864871400, Color3.fromRGB(255, 255, 255), true)
 CreditsTab:CreateParagraph({Title = "0110rim", Content = "착함의 경지"})
