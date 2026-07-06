@@ -259,59 +259,6 @@ local Rayfield = {
     CreateInput = function() end
 }
 
-local paca = {
-    TextColor = Color3.fromRGB(255,255,255),
-    LabelColor = Color3.fromRGB(0,220,100),
-
-    Background = Color3.fromRGB(0,0,0),
-    Topbar = Color3.fromRGB(8,8,8),
-    Shadow = Color3.fromRGB(0,0,0),
-
-    NotificationBackground = Color3.fromRGB(12,12,12),
-    NotificationActionsBackground = Color3.fromRGB(25,25,25),
-
-    TabBackground = Color3.fromRGB(15,10,22),
-    TabStroke = Color3.fromRGB(45,25,70),
-    TabBackgroundSelected = Color3.fromRGB(110,40,190),
-    TabTextColor = Color3.fromRGB(150,150,150),
-    SelectedTabTextColor = Color3.fromRGB(255,255,255),
-
-    ElementBackground = Color3.fromRGB(10,10,10),
-    ElementBackgroundHover = Color3.fromRGB(18,18,18),
-    SecondaryElementBackground = Color3.fromRGB(5,5,5),
-    ElementStroke = Color3.fromRGB(25,25,25),
-    SecondaryElementStroke = Color3.fromRGB(18,18,18),
-
-    SliderBackground = Color3.fromRGB(30,30,30),
-    SliderProgress = Color3.fromRGB(255,255,255),
-    SliderStroke = Color3.fromRGB(180,180,180),
-
-    ToggleBackground = Color3.fromRGB(12,12,12),
-
-    ToggleEnabled = Color3.fromRGB(220,0,0),
-    ToggleEnabledStroke = Color3.fromRGB(255,80,80),
-    ToggleEnabledOuterStroke = Color3.fromRGB(150,0,0),
-
-    ToggleDisabled = Color3.fromRGB(40,40,40),
-    ToggleDisabledStroke = Color3.fromRGB(60,60,60),
-    ToggleDisabledOuterStroke = Color3.fromRGB(25,25,25),
-
-    DropdownSelected = Color3.fromRGB(20,15,25),
-    DropdownUnselected = Color3.fromRGB(12,12,12),
-
-    InputBackground = Color3.fromRGB(15,15,8),
-    InputStroke = Color3.fromRGB(220,180,0),
-    PlaceholderColor = Color3.fromRGB(120,110,80),
-}
-
-local oldCreateToggle = Rayfield.CreateToggle
-local oldCreateButton = Rayfield.CreateButton
-local oldCreateLabel = Rayfield.CreateLabel
-local oldCreateDropdown = Rayfield.CreateDropdown
-local oldCreateSlider = Rayfield.CreateSlider
-local oldCreateInput = Rayfield.CreateInput
-
--- 텍스트 내부에서 특정 단어를 찾아 그라데이션으로 쪼개주는 내부 함수
 local function autoGradient(text, target, startColor, endColor)
     if not string.find(text, target, 1, true) then return text end
     
@@ -395,13 +342,7 @@ end
 
 
 -- [Orion UI Window 생성으로 교체]
-local Window = OrionLib:MakeWindow({
-    Name = "파카허브 [프리미엄]",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "PacaHub",
-    IntroText = "파카허브 [프리미엄]"
-})
+
 
 -- [Orion UI 탭 생성 문법으로 교체]
 local playerTab = Window:MakeTab({Name = "플레이어 설정", Icon = "rbxassetid://6034281935", PremiumOnly = false})    
