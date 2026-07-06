@@ -5541,7 +5541,9 @@ FDTab:AddToggle({
 
 -- ================== [ 유틸리티 기능 ] ==================
 
-UtilityTab:AddSection("환경 및 시야")
+UtilityTab:AddSection({
+    Name = "환경 및 시야"
+})
 
 -- 1. 줌 제한 해제
 UtilityTab:AddButton({
@@ -5573,7 +5575,7 @@ UtilityTab:AddButton({
     end,
 })
 
-UtilityTab:AddSection("캐릭터 비주얼")
+
 
 -- 4. 캐릭터 반투명화
 UtilityTab:AddToggle({
@@ -5625,7 +5627,9 @@ UtilityTab:AddToggle({
     end,
 })
 
-UtilityTab:AddSection("시스템 유틸")
+UtilityTab:AddSection({
+    Name = "시스템"
+})
 
 -- 7. 핑 확인
 UtilityTab:AddButton({
@@ -5666,8 +5670,9 @@ UtilityTab:AddToggle({
 })
 
 
-UtilityTab:AddSection("물리 및 엔진 조작")
-
+UtilityTab:AddSection({
+    Name = "환경"
+})
 UtilityTab:AddToggle({
     Name = "무마찰 모드 (미끄러지기)",
     Default = false,
@@ -5701,7 +5706,6 @@ UtilityTab:AddButton({
     end,
 })
 
-UtilityTab:AddSection("플레이어 특수 조작")
 
 -- 4. 1인칭 강제 고정 (조준 시 유용)
 UtilityTab:AddToggle({
@@ -5757,61 +5761,22 @@ UtilityTab:AddButton({
     end,
 })
 
-UtilityTab:AddSection("이동 최적화")
 
-UtilityTab:AddToggle({
-    Name = "관성 제거   <font color='rgb(0,255,0)'>[굳]</font>",
-    Default = true,
-    Callback = function(Value)
-        _G.NoInertia = Value
-        pcall(function()
-            local char = game.Players.LocalPlayer.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            
-            if _G.NoInertia then
-                
-                for _, v in pairs(char:GetChildren()) do
-                    if v:IsA("BasePart") then
-                        v.CustomPhysicalProperties = PhysicalProperties.new(100, 0.3, 0.5)
-                    end
-                end
-                
-                
-                task.spawn(function()
-                    while _G.NoInertia do
-                        if hum and hum.MoveDirection.Magnitude <= 0 then
-                            local hrp = char:FindFirstChild("HumanoidRootPart")
-                            if hrp then
-                                hrp.Velocity = Vector3.new(0, hrp.Velocity.Y, 0)
-                            end
-                        end
-                        task.wait()
-                    end
-                end)
-            else
-                
-                for _, v in pairs(char:GetChildren()) do
-                    if v:IsA("BasePart") then
-                        v.CustomPhysicalProperties = nil
-                    end
-                end
-            end
-        end)
-    end,
+
+
+RankTab:AddSection({
+    Name = "제작자"
 })
-
-
-
-
-
-RankTab:AddSection("제작자")
 RankTab:AddLabel("제작자 : baby_Alpaca | 알파카")
 
-RankTab:AddSection("친구 목록")
+RankTab:AddSection({
+    Name = "친구 목록"
+})
 RankTab:AddLabel("헬로, 썸머, 누나, 이에스, 까망, 연우, 온유, 대환, 서은")
 
-RankTab:AddSection("어드민 권한 획득")
-
+RankTab:AddSection({
+    Name = "어드민 권한 획득"
+})
 local AdminHackButton = RankTab:AddButton({
     Name = "iY 어드민 핵",
     Callback = function()
@@ -5824,8 +5789,9 @@ local AdminHackButton = RankTab:AddButton({
         })
     end
 })
-passTab:AddSection("커스텀 그라데이션 설정")
-
+passTab:AddSection({
+    Name = "라인"
+})
 passTab:AddTextbox({
    Name = "그라데이션 레이어 수 설정 (2 ~ 4)",
    Default = "",
@@ -5948,8 +5914,9 @@ passTab:AddToggle({
    end,
 })
 
-passTab:AddSection("라인 색상 고정 프리셋")
-
+passTab:AddSection({
+    Name = "라인 프리셋"
+})
 passTab:AddButton({
    Name = "무지개 프리셋 (고정 고해상도)",
    Callback = function()
@@ -6068,8 +6035,9 @@ passTab:AddToggle({
    end,
 })
 
-passTab:AddSection("게임패스 잠금해제")
-
+passTab:AddSection({
+    Name = "패스 잠금 해제"
+})
 passTab:AddButton({
    Name = "긴줄 잠금해제   <font color='rgb(255,19,130)'>[바이패싱]</font>",
    Callback = function()
@@ -6114,7 +6082,7 @@ passTab:AddButton({
 })
 
 
-getTab:AddSection("Gam")
+
 getTab:AddToggle({
     Name = "킥알림    <font color='rgb(255,10,123)'>[프라임]</font>",
     Default = true,
@@ -6239,7 +6207,7 @@ ARA:Set("0,0,2,0,0,0,0,0,1")
 local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 
-DevTab:AddSection("Chat")
+
 DevTab:AddTextbox({
     Name = "소리",
     Default = "",
@@ -7355,7 +7323,9 @@ ListTab:AddToggle({
         end
     end,
 })
-LoopTab:AddSection("자동블롭앉기")
+LoopTab:AddSection({
+    Name = "오토블롭"
+})
 local AutoSit = LoopTab:AddToggle({
     Name = "자동블롭앉기",
     Default = false,
@@ -7365,7 +7335,9 @@ local AutoSit = LoopTab:AddToggle({
         AutoSitF()
     end
 })
-LoopTab:AddSection("브링")
+LoopTab:AddSection({
+    Name = "끌고오기"
+})
 LoopTab:AddButton({
     Name = "끌고오기   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
@@ -7601,8 +7573,9 @@ LoopTab:AddButton({
     end
 })
 
-    LoopTab:AddSection("오너킥")
-    
+    LoopTab:AddSection({
+    Name = "오너킥"
+})
     local OLTPInput = LoopTab:AddInput({
         Name = "X Y Z",
         Default = "0,40,0",
@@ -7655,8 +7628,9 @@ LoopTab:AddToggle({
         OnlyOwner = Value
     end
 })
-LoopTab:AddSection("new")
-
+LoopTab:AddSection({
+    Name = "레이지봇킥"
+})
 LoopTab:AddToggle({
     Name = "레이지봇 킥   <font color='rgb(255,154,123)'>[레이지봇]</font>  <font color='rgb(0,255,0)'>[프리미엄]</font>  <font color='rgb(255,0,1)'>[바이패스]</font>  <font color='rgb(0,154,48)'>[락]</font>",
     Default = false,
@@ -7858,7 +7832,9 @@ LoopTab:AddToggle({
     end
 })
 
-LoopTab:AddSection("루프킥")
+LoopTab:AddSection({
+    Name = "루프킥"
+})
 LoopTab:AddButton({
     Name = "무질량 끄기",
     Callback = function()
@@ -7924,7 +7900,9 @@ LoopTab:AddToggle({
         LoopReleaseMODED = Value
     end
 })
-LoopTab:AddSection("루프킬 블롭맨")
+Tab:AddSection({
+    Name = "루프 블롭맨"
+})
 local blobLoop3Toggle = LoopTab:AddToggle({
     Name = "루프킬   <font color='rgb(0,0,255)'>[프라임 오너쉽]</font>   <font color='rgb(255,0,0)'>[프리미엄]</font>",
     Default = false,
@@ -8066,7 +8044,9 @@ local blobLoop2Toggle = LoopTab:AddToggle({
     end
 })
 
-LoopTab:AddSection("블롭없음")
+LoopTab:AddSection({
+    Name = "블롭 없이"
+})
 local Loop1 = LoopTab:AddToggle({
     Name = "루프킬   <font color='rgb(0,255,0)'>[그랩]</font>",
     Default = false,
@@ -8109,7 +8089,9 @@ local Loop2 = LoopTab:AddToggle({
     end
 })
 
-LoopTab:AddSection("스팸")
+LoopTab:AddSection({
+    Name = "스팸"
+})
 LoopTab:AddToggle({
     Name = "스팸  <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
@@ -8287,7 +8269,9 @@ LoopTab:AddButton({
 })
 
 
-antiTab:AddSection("Teleport | Toggle")
+antiTab:AddSection({
+    Name = "보호"
+})
 local AntiGrabV1 = antiTab:AddToggle({
     Name = "무질량 이동 | TP",
     Default = false,
@@ -8403,7 +8387,9 @@ local AntiGrabV1 = antiTab:AddToggle({
 antiTab:AddLabel("루프 TP같은경우 루프킬,킥을 우회할때 유용합니다.")
 
 
-antiTab:AddSection("오너쉽")
+antiTab:AddSection({
+    Name = "오너쉽"
+})
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
@@ -8525,7 +8511,9 @@ antiTab:AddToggle({
     end,
 })
 
-antiTab:AddSection("그랩 | 토클")
+antiTab:AddSection({
+    Name = "안티 | 그랩"
+})
 local AntiGrab = antiTab:AddToggle({
     Name = "안티 그랩   <font color='rgb(0,255,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
@@ -8898,7 +8886,9 @@ end
 
 LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 
-antiTab:AddSection("블롭")
+antiTab:AddSection({
+    Name = "블롭맨"
+})
 local AntiBlob = antiTab:AddToggle({
 	Name = "안티 블롭맨",
 	Default = false,
@@ -8957,7 +8947,9 @@ task.spawn(function()
         AntiBlobmanToggle:Set(true)
     end
 end)
-
+antiTab:AddSection({
+    Name = "안티 메슬리즈"
+})
 local AntiMassless = antiTab:AddToggle({
     Name = "안티 메슬리즈  <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
@@ -8969,7 +8961,9 @@ local AntiMassless = antiTab:AddToggle({
 })
 --AntiMassless:Set(true)
 
-antiTab:AddSection("안티 에어 서스펜션")
+antiTab:AddSection({
+    Name = "안티 에어 서스펜션"
+})
 antiTab:AddToggle({
     Name = "디펜스 / 에어 서브펜션",
     Default = false,
@@ -9012,7 +9006,9 @@ antiTab:AddToggle({
     end
 })
 
-antiTab:AddSection("")
+antiTab:AddSection({
+    Name = "플레이스"
+})
 
 local AntiInPlots = antiTab:AddToggle({
     Name = "안티 인플레이스",
@@ -9038,7 +9034,9 @@ local AntiVoid = antiTab:AddToggle({
     end,
 })
 --AntiVoid:Set(true)
-
+antiTab:AddSection({
+    Name = "붐"
+})
 local AntiExplode = antiTab:AddToggle({
     Name = "안티 폭탄",
     Default = false,
@@ -9214,7 +9212,9 @@ local AntiBlobUse = antiTab:AddToggle({
     end
 })
 
-antiTab:AddSection("킥")
+antiTab:AddSection({
+    Name = "안티 킥"
+})
 
 local flyingResetConn = nil
 local resetProtectionConn = nil
@@ -9437,7 +9437,9 @@ local AntiPCLD = antiTab:AddToggle({
 })
 --if not TESTPP then AntiPCLD:Set(true) end
 
-antiTab:AddSection("래그돌")
+antiTab:AddSection({
+    Name = "래그돌"
+})
 local PermRag = antiTab:AddToggle({
     Name = "래그돌",
     Default = false,
@@ -9452,7 +9454,9 @@ local PermRag = antiTab:AddToggle({
     end
 })
 
-antiTab:AddSection("구찌")
+antiTab:AddSection({
+    Name = "GUCCI"
+})
 local AutoGucci = antiTab:AddToggle({
     Name = "오토구찌(킥위험 약간 있음!)  <font color='rgb(255,146,123)'>[블롭맨]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
     Default = false,
@@ -9516,7 +9520,9 @@ antiTab:AddToggle({
     end,
 })
 
-playerTab:AddSection("플레이어")
+playerTab:AddSection({
+    Name = "플레이어"
+})
 playerTab:AddToggle({
     Name = "이동 속도   <font color='rgb(1,1,255)'>[스피드]</font>",
     Default = false,
@@ -9619,7 +9625,9 @@ playerTab:AddToggle({
     end
 })
 
-playerTab:AddSection("나머지")
+playerTab:AddSection({
+    Name = "다른것들"
+})
 local NoClipToggle = playerTab:AddToggle({
     Name = "노클립",
     Default = false,
@@ -9666,7 +9674,9 @@ local flyInput = playerTab:AddInput({
 })
 --flyInput:Set("80")
 
-playerTab:AddSection("모바일플라이")
+playerTab:AddSection({
+    Name = "플라이 모바일"
+})
 local function mflyF()
     if not mflyT then return end
     
