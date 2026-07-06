@@ -9711,7 +9711,7 @@ keybindTab:AddSection({
     Name = "줄"
 })
 
-local antilagDet = keybindTab:AddTextbox("linesTextBoxFlag", {
+local antilagDet = keybindTab:AddTextbox("linesTextboxFlag", {
     Text = "줄 감지",
     Default = "30",
     Placeholder = "",
