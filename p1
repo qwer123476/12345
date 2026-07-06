@@ -249,9 +249,56 @@ Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 -- [Rayfield 라이브러리 로드를 Orion 라이브러리 로드로 변경]
 local OrionLib =  loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
 local HttpService = game:GetService("HttpService")
+
+-- =========================
+-- 📂 파일 & 데이터
+-- =========================
 local FILE = "config.txt"
-local data = {}
--- [기존 코드 훼손 및 누락 방지를 위한 Rayfield 더미 테이블 및 원본 테마 테이블 유지]
+
+-- =========================
+-- 💾 저장 함수
+-- =========================
+local function SaveAll()
+    local saveTable = {}
+
+    -- Orion UI 전체 스냅샷
+    for flag, obj in pairs(OrionLib.Flags or {}) do
+        if obj and obj.Value ~= nil then
+            saveTable[flag] = obj.Value
+        end
+    end
+
+    local success, err = pcall(function()
+        writefile(FILE, HttpService:JSONEncode(saveTable))
+    end)
+
+    if not success then
+        warn("SAVE ERROR:", err)
+    end
+end
+
+-- =========================
+-- 📂 불러오기 함수
+-- =========================
+local function LoadAll()
+    if not isfile(FILE) then return end
+
+    local success, data = pcall(function()
+        return HttpService:JSONDecode(readfile(FILE))
+    end)
+
+    if success and type(data) == "table" then
+        for flag, value in pairs(data) do
+            if OrionLib.Flags and OrionLib.Flags[flag] then
+                pcall(function()
+                    OrionLib.Flags[flag]:Set(value)
+                end)
+            end
+        end
+    end
+end
+
+
 local Rayfield = {
     CreateToggle = function() end,
     CreateButton = function() end,
@@ -11380,43 +11427,32 @@ lagTab:AddTextbox({
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger() 
 Window:AddConfigTab()
-local function Save()
-    local all = {}
 
-    for _, v in pairs(OrionLib.Flags) do
-        all[v.Flag] = v.Value
-    end
+local SettingsTab = Window:MakeTab({
+    Name = "Settings"
+})
 
-    writefile(FILE, HttpService:JSONEncode(all))
-end
-local function Load()
-    if isfile(FILE) then
-        local data = HttpService:JSONDecode(readfile(FILE))
-
-        for flag, value in pairs(data) do
-            if OrionLib.Flags[flag] then
-                OrionLib.Flags[flag]:Set(value)
-            end
-        end
-    end
-end
-Tab1:AddButton({
+-- =========================
+-- 🔘 버튼 (여기에 위치)
+-- =========================
+SettingsTab:AddButton({
     Name = "저장",
     Callback = function()
-        Save()
+        SaveAll()
     end
 })
 
-Tab1:AddButton({
+SettingsTab:AddButton({
     Name = "불러오기",
     Callback = function()
-        Load()
+        LoadAll()
     end
 })
 
-
-
-
+-- =========================
+-- 자동 복구
+-- =========================
+LoadAll()
 function OrionLib:Destroy()
 	Orion:Destroy()
 end
