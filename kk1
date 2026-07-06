@@ -10314,7 +10314,7 @@ local Button = plotTab:AddButton({
 
 
 
-FunTab:AddSection({
+funTab:AddSection({
     Name = "꼬추 만들기"
 })
 
