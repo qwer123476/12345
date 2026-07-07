@@ -419,6 +419,20 @@ mainWindowStroke = Instance.new("UIStroke")
 local mainWindowGradient = Instance.new("UIGradient", mainWindowStroke)
 mainWindowGradient.Parent = windowStroke
 
+mainWindowGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,127,0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,0,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
+})
+
+local RunService = game:GetService("RunService")
+RunService.RenderStepped:Connect(function()
+    mainWindowGradient.Offset += Vector2.new(0.0008, 0)
+end)
+
 
 function OrionLib:SetTheme()
 	local themeData = self.Themes[self.SelectedTheme]
@@ -475,16 +489,7 @@ function OrionLib:SetTheme()
 
 	OrionLib:SaveThemeCfg()
 end
-mainWindowGradient.Parent = windowStroke
 
-mainWindowGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
-    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,127,0)),
-    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
-    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,0,255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
-})
 
 local RunService = game:GetService("RunService")
 RunService.RenderStepped:Connect(function()
