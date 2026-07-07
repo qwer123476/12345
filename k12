@@ -7874,6 +7874,22 @@ LoopTab:AddToggle({
                         end
                     end
 
+                    -- 통합 로직 시작
+                    hum.BreakJointsOnDeath = false
+                    hum.WalkSpeed = 0
+                    hum.JumpPower = 0
+                    hum.AutoRotate = false
+                    local conn = hum:GetPropertyChangedSignal("Health"):Connect(function() 
+                        if hum.Health < 100 then hum.Health = 100 end 
+                    end)
+                    pcall(function()
+                        local r = hum.RigType
+                        hum.RigType = (r == Enum.HumanoidRigType.R6) and Enum.HumanoidRigType.R15 or Enum.HumanoidRigType.R6
+                        task.wait(0.05)
+                        hum.RigType = r
+                    end)
+                    -- 통합 로직 끝
+
                     if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 then
                         if myHrp and hrp and originCF then
                             hrp.CFrame = CFrame.new(originCF.X, originCF.Y + 50, originCF.Z)
@@ -7893,7 +7909,8 @@ LoopTab:AddToggle({
                     while blobKickT3 and player.Parent == game.Players and player.Character == char and hum.Health > 0 and hrp:IsDescendantOf(workspace) do
                         task.wait(0.2)
                     end
-
+                    
+                    conn:Disconnect() -- 루프 종료 후 리소스 정리
                     task.wait(0.1)
                     break
                 end
