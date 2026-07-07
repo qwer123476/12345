@@ -475,31 +475,20 @@ function OrionLib:SetTheme()
 
 	OrionLib:SaveThemeCfg()
 end
-task.spawn(function()
-    local RunService = game:GetService("RunService")
+mainWindowGradient.Parent = windowStroke
 
-    while true do
-        if windowStroke then
-            if not windowStroke:FindFirstChildOfClass("UIGradient") then
-                local gradient = Instance.new("UIGradient")
-                gradient.Parent = windowStroke
+mainWindowGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,127,0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,0,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
+})
 
-                gradient.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
-                    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,127,0)),
-                    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
-                    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
-                    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,0,255)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
-                })
-
-                RunService.RenderStepped:Connect(function()
-                    gradient.Offset += Vector2.new(0.0008, 0)
-                end)
-            end
-        end
-        task.wait(1)
-    end
+local RunService = game:GetService("RunService")
+RunService.RenderStepped:Connect(function()
+    mainWindowGradient.Offset += Vector2.new(0.0008, 0)
 end)
 RunService.RenderStepped:Connect(function(dt)
     mainWindowGradient.Offset = mainWindowGradient.Offset + Vector2.new(0.0008, 0)
