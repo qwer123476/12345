@@ -6347,7 +6347,7 @@ getTab:AddToggle({
     Name = "킥알림    <font color='rgb(255,10,123)'>[프라임]</font>",
     
     save = true,
-    Flag = "5",
+    Flag = "9797979765",
     Callback = function(Value)
         ifKickThenT = Value
         if Value then
