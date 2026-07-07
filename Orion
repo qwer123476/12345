@@ -419,19 +419,7 @@ mainWindowStroke = Instance.new("UIStroke")
 local mainWindowGradient = Instance.new("UIGradient", mainWindowStroke)
 mainWindowGradient.Parent = windowStroke
 
-mainWindowGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
-    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,127,0)),
-    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
-    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,0,255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
-})
-local RunService = game:GetService("RunService")
 
-RunService.RenderStepped:Connect(function(dt)
-    mainWindowGradient.Offset = mainWindowGradient.Offset + Vector2.new(0.0008, 0)
-end)
 function OrionLib:SetTheme()
 	local themeData = self.Themes[self.SelectedTheme]
 	if not themeData then return end
@@ -487,7 +475,19 @@ function OrionLib:SetTheme()
 
 	OrionLib:SaveThemeCfg()
 end
+mainWindowGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,127,0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,0,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
+})
+local RunService = game:GetService("RunService")
 
+RunService.RenderStepped:Connect(function(dt)
+    mainWindowGradient.Offset = mainWindowGradient.Offset + Vector2.new(0.0008, 0)
+end)
 local WhitelistedMouse = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2,Enum.UserInputType.MouseButton3}
 local BlacklistedKeys = {Enum.KeyCode.Unknown,Enum.KeyCode.W,Enum.KeyCode.A,Enum.KeyCode.S,Enum.KeyCode.D,Enum.KeyCode.Up,Enum.KeyCode.Left,Enum.KeyCode.Down,Enum.KeyCode.Right,Enum.KeyCode.Slash,Enum.KeyCode.Tab,Enum.KeyCode.Backspace,Enum.KeyCode.Escape}
 
