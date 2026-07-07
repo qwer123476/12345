@@ -1207,21 +1207,38 @@ function OrionLib:MakeWindow(WindowConfig)
 local TitleGradient = Instance.new("UIGradient")
 TitleGradient.Parent = WindowName
 
+
 TitleGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
-	ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-	ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
-	ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-	ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))
+	ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 80, 80)),
+	ColorSequenceKeypoint.new(0.16, Color3.fromRGB(255, 170, 80)),
+	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(255, 245, 90)),
+	ColorSequenceKeypoint.new(0.50, Color3.fromRGB(90, 255, 170)),
+	ColorSequenceKeypoint.new(0.66, Color3.fromRGB(90, 190, 255)),
+	ColorSequenceKeypoint.new(0.83, Color3.fromRGB(170, 90, 255)),
+	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 80, 80))
 })
 
-TweenService:Create(
-	TitleGradient,
-	TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
-	{Rotation = 360}
-):Play()
+TitleGradient.Rotation = 0
+TitleGradient.Offset = Vector2.new(-1.5, 0)
+
+task.spawn(function()
+	local t = 0
+
+	while true do
+		local dt = task.wait()
+		t += dt
+
+		
+		TitleGradient.Offset = Vector2.new((t * 0.2) % 3 - 1.5, 0)
+
+		
+		TitleGradient.Rotation = math.sin(t * 0.18) * 1
+
+		
+		local b = 248 + math.sin(t * 0.9) * 7
+		WindowName.TextColor3 = Color3.fromRGB(b, b, b)
+	end
+end)
     task.wait(0.1)
 
     local TextService = game:GetService("TextService")
