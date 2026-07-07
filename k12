@@ -7241,14 +7241,23 @@ Logger()
 -- =========================================================
 
 local function findPlayer(text)
-    if not text or text == "" then return nil end
+    if not text or text == "" then
+        return nil
+    end
+
     text = text:lower()
 
     for _, p in ipairs(Players:GetPlayers()) do
-        if p.Name:lower():find(text, 1, true) then
+        local username = p.Name:lower()
+        local display = p.DisplayName:lower()
+
+        -- Username 또는 DisplayName의 앞부분부터만 일치
+        if username:find(text, 1, true) == 1
+        or display:find(text, 1, true) == 1 then
             return p
         end
     end
+
     return nil
 end
 
@@ -7320,7 +7329,7 @@ end
 -- =========================================================
 
 DropdownV1 = ListTab:AddDropdown({
-    Name = "타겟리스트",
+    Name = "타겟리스트(미작동)",
     Options = playersInLoop1V,
     MultipleOptions = true,
     Callback = function(options)
