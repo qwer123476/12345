@@ -4365,7 +4365,7 @@ function MasslessGrabF()
     end
 end
 
-function NoClipGrabF()
+Function NoClipGrabF()
     local trackedTargets = {}
     local playerCheckCooldown = 0
     
@@ -4452,8 +4452,13 @@ function NoClipGrabF()
                 
                 for target, data in pairs(trackedTargets) do
                     if data.isPlayer then
-                        local newParts = {}
-                  
+                        
+                    end
+                end
+            end
+        end
+    end
+end
 
 function ViewToolF()
     local Tools = {
