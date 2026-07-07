@@ -8175,216 +8175,482 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local rs = ReplicatedStorage
 local plr = Players.LocalPlayer
 
-local activeKicks = {}      
-local activeThreads = {}    
-local f4LoopCalled = false  
+local destroyCount = 0
+OwnerKickMODED = false
+SitMODED = false
+OnlyOwner = false
+SkipOL = false
+OLTPValue = Vector3.new(0, 20, 0) -- 20스터드 위로 고정
 
--- [통합된 F4 오너쉽 + 끌고오기 메인 루프 함수]
-function loopPlayerOwnershipF4()
-    task.spawn(function()
-        while loopPlayerTF4 do
-            local targetList = {}
-            if playersInLoop2V then 
-                for _, v in pairs(playersInLoop2V) do table.insert(targetList, v) end 
+function loopPlayerBlobF4()
+    local runningTasks = {}
+    local monitoredPlayers = {}
+    local independentHoldConnections = {}
+    local anchorToggleTasks = {}
+    local ownerTags = {}
+    local originPositions = {}
+    local destroyCounts = {} 
+
+    local function processPlayer(player)
+        if not player then return end
+
+        while blobLoopT4 do
+            if not player.Parent then
+                monitoredPlayers[player] = nil
+                independentHoldConnections[player] = nil
+                if anchorToggleTasks[player] then
+                    task.cancel(anchorToggleTasks[player])
+                    anchorToggleTasks[player] = nil
+                end
+                if ownerTags[player] then
+                    ownerTags[player]:Destroy()
+                    ownerTags[player] = nil
+                end
+                if originPositions[player] then
+                    originPositions[player] = nil
+                end
+                if player.Character then
+                    local charTOR = player.Character:FindFirstChild("Torso")
+                    if charTOR then
+                        charTOR.Anchored = false
+                    end
+                end
+                return
             end
 
-            for _, name in ipairs(targetList) do
-                if not loopPlayerTF4 then break end 
+            local character = player.Character
+            while blobLoopT4 and (not character or not character:FindFirstChild("Humanoid")) do
+                if not player.Parent then return end
+                task.wait(0.5)
+                character = player.Character
+            end
 
-                local player = Players:FindFirstChild(name)
-                if player and player ~= plr and not table.find(Whitelist or {}, player.Name) then
-                    
-                    local myChar = plr.Character
-                    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-                    
-                    local targetChar = player.Character
-                    local targetHrp = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-                    local targetHum = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
+            local charHUM = character and character:FindFirstChild("Humanoid")
+            if not charHUM then
+                task.wait(0.5)
+                continue
+            end
 
-                    if myChar and myHrp and myHum and myHum.Health > 0 and targetChar and targetHrp and targetHum and targetHum.Health > 0 then
-                        
-                        if (PPs and PPs:FindFirstChild(name)) or (inv and inv:FindFirstChild(name)) then 
-                            continue 
-                        end
+            if not originPositions[player] then
+                local myChar = plr.Character
+                local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                if myHRP then
+                    originPositions[player] = myHRP.CFrame
+                end
+            end
 
-                        local distance = (myHrp.Position - targetHrp.Position).Magnitude
+            while blobLoopT4 and charHUM and charHUM.Health <= 0 do
+                if not player.Parent then return end
+                if ownerTags[player] then
+                    ownerTags[player]:Destroy()
+                    ownerTags[player] = nil
+                end
 
-                        -- 1단계: 반경 25스터드보다 멀리 있다면 [끌고오기]
-                        if distance > 25 then
-                            if activeKicks[player] then
-                                activeKicks[player]:Disconnect()
-                                activeKicks[player] = nil
+                local myChar = plr.Character
+                local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                if myHRP and originPositions[player] then
+                    myHRP.CFrame = originPositions[player]
+                end
+
+                if independentHoldConnections[player] then
+                    independentHoldConnections[player]:Disconnect()
+                    independentHoldConnections[player] = nil
+                end
+                
+                if anchorToggleTasks[player] then
+                    task.cancel(anchorToggleTasks[player])
+                    anchorToggleTasks[player] = nil
+                end
+                
+                task.wait(0.5)
+                character = player.Character
+                charHUM = character and character:FindFirstChild("Humanoid")
+            end
+
+            local _, safeHRP, head = safeGetCharacterParts(player)
+            if not safeHRP or not head then
+                task.wait(0.5)
+                continue
+            end
+
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if not myHRP then
+                task.wait(0.5)
+                continue
+            end
+
+            local charHRP = character:FindFirstChild("HumanoidRootPart")
+            local charTOR = character:FindFirstChild("Torso")
+            if not charHRP then
+                task.wait(0.5)
+                continue
+            end
+
+            local tpRunning = true
+            local CF
+            task.spawn(function()
+                while tpRunning and blobLoopT4 do
+                    if not player.Parent then break end
+                    local ok, cf = TP(player)
+                    if ok and cf then 
+                        CF = cf
+                    end
+                    task.wait()
+                end
+            end)
+
+            local shouldContinue = false
+            while blobLoopT4 do
+                if not character.Parent or not charHUM or charHUM.Health <= 0 then 
+                    tpRunning = false
+                    shouldContinue = true
+
+                    local mChar = plr.Character
+                    local mHRP = mChar and mChar:FindFirstChild("HumanoidRootPart")
+                    if mHRP and originPositions[player] then
+                        mHRP.CFrame = originPositions[player]
+                    end
+                    break
+                end
+
+                local ownerTag = head:FindFirstChild("PartOwner")
+                if not ownerTag or (ownerTag:IsA("StringValue") and ownerTag.Value ~= plr.Name) then
+                    rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                    if charHRP then rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, charHRP.CFrame) end
+                end
+
+                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+                    break
+                else
+                    if charHRP then
+                        charHRP.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                        charHRP.AssemblyAngularVelocity = Vector3.new(0,0,0)
+                    end
+                end
+                task.wait()
+            end
+
+            if not shouldContinue then
+                tpRunning = false
+
+                if CF then
+                    BACK(CF)
+                elseif originPositions[player] then
+                    BACK(originPositions[player])
+                end
+
+                if anchorToggleTasks[player] then
+                    task.cancel(anchorToggleTasks[player])
+                    anchorToggleTasks[player] = nil
+                end
+
+                if not ownerTags[player] then
+                    local tag = Instance.new("StringValue")
+                    tag.Name = "OwnerKickRagdoll"
+                    tag.Parent = head
+                    ownerTags[player] = tag
+                end
+
+                local targetNames = {"NinjaKunai","NinjaShuriken","NinjaKatana","ToolCleaver","ToolDiggingForkRusty","ToolPencil","ToolPickaxe"}
+                for _, child in ipairs(workspace:GetChildren()) do
+                    if child:IsA("Folder") and child.Name:match("SpawnedInToys$") then
+                        for _, item in ipairs(child:GetChildren()) do
+                            if table.find(targetNames, item.Name) and item:FindFirstChild("StickyPart") then
+                                local sticky = item.StickyPart
+                                local weld = sticky:FindFirstChild("StickyWeld")
+                                if weld and weld:IsA("WeldConstraint") and weld.Part1 and weld.Part1:IsDescendantOf(character) then
+                                    rs.GrabEvents.SetNetworkOwner:FireServer(sticky, sticky.CFrame)
+                                    sticky.CFrame = CFrame.new(0,9999,0)
+                                end
                             end
-
-                            UpdateCurrentBlobman()
-                            local character, hrp, head = safeGetCharacterParts(player)
-                            if hrp and head then
-                                local characterParts = {hrp}
-                                if character:FindFirstChild("Head") then table.insert(characterParts, character.Head) end
-                                local torsoParts = {"Torso"}
-                                for _, partName in ipairs(torsoParts) do
-                                    local part = character:FindFirstChild(partName)
-                                    if part then table.insert(characterParts, part) end
-                                end
-                                local armParts = {"Left Arm", "Right Arm"}
-                                for _, partName in ipairs(armParts) do
-                                    local part = character:FindFirstChild(partName)
-                                    if part then table.insert(characterParts, part) end
-                                end
-                                local legParts = {"Left Leg", "Right Leg"}
-                                for _, partName in ipairs(legParts) do
-                                    local part = character:FindFirstChild(partName)
-                                    if part then table.insert(characterParts, part) end
-                                end
-
-                                local originCF = myHrp.CFrame
-                                local tpRunning = true
-                                
-                                local tpThread = task.spawn(function()
-                                    while tpRunning and loopPlayerTF4 do
-                                        if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
-                                           (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
-                                            break
-                                        end
-                                        local ok, cf = TP(player)
-                                        if ok and cf then CF = cf end
-                                        task.wait()
-                                    end
-                                end)
-                                table.insert(activeThreads, tpThread)
-
-                                local success = false
-                                local startTime = tick()
-                                local timeout = 10
-
-                                while tpRunning and tick() - startTime < timeout and loopPlayerTF4 do
-                                    if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
-                                       (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
-                                        break
-                                    end
-                                    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") or 
-                                       (player.Character:FindFirstChildOfClass("Humanoid") and player.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
-                                        break
-                                    end
-
-                                    for _, part in ipairs(characterParts) do
-                                        if part and part.Parent then
-                                            rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
-                                        end
-                                    end
-                                    
-                                    local ownerTag = head:FindFirstChild("PartOwner")
-                                    if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
-                                        success = true
-                                        break
-                                    end
-                                    task.wait()
-                                end
-
-                                tpRunning = false
-                                if coroutine.status(tpThread) ~= "dead" then task.cancel(tpThread) end
-
-                                if originCF and myHrp and myHrp.Parent then
-                                    myHrp.CFrame = originCF
-                                    task.wait()
-                                end
-
-                                if success then
-                                    for _, part in ipairs(characterParts) do
-                                        if part and part.Parent and myHrp and myHrp.Parent then
-                                            part.CFrame = myHrp.CFrame
-                                        end
-                                    end
-                                end
-
-                                if originCF and myHrp and myHrp.Parent then 
-                                    BACK(originCF) 
-                                end
-                            end
-                        end
-
-                        -- 2단계: 내 반경 25스터드 이내 진입 시 [F4 고정 및 물리 무력화]
-                        local checkDistance = (myHrp.Position - targetHrp.Position).Magnitude
-                        if checkDistance <= 25 and not activeKicks[player] then
-                            
-                            -- ★ 핵심 변경: 중력 계산이 끝난 직후인 Heartbeat로 변경하여 지터링 방지
-                            local connection
-                            connection = RunService.Heartbeat:Connect(function()
-                                if not loopPlayerTF4 or not player or not player.Parent then
-                                    connection:Disconnect()
-                                    if activeKicks[player] == connection then activeKicks[player] = nil end
-                                    return
-                                end
-
-                                local cChar = player.Character
-                                if not cChar then return end
-                                local cHrp = cChar:FindFirstChild("HumanoidRootPart")
-                                local cHead = cChar:FindFirstChild("Head")
-                                local cHum = cChar:FindFirstChild("Humanoid")
-                                if not cHrp or not cHead or not cHum or cHum.Health <= 0 then return end
-
-                                local mChar = plr.Character
-                                local mHrp = mChar and mChar:FindFirstChild("HumanoidRootPart")
-                                local mHum = mChar and mChar:FindFirstChild("Humanoid")
-                                if not mHrp or not mHum or mHum.Health <= 0 then return end
-
-                                local mSeat = mHum.SeatPart
-                                if mSeat and mSeat.Parent ~= nil then return end
-
-                                -- ★ 매스리스 및 충돌 권한 로컬 무력화 (내 화면에서 물리 엔진 저항을 아예 차단)
-                                for _, part in ipairs(cChar:GetChildren()) do
-                                    if part:IsA("BasePart") then
-                                        part.CanCollide = false
-                                        part.Massless = true
-                                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                    end
-                                end
-
-                                -- 오너쉽 스팸
-                                ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(cHrp, cHrp.CFrame)
-                                ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(cHead, cHead.CFrame)
-
-                                if ReplicatedStorage.GrabEvents:FindFirstChild("DestroyGrabLine") then
-                                    ReplicatedStorage.GrabEvents.DestroyGrabLine:FireServer(cHrp)
-                                end
-
-                                -- ★ 요청하신대로 내 위치 기준 Y축 +28스터드 공중에 완전 고정
-                                local targetCF = mHrp.CFrame * CFrame.new(0, 28, 0)
-                                cHrp.CFrame = targetCF
-                            end)
-                            
-                            activeKicks[player] = connection
                         end
                     end
                 end
-                task.wait(0.003) 
-            end
 
-            for lockedPlayer, connection in pairs(activeKicks) do
-                if not lockedPlayer.Parent or not table.find(targetList, lockedPlayer.Name) then
-                    connection:Disconnect()
-                    activeKicks[lockedPlayer] = nil
+                if independentHoldConnections[player] then
+                    independentHoldConnections[player]:Disconnect()
+                    independentHoldConnections[player] = nil
+                end
+
+                -- ★ 핵심 위치 고정 & 오너쉽 스팸 극대화 로직 (Heartbeat)
+                independentHoldConnections[player] = RunService.Heartbeat:Connect(function()
+                    if not blobLoopT4 or not character or not character.Parent or not charHRP or not charHRP.Parent or not charHUM or charHUM.Health <= 0 then
+                        if independentHoldConnections[player] then 
+                            independentHoldConnections[player]:Disconnect()
+                            independentHoldConnections[player] = nil
+                            destroyCounts[player] = nil
+                        end
+                        if anchorToggleTasks[player] then
+                            task.cancel(anchorToggleTasks[player])
+                            anchorToggleTasks[player] = nil
+                        end
+                        if ownerTags[player] then
+                            ownerTags[player]:Destroy()
+                            ownerTags[player] = nil
+                        end
+                        if charTOR then
+                            charTOR.Anchored = false
+                        end
+
+                        local mChar = plr.Character
+                        local mHRP = mChar and mChar:FindFirstChild("HumanoidRootPart")
+                        if mHRP and originPositions[player] then
+                            mHRP.CFrame = originPositions[player]
+                        end
+                        return
+                    end
+
+                    -- 타겟 위치 지정 (기존 원형 배치 로직)
+                    local activeKicking = {}
+                    for p, t in pairs(runningTasks) do
+                        if t and p.Parent and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and ownerTags[p] then
+                            table.insert(activeKicking, p)
+                        end
+                    end
+                    table.sort(activeKicking, function(a, b) return a.Name < b.Name end)
+
+                    local targetPosition
+                    if #activeKicking <= 1 then
+                        targetPosition = myHRP.CFrame * CFrame.new(OLTPValue)
+                    else
+                        local index = table.find(activeKicking, player) or 1
+                        local count = #activeKicking
+                        local angle = (index - 1) * (2 * math.pi / count)
+                        local radius = 20
+                        local offset = Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+                        targetPosition = (myHRP.CFrame * CFrame.new(OLTPValue)) * CFrame.new(offset)
+                    end
+
+                    -- 1. 매 프레임 타겟 모든 파트 물리 저항 무력화 + 강제 속도 0
+                    for _, part in ipairs(character:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.Massless = true
+                            part.CanCollide = false
+                            part.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                            part.AssemblyAngularVelocity = Vector3.new(0,0,0)
+                        end
+                    end
+
+                    -- 2. 좌표 즉각 고정
+                    charHRP.CFrame = targetPosition
+                    if head then head.CFrame = targetPosition end
+
+                    -- 3. ★ 딜레이 유발 조건문 전부 삭제 & 오너쉽 리퀘스트 극도로 빠르게 난사 ★
+                    rs.GrabEvents.SetNetworkOwner:FireServer(charHRP, targetPosition)
+                    if head then
+                        rs.GrabEvents.SetNetworkOwner:FireServer(head, targetPosition)
+                    end
+
+                    if not OnlyOwner then 
+                        rs.GrabEvents.DestroyGrabLine:FireServer(charHRP) 
+                    end
+                    
+                    if SitMODED then 
+                        charHUM.Sit = true 
+                    end
+                end)
+
+                if SkipOL then task.wait(2) end
+
+                anchorToggleTasks[player] = task.spawn(function()
+                    while blobLoopT4 and character and character.Parent and charHRP and charHRP.Parent and charHUM and charHUM.Health > 0 do
+                        if charTOR and SkipOL then charTOR.Anchored = true end
+                        task.wait()
+                    end
+                end)
+
+                while blobLoopT4 do
+                    if not character.Parent or not charHRP.Parent or charHUM.Health <= 0 then 
+                        if independentHoldConnections[player] then
+                            independentHoldConnections[player]:Disconnect()
+                            independentHoldConnections[player] = nil
+                        end
+                        if anchorToggleTasks[player] then
+                            task.cancel(anchorToggleTasks[player])
+                            anchorToggleTasks[player] = nil
+                        end
+                        if ownerTags[player] then
+                            ownerTags[player]:Destroy()
+                            ownerTags[player] = nil
+                        end
+                        if charTOR then
+                            charTOR.Anchored = false
+                        end
+
+                        local mChar = plr.Character
+                        local mHRP = mChar and mChar:FindFirstChild("HumanoidRootPart")
+                        if mHRP and originPositions[player] then
+                            mHRP.CFrame = originPositions[player]
+                        end
+                        break 
+                    end
+                    task.wait()
+                end
+
+                if independentHoldConnections[player] then 
+                    independentHoldConnections[player]:Disconnect()
+                    independentHoldConnections[player] = nil
+                end
+
+                if anchorToggleTasks[player] then
+                    task.cancel(anchorToggleTasks[player])
+                    anchorToggleTasks[player] = nil
+                end
+
+                if ownerTags[player] then
+                    ownerTags[player]:Destroy()
+                    ownerTags[player] = nil
+                end
+
+                if charTOR then
+                    charTOR.Anchored = false
+                end
+
+                local mChar = plr.Character
+                local mHRP = mChar and mChar:FindFirstChild("HumanoidRootPart")
+                if mHRP and originPositions[player] then
+                    mHRP.CFrame = originPositions[player]
                 end
             end
 
-            task.wait(0.5) 
+            if originPositions[player] then
+                originPositions[player] = nil
+            end
+            
+            task.wait(0.35)
         end
+    end
+
+    task.spawn(function()
+        while blobLoopT4 do
+            local targetList = {}
+            if playersInLoop1V then for _, v in pairs(playersInLoop1V) do table.insert(targetList, v) end end
+            if playersInLoop2V then for _, v in pairs(playersInLoop2V) do table.insert(targetList, v) end end
+
+            for _, name in ipairs(targetList) do
+                local player = game.Players:FindFirstChild(name)
+                if not player or player == plr then continue end
+                if PPs:FindFirstChild(name) or inv:FindFirstChild(name) then continue end
+
+                if not monitoredPlayers[player] then
+                    monitoredPlayers[player] = true
+                    if not runningTasks[player] then
+                        runningTasks[player] = task.spawn(function()
+                            pcall(function() processPlayer(player) end)
+                            runningTasks[player] = nil
+                            monitoredPlayers[player] = nil
+                            if independentHoldConnections[player] then
+                                independentHoldConnections[player]:Disconnect()
+                                independentHoldConnections[player] = nil
+                            end
+                            if anchorToggleTasks[player] then
+                                task.cancel(anchorToggleTasks[player])
+                                anchorToggleTasks[player] = nil
+                            end
+                            if ownerTags[player] then
+                                ownerTags[player]:Destroy()
+                                ownerTags[player] = nil
+                            end
+                            if originPositions[player] then
+                                originPositions[player] = nil
+                            end
+                            destroyCounts[player] = nil
+                            if player.Character then
+                                local charTOR = player.Character:FindFirstChild("Torso")
+                                if charTOR then
+                                    charTOR.Anchored = false
+                                end
+                            end
+                        end)
+                    end
+                end
+            end
+
+            for player, taskInfo in pairs(runningTasks) do
+                if not player.Parent then
+                    task.cancel(taskInfo)
+                    runningTasks[player] = nil
+                    monitoredPlayers[player] = nil
+                    if independentHoldConnections[player] then
+                        independentHoldConnections[player]:Disconnect()
+                        independentHoldConnections[player] = nil
+                    end
+                    if anchorToggleTasks[player] then
+                        task.cancel(anchorToggleTasks[player])
+                        anchorToggleTasks[player] = nil
+                    end
+                    if ownerTags[player] then
+                        ownerTags[player]:Destroy()
+                        ownerTags[player] = nil
+                    end
+                    if originPositions[player] then
+                        originPositions[player] = nil
+                    end
+                    destroyCounts[player] = nil
+                    if player.Character then
+                        local charTOR = player.Character:FindFirstChild("Torso")
+                        if charTOR then
+                            charTOR.Anchored = false
+                        end
+                    end
+                end
+            end
+            task.wait(0.5)
+        end
+
+        for player, taskInfo in pairs(anchorToggleTasks) do
+            if taskInfo then task.cancel(taskInfo) end
+        end
+        for _, taskInfo in pairs(runningTasks) do task.cancel(taskInfo) end
+        for player, connection in pairs(independentHoldConnections) do
+            if connection then connection:Disconnect() end
+        end
+        for player, tag in pairs(ownerTags) do
+            if tag then tag:Destroy() end
+        end
+        
+        ownerTags = {}
+
+        for player, originCF in pairs(originPositions) do
+            local myChar = plr.Character
+            local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if myHRP and originCF then
+                myHRP.CFrame = originCF
+            end
+        end
+        originPositions = {}
+
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player.Character then
+                local charTOR = player.Character:FindFirstChild("Torso")
+                if charTOR then
+                    charTOR.Anchored = false
+                end
+            end
+        end
+
+        runningTasks = {}
+        monitoredPlayers = {}
+        independentHoldConnections = {}
+        anchorToggleTasks = {}
+        destroyCounts = {}
     end)
 end
 
 -- ==========================================
--- Orion 토글 버튼 설정 (완벽 리셋 기능 탑재)
+-- Orion 토글 버튼 설정 (완벽 연동)
 -- ==========================================
+local f4LoopCalled = false
+
 local LoopF4 = LoopTab:AddToggle({
-    Name = "오너쉽 루프 F4   <font color='rgb(0,255,0)'>[그랩]</font>",
+    Name = "노블롭 킥   <font color='rgb(255,155,8)'>[NTO]</font>",
     Default = false,
-    Flag = "F4_Ownership_Save_Config",
+    Flag = "F4_BlobOwnership_Save_Config",
     Save = true,
     Callback = function(Value)
-        loopPlayerTF4 = Value
-        if loopPlayerTF4 then
+        blobLoopT4 = Value
+        if blobLoopT4 then
             table.clear(playersInLoop2V)
             for i, e in ipairs(playersInLoop1V) do
                 local nameOnly = e:match("^(.-) %(") or e
@@ -8393,24 +8659,12 @@ local LoopF4 = LoopTab:AddToggle({
             
             if not f4LoopCalled then
                 f4LoopCalled = true
-                loopPlayerOwnershipF4()
+                loopPlayerBlobF4()
             end
         else
-            loopPlayerTF4 = false
+            blobLoopT4 = false
             table.clear(playersInLoop2V)
             f4LoopCalled = false
-            
-            for lockedPlayer, connection in pairs(activeKicks) do
-                if connection then connection:Disconnect() end
-            end
-            table.clear(activeKicks)
-
-            for _, thread in ipairs(activeThreads) do
-                if coroutine.status(thread) ~= "dead" then
-                    task.cancel(thread)
-                end
-            end
-            table.clear(activeThreads)
         end
     end
 })
