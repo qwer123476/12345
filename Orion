@@ -3829,12 +3829,12 @@ end)
 		})
 
 		local windowstroke = config_tab:AddSection({
-			Name = "윈도우 스톡"
+			Name = "테두리"
 		})
 
 
 		windowstroke:AddSlider({
-			Name = "스톡",
+			Name = "테두리 두께",
 			Min = 1,
 			Max = 3,
 			Default = 1.5,
