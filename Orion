@@ -363,7 +363,7 @@ function AddThemeObject(Object, Type)
     return Object
 end  
 
---[[
+
 local function SetTheme()
 	for Name, Type in pairs(OrionLib.ThemeObjects) do
 		for _, Object in pairs(Type) do
@@ -371,7 +371,7 @@ local function SetTheme()
 		end    
 	end    
 end
-]]--
+
 
 local GlobalSearch = Instance.new("TextBox")
 
