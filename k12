@@ -416,7 +416,7 @@ end
 
 -- [Orion UI Window 생성으로 교체]
 local Window = OrionLib:MakeWindow({
-    Name = "PACA HUB [Premium]",
+    Name = "PACA HUB V3 [Premium]",
     HidePremium = false,
     SaveConfig = false,
     ConfigFolder = "PacaHub",
@@ -11436,7 +11436,7 @@ Logger()
 Window:AddConfigTab()
 
 local SettingsTab = Window:MakeTab({
-    Name = "Settings"
+    Name = "설정 저장"
 })
 
 -- =========================
