@@ -4365,7 +4365,7 @@ function MasslessGrabF()
     end
 end
 
-Function NoClipGrabF()
+function NoClipGrabF()
     local trackedTargets = {}
     local playerCheckCooldown = 0
     
