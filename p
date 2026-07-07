@@ -8482,31 +8482,36 @@ end)
 
 antiTab:AddToggle({
     Name = "안티그랩V3   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-    
     save = true,
     Flag = "AutoStruggle", 
     Callback = function(enabled)
         if enabled then
             autoStruggleCoroutine = RunService.Heartbeat:Connect(function()
                 local character = localPlayer.Character
-                if character and character:FindFirstChild("Head") then
-                    local head = character.Head
-                    local partOwner = head:FindFirstChild("PartOwner")
-                    if partOwner then
-                        Struggle:FireServer()
-                        ReplicatedStorage.GameCorrectionEvents.StopAllVelocity:FireServer()
-                        for _, part in pairs(character:GetChildren()) do
-                            if part:IsA("BasePart") then
-                                part.Anchored = true
-                            end
+                if not character then return end
+                
+                local head = character:FindFirstChild("Head")
+                if head and head:FindFirstChild("PartOwner") then
+                    
+                    
+                    local struggleEvent = ReplicatedStorage:FindFirstChild("Struggle") 
+                    if struggleEvent then
+                        struggleEvent:FireServer()
+                    end
+
+                    
+                    local gameEvents = ReplicatedStorage:FindFirstChild("GameCorrectionEvents")
+                    if gameEvents then
+                        local stopVelocity = gameEvents:FindFirstChild("StopAllVelocity")
+                        if stopVelocity then
+                            stopVelocity:FireServer()
                         end
-                        while localPlayer.IsHeld.Value do
-                            wait()
-                        end
-                        for _, part in pairs(character:GetChildren()) do
-                            if part:IsA("BasePart") then
-                                part.Anchored = false
-                            end
+                    end
+
+                    
+                    for _, part in pairs(character:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.Anchored = true
                         end
                     end
                 end
