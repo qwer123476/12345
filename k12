@@ -412,7 +412,8 @@ local DDTab = Window:MakeTab({Name = "티배깅", Icon = "rbxassetid://448334599
 local FDTab = Window:MakeTab({Name = "친구 보호", Icon = "rbxassetid://6026568198", PremiumOnly = false})        
 local antiTab = Window:MakeTab({Name = "안전", Icon = "rbxassetid://6034831332", PremiumOnly = false})               
 local ListTab = Window:MakeTab({Name = "명단", Icon = "rbxassetid://3572491301", PremiumOnly = false})              
-local LoopTab = Window:MakeTab({Name = "조지기", Icon = "rbxassetid://6023426923", PremiumOnly = false})             
+local LoopTab = Window:MakeTab({Name = "조지기", Icon = "rbxassetid://6023426923", PremiumOnly = false})    
+local oneTab = Window:MakeTab({Name = "한번 조지기", Icon = "rbxassetid://448335998", PremiumOnly = false})
 local AuraTab = Window:MakeTab({Name = "아우라", Icon = "rbxassetid://6031068423", PremiumOnly = false})   
 local bdTab = Window:MakeTab({Name = "배경체인저", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local funTab = Window:MakeTab({Name = "찌끄레기", Icon = "rbxassetid://4483345998", PremiumOnly = false})            
@@ -6512,31 +6513,11 @@ DevTab:AddToggle({
         end
     end
 })
-LoopTab:AddSection({
+oneTab:AddSection({
 	Name = "특별기능"
 })
-local Loop1 = LoopTab:AddToggle({
-    Name = "PTM",
-    
-    save = true,
-    Flag = "2991",
-    Callback = function(Value)
-        loopPlayerT3 = Value
-        if loopPlayerT3 then
-            table.clear(playersInLoop2V)
-            for i, e in ipairs(playersInLoop1V) do
-                local nameOnly = e:match("^(.-) %(") or e
-                table.insert(playersInLoop2V, nameOnly)
-            end
-            loopPlayerF3()
-        else
-            loopPlayerT3 = false
-            table.clear(playersInLoop2V)
-        end
-    end
-})
 
-LoopTab:AddButton({
+oneTab:AddButton({
     Name = "킬    <font color='rgb(255,0,0)'>[오너]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6593,7 +6574,7 @@ LoopTab:AddButton({
     end
 })
 
-LoopTab:AddButton({
+oneTab:AddButton({
     Name = "날리기    <font color='rgb(255,0,0)'>[오너]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6688,7 +6669,8 @@ LoopTab:AddButton({
 })
 
 
-DevTab:AddToggle({
+
+oneTab:AddToggle({
     Name = "wd 소환 (상대안티킥 해제)",
     Default = false,
     Flag = "5",
@@ -6700,7 +6682,7 @@ DevTab:AddToggle({
     end
 })
 
-local RRButton = LoopTab:AddButton({
+local RRButton = oneTab:AddButton({
     Name = "릴리즈    <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6712,7 +6694,7 @@ local RRButton = LoopTab:AddButton({
     end
 })
 
-local LGButton = LoopTab:AddButton({
+local LGButton = oneTab:AddButton({
     Name = "메슬리즈   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6724,7 +6706,7 @@ local LGButton = LoopTab:AddButton({
     end
 })
 
-local RGButton = LoopTab:AddButton({
+local RGButton = oneTab:AddButton({
     Name = "잡기   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
@@ -6736,7 +6718,7 @@ local RGButton = LoopTab:AddButton({
     end
 })
 
-local RDButton = LoopTab:AddButton({
+local RDButton = oneTab:AddButton({
     Name = "놓기   <font color='rgb(255,154,123)'>[블롭맨]</font>",
     Callback = function()
         table.clear(playersInLoop2V)
