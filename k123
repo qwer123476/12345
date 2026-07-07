@@ -8172,12 +8172,12 @@ local Loop2 = LoopTab:AddToggle({
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local rs = ReplicatedStorage -- 제공해주신 끌고오기 스크립트의 rs 변수 대응
+local rs = ReplicatedStorage
 local plr = Players.LocalPlayer
 
-local activeKicks = {}      -- F4 고정용 커넥션 저장 테이블
-local activeThreads = {}    -- 끌고오기(TP) 스레드 관리 테이블
-local f4LoopCalled = false  -- 중복 루프 방지용 플래그
+local activeKicks = {}      
+local activeThreads = {}    
+local f4LoopCalled = false  
 
 -- [통합된 F4 오너쉽 + 끌고오기 메인 루프 함수]
 function loopPlayerOwnershipF4()
@@ -8189,7 +8189,7 @@ function loopPlayerOwnershipF4()
             end
 
             for _, name in ipairs(targetList) do
-                if not loopPlayerTF4 then break end -- 루프 도중 꺼지면 즉시 중단
+                if not loopPlayerTF4 then break end 
 
                 local player = Players:FindFirstChild(name)
                 if player and player ~= plr and not table.find(Whitelist or {}, player.Name) then
@@ -8202,19 +8202,16 @@ function loopPlayerOwnershipF4()
                     local targetHrp = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
                     local targetHum = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
 
-                    -- 양쪽 유저가 모두 살아있는 상태일 때만 판단
                     if myChar and myHrp and myHum and myHum.Health > 0 and targetChar and targetHrp and targetHum and targetHum.Health > 0 then
                         
-                        -- 예외 처리 명단 체크 (PPs, inv)
                         if (PPs and PPs:FindFirstChild(name)) or (inv and inv:FindFirstChild(name)) then 
                             continue 
                         end
 
                         local distance = (myHrp.Position - targetHrp.Position).Magnitude
 
-                        -- 1단계: 반경 25스터드보다 멀리 있다면 [끌고오기] 로직 실행
+                        -- 1단계: 반경 25스터드보다 멀리 있다면 [끌고오기]
                         if distance > 25 then
-                            -- 다시 멀어졌다면 기존 F4 고정 커넥션이 있을 경우 잠시 해제
                             if activeKicks[player] then
                                 activeKicks[player]:Disconnect()
                                 activeKicks[player] = nil
@@ -8223,7 +8220,6 @@ function loopPlayerOwnershipF4()
                             UpdateCurrentBlobman()
                             local character, hrp, head = safeGetCharacterParts(player)
                             if hrp and head then
-                                -- 전신 파트 수집
                                 local characterParts = {hrp}
                                 if character:FindFirstChild("Head") then table.insert(characterParts, character.Head) end
                                 local torsoParts = {"Torso"}
@@ -8245,7 +8241,6 @@ function loopPlayerOwnershipF4()
                                 local originCF = myHrp.CFrame
                                 local tpRunning = true
                                 
-                                -- 실시간 TP 스레드 생성 및 등록
                                 local tpThread = task.spawn(function()
                                     while tpRunning and loopPlayerTF4 do
                                         if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
@@ -8263,7 +8258,6 @@ function loopPlayerOwnershipF4()
                                 local startTime = tick()
                                 local timeout = 10
 
-                                -- 오너쉽 탈취 및 조건 성립 대기 루프
                                 while tpRunning and tick() - startTime < timeout and loopPlayerTF4 do
                                     if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or 
                                        (plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
@@ -8310,13 +8304,13 @@ function loopPlayerOwnershipF4()
                             end
                         end
 
-                        -- 2단계: 내 반경 25스터드 이내로 진입 완료 시 [F4 고정 로직] 작동
-                        -- (처음부터 가까이 있었거나, 위에서 성공적으로 끌고 온 경우 실행됨)
+                        -- 2단계: 내 반경 25스터드 이내 진입 시 [F4 고정 및 물리 무력화]
                         local checkDistance = (myHrp.Position - targetHrp.Position).Magnitude
                         if checkDistance <= 25 and not activeKicks[player] then
                             
+                            -- ★ 핵심 변경: 중력 계산이 끝난 직후인 Heartbeat로 변경하여 지터링 방지
                             local connection
-                            connection = RunService.Stepped:Connect(function()
+                            connection = RunService.Heartbeat:Connect(function()
                                 if not loopPlayerTF4 or not player or not player.Parent then
                                     connection:Disconnect()
                                     if activeKicks[player] == connection then activeKicks[player] = nil end
@@ -8332,14 +8326,23 @@ function loopPlayerOwnershipF4()
 
                                 local mChar = plr.Character
                                 local mHrp = mChar and mChar:FindFirstChild("HumanoidRootPart")
-                                campaigners = mChar and mChar:FindFirstChild("Humanoid")
-                                if not mHrp or not campaigners or campaigners.Health <= 0 then return end
+                                local mHum = mChar and mChar:FindFirstChild("Humanoid")
+                                if not mHrp or not mHum or mHum.Health <= 0 then return end
 
-                                -- 탈것 탑승 시 일시 중지
-                                local mSeat = campaigners.SeatPart
+                                local mSeat = mHum.SeatPart
                                 if mSeat and mSeat.Parent ~= nil then return end
 
-                                -- 오너쉽 스팸 및 묶기
+                                -- ★ 매스리스 및 충돌 권한 로컬 무력화 (내 화면에서 물리 엔진 저항을 아예 차단)
+                                for _, part in ipairs(cChar:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        part.CanCollide = false
+                                        part.Massless = true
+                                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                                    end
+                                end
+
+                                -- 오너쉽 스팸
                                 ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(cHrp, cHrp.CFrame)
                                 ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(cHead, cHead.CFrame)
 
@@ -8347,22 +8350,18 @@ function loopPlayerOwnershipF4()
                                     ReplicatedStorage.GrabEvents.DestroyGrabLine:FireServer(cHrp)
                                 end
 
-                                -- 내 머리 위 (Y+6) 강제 고정 박아버리기
+                                -- ★ 요청하신대로 내 위치 기준 Y축 +28스터드 공중에 완전 고정
                                 local targetCF = mHrp.CFrame * CFrame.new(0, 28, 0)
                                 cHrp.CFrame = targetCF
-
-                                cHrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                cHrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                             end)
                             
                             activeKicks[player] = connection
                         end
                     end
                 end
-                task.wait(0.003) -- 플레이어간 미세 대기시간
+                task.wait(0.003) 
             end
 
-            -- 명단에서 아웃되었거나 서버를 나간 유저들 물리 해제 및 커넥션 정리
             for lockedPlayer, connection in pairs(activeKicks) do
                 if not lockedPlayer.Parent or not table.find(targetList, lockedPlayer.Name) then
                     connection:Disconnect()
@@ -8370,7 +8369,7 @@ function loopPlayerOwnershipF4()
                 end
             end
 
-            task.wait(0.5) -- 전체 리스폰/감시 주기 변경
+            task.wait(0.5) 
         end
     end)
 end
@@ -8379,7 +8378,7 @@ end
 -- Orion 토글 버튼 설정 (완벽 리셋 기능 탑재)
 -- ==========================================
 local LoopF4 = LoopTab:AddToggle({
-    Name = "노블롭 킥   <font color='rgb(255,155,8)'>[NTO]</font>",
+    Name = "오너쉽 루프 F4   <font color='rgb(0,255,0)'>[그랩]</font>",
     Default = false,
     Flag = "F4_Ownership_Save_Config",
     Save = true,
@@ -8397,18 +8396,15 @@ local LoopF4 = LoopTab:AddToggle({
                 loopPlayerOwnershipF4()
             end
         else
-            -- 끄기(OFF) 전환 시 예외 없이 완벽하게 초기화하여 잔상 차단
             loopPlayerTF4 = false
             table.clear(playersInLoop2V)
             f4LoopCalled = false
             
-            -- 1. 돌고 있는 모든 물리 고정(Stepped) 강제 파괴
             for lockedPlayer, connection in pairs(activeKicks) do
                 if connection then connection:Disconnect() end
             end
             table.clear(activeKicks)
 
-            -- 2. 백그라운드에서 실행 중이던 모든 끌고오기(TP) 연산 스레드 강제 종료
             for _, thread in ipairs(activeThreads) do
                 if coroutine.status(thread) ~= "dead" then
                     task.cancel(thread)
@@ -8418,6 +8414,7 @@ local LoopF4 = LoopTab:AddToggle({
         end
     end
 })
+
 
 LoopTab:AddSection({
     Name = "스팸"
