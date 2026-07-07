@@ -1346,7 +1346,7 @@ end)
 	
 	mainWindowStroke.Parent = MainWindow
 	mainWindowStroke.Thickness = 2.5
-	mainWindowStroke.Color = Color3.fromRGB(255,255,255)
+	--mainWindowStroke.Color = Color3.fromRGB(255,255,255)
 	mainWindowStroke.Transparency = 0.1
 	mainWindowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	
