@@ -1,17 +1,4 @@
-if not getgenv().MyLoaderAuthorized then
-    game.Players.LocalPlayer:Kick("공식 로더를 사용하세요.")
-    return
-end
 
-getgenv().MyLoaderAuthorized = nil
-
-local ok, err = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/nan/main/ii"))()
-end)
-
-if not ok then
-    warn("[Loader Error] " .. tostring(err))
-end
 
 
 print("AP FTAP Script 시작 - 설정 저장 활성화")
