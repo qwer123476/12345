@@ -1347,6 +1347,14 @@ end)
 	mainWindowStroke.Parent = MainWindow
 	mainWindowStroke.Thickness = 2.5
 	--mainWindowStroke.Color = Color3.fromRGB(255,255,255)
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.01 do
+            mainWindowStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.5) 
+        end
+    end
+end)
 	mainWindowStroke.Transparency = 0.1
 	mainWindowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	
