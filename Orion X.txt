@@ -1204,7 +1204,24 @@ function OrionLib:MakeWindow(WindowConfig)
 		Font = Enum.Font.GothamBlack,
 		TextSize = 20
 	}), "Text")
+local TitleGradient = Instance.new("UIGradient")
+TitleGradient.Parent = WindowName
 
+TitleGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+	ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+	ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+	ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+	ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))
+})
+
+TweenService:Create(
+	TitleGradient,
+	TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
+	{Rotation = 360}
+):Play()
     task.wait(0.1)
 
     local TextService = game:GetService("TextService")
@@ -1295,13 +1312,13 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	
 
-	--[[
+	
 	mainWindowGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
 		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 120, 255)),
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 255))
 	})
-	]]--
+	
 
 	mainWindowGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),   -- Vermelho
@@ -1533,8 +1550,8 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	if WindowConfig.FreeMouse then
 		OrionLib:MakeNotification({
-			Name = "Free Mouse mode is on",
-			Content = "if you want it to go back to normal, just press M or close the GUI",
+			Name = "프리미엄이 켜졌습니다",
+			Content = "M키 또는 닫기버튼으로 다시 열수있습니다",
 			Time = 10
 		})
 	end
