@@ -1059,8 +1059,8 @@ function AutoGucciF()
             local OCF = hrp.CFrame
 
             -- 🔥 앉기
-            fireproximityprompt(prompt)
-            task.wait(0.25)
+            --fireproximityprompt(prompt)
+            --task.wait(0.25)
 
             -- 위치 복구
             hrp.CFrame = OCF
