@@ -10490,308 +10490,310 @@ funTab:AddSection({
     Name = "꼬추 만들기"
 })
 
-local PencilInput = funTab:AddTextbox({
-    Name = "연필 [dick]",
-    Default = "",
-    save = true,
-    Flag = "6464646193",
-    TextDisappear = false,
-    Callback = function(Value)
-        -- 입력값은 변수에 저장됨
-    end
+funTab:AddTextbox({
+	Name = "연필 [dick]",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(Value)
+		InputValue = Value
+	end	  
 })
 
 funTab:AddButton({
-    Name = "만들기",
-    Callback = function()
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-        local pencilCountText = PencilInput.Value -- Orion의 Textbox 값 호출 방식
-        local TNUM = tonumber(pencilCountText)
+	Name = "만들기",
+	Callback = function()
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+		local TNUM = tonumber(InputValue)
 
-        if not TNUM or TNUM <= 0 then  
-            warn("Please enter a valid number!")  
-            OrionLib:MakeNotification({
-                Name = "[ ✏️ ]",
-                Content = "유효한 숫자를 입력하세요.",
-                Image = "rbxassetid://4483345998",
-                Time = 3
-            })
-            return  
-        end  
+		if not TNUM or TNUM <= 0 then
+			warn("Please enter a valid number!")
+			OrionLib:MakeNotification({
+				Name = "[ ✏️ ]",
+				Content = "숫자를 적으세요",
+				Time = 3
+			})
+			return
+		end
 
-        local character = plr.Character or plr.CharacterAdded:Wait()  
-        local hrp = character:WaitForChild("HumanoidRootPart")  
-        local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")  
-        local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
+		local plr = game.Players.LocalPlayer
+		local character = plr.Character or plr.CharacterAdded:Wait()
+		local hrp = character:WaitForChild("HumanoidRootPart")
 
-        -- 내부 함수 정의
-        local function GetPlotNumber()
-            local char = plr.Character
-            if not char then return nil end
-            if char.Parent == workspace then return nil end
-            if char.Parent.Name == "PlayersInPlots" then
-                for _, plot in workspace.Plots:GetChildren() do  
-                    for _, owner in plot.PlotSign.ThisPlotsOwners:GetChildren() do  
-                        if owner.Value == plr.Name then
-                            return tonumber(string.match(plot.Name, "%d+"))
-                        end
-                    end
-                end
-            end
-            return nil
-        end
+		local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
+		local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
 
-        local function GetInventory()
-            local plotNumber = GetPlotNumber()
-            if plotNumber then
-                local plotItems = workspace:FindFirstChild("PlotItems")
-                if plotItems and plotItems:FindFirstChild("Plot" .. plotNumber) then
-                    return plotItems["Plot" .. plotNumber]
-                end
-            end
-            return workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
-        end
+		function GetPlotNumber()
+			local char = plr.Character
+			if not char then return nil end
 
-        local function createPencil(index)
-            while not plr.CanSpawnToy.Value do task.wait() end
-            task.spawn(function()  
-                SpawnToy:InvokeServer("ToolPencil", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0,0,0))  
-            end)  
-            task.wait(0.3)  
-            local inv = GetInventory()  
-            local pencil
-            for _, item in pairs(inv:GetChildren()) do
-                if item.Name == "ToolPencil" then pencil = item break end
-            end
-            if not pencil then return nil end  
+			if char.Parent == workspace then 
+				return nil
+			elseif char.Parent.Name == "PlayersInPlots" then
+				for _, plot in workspace.Plots:GetChildren() do
+					for _, owner in plot.PlotSign.ThisPlotsOwners:GetChildren() do
+						if owner.Value == plr.Name then
+							return tonumber(plot.Name:match("%d+"))
+						end
+					end
+				end
+			end
+			return nil
+		end
 
-            local stickyPart = pencil:WaitForChild("StickyPart")  
-            local SoundPart = pencil:WaitForChild("SoundPart")  
-            if stickyPart and SoundPart then  
-                ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)  
-                ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, character.Torso.CFrame)  
-            end  
+		function GetInventory()
+			local plotNumber = GetPlotNumber()
 
-            if SoundPart:FindFirstChild("PartOwner") then SoundPart.CFrame = CFrame.new(0, 599999, 999) end  
-            stickyPart.Name = "w" .. index  
-            for _, part in pairs(pencil:GetDescendants()) do  
-                if part:IsA("BasePart") and part.Color == Color3.fromRGB(158, 108, 141) then part.Name = "a" .. index end  
-            end  
-            return pencil
-        end
+			if plotNumber then
+				local plotItems = workspace:FindFirstChild("PlotItems")
+				if plotItems then
+					local plotFolder = plotItems:FindFirstChild("Plot" .. plotNumber)
+					if plotFolder then
+						return plotFolder
+					end
+				end
+			end
+			return workspace:WaitForChild(plr.Name .. "SpawnedInToys")
+		end
 
-        -- 생성 및 연결 로직
-        local pencils = {}
-        for i = 1, TNUM do
-            local p = createPencil(i)
-            if p then table.insert(pencils, p) end
-            task.wait(0.1)
-        end
+		local function createPencil(index)
+			while not plr.CanSpawnToy.Value do task.wait() end
 
-        for i = 1, #pencils - 1 do
-            local cur, nxt = pencils[i], pencils[i + 1]
-            if cur and nxt then  
-                local aF = cur:FindFirstChild("w" .. i)  
-                local aT = nxt:FindFirstChild("a" .. (i + 1))  
-                if aF and aT then StickyPartEvent:FireServer(aF, aT, CFrame.Angles(0, math.rad(-90), 0)) end  
-            end  
-            task.wait(0.05)
-        end
+			task.spawn(function()
+				SpawnToy:InvokeServer("ToolPencil", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0,0,0))
+			end)
 
-        local torso2 = character:WaitForChild("HumanoidRootPart"):WaitForChild("RagdollTouchedHitbox")
-        if torso2 and #pencils >= TNUM then
-            local lastP = pencils[TNUM]
-            local wLast = lastP:FindFirstChild("w" .. TNUM)
-            if wLast then
-                local relCF = torso2.CFrame:ToObjectSpace(torso2.CFrame * CFrame.new(0, -1.1, 0.1) * CFrame.Angles(0, math.rad(180), 0))
-                StickyPartEvent:FireServer(wLast, torso2, relCF)
-            end
-        end
-    end
+			task.wait(0.3)
+
+			local inv = GetInventory()
+
+			local pencil
+			for i = #inv:GetChildren(), 1, -1 do
+				local obj = inv:GetChildren()[i]
+				if obj.Name == "ToolPencil" then
+					pencil = obj
+					break
+				end
+			end
+
+			if not pencil then return nil end
+
+			local stickyPart = pencil:WaitForChild("StickyPart")
+			local SoundPart = pencil:WaitForChild("SoundPart")
+
+			if stickyPart and SoundPart then
+				ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)
+				ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, character:FindFirstChild("Torso") and character.Torso.CFrame or hrp.CFrame)
+			end
+
+			local PartOwner = SoundPart:WaitForChild("PartOwner")
+			if PartOwner then
+				SoundPart.CFrame = CFrame.new(0, 599999, 999)
+			end
+
+			stickyPart.Name = "w" .. index
+
+			for _, part in pairs(pencil:GetDescendants()) do
+				if part:IsA("BasePart") and part.Color == Color3.fromRGB(158, 108, 141) then
+					part.Name = "a" .. index
+				end
+			end
+
+			return pencil
+		end
+
+		local pencils = {}
+
+		for i = 1, TNUM do
+			local pencil = createPencil(i)
+			if pencil then
+				table.insert(pencils, pencil)
+			end
+			task.wait(0.1)
+		end
+
+		for i = 1, #pencils - 1 do
+			local current = pencils[i]
+			local nextP = pencils[i + 1]
+
+			if current and nextP then
+				local from = current:FindFirstChild("w" .. i)
+				local to = nextP:FindFirstChild("a" .. (i + 1))
+
+				if from and to then
+					StickyPartEvent:FireServer(from, to, CFrame.Angles(0, math.rad(-90), 0))
+				end
+			end
+			task.wait(0.05)
+		end
+
+		local torso2 = character:WaitForChild("HumanoidRootPart"):WaitForChild("RagdollTouchedHitbox")
+
+		if torso2 and #pencils >= TNUM then
+			local last = pencils[TNUM]
+			if last then
+				local wLast = last:FindFirstChild("w" .. TNUM)
+				if wLast then
+					local attachCF = torso2.CFrame * CFrame.new(0, -1.1, 0.1) * CFrame.Angles(0, math.rad(180), 0)
+					local relativeCF = torso2.CFrame:ToObjectSpace(attachCF)
+					StickyPartEvent:FireServer(wLast, torso2, relativeCF)
+				end
+			end
+		end
+	end
 })
 
 
 
 
 
+
+local InputValue = ""
+
 funTab:AddTextbox({
-   Name = "쿠나이",
-   Default = "",
-    save = true,
-   PlaceholderText = "Value",
-   RemoveTextAfterFocusLost = false,
-   Flag = "Inpu16t1",
-   Callback = function(Text)
-   end
+	Name = "쿠나이",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(Value)
+		InputValue = Value
+	end
 })
 
 funTab:AddSection({
-    Name = "UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요."
+	Name = "UFO,하늘섬 돌,광산열차를 잡은채로 10으로설정한후 만들기를 해보세요."
 })
-local Ctratee = funTab:AddButton({
-   Name = "무력화   <font color='rgb(0,0,255)'>[프리미엄]</font>",
-   Callback = function()
-       local ReplicatedStorage = game:GetService("ReplicatedStorage")
-       local Players = game:GetService("Players")
-       local plr = Players.LocalPlayer
-       
-       local kunaiCountText = Inputt.CurrentValue
-       local TNUM = tonumber(kunaiCountText)
 
-       if not TNUM or TNUM <= 0 or TNUM > 100 then
-           Rayfield:Notify({Title = "[ 🥷 ]", Content = "Invalid Value", Duration = 3, Image = 0})
-           return
-       end
+funTab:AddButton({
+	Name = "무력화 [프리미엄]",
+	Callback = function()
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+		local Players = game:GetService("Players")
+		local plr = Players.LocalPlayer
+		
+		local TNUM = tonumber(InputValue)
 
-       local character = plr.Character or plr.CharacterAdded:Wait()
-       local hrp = character:WaitForChild("HumanoidRootPart")
-       local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
-       
-       if not torso then
-           return
-       end
-       
-       local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
-       local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
+		if not TNUM or TNUM <= 0 or TNUM > 100 then
+			OrionLib:MakeNotification({
+				Name = "[ 🥷 ]",
+				Content = "Invalid Value",
+				Time = 3
+			})
+			return
+		end
 
-       function GetTargetPartFromGrabParts()
-           local grabPartsModel = workspace:FindFirstChild("GrabParts")
-           if not grabPartsModel then return nil end
+		local character = plr.Character or plr.CharacterAdded:Wait()
+		local hrp = character:WaitForChild("HumanoidRootPart")
+		local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+		
+		if not torso then return end
+		
+		local StickyPartEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
+		local SpawnToy = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("SpawnToyRemoteFunction")
 
-           local grabPart = grabPartsModel:FindFirstChild("GrabPart")
-           if not grabPart then return nil end
+		local function GetTargetPartFromGrabParts()
+			local grabPartsModel = workspace:FindFirstChild("GrabParts")
+			if not grabPartsModel then return nil end
 
-           local weldConstraint = grabPart:FindFirstChild("WeldConstraint")
-           if not weldConstraint or not weldConstraint:IsA("WeldConstraint") then return nil end
+			local grabPart = grabPartsModel:FindFirstChild("GrabPart")
+			if not grabPart then return nil end
 
-           if not weldConstraint.Part1 then return nil end
+			local weldConstraint = grabPart:FindFirstChild("WeldConstraint")
+			if not weldConstraint or not weldConstraint:IsA("WeldConstraint") then return nil end
 
-           return weldConstraint.Part1
-       end
+			return weldConstraint.Part1
+		end
 
-       function GetPlotNumber()
-           local char = plr.Character
-           if not char then return nil end
+		local function GetPlotNumber()
+			local char = plr.Character
+			if not char then return nil end
 
-           if char.Parent == workspace then 
-               return nil
-           elseif char.Parent.Name == "PlayersInPlots" then
-               for _, plot in workspace.Plots:GetChildren() do
-                   local plotSign = plot:FindFirstChild("PlotSign")
-                   if plotSign and plotSign:FindFirstChild("ThisPlotsOwners") then
-                       for _, owner in plotSign.ThisPlotsOwners:GetChildren() do
-                           if owner.Value == plr.Name then
-                               if plot.Name == "Plot1" then
-                                   return 1
-                               elseif plot.Name == "Plot2" then
-                                   return 2
-                               elseif plot.Name == "Plot3" then
-                                   return 3
-                               elseif plot.Name == "Plot4" then
-                                   return 4
-                               elseif plot.Name == "Plot5" then
-                                   return 5
-                               end
-                           end
-                       end
-                   end
-               end
-           end
-           return nil
-       end
+			if char.Parent == workspace then 
+				return nil
+			elseif char.Parent.Name == "PlayersInPlots" then
+				for _, plot in workspace.Plots:GetChildren() do
+					local plotSign = plot:FindFirstChild("PlotSign")
+					if plotSign and plotSign:FindFirstChild("ThisPlotsOwners") then
+						for _, owner in plotSign.ThisPlotsOwners:GetChildren() do
+							if owner.Value == plr.Name then
+								return tonumber(plot.Name:match("%d+"))
+							end
+						end
+					end
+				end
+			end
+			return nil
+		end
 
-       function GetInventory()
-           local plotNumber = GetPlotNumber()
+		local function GetInventory()
+			local plotNumber = GetPlotNumber()
 
-           if plotNumber then
-               local plotItems = workspace:FindFirstChild("PlotItems")
-               if plotItems then
-                   local plotFolder = plotItems:FindFirstChild("Plot" .. plotNumber)
-                   if plotFolder then
-                       return plotFolder
-                   end
-               end
-           end
-           
-           local defaultInv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
-           if defaultInv then
-               return defaultInv
-           end
-           
-           return nil
-       end
+			if plotNumber then
+				local plotItems = workspace:FindFirstChild("PlotItems")
+				if plotItems then
+					local plotFolder = plotItems:FindFirstChild("Plot" .. plotNumber)
+					if plotFolder then
+						return plotFolder
+					end
+				end
+			end
+			
+			return workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+		end
 
-       local targetPart = GetTargetPartFromGrabParts()
-       if not targetPart then
-           return
-       end
+		local targetPart = GetTargetPartFromGrabParts()
+		if not targetPart then return end
 
-       function createAndAttachKunai()
-           while not plr.CanSpawnToy.Value do 
-               task.wait(0.1) 
-           end
+		local function createAndAttachKunai()
+			while not plr.CanSpawnToy.Value do task.wait(0.1) end
 
-           local position = hrp.CFrame
+			task.spawn(function()
+				SpawnToy:InvokeServer("NinjaKunai", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0, 0, 0))
+			end)
 
-           local success, result = pcall(function()
- task.spawn(function()
-               return SpawnToy:InvokeServer("NinjaKunai", hrp.CFrame * CFrame.new(0,5,15), Vector3.new(0, 0, 0))
-           end)
-           end)
-           
-           if not success then
-               return nil
-           end
+			task.wait(0.2)
 
-           task.wait(0.2)
+			local inv = GetInventory()
+			if not inv then return nil end
 
-           local inv = GetInventory()
-           if not inv then
-               return nil
-           end
+			local kunai
+			for i = #inv:GetChildren(), 1, -1 do
+				local obj = inv:GetChildren()[i]
+				if obj.Name == "NinjaKunai" then
+					kunai = obj
+					break
+				end
+			end
 
-           local kunai
-           local children = inv:GetChildren()
-           for i = #children, 1, -1 do
-               if children[i].Name == "NinjaKunai" then
-                   kunai = children[i]
-                   break
-               end
-           end
+			if not kunai then return nil end
 
-           if not kunai then 
-               return nil 
-           end
+			local stickyPart = kunai:WaitForChild("StickyPart")
+			local SoundPart = kunai:WaitForChild("SoundPart")
 
-           local stickyPart = kunai:WaitForChild("StickyPart")
-           local SoundPart = kunai:WaitForChild("SoundPart")
+			if stickyPart and SoundPart then
+				pcall(function()
+					ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)
+					ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, torso.CFrame)
+				end)
+			end
 
-           if stickyPart and SoundPart then
-               pcall(function()
-                   ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, SoundPart.CFrame)
-                   ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(SoundPart, torso.CFrame)
-               end)
-           end
+			if stickyPart then
+				local relativeCF = targetPart.CFrame:ToObjectSpace(targetPart.CFrame)
+				pcall(function()
+					StickyPartEvent:FireServer(stickyPart, targetPart, relativeCF)
+				end)
+			end
 
-           if stickyPart then
-               local attachPosition = targetPart.CFrame
-               local relativeCF = targetPart.CFrame:ToObjectSpace(attachPosition)
+			task.wait(0.1)
+			return kunai
+		end
 
-               pcall(function()
-                   StickyPartEvent:FireServer(stickyPart, targetPart, relativeCF)
-               end)
-           end
-
-           task.wait(0.1)
-           return kunai
-       end
-
-       for i = 1, TNUM do
-           createAndAttachKunai()
-           task.wait(0.1)
-       end
-   end
+		for i = 1, TNUM do
+			createAndAttachKunai()
+			task.wait(0.1)
+		end
+	end
 })
+
+
 
 bdTab:AddSection({
     Name = "배경"
