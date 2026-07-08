@@ -3839,7 +3839,7 @@ end)
 
 		windowstroke:AddSlider({
 			Name = "테두리 두께",
-			Min = 1,
+			Min = 0,
 			Max = 3,
 			Default = 1.5,
 			Color = Color3.fromRGB(59, 122, 179),
