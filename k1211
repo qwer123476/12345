@@ -1100,7 +1100,7 @@ function AutoGucciF()
 
                     
                     
-                    blobHRP.CFrame = blobHRP.CFrame + Vector3.new(0, 80000, 0)
+                    blobHRP.CFrame = blobHRP.CFrame + Vector3.new(0, 9999, 0)
                 end
 
                 task.wait()
