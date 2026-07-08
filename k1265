@@ -1023,103 +1023,105 @@ end
 end
 
 function AutoGucciF()
+    local SetNetworkOwner = rs:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
+    local SpawnToyRemoteFunction = RepStorage.MenuToys.SpawnToyRemoteFunction
+    local RagdollRemote = RepStorage.CharacterEvents.RagdollRemote
+    local DestroyToy = RepStorage.MenuToys.DestroyToy
+
     while AutoGucciT do
-        local success = pcall(function()
+        local success, err = pcall(function()
+
             spawnBlobmanF()
 
-             char = plr.Character
-            if not char then
-                task.wait(0.2)
-                return 
-            end
+            -- 🔴 blob 생성 대기 (핵심)
+            repeat task.wait() until blobmanInstanceS 
+                and blobmanInstanceS:FindFirstChild("VehicleSeat")
 
-             hrp = char:WaitForChild("HumanoidRootPart")
-             hum = char:WaitForChild("Humanoid")
-             rag = hum:WaitForChild("Ragdolled")
-             held = plr:WaitForChild("IsHeld")
+            local char = plr.Character
+            if not char then return end
 
-             SpawnToyRemoteFunction = RepStorage.MenuToys.SpawnToyRemoteFunction 
-             RagdollRemote = RepStorage.CharacterEvents.RagdollRemote
-             DestroyToy = RepStorage.MenuToys.DestroyToy
-             seat = blobmanInstanceS:WaitForChild("VehicleSeat"):WaitForChild("ProximityPrompt")
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            local hum = char:WaitForChild("Humanoid")
+            local rag = hum:WaitForChild("Ragdolled")
+            local held = plr:WaitForChild("IsHeld")
 
-            if not hrp then return end
-             OCF = hrp.CFrame
+            local seat = blobmanInstanceS.VehicleSeat
+            local OCF = hrp.CFrame
 
-            if not sitJumpT then
-                task.spawn(sitJumpF)
-                sitJumpT = true
-            end
+            -- 🔥 앉기 트리거 (필수)
+            fireproximityprompt(seat:WaitForChild("ProximityPrompt"))
 
-            task.spawn(ragdollLoopF)
-            task.wait(0.3)
-            --fireproximityprompt(seat)
-            --task.wait(0.2)
-            --hrp.Massless = false
-            --task.wait(0.15)
+            task.wait(0.2)
+
+            -- 위치 복원
             hrp.CFrame = OCF
 
-            successCheck = true
-            sitJumpT = false
-            RagdollRemote:FireServer(hrp, 0.001)
+            -- 🔥 래그돌 (시간 늘림)
+            RagdollRemote:FireServer(hrp, 0.5)
+
+            local successCheck = true
 
             while successCheck and AutoGucciT do
+                -- 죽으면 종료
                 if hum.Health <= 0 then
-                    if blobmanInstanceS then
-                        DestroyToy:FireServer(blobmanInstanceS)
-                    end
-                    successCheck = false
-                    break
-                end
-
-                 seat = blobmanInstanceS and blobmanInstanceS:FindFirstChildWhichIsA("VehicleSeat")
-                if seat.Occupant ~= nil then
                     DestroyToy:FireServer(blobmanInstanceS)
-                    successCheck = false
                     break
                 end
 
+                -- 앉기 성공하면 종료 (구찌 성공 포인트)
+                if seat and seat.Occupant ~= nil then
+                    DestroyToy:FireServer(blobmanInstanceS)
+                    break
+                end
+
+                -- 잡힘 / 래그돌 탈출
                 if rag.Value == true or held.Value == true then
                     while (rag.Value == true or held.Value == true) and AutoGucciT do
                         rs.CharacterEvents.Struggle:FireServer()
                         task.wait()
                     end
-                    successCheck = false
                     break
                 end
 
-                 blobHRP = blobmanInstanceS and blobmanInstanceS:FindFirstChild("HumanoidRootPart")
+                -- 🔥 핵심: 네트워크 + 위치 날리기
+                local blobHRP = blobmanInstanceS:FindFirstChild("HumanoidRootPart")
                 if blobHRP then
-                     SetNetworkOwner = rs:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
                     pcall(function()
                         SetNetworkOwner:FireServer(blobHRP, hrp)
                     end)
-                    blobHRP.CFrame = CFrame.new(0, 999999999999, 0)
+
+                    -- 🔴 너무 높지 않게
+                    blobHRP.CFrame = CFrame.new(0, 10000, 0)
                 end
 
                 task.wait()
             end
 
-            if not successCheck then
-                 blobHRP = blobmanInstanceS and blobmanInstanceS:FindFirstChild("HumanoidRootPart")
-                 -- [Orion 알림 방식으로 교체]
-                OrionLib:MakeNotification({Name = "[ 🔓 ]", Content = "구찌실패", Time = 1, Image = "rbxassetid://4483345998"})
-                if hum then
-                    rs.CharacterEvents.Struggle:FireServer(plr)
-                    hum.Sit = true
-                    task.wait(0.1)
-                    hum.Sit = false
-                    if blobHRP.Position.Y > 9000 then  DestroyToy:FireServer(blobmanInstanceS) end
-                end
+            -- ❌ 실패 처리
+            OrionLib:MakeNotification({
+                Name = "[ 🔓 ]",
+                Content = "구찌 실패",
+                Time = 1,
+                Image = "rbxassetid://4483345998"
+            })
 
-                sitJumpT = false
-                task.wait(1)
+            if hum then
+                rs.CharacterEvents.Struggle:FireServer()
+                hum.Sit = true
+                task.wait(0.1)
+                hum.Sit = false
             end
+
+            task.wait(1)
         end)
-    task.wait()
+
+        if not success then
+            warn("AutoGucci Error:", err)
+        end
+
+        task.wait()
     end
 end
-
 function sitJumpFV2()
      char = plr.Character
      hum = char and char:FindFirstChild("Humanoid")
