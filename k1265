@@ -1094,7 +1094,7 @@ function AutoGucciF()
                     pcall(function()
                         SetNetworkOwner:FireServer(blobHRP, hrp)
                     end)
-                    blobHRP.CFrame = CFrame.new(0, 999999, 0)
+                    blobHRP.CFrame = CFrame.new(0, 999999999999, 0)
                 end
 
                 task.wait()
@@ -1103,7 +1103,7 @@ function AutoGucciF()
             if not successCheck then
                  blobHRP = blobmanInstanceS and blobmanInstanceS:FindFirstChild("HumanoidRootPart")
                  -- [Orion 알림 방식으로 교체]
-                OrionLib:MakeNotification({Name = "[ 🔓 ]", Content = "구찌실패 | 기다려 씨발", Time = 1, Image = "rbxassetid://4483345998"})
+                OrionLib:MakeNotification({Name = "[ 🔓 ]", Content = "구찌실패", Time = 1, Image = "rbxassetid://4483345998"})
                 if hum then
                     rs.CharacterEvents.Struggle:FireServer(plr)
                     hum.Sit = true
