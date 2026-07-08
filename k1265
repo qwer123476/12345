@@ -1058,9 +1058,9 @@ function AutoGucciF()
 
             local OCF = hrp.CFrame
 
-            -- 🔥 앉기
-            --fireproximityprompt(prompt)
-            --task.wait(0.25)
+            
+            fireproximityprompt(prompt)
+            task.wait(0.25)
 
             -- 위치 복구
             hrp.CFrame = OCF
@@ -1100,7 +1100,7 @@ function AutoGucciF()
 
                     
                     
-                    blobHRP.CFrame = blobHRP.CFrame + Vector3.new(0, 800000, 0)
+                    blobHRP.CFrame = blobHRP.CFrame + Vector3.new(0, 80000, 0)
                 end
 
                 task.wait()
