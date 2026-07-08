@@ -1091,7 +1091,7 @@ function AutoGucciF()
                     end)
 
                     -- 🔴 너무 높지 않게
-                    blobHRP.CFrame = CFrame.new(0, 10000, 0)
+                    blobHRP.CFrame = CFrame.new(0, 999999, 0)
                 end
 
                 task.wait()
