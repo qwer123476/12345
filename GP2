@@ -3125,7 +3125,7 @@ function AntiGrabF(enable)
         end
 
         if isvs and POR then
-        task.wait(0.3)
+            task.wait(0.3)
         end
 
         if POR and POR.Value then
@@ -3169,13 +3169,13 @@ function AntiGrabF(enable)
             hum.AutoRotate = true
         end
 
+        
         --if not hrp or hum.Health <= 0 then
             --hum:ChangeState(Enum.HumanoidStateType.Dead)
             --char:BreakJoints()
             --rs.CharacterEvents.Struggle:FireServer()
             --if hrp2 then hrp2.CFrame = CFrame.new(9999, DY, 9999) end
-        end
-
+        
         if isHeld.Value == true then
             if hum.MoveDirection.Magnitude > 0 then
                 local moveSpeed = 10
