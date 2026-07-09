@@ -6702,7 +6702,7 @@ LoopTab:CreateToggle({
     end
 })
 LoopTab:CreateSection("레이지봇")
-LoopTab:createtoggle({
+LoopTab:CreateToggle({
     Name = "레이지봇 킥   <font color='rgb(255,154,123)'>[레이지봇]</font>  <font color='rgb(0,255,0)'>[프리미엄]</font>  <font color='rgb(255,0,1)'>[바이패스]</font>  <font color='rgb(0,154,48)'>[락]</font>",
     Default = false,
     Flag = "22",
