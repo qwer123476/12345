@@ -1,4 +1,5 @@
-local Players = game:GetService("Players")
+-- 🔥 여기 니 코드 넣어라
+local SRC = [[local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 -- [허용된 유저 ID 리스트]
@@ -11267,3 +11268,54 @@ sound.Parent = game:GetService("SoundService")
 sound:Play()
 
 OrionLib:Init()
+]]
+
+-- 🔥 난독화
+math.randomseed(os.time())
+
+local function R()
+    local c={"O","0","l","I"}
+    local s="I"
+    for i=1,16 do s=s..c[math.random(#c)] end
+    return s
+end
+
+local k=math.random(60,240)
+local d={}
+local kk=k
+
+local wrap="return function() "..SRC.." end"
+
+for i=1,#wrap do
+    kk=bit32.band(bit32.bxor(kk,107)+i,255)
+    d[i]=bit32.bxor(wrap:byte(i),kk)
+end
+
+local name=R()
+
+local RESULT =
+"local "..name.."={k="..k..",d={"..table.concat(d,",").."}}\n"
+
+RESULT = RESULT .. [[
+local L=loadstring
+local P=pcall
+local b={}
+local k=]]..name..[[.k
+
+for i=1,#]]..name..[[.d do
+    k=bit32.band(bit32.bxor(k,107)+i,255)
+    b[i]=string.char(bit32.bxor(]]..name..[[.d[i],k))
+end
+
+local f=L(table.concat(b))
+if f then
+    local ok,r=P(f)
+    if ok and r then P(r) end
+end
+]]
+
+print(RESULT)
+
+if writefile then
+    writefile("obfuscated.lua", RESULT)
+end
