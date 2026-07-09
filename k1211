@@ -9081,20 +9081,69 @@ antiTab:AddToggle({
         antiLagF()
     end
 })
-antiTab:AddToggle({
-    Name = "안티렉V3[파카]",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            Rayfield:Notify({
-                Title = "안내",
-                Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
-            })
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+function antiLag2F()
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart", 5)
+    local hum = char:WaitForChild("Humanoid", 5)
+    
+    if not char or not hum then return end
+
+    local beamScript = plr.PlayerScripts:FindFirstChild("CharacterAndBeamMove")
+
+    if antiLagT == true then
+        if beamScript then
+            beamScript.Disabled = true
         end
-    end,
+
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Sparkles") or v:IsA("Fire") then
+                v.Enabled = false
+            elseif v:IsA("Beam") or v:IsA("Trail") then
+                v.Enabled = false
+                v.TextureSpeed = 0 
+            elseif v:IsA("Explosion") then
+                v.Visible = false
+            end
+        end
+
+        settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.DefaultThrottle
+        settings().Physics.AllowSleep = true
+
+        if hum then
+            hum.AnimationConstraint = Enum.AnimationConstraint.None
+        end
+
+    elseif antiLagT == false then
+        if beamScript then
+            beamScript.Disabled = false
+        end
+
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Sparkles") or v:IsA("Fire") or v:IsA("Beam") or v:IsA("Trail") then
+                v.Enabled = true
+                if v:IsA("Beam") or v:IsA("Trail") then
+                    v.TextureSpeed = 1
+                end
+            end
+        end
+        
+        settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
+    end
+end
+antiTab:AddToggle({
+    Name = "안티 렉V3<font color='rgb(0,0,255)'>[프리미엄]</font>",
+    
+    save = true,
+    Flag = "shsujs17j",
+    Callback = function(Value)
+        antiLag2T = Value
+        antiLag2F()
+    end
 })
+
 
 local AutoAttack = antiTab:AddToggle({
     Name = "오토어택 | 킬",
