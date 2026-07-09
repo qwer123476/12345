@@ -9082,14 +9082,12 @@ antiTab:AddToggle({
     end
 })
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
+local lineConnection = nil
 
-function antiLag2F()
-    local char = plr.Character or plr.CharacterAdded:Wait()
-    local hrp = char:WaitForChild("HumanoidRootPart", 5)
-    local hum = char:WaitForChild("Humanoid", 5)
-    
-    if not char or not hum then return end
+function antiLagV3()
+    local char = plr.Character
+    if not char then return end
+    local hum = char:FindFirstChild("Humanoid")
 
     local beamScript = plr.PlayerScripts:FindFirstChild("CharacterAndBeamMove")
 
@@ -9098,49 +9096,43 @@ function antiLag2F()
             beamScript.Disabled = true
         end
 
-        for _, v in ipairs(workspace:GetDescendants()) do
-            if v:IsA("ParticleEmitter") or v:IsA("Sparkles") or v:IsA("Fire") then
-                v.Enabled = false
-            elseif v:IsA("Beam") or v:IsA("Trail") then
-                v.Enabled = false
-                v.TextureSpeed = 0 
-            elseif v:IsA("Explosion") then
-                v.Visible = false
-            end
-        end
-
-        settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.DefaultThrottle
         settings().Physics.AllowSleep = true
-
         if hum then
             hum.AnimationConstraint = Enum.AnimationConstraint.None
+        end
+
+        if not lineConnection then
+            lineConnection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("Beam") or descendant:IsA("Trail") or descendant.Name:lower():find("line") then
+                    task.defer(function()
+                        descendant:Destroy()
+                    end)
+                end
+            end)
         end
 
     elseif antiLagT == false then
         if beamScript then
             beamScript.Disabled = false
         end
-
-        for _, v in ipairs(workspace:GetDescendants()) do
-            if v:IsA("ParticleEmitter") or v:IsA("Sparkles") or v:IsA("Fire") or v:IsA("Beam") or v:IsA("Trail") then
-                v.Enabled = true
-                if v:IsA("Beam") or v:IsA("Trail") then
-                    v.TextureSpeed = 1
-                end
-            end
-        end
         
-        settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
+        settings().Physics.AllowSleep = false
+        
+        if lineConnection then
+            lineConnection:Disconnect()
+            lineConnection = nil
+        end
     end
 end
+
 antiTab:AddToggle({
     Name = "안티 렉V3<font color='rgb(0,0,255)'>[프리미엄]</font>",
     
     save = true,
     Flag = "shsujs17j",
     Callback = function(Value)
-        antiLag2T = Value
-        antiLag2F()
+        antiLagV3T = Value
+        antiLagV3F()
     end
 })
 
