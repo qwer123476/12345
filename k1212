@@ -44,7 +44,404 @@ playersInLoop2V = {} -- Loop
 
 PPs = workspace:WaitForChild("PlotItems"):WaitForChild("PlayersInPlots")
 
+---------------------------------------------------------------- [ 기본 설정 ]
+function PcldOwner()
+    task.spawn(function()
+        while task.wait(0.1) do
+            usedNames = {}
 
+            for _, pcld in pairs(workspace:GetChildren()) do
+                if pcld.Name == "PlayerCharacterLocationDetector" then
+                    if pcld.CFrame == CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1) then
+                        continue
+                    end
+
+                    hasOwner = false
+                    existingBoolValues = {}
+
+                    for _, child in pairs(pcld:GetChildren()) do
+                        if child:IsA("BoolValue") then
+                            table.insert(existingBoolValues, child)
+                        end
+                    end
+
+                    if #existingBoolValues >= 2 then
+                        for _, boolValue in pairs(existingBoolValues) do
+                            boolValue:Destroy()
+                        end
+                    elseif #existingBoolValues == 1 then
+                        hasOwner = true
+                    end
+
+                    if hasOwner then
+                        continue
+                    end
+
+                    closestPlayer = nil
+                    closestDist = 30
+                    candidates = {}
+
+                    for _, player in pairs(Players:GetPlayers()) do
+                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                            hrp = player.Character.HumanoidRootPart
+                            dist = (pcld.Position - hrp.Position).Magnitude
+
+                            if dist < closestDist then
+                                table.insert(candidates, {
+                                    player = player,
+                                    dist = dist,
+                                    hrp = hrp
+                                })
+                            end
+                        end
+                    end
+
+                    table.sort(candidates, function(a, b)
+                        return a.dist < b.dist
+                    end)
+
+                    for _, candidate in pairs(candidates) do
+                        ownerName = string.format("[ %s ] ( @%s )",
+                            candidate.player.DisplayName,
+                            candidate.player.Name)
+
+                        if not usedNames[ownerName] then
+                            closestPlayer = candidate.player
+                            closestDist = candidate.dist
+                            usedNames[ownerName] = true
+                            break
+                        end
+                    end
+
+                    if closestPlayer then
+                        ownerName = string.format("[ %s ] ( @%s )",
+                            closestPlayer.DisplayName,
+                            closestPlayer.Name)
+
+                         boolValue = nil
+                        for _, child in pairs(pcld:GetChildren()) do
+                            if child:IsA("BoolValue") then
+                                boolValue = child
+                                boolValue.Name = ownerName
+                                break
+                            end
+                        end
+
+                        if not boolValue then
+                            boolValue = Instance.new("BoolValue")
+                            boolValue.Name = ownerName
+                            boolValue.Parent = pcld
+                        end
+
+                        task.spawn(function(player, value)
+                            while value.Parent do
+                                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                     hrp = player.Character.HumanoidRootPart
+                                    
+                                    if hrp.Massless == true then
+                                        if not value.Value then
+                                            value.Value = true
+                                        end
+                                    else
+                                        if value.Value then
+                                            value.Value = false
+                                        end
+                                    end
+
+                                    if not Players:FindFirstChild(player.Name) or 
+                                       not player.Character or 
+                                       player.Character:FindFirstChild("Humanoid") and 
+                                       player.Character.Humanoid.Health <= 0 then
+                                        value:Destroy()
+                                        break
+                                    end
+                                else
+                                    value:Destroy()
+                                    break
+                                end
+
+                                task.wait(0.1)
+                            end
+                        end, closestPlayer, boolValue)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+
+function SpawnCFrame()
+    local camPart
+    myDisplayName = plr.DisplayName
+    myUserName = plr.Name
+    myPOIdentifier = string.format("[ %s ] ( @%s )", myDisplayName, myUserName)
+
+    function findMyPO()
+        for _, obj in pairs(workspace:GetChildren()) do
+            if obj.Name == "PlayerCharacterLocationDetector" then
+                for _, child in pairs(obj:GetChildren()) do
+                    if child:IsA("BoolValue") and child.Name == myPOIdentifier then
+                        return obj
+                    end
+                end
+            end
+        end
+        return nil
+    end
+
+    if not workspace:FindFirstChild("CamPart") or workspace:FindFirstChild("CamPart"):FindFirstChild("CamPart") then
+         char = plr.Character or plr.CharacterAdded:Wait()
+        camPart = char:FindFirstChild("CamPart"):Clone()
+        camPart.Name = "CamPart"
+        camPart.Parent = workspace
+        camPart.Transparency = 0.9
+    else
+        camPart = workspace.CamPart
+    end
+
+     lastHRPVelocity = Vector3.new(0, 0, 0)
+
+    task.spawn(function()
+         rayParams = RaycastParams.new()
+        rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+        while true do
+             ping = plr:GetNetworkPing()
+             myPO = findMyPO()
+             char = plr.Character
+             hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+            if hrp then
+                lastHRPVelocity = hrp.Velocity
+            end
+
+            if myPO and hrp then
+                rayParams.FilterDescendantsInstances = {char, camPart, myPO}
+
+                 offset = myPO.Position + (lastHRPVelocity * (ping + 0.15))
+
+                 rayOrigin = offset
+                 rayDirection = Vector3.new(0, 23, 0)
+                 rayResult = workspace:Raycast(rayOrigin, rayDirection, rayParams)
+
+                local targetPosition
+
+                if rayResult then
+                    targetPosition = rayResult.Position - Vector3.new(0, 0.5, 0)
+                else
+                    targetPosition = offset + rayDirection
+                end
+
+                 originalRotation = myPO.CFrame.Rotation * CFrame.Angles(math.rad(-90), 0, 0)
+                camPart.CFrame = CFrame.new(targetPosition) * originalRotation
+
+                rayParams.FilterDescendantsInstances = {char, camPart}
+
+                 offset = hrp.Position + (lastHRPVelocity * (ping + 0.15))
+                
+                 rayOrigin = offset
+                 rayDirection = Vector3.new(0, 20, 0)
+                 rayResult = workspace:Raycast(rayOrigin, rayDirection, rayParams)
+
+                local targetPosition
+
+                if rayResult then
+                    targetPosition = rayResult.Position - Vector3.new(0, 0.5, 0)
+                else
+                    targetPosition = offset + rayDirection
+                end
+
+                 originalRotation = (hrp.CFrame * CFrame.Angles(math.rad(-90), 0, 0)).Rotation
+                camPart.CFrame = CFrame.new(targetPosition) * originalRotation
+                camPart.Name = "SpawnCF"
+            end
+            task.wait()
+        end
+    end)
+
+    return camPart
+end
+
+G = rs.GrabEvents
+G:WaitForChild("EndGrabEarly"):Destroy()
+Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
+
+-- [Rayfield 라이브러리 로드를 Orion 라이브러리 로드로 변경]
+-- URL을 변수로 먼저 지정하여 호출
+
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
+
+local HttpService = game:GetService("HttpService")
+
+-- =========================
+-- 📂 파일 & 데이터
+-- =========================
+local FILE = "config.txt"
+
+-- =========================
+-- 💾 저장 함수
+-- =========================
+local function SaveAll()
+    local saveTable = {}
+
+    -- Orion UI 전체 스냅샷
+    for flag, obj in pairs(OrionLib.Flags or {}) do
+        if obj and obj.Value ~= nil then
+            saveTable[flag] = obj.Value
+        end
+    end
+
+    local success, err = pcall(function()
+        writefile(FILE, HttpService:JSONEncode(saveTable))
+    end)
+
+    if not success then
+        warn("SAVE ERROR:", err)
+    end
+end
+
+-- =========================
+-- 📂 불러오기 함수
+-- =========================
+local function LoadAll()
+    if not isfile(FILE) then return end
+
+    local success, data = pcall(function()
+        return HttpService:JSONDecode(readfile(FILE))
+    end)
+
+    if success and type(data) == "table" then
+        for flag, value in pairs(data) do
+            if OrionLib.Flags and OrionLib.Flags[flag] then
+                pcall(function()
+                    OrionLib.Flags[flag]:Set(value)
+                end)
+            end
+        end
+    end
+end
+
+
+local Rayfield = {
+    CreateToggle = function() end,
+    CreateButton = function() end,
+    CreateLabel = function() end,
+    CreateDropdown = function() end,
+    CreateSlider = function() end,
+    CreateInput = function() end
+}
+
+local function autoGradient(text, target, startColor, endColor)
+    if not string.find(text, target, 1, true) then return text end
+    
+    local len = utf8.len(target)
+    local result = ""
+    local count = 0
+    
+    for _, code in utf8.codes(target) do
+        local char = utf8.char(code)
+        count = count + 1
+        local ratio = (len > 1) and ((count - 1) / (len - 1)) or 0
+        local r = math.floor(startColor.R * 255 + (endColor.R - startColor.R) * 255 * ratio)
+        local g = math.floor(startColor.G * 255 + (endColor.G - startColor.G) * 255 * ratio)
+        local b = math.floor(startColor.B * 255 + (endColor.B - startColor.B) * 255 * ratio)
+        result = result .. string.format("<font color='rgb(%d,%d,%d)'>%s</font>", r, g, b, char)
+    end
+    
+    return string.gsub(text, string.gsub(target, "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1"), result)
+end
+
+local function applyRichTextAndEffects(element)
+    if not element then return end
+    task.spawn(function()
+        for _, v in pairs(element:GetDescendants()) do
+            if v:IsA("TextLabel") then
+                local currentText = v.Text
+                
+                -- 이미 작성되어 있던 특정 문구들을 자동으로 그라데이션 텍스트로 변환
+                -- 예: [라인]을 주황->노랑 그라데이션으로 변경
+                currentText = autoGradient(currentText, "[라인]", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
+                -- 예: [프리미엄]을 빨강->파랑 그라데이션으로 변경
+                currentText = autoGradient(currentText, "[프리미엄]", Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255))
+                
+                v.Text = currentText
+                v.RichText = true
+                
+                -- 글자 뒤에 은은하게 깔리는 검은색 안개(번짐) 효과
+                v.TextStrokeTextColor3 = Color3.fromRGB(0, 0, 0)
+                v.TextStrokeThickness = 2.5
+                v.TextStrokeTransparency = 0.5
+            end
+        end
+    end)
+end
+
+function Rayfield:CreateToggle(options)
+    local element = oldCreateToggle(self, options)
+    applyRichTextAndEffects(element)
+    return element
+end
+
+function Rayfield:CreateButton(options)
+    local element = oldCreateButton(self, options)
+    applyRichTextAndEffects(element)
+    return element
+end
+
+function Rayfield:CreateLabel(options)
+    local element = oldCreateLabel(self, options)
+    applyRichTextAndEffects(element)
+    return element
+end
+
+function Rayfield:CreateDropdown(options)
+    local element = oldCreateDropdown(self, options)
+    applyRichTextAndEffects(element)
+    return element
+end
+
+function Rayfield:CreateSlider(options)
+    local element = oldCreateSlider(self, options)
+    applyRichTextAndEffects(element)
+    return element
+end
+
+function Rayfield:CreateInput(options)
+    local element = oldCreateInput(self, options)
+    applyRichTextAndEffects(element)
+    return element
+end
+
+
+-- [Orion UI Window 생성으로 교체]
+local Window = OrionLib:MakeWindow({
+    Name = "PACA HUB V3 [Premium]",
+    HidePremium = false,
+    SaveConfig = false,
+    ConfigFolder = "PacaHub",
+    IntroText = "파카허브 [프리미엄]"
+})
+-- [Orion UI 탭 생성 문법으로 교체]
+local playerTab = Window:MakeTab({Name = "플레이어 설정", Icon = "rbxassetid://6034281935", PremiumOnly = false})    
+local passTab = Window:MakeTab({Name = "패스잠금해제", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local getTab = Window:MakeTab({Name = "알림", Icon = "rbxassetid://649498361", PremiumOnly = false})
+local grabTab = Window:MakeTab({Name = "컴뱃", Icon = "rbxassetid://6026568198", PremiumOnly = false})               
+local UtilityTab = Window:MakeTab({Name = "유틸리티", Icon = "rbxassetid://6031094678", PremiumOnly = false}) 
+local plotTab = Window:MakeTab({Name = "집", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local DDTab = Window:MakeTab({Name = "티배깅", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local FDTab = Window:MakeTab({Name = "친구 보호", Icon = "rbxassetid://6026568198", PremiumOnly = false})        
+local antiTab = Window:MakeTab({Name = "안전", Icon = "rbxassetid://6034831332", PremiumOnly = false})               
+local ListTab = Window:MakeTab({Name = "명단", Icon = "rbxassetid://3572491301", PremiumOnly = false})              
+local LoopTab = Window:MakeTab({Name = "조지기", Icon = "rbxassetid://6023426923", PremiumOnly = false})    
+local AuraTab = Window:MakeTab({Name = "아우라", Icon = "rbxassetid://6031068423", PremiumOnly = false})   
+local bdTab = Window:MakeTab({Name = "배경체인저", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+local funTab = Window:MakeTab({Name = "찌끄레기", Icon = "rbxassetid://4483345998", PremiumOnly = false})            
+local keybindTab = Window:MakeTab({Name = "설정", Icon = "rbxassetid://6031094678", PremiumOnly = false})            
+local DevTab = Window:MakeTab({Name = "잡기능", Icon = "rbxassetid://3944680095", PremiumOnly = false})             
+local RankTab = Window:MakeTab({Name = "제작자 친구", Icon = "rbxassetid://6034281935", PremiumOnly = false})       
+local lagTab = Window:MakeTab({Name = "렉", Icon = "rbxassetid://6023426923", PremiumOnly = false})   
+local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/cd"))()
