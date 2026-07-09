@@ -1,0 +1,314 @@
+-- =================================================================================
+-- [ 서비스 및 기본 변수 정의 ]
+-- =================================================================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local plr = Players.LocalPlayer
+
+local rs = ReplicatedStorage
+local rs2 = RunService
+
+-- 기능 연동 변수 및 테이블 정의
+local blobKickT3 = false
+local selectedPlayerName = "" -- 검색창에 매칭된 실제 유저 이름이 저장되는 변수
+local Whitelist = Whitelist or {}
+
+local PPs = workspace:WaitForChild("PlotItems", 5):WaitForChild("PlayersInPlots", 5) or Instance.new("Folder")
+
+-- =================================================================================
+-- [ 의존성 가상 함수 정의 ]
+-- =================================================================================
+local currentBlobS = nil
+local function UpdateCurrentBlobman() end
+local function BlobMassless(blob, hrp, side) end
+local function TP(targetPlayer) end
+local function BACK(originalCFrame)
+    local myChar = plr.Character
+    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+    if myHrp and originalCFrame then
+        myHrp.CFrame = originalCFrame
+    end
+end
+
+-- =================================================================================
+-- [ 핵심 기능: 네트워크 사거리를 극복하는 무한 루프 RunRageBotKick 함수 ]
+-- =================================================================================
+local function RunRageBotKick(Value)
+    blobKickT3 = Value
+    
+    if not Value then
+        return
+    end
+
+    task.spawn(function()
+        local angle = 0
+        
+        -- 토글이 켜져 있는 동안 무한 반복
+        while blobKickT3 do
+            UpdateCurrentBlobman()
+
+            local myChar = plr.Character
+            local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+            local seat = myHum and myHum.SeatPart
+
+            -- 블롭맨에 타지 않았다면 대기
+            if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
+                task.wait(0.1)
+                continue
+            end
+
+            local isRiding = true
+
+            -- 지정된 타겟이 없거나 공백일 때 대기
+            if selectedPlayerName == "" or selectedPlayerName == nil then
+                task.wait(0.5)
+                continue
+            end
+
+            local name = selectedPlayerName
+            
+            -- 화이트리스트 검사
+            if table.find(Whitelist, name) or PPs:FindFirstChild(name) then 
+                task.wait(0.5)
+                continue 
+            end
+
+            local player = game.Players:FindFirstChild(name)
+            if not player then 
+                task.wait(0.5)
+                continue 
+            end
+            
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local head = char and char:FindFirstChild("Head")
+            
+            -- 타겟의 캐릭터 상태 검사 (죽어있으면 부활할 때까지 루프 대기)
+            if not char or not hum or not hrp or not head or char.Parent == nil or not hrp:IsDescendantOf(workspace) or hum.Health <= 0 then 
+                task.wait(0.1)
+                continue 
+            end
+
+            local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+            if not myHrp then continue end
+
+            -- 🎯 [핵심 추가: 네트워크 소유권 획득을 위한 강제 밀착 로직]
+            -- 로블록스 물리 엔진 특성상 멀리 있으면 소유권(NetworkOwner)을 뺏을 수 없으므로,
+            -- 내 캐릭터를 대상의 3스터드 뒤로 순간이동시켜 거리를 좁힙니다.
+            local currentDistance = (myHrp.Position - hrp.Position).Magnitude
+            if currentDistance > 15 then
+                myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 3)
+                task.wait(0.15) -- 서버와 위치 동기화 및 소유권 인식을 위한 미세 대기 시간
+            end
+
+            local originCF = myHrp.CFrame
+            local fixedPosition = CFrame.new(originCF.Position.X, originCF.Position.Y + 50, originCF.Position.Z)
+            local targetPosition = fixedPosition * CFrame.new(0, 0, 10)
+
+            local tpRunning = true
+            task.spawn(function()
+                while tpRunning and blobKickT3 and selectedPlayerName == name do
+                    TP(player)
+                    task.wait()
+                end
+            end)
+
+            -- 밀착된 상태에서 네트워크 소유권 탈취 연산 시도
+            local networkTimeout = 0
+            while blobKickT3 and networkTimeout < 30 and selectedPlayerName == name do
+                rs.GrabEvents.SetNetworkOwner:FireServer(head, head.CFrame)
+                local ownerTag = head:FindFirstChild("PartOwner")
+                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == plr.Name then
+                    break
+                end
+                networkTimeout = networkTimeout + 1
+                task.wait()
+            end
+
+            tpRunning = false
+
+            -- 전체 사거리 무기 감지 및 무력화
+            local targetNames = { "NinjaKunai", "NinjaShuriken", "NinjaKatana", "ToolCleaver", "ToolDiggingForkRusty", "ToolPencil", "ToolPickaxe" }
+            for _, child in ipairs(workspace:GetChildren()) do
+                if child:IsA("Folder") and child.Name:match("SpawnedInToys$") then
+                    for _, item in ipairs(child:GetChildren()) do
+                        if table.find(targetNames, item.Name) and item:FindFirstChild("StickyPart") then
+                            local sticky = item.StickyPart
+                            local weld = sticky:FindFirstChild("StickyWeld")
+                            if weld and weld:IsA("WeldConstraint") and weld.Part1 then
+                                local targetParts = {
+                                    char:FindFirstChild("Head"),
+                                    char:FindFirstChild("Torso"),
+                                    char:FindFirstChild("Left Arm"),
+                                    char:FindFirstChild("Left Leg"),
+                                    char:FindFirstChild("Right Arm"),
+                                    char:FindFirstChild("Right Leg"),
+                                    hrp:FindFirstChild("RagdollTouchedHitbox"),
+                                    hrp:FindFirstChild("FirePlayerPart"),
+                                }
+                                for _, tPart in ipairs(targetParts) do
+                                    if tPart and weld.Part1 == tPart then
+                                        local basePart = item.PrimaryPart or sticky
+                                        if basePart and (basePart.Position - hrp.Position).Magnitude <= 999999 then
+                                            rs.GrabEvents.SetNetworkOwner:FireServer(sticky, sticky.CFrame)
+                                            sticky.CFrame = CFrame.new(0, 9999, 0)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            pcall(function()
+                rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
+            end)
+
+            if myHrp and hrp then
+                pcall(function()
+                    rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
+                end)
+                hrp.CFrame = targetPosition
+                myHrp.CFrame = fixedPosition
+            end
+            task.wait(0.05)
+
+            if currentBlobS and hrp and hrp.Parent.Name == name then
+                BlobMassless(currentBlobS, hrp, "Right")
+            end
+            task.wait(0.0005)
+
+            local startTime = os.clock()
+            
+            -- 공격 루프 (2.6초 동안 고속 궤도 회전 연산 실행)
+            while blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and hrp:IsDescendantOf(workspace) and selectedPlayerName == name do
+                if os.clock() - startTime >= 2.6 then 
+                    break 
+                end
+
+                if myHrp and hrp then
+                    pcall(function()
+                        rs.GrabEvents.SetNetworkOwner:FireServer(hrp, targetPosition)
+                    end)
+                    hrp.CFrame = targetPosition
+                    
+                    angle = angle + 0.78
+                    local offsetX = math.cos(angle) * 10.5
+                    local offsetZ = math.sin(angle) * 10.5
+                    
+                    local myOrbitCF = CFrame.new(targetPosition.Position + Vector3.new(offsetX, 0, offsetZ), targetPosition.Position)
+                    myHrp.CFrame = myOrbitCF
+                end
+                
+                task.wait()
+
+                pcall(function()
+                    rs.GrabEvents.DestroyGrabLine:FireServer(head, head.CFrame)
+                end)
+
+                if currentBlobS and hrp and hrp.Parent.Name == name and name ~= plr.Name and hum.Health > 0 then
+                    BlobMassless(currentBlobS, hrp, "Right")
+                end
+            end
+
+            -- 공격 사이클 종료 후 마무리 연산
+            if blobKickT3 and player.Parent and char.Parent and hum.Health > 0 and selectedPlayerName == name then
+                if myHrp and hrp and originCF then
+                    hrp.CFrame = CFrame.new(originCF.X, originCF.Y + 50, originCF.Z)
+                    myHrp.CFrame = hrp.CFrame
+                    
+                    if currentBlobS and hrp.Parent.Name == name then
+                        BlobMassless(currentBlobS, hrp, "Right")
+                    end
+                    task.wait(0.08)
+                end
+            end
+
+            -- 원래 위치로 복귀
+            if originCF and myHrp then
+                BACK(originCF)
+            end
+
+            -- 숏 딜레이 후 다음 무한 공격 루프로 진입
+            task.wait(0.1)
+        end
+    end)
+end
+
+-- =================================================================================
+-- [ 새 UI 생성 및 검색창 설정 ]
+-- =================================================================================
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Final Control System",
+   LoadingTitle = "Loading Final Script...",
+   LoadingSubtitle = "Network Ownership Bypass",
+   ConfigurationSaving = { Enabled = false },
+   KeySystem = false
+})
+
+local MainTab = Window:CreateTab("Main", nil)
+MainTab:CreateSection("Target Search Input")
+
+-- 유저 검색창 (앞글자만 입력 가능, 대소문자 구분 없음)
+local PlayerInput = MainTab:CreateInput({
+   Name = "Type Target Player Name",
+   PlaceholderText = "유저 이름 입력 (자동 검색 연동)",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      if Text == "" then return end
+      
+      local foundPlayer = nil
+      local lowerText = string.lower(Text)
+      
+      for _, player in ipairs(Players:GetPlayers()) do
+          if player ~= plr and string.find(string.lower(player.Name), lowerText) then
+              foundPlayer = player
+              break
+          end
+      end
+      
+      if foundPlayer then
+          selectedPlayerName = foundPlayer.Name
+          Rayfield:Notify({
+              Title = "타겟 매칭 성공",
+              Content = "🎯 현재 타겟: " .. selectedPlayerName,
+              Duration = 3
+          })
+      else
+          selectedPlayerName = ""
+          Rayfield:Notify({
+              Title = "검색 실패",
+              Content = "해당 이름을 포함한 유저를 찾지 못했습니다.",
+              Duration = 3
+          })
+      end
+   end,
+})
+
+MainTab:CreateSection("Execution")
+
+-- 무한 추적 공격 토글 스위치
+local RageKickToggle = MainTab:CreateToggle({
+   Name = "Blobman RageBot Kick (Infinite Loop + Teleport Close)",
+   CurrentValue = false,
+   Flag = "BlobKickFlag",
+   Callback = function(Value)
+      if Value and (selectedPlayerName == "" or selectedPlayerName == nil) then
+          Rayfield:Notify({Title = "경고", Content = "이름을 먼저 입력하여 대상을 매칭하세요!", Duration = 3})
+          return
+      end
+      RunRageBotKick(Value)
+      print("[알림] 사거리 무한 루프 킥 상태 변경: ", Value)
+   end
+})
+
+Rayfield:Notify({
+   Title = "최종 시스템 로드 완료",
+   Content = "밀착식 네트워크 우회 기능이 준비되었습니다.",
+   Duration = 4,
+})
