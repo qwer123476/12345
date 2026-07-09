@@ -3169,9 +3169,9 @@ function AntiGrabF(enable)
             hum.AutoRotate = true
         end
 
-        if not hrp or hum.Health <= 0 then
-            hum:ChangeState(Enum.HumanoidStateType.Dead)
-            char:BreakJoints()
+        --if not hrp or hum.Health <= 0 then
+            --hum:ChangeState(Enum.HumanoidStateType.Dead)
+            --char:BreakJoints()
             --rs.CharacterEvents.Struggle:FireServer()
             --if hrp2 then hrp2.CFrame = CFrame.new(9999, DY, 9999) end
         end
@@ -9022,28 +9022,3 @@ CreditsTab:CreateLabel("Diro", 78390276296494, Color3.fromRGB(255, 255, 255), fa
 CreditsTab:CreateParagraph({Title = "dsc l1l1l1l1l1l1l1l1l1l1l1_", Content = "Co-Owner"})
 ]]--
 
-if plr.UserId ~= 9078065998 then
-    task.spawn(function()
-        while task.wait() do
-            local CoreGui = game:GetService("CoreGui")
-            local Console = CoreGui:FindFirstChild("DevConsoleMaster")
-            if Console and Console.Parent then Console:Destroy() end
-        end
-    end)
-end	
-
-game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
-game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
-
-vu = game:GetService("VirtualUser")
-plr.Idled:Connect(function()
-vu:CaptureController()
-vu:ClickButton2(Vector2.new())
-end)
-
-for _, v in pairs(workspace.Map.AlwaysHereTweenedObjects:GetDescendants()) do
-if v.Name == "FollowThisPart" then v:Destroy() end
-if v:IsA("BasePart") then v.CustomPhysicalProperties = PhysicalProperties.new(0.35,0,0) end
-end
-
-Logger()
