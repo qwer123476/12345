@@ -11227,6 +11227,125 @@ lagTab:AddTextbox({
 		LineLagV = Value
 	end
 })
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+local antiFlingConnection = nil
+local antiOwnershipConnection = nil
+local antiLagConnection = nil
+
+antiTab:AddToggle({
+    Name = "안티 플링",
+    Default = false,
+    Callback = function(state)
+        if state then
+            antiFlingConnection = RunService.Stepped:Connect(function()
+                for _, v in ipairs(Workspace:GetDescendants()) do
+                    if v:IsA("BasePart") and v \~= HumanoidRootPart and v.Anchored == false then
+                        local dist = (v.Position - HumanoidRootPart.Position).Magnitude
+                        if dist < 15 then
+                            v.CanCollide = false
+                            if v.AssemblyLinearVelocity.Magnitude > 50 then
+                                v.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if antiFlingConnection then antiFlingConnection:Disconnect() end
+        end
+    end
+})
+
+
+antiTab:AddToggle({
+    Name = "안티오너쉽 스팸V2",
+    Default = false,
+    Callback = function(state)
+        if state then
+            antiOwnershipConnection = RunService.Heartbeat:Connect(function()
+                if HumanoidRootPart then
+                    HumanoidRootPart.AssemblyLinearVelocity = HumanoidRootPart.AssemblyLinearVelocity * 0.85
+                    HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0,0,0)
+                end
+                for _, part in ipairs(Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part:SetNetworkOwner(LocalPlayer)
+                    end
+                end
+            end)
+        else
+            if antiOwnershipConnection then antiOwnershipConnection:Disconnect() end
+        end
+    end
+})
+
+
+
+local silentAimTarget = nil
+local silentAimConnection = nil
+
+local SilentAim = CombatTab:AddToggle({
+    Name = "사일런트 에임",
+    Default = false,
+    Callback = function(state)
+        if state then
+            silentAimConnection = RunService.RenderStepped:Connect(function()
+                local closest, dist = nil, math.huge
+                for _, plr in ipairs(Players:GetPlayers()) do
+                    if plr \~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        local root = plr.Character.HumanoidRootPart
+                        local d = (root.Position - HumanoidRootPart.Position).Magnitude
+                        if d < dist and d < 200 then
+                            dist = d
+                            closest = root
+                        end
+                    end
+                end
+                silentAimTarget = closest
+            end)
+        else
+            if silentAimConnection then silentAimConnection:Disconnect() end
+            silentAimTarget = nil
+        end
+    end
+})
+
+
+
+
+local AntiLag = antiTab:AddToggle({
+    Name = "안티렉 (시험단계)",
+    Default = false,
+    Callback = function(state)
+        if state then
+            antiLagConnection = RunService.Heartbeat:Connect(function()
+                for _, obj in ipairs(Workspace:GetDescendants()) do
+                    if obj:IsA("Decal") or obj:IsA("Texture") then
+                        obj.Transparency = 1
+                    elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+                        obj.Enabled = false
+                    elseif obj:IsA("BasePart") and obj.Transparency < 0.9 then
+                        if obj.Size.Magnitude > 50 then
+                            obj.Transparency = 0.85
+                        end
+                    end
+                end
+            end)
+        else
+            if antiLagConnection then antiLagConnection:Disconnect() end
+        end
+    end
+})
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger() 
 Window:AddConfigTab()
