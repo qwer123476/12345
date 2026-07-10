@@ -11302,7 +11302,7 @@ local SilentAim = CombatTab:AddToggle({
             silentAimConnection = RunService.RenderStepped:Connect(function()
                 local closest, dist = nil, math.huge
                 for _, plr in ipairs(Players:GetPlayers()) do
-                    if plr \~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                         local root = plr.Character.HumanoidRootPart
                         local d = (root.Position - HumanoidRootPart.Position).Magnitude
                         if d < dist and d < 200 then
