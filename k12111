@@ -11249,7 +11249,7 @@ antiTab:AddToggle({
         if state then
             antiFlingConnection = RunService.Stepped:Connect(function()
                 for _, v in ipairs(Workspace:GetDescendants()) do
-                    if v:IsA("BasePart") and v \~= HumanoidRootPart and v.Anchored == false then
+                    if v:IsA("BasePart") and v ~= HumanoidRootPart and v.Anchored == false then
                         local dist = (v.Position - HumanoidRootPart.Position).Magnitude
                         if dist < 15 then
                             v.CanCollide = false
