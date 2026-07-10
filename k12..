@@ -11293,8 +11293,7 @@ antiTab:AddToggle({
 
 local silentAimTarget = nil
 local silentAimConnection = nil
-
-local SilentAim = CombatTab:AddToggle({
+grabTab:AddToggle({
     Name = "사일런트 에임",
     Default = false,
     Callback = function(state)
