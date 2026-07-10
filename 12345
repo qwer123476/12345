@@ -5048,7 +5048,7 @@ local function initialize(Library)
     silentCircle.Thickness = 1
     silentCircle.Filled = false
     silentCircle.Transparency = 1
-    State.drawings.silent.circle = silentCircle
+    --State.drawings.silent.circle = silentCircle
 
     local aimbotCircle = Drawing.new("Circle")
     aimbotCircle.Visible = false
