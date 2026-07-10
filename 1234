@@ -4881,7 +4881,7 @@ local function initialize(Library)
     Options.atmosphere_haze:OnChanged(atmo_update)
     Options.atmosphere_density:OnChanged(atmo_update)
     Options.atmosphere_offset:OnChanged(atmo_update)
-    Options.atmosphere_color:OnChanged(atmo_update)
+    
 
     Toggles.sunrays_enabled:OnChanged(sun_update)
     Options.sunrays_spread:OnChanged(sun_update)
