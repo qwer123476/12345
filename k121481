@@ -336,7 +336,7 @@ local function applyRichTextAndEffects(element)
             if v:IsA("TextLabel") then
                 local currentText = v.Text
                 
-                ", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
+                ", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))"
                 
                 currentText = autoGradient(currentText, "[프리미엄]", Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255))
                 
