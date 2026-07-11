@@ -7064,8 +7064,8 @@ grabTab:AddToggle({
         if Value then KickGrabF() end
     end
 })
-LnTab:AddToggle({
-    Name = "Spin Grab",
+grabTab:AddToggle({
+    Name = "스핀 그랩",
     Default = false,
     Save = true,
     Flag = "SpinGrab",
