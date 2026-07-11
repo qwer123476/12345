@@ -5943,7 +5943,7 @@ DevTab:AddButton({
     end
 })
 
-devTab:AddToggle({
+DevTab:AddToggle({
     Name = "사일런트 킥 올",
     Default = false,
     Callback = function(enabled)
