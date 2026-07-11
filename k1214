@@ -418,11 +418,12 @@ local FDTab = Window:MakeTab({Name = "친구 보호", Icon = "rbxassetid://60265
 local antiTab = Window:MakeTab({Name = "안전", Icon = "rbxassetid://6034831332", PremiumOnly = false})               
 local ListTab = Window:MakeTab({Name = "명단", Icon = "rbxassetid://3572491301", PremiumOnly = false})              
 local LoopTab = Window:MakeTab({Name = "조지기", Icon = "rbxassetid://6023426923", PremiumOnly = false})    
+local DevTab = Window:MakeTab({Name = "전체 조지기", Icon = "rbxassetid://3944680095", PremiumOnly = false})          
 local AuraTab = Window:MakeTab({Name = "아우라", Icon = "rbxassetid://6031068423", PremiumOnly = false})   
 local bdTab = Window:MakeTab({Name = "배경체인저", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local funTab = Window:MakeTab({Name = "찌끄레기", Icon = "rbxassetid://4483345998", PremiumOnly = false})            
 local keybindTab = Window:MakeTab({Name = "설정", Icon = "rbxassetid://6031094678", PremiumOnly = false})            
-local DevTab = Window:MakeTab({Name = "잡기능", Icon = "rbxassetid://3944680095", PremiumOnly = false})             
+   
 local RankTab = Window:MakeTab({Name = "제작자 친구", Icon = "rbxassetid://6034281935", PremiumOnly = false})       
 local lagTab = Window:MakeTab({Name = "렉", Icon = "rbxassetid://6023426923", PremiumOnly = false})   
 local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid://4483345998", PremiumOnly = false})
@@ -5876,11 +5877,351 @@ FDTab:AddToggle({
         end
     end
 })
+BlobmanTab:AddButton({
+    Name = "Silent Kick All",
+    Callback = function()
+        local Humanoid = get_hum()
+        if not check_hum(Humanoid) then return end
+        if not Humanoid.SeatPart then return end
+        if not Humanoid.SeatPart.Parent then return end
+        if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then return end
 
+        local blob = Humanoid.SeatPart.Parent
 
+        local players = getPlayerList()
+        if #players == 0 then return end
 
--- ================== [ 유틸리티 기능 ] ==================
+        local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
+        local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
+        local drop = blob.BlobmanSeatAndOwnerScript.CreatureDrop
+        local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
+        local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
 
+        local detector = blob.LeftDetector
+        local weld = blob.LeftDetector.LeftWeld
+        local localHrp = getCurrentCharacter().HumanoidRootPart
+
+        for _, playerName in ipairs(players) do
+            local player = game.Players:FindFirstChild(playerName)
+            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHrp = player.Character.HumanoidRootPart
+                snapBlobTo(blob, targetHrp.CFrame)
+                task.wait(0.15)
+                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                release:FireServer(blob.RightDetector.RightWeld)
+                task.wait(0)
+            end
+        end
+
+        snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
+        task.wait(0.05)
+
+        for _, playerName in ipairs(players) do
+            local player = game.Players:FindFirstChild(playerName)
+            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHrp = player.Character.HumanoidRootPart
+                local blobHrp = blob.HumanoidRootPart
+                targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z)
+            end
+        end
+        task.wait(0.1)
+
+        for _, playerName in ipairs(players) do
+            local player = game.Players:FindFirstChild(playerName)
+            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHrp = player.Character.HumanoidRootPart
+                set:FireServer(targetHrp, targetHrp.CFrame)
+                del:FireServer(targetHrp)
+
+                grab:FireServer(detector, localHrp, weld)
+                grab:FireServer(detector, targetHrp, weld)
+                drop:FireServer(weld, targetHrp.RootAttachment)
+            end
+        end
+        task.wait(3)
+        releaseBlobAlign(blob)
+    end
+})
+
+devTab:AddToggle({
+    Name = "사일런트 킥 올",
+    Default = false,
+    Callback = function(enabled)
+        getgenv().loopSilentKick = enabled
+        
+        while getgenv().loopSilentKick do
+            local Humanoid = get_hum()
+            if not check_hum(Humanoid) then 
+                task.wait(1)
+                continue 
+            end
+            if not Humanoid.SeatPart then 
+                task.wait(1)
+                continue 
+            end
+            if not Humanoid.SeatPart.Parent then 
+                task.wait(1)
+                continue 
+            end
+            if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then 
+                task.wait(1)
+                continue 
+            end
+
+            local blob = Humanoid.SeatPart.Parent
+
+            local players = getPlayerList()
+            if #players == 0 then 
+                task.wait(1)
+                continue 
+            end
+
+            local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
+            local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
+            local drop = blob.BlobmanSeatAndOwnerScript.CreatureDrop
+            local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
+            local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
+
+            local detector = blob.LeftDetector
+            local weld = blob.LeftDetector.LeftWeld
+            local localHrp = getCurrentCharacter().HumanoidRootPart
+
+            for _, playerName in ipairs(players) do
+                if not getgenv().loopSilentKick then break end
+                
+                local player = game.Players:FindFirstChild(playerName)
+                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHrp = player.Character.HumanoidRootPart
+                    snapBlobTo(blob, targetHrp.CFrame)
+                    task.wait(0.15)
+                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                    release:FireServer(blob.RightDetector.RightWeld)
+                    task.wait(0)
+                end
+            end
+
+            if not getgenv().loopSilentKick then break end
+
+            snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
+            task.wait(0.05)
+
+            for _, playerName in ipairs(players) do
+                if not getgenv().loopSilentKick then break end
+                
+                local player = game.Players:FindFirstChild(playerName)
+                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHrp = player.Character.HumanoidRootPart
+                    local blobHrp = blob.HumanoidRootPart
+                    targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z)
+                end
+            end
+            task.wait(0.1)
+
+            for _, playerName in ipairs(players) do
+                if not getgenv().loopSilentKick then break end
+                
+                local player = game.Players:FindFirstChild(playerName)
+                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHrp = player.Character.HumanoidRootPart
+                    set:FireServer(targetHrp, targetHrp.CFrame)
+                    del:FireServer(targetHrp)
+
+                    grab:FireServer(detector, localHrp, weld)
+                    grab:FireServer(detector, targetHrp, weld)
+                    drop:FireServer(weld, targetHrp.RootAttachment)
+                end
+            end
+            
+            if not getgenv().loopSilentKick then break end
+            
+            task.wait(3)
+            releaseBlobAlign(blob)
+            
+            task.wait(1)
+        end
+    end
+})
+
+DevTab:AddToggle({
+			Name = "브링 올",
+			Default = false,
+			Callback = function(value)
+				BringLoop = value
+				if value then
+					if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+						BringSavedPosition = LocalPlayer.Character.HumanoidRootPart.CFrame
+					end
+					CameraFree = true
+					if BringSavedPosition then
+						CameraPart = Instance.new("Part")
+						CameraPart.Size = Vector3.new(1, 1, 1)
+						CameraPart.Anchored = true
+						CameraPart.CanCollide = false
+						CameraPart.Transparency = 1
+						CameraPart.Position = BringSavedPosition.Position + Vector3.new(0, 15, 0)
+						CameraPart.Parent = workspace
+						OriginalCameraSubject = game.Workspace.CurrentCamera.CameraSubject
+						game.Workspace.CurrentCamera.CameraSubject = CameraPart
+					end
+					StartBringLoop()
+				else
+					if BringSavedPosition and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+						LocalPlayer.Character.HumanoidRootPart.CFrame = BringSavedPosition
+					end
+					CameraFree = false
+					if CameraPart then
+						game.Workspace.CurrentCamera.CameraSubject = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") or OriginalCameraSubject
+						CameraPart:Destroy()
+						CameraPart = nil
+					end
+				end
+			end
+		})
+
+DevTab:AddButton({
+    Name = "매스 킥올",
+    Callback = function()
+        local Humanoid = get_hum()
+        if not check_hum(Humanoid) then return end
+        if not Humanoid.SeatPart then return end
+        if not Humanoid.SeatPart.Parent then return end
+
+        if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then return end
+
+        local blob = Humanoid.SeatPart.Parent
+
+        local players = getPlayerList()
+        if #players == 0 then return end
+
+        local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
+        local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
+        local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
+        local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
+
+        for _, playerName in ipairs(players) do
+            local player = game.Players:FindFirstChild(playerName)
+            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHrp = player.Character.HumanoidRootPart
+                snapBlobTo(blob, targetHrp.CFrame)
+                task.wait(0.15)
+                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                release:FireServer(blob.RightDetector.RightWeld)
+                task.wait(0)
+            end
+        end
+
+        snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
+        task.wait(0.05)
+
+        for _, playerName in ipairs(players) do local player = game.Players:FindFirstChild(playerName) if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then local targetHrp = player.Character.HumanoidRootPart local blobHrp = blob.HumanoidRootPart targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z) end end task.wait(0)
+   
+        for _, playerName in ipairs(players) do
+            local player = game.Players:FindFirstChild(playerName)
+            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHrp = player.Character.HumanoidRootPart
+                 set:FireServer(targetHrp, targetHrp.CFrame)
+                del:FireServer(targetHrp)
+                task.wait(0.05)
+                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+            end
+        end
+
+        task.wait(2)
+        releaseBlobAlign(blob)
+    end
+})
+
+DevTab:AddToggle({
+    Name = "루프 킥올",
+    Default = false,
+    Callback = function(enabled)
+        getgenv().loopMassKick = enabled
+        
+        while getgenv().loopMassKick do
+            local Humanoid = get_hum()
+            if not check_hum(Humanoid) then 
+                task.wait(1)
+                continue 
+            end
+            if not Humanoid.SeatPart then 
+                task.wait(1)
+                continue 
+            end
+            if not Humanoid.SeatPart.Parent then 
+                task.wait(1)
+                continue 
+            end
+            if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then 
+                task.wait(1)
+                continue 
+            end
+
+            local blob = Humanoid.SeatPart.Parent
+
+            local players = getPlayerList()
+            if #players == 0 then 
+                task.wait(1)
+                continue 
+            end
+
+            local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
+            local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
+            local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
+            local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
+
+            for _, playerName in ipairs(players) do
+                if not getgenv().loopMassKick then break end
+                
+                local player = game.Players:FindFirstChild(playerName)
+                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHrp = player.Character.HumanoidRootPart
+                    snapBlobTo(blob, targetHrp.CFrame)
+                    task.wait(0.15)
+                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                    release:FireServer(blob.RightDetector.RightWeld)
+                    task.wait(0)
+                end
+            end
+
+            if not getgenv().loopMassKick then break end
+
+            snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
+            task.wait(0.05)
+
+            for _, playerName in ipairs(players) do 
+                if not getgenv().loopMassKick then break end
+                
+                local player = game.Players:FindFirstChild(playerName) 
+                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then 
+                    local targetHrp = player.Character.HumanoidRootPart 
+                    local blobHrp = blob.HumanoidRootPart 
+                    targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z) 
+                end 
+            end 
+            task.wait(0)
+       
+            for _, playerName in ipairs(players) do
+                if not getgenv().loopMassKick then break end
+                
+                local player = game.Players:FindFirstChild(playerName)
+                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHrp = player.Character.HumanoidRootPart
+                    set:FireServer(targetHrp, targetHrp.CFrame)
+                    del:FireServer(targetHrp)
+                    task.wait(0.05)
+                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
+                end
+            end
+
+            task.wait(2)
+            releaseBlobAlign(blob)
+            
+            task.wait(1)
+        end
+    end
+})
 UtilityTab:AddSection({
     Name = "환경 및 시야"
 })
@@ -6700,7 +7041,7 @@ local NoClipGrab = grabTab:AddToggle({
 })
 
 grabTab:AddToggle({ 
-    Name = "드럼통(킬)그랩  <font color='rgb(255,0,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>", 
+    Name = "킬그랩  <font color='rgb(255,0,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>", 
     
     save = true,
     Flag = "1mbmbmb",
@@ -6721,6 +7062,57 @@ grabTab:AddToggle({
     Callback = function(Value)
         KickGrabT = Value
         if Value then KickGrabF() end
+    end
+})
+LnTab:AddToggle({
+    Name = "Spin Grab",
+    Default = false,
+    Save = true,
+    Flag = "SpinGrab",
+    Callback = function(enabled)
+        if enabled then
+            gravityGrabConnection = workspace.ChildAdded:Connect(function(model)
+                if model.Name == "GrabParts" then
+                    local partToImpulse = model.GrabPart.WeldConstraint.Part1
+                    if partToImpulse then
+                        local bodyAngularVelocity = Instance.new("BodyAngularVelocity")
+                        bodyAngularVelocity.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                        bodyAngularVelocity.AngularVelocity = Vector3.new(0, spinSpeed, 0)
+                        bodyAngularVelocity.Parent = partToImpulse
+ 
+                        local bodyPosition = Instance.new("BodyPosition")
+                        bodyPosition.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                        bodyPosition.Position = partToImpulse.Position
+                        bodyPosition.Parent = partToImpulse
+ 
+                        table.insert(spinningObjects, {part = partToImpulse, bav = bodyAngularVelocity, bp = bodyPosition})
+                    end
+                end
+            end)
+        else
+            if gravityGrabConnection then
+                gravityGrabConnection:Disconnect()
+            end
+        end
+    end
+})
+
+grabTab:AddSlider({
+    Name = "스핀 그랩",
+    Min = 1,
+    Max = 500000000,
+    Default = 5,
+    Increment = 1,
+    ValueName = "Speed",
+    Callback = function(value)
+        if manualSpinSpeed == 0 then
+            spinSpeed = value
+            for _, obj in ipairs(spinningObjects) do
+                if obj.bav and obj.bav.Parent then
+                    obj.bav.AngularVelocity = Vector3.new(0, spinSpeed, 0)
+                end
+            end
+        end
     end
 })
 
@@ -10354,145 +10746,6 @@ AuraTab:AddSection({
     Name = "킬,플링"
 })
 
-AuraTab:AddToggle({
-    Name = "킬 All  (베타)",
-    Default = false,
-    save = true,
-    Flag = "21997979",
-    Callback = function(Value)
-        blobLoopT3 = Value
-        
-        if not Value then
-            return
-        end
-
-        task.spawn(function()
-            while blobLoopT3 do
-                local myChar = plr.Character
-                local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-                
-                if myChar and myHum then
-                    local currentSeat = myHum.SeatPart
-                    if not (currentSeat and currentSeat.Parent and currentSeat.Parent.Name == "CreatureBlobman") then
-                        if not workspace:FindFirstChild("CreatureBlobman") then
-                            rs.BlobEvents.SpawnBlobman:FireServer()
-                            task.wait(0.2)
-                        end
-                        
-                        local targetBlob = workspace:FindFirstChild("CreatureBlobman")
-                        if targetBlob then
-                            local targetSeat = targetBlob:FindFirstChildOfClass("Seat") or targetBlob:FindFirstChild("DriveSeat")
-                            if targetSeat then
-                                targetSeat:Sit(myHum)
-                                task.wait(0.1)
-                            end
-                        end
-                    end
-                end
-
-                UpdateCurrentBlobman()
-
-                local seat = plr.Character
-                    and plr.Character:FindFirstChildOfClass("Humanoid")
-                    and plr.Character:FindFirstChildOfClass("Humanoid").SeatPart
-
-                if not (seat and seat.Parent and seat.Parent.Name == "CreatureBlobman") then
-                    task.wait(0.5)
-                    continue
-                end
-
-                local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                if not myHrp then 
-                    task.wait(0.1)
-                    continue 
-                end
-
-                local initialCFrame = myHrp.CFrame
-                local teleportedToAny = false
-
-                for _, player in ipairs(game.Players:GetPlayers()) do
-                    if not blobLoopT3 then break end
-                    if player == plr then continue end
-                    if table.find(Whitelist, player.Name) or (PPs and PPs:FindFirstChild(player.Name)) then continue end
-
-                    local char = player.Character
-                    local hum = char and char:FindFirstChildOfClass("Humanoid")
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    
-                    if not char or not hum or not hrp or char.Parent == nil or not hrp:IsDescendantOf(workspace) then 
-                        continue 
-                    end
-
-                    if hum.Health <= 0 then continue end
-
-                    local distance = (myHrp.Position - hrp.Position).Magnitude
-                    if distance <= 200 then
-                        teleportedToAny = true
-                        local startTime = tick()
-
-                        if distance > 30 then
-                            TP(player)
-                            task.wait(0.01)
-                            
-                            myChar = plr.Character
-                            myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                            if myHrp then myHrp.CFrame = hrp.CFrame * CFrame.new(0, 0, 2) end
-                        end
-
-                        while blobLoopT3 and hum and hum.Health > 0 and char.Parent ~= nil do
-                            local timePassed = tick() - startTime
-                            
-                            if timePassed >= 4 then
-                                break
-                            end
-
-                            pcall(function()
-                                rs.GrabEvents.SetNetworkOwner:FireServer(hrp, hrp.CFrame)
-                                hrp.AssemblyLinearVelocity = Vector3.new(0, -999999, 0)
-                                rs.GrabEvents.DestroyGrabLine:FireServer(hrp, CFrame.new(hrp.Position.X, -50000, hrp.Position.Z))
-                            end)
-
-                            if currentBlobS then
-                                hum.BreakJointsOnDeath = false
-                                hum.WalkSpeed = 0
-                                hum.JumpPower = 0
-
-                                if hum.SeatPart == nil then
-                                    if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
-                                    if hum.RigType ~= Enum.HumanoidRigType.R6 then hum.RigType = Enum.HumanoidRigType.R6 end
-                                    if hum.RigType ~= Enum.HumanoidRigType.R15 then hum.RigType = Enum.HumanoidRigType.R15 end
-                                end
-
-                                for i = 1, 3 do
-                                    if not blobLoopT3 or hum.Health <= 0 then break end
-                                    BlobGrab(currentBlobS, hrp, "Right")
-                                    BlobRelease(currentBlobS, hrp, "Right")
-                                end
-                            end
-                            
-                            if timePassed >= 2 then
-                                task.wait()
-                            else
-                                task.wait(0.02)
-                            end
-                        end
-                    end
-                end
-
-                if blobLoopT3 and teleportedToAny then
-                    myChar = plr.Character
-                    myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-                    if myHrp then
-                        BACK(initialCFrame)
-                        task.wait(0.05)
-                    end
-                end
-
-                task.wait(0.05)
-            end
-        end)
-    end
-})
 
 
 AuraTab:AddToggle({
@@ -10788,8 +11041,274 @@ local Button = plotTab:AddButton({
     end,
 })
 
+pcall(function()
+        localPlayer.CharacterAdded:Connect(function(char)
+            pcall(function()
+                char:WaitForChild("HumanoidRootPart")
+                _G.AutoSlotHRP = char:FindFirstChild("HumanoidRootPart")
+            end)
+        end)
+        if localPlayer.Character then
+            pcall(function()
+                _G.AutoSlotHRP = localPlayer.Character:WaitForChild("HumanoidRootPart")
+            end)
+        else
+            localPlayer.CharacterAdded:Wait()
+            pcall(function()
+                _G.AutoSlotHRP = localPlayer.Character:WaitForChild("HumanoidRootPart")
+            end)
+        end
+    end)
+
+    function GetRandomSlot()
+        local s, r = pcall(function()
+            return workspace.Slots:GetChildren()
+        end)
+        return (s and #r > 0 and r[math.random(1, #r)]) or nil
+    end
+
+    function GetTimeText(slot)
+        local s, r = pcall(function()
+            return slot.Screen.SlotGui.TimeLeftFrame.TimeText
+        end)
+        return (s and r) or nil
+    end
+
+    function ProcessSlot()
+        task.spawn(function()
+            local cf = (_G.AutoSlotHRP and _G.AutoSlotHRP.CFrame) or CFrame.new(0, 100, 0)
+            while true do
+                if not _G.AutoSlotTP then task.wait(1) continue end
+                local slot = GetRandomSlot()
+                local handle = (slot and slot:FindFirstChild("SlotHandle") and slot.SlotHandle:FindFirstChild("Handle")) or nil
+                local timeText = (slot and GetTimeText(slot)) or nil
+                if handle and timeText and _G.AutoSlotHRP then
+                    while timeText.Text ~= "0:00" and _G.AutoSlotTP do
+                        pcall(function() _G.AutoSlotLabel:Set("Time: " .. timeText.Text) end)
+                        task.wait(0.3)
+                    end
+                    if not _G.AutoSlotTP then continue end
+                    pcall(function()
+                        _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
+                        if not (_G.AutoSlotTP and _G.AutoSlotHRP) then return end
+                        _G.AutoSlotHRP.CFrame = CFrame.new(handle.Position + Vector3.new(0, -3, 0))
+                        task.wait(0.5)
+                        if not _G.AutoSlotTP then return end
+                        _G.AutoSlotHRP.Anchored = true
+                        task.wait(0.5)
+                        if not _G.AutoSlotTP then return end
+                        game.ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(handle, CFrame.new(handle.Position))
+                        task.wait(0.8)
+                        if not _G.AutoSlotTP then return end
+                        _G.AutoSlotHRP.CFrame = cf
+                        _G.AutoSlotHRP.Anchored = false
+                    end)
+                    local t = 0
+                    while timeText.Text == "0:00" and t < 7 and _G.AutoSlotTP do
+                        pcall(function() _G.AutoSlotLabel:Set("Time: " .. timeText.Text) end)
+                        task.wait(0.5)
+                        t += 0.5
+                    end
+                else
+                    task.wait(0.5)
+                end
+            end
+        end)
+    end
+
+    plotTab:AddToggle({
+        Name = "오토슬롯",
+        Default = false,
+        Callback = function(v)
+            _G.AutoSlotTP = v
+            if v then
+                ProcessSlot()
+                if linguage == "pt-br" then
+                    logMessage("Auto-Slot ativado")
+                else
+                    logMessage("Auto-Slot activated")
+                end
+            else
+                if linguage == "pt-br" then
+                    logMessage("Auto-Slot desativado")
+                else
+                    logMessage("Auto-Slot deactivated")
+                end
+            end
+        end
+    })
+
+    task.spawn(function()
+        while true do
+            pcall(function()
+                if not _G.AutoSlotTP then
+                    local slot = GetRandomSlot()
+                    local timeText = (slot and GetTimeText(slot)) or nil
+                    if timeText then
+                        _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
+                    else
+                        _G.AutoSlotLabel:Set("Time: ...")
+                    end
+                end
+            end)
+            task.wait(1)
+        end
+    end)
+
+AutoTab:AddSection({
+        Name = "Infinite time house"
+    })
+
+-- VariÃ¡veis Globais
+local RTime = nil
+local TimeInHouseLabel = AutoTab:AddLabel("Time: 0")
+
+-- FunÃ§Ã£o auxiliar para obter HumanoidRootPart
+local function getCharacterRootPart()
+    if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        return localPlayer.Character.HumanoidRootPart
+    end
+    return nil
+end
+
+-- Monitora quando o jogador entra em uma plot
+pcall(function()
+    local plots = workspaceService and workspaceService:FindFirstChild("Plots")
+    if not plots then return end
+    plots.DescendantAdded:Connect(function(child)
+        if child.Name == "Value" and 
+           tostring(child.Parent) == "ThisPlotsOwners" and 
+           child.Value == localPlayer.Name then
+            
+            RTime = child:WaitForChild("TimeRemainingNum", 1)
+            if RTime then
+                RTime.Changed:Connect(function(timeInHouse)
+                    TimeInHouseLabel:Set("Time: " .. timeInHouse)
+                end)
+            end
+        end
+    end)
+end)
 
 
+local function teleportToLocation(location)
+    local rootPart = getCharacterRootPart()
+    if not rootPart then return end
+    
+    if location == "Spin" and _G.SavedPositionInSpin then
+        rootPart.CFrame = _G.SavedPositionInSpin
+    elseif location == "House" and _G.SavedPositionOutHouse then
+        rootPart.CFrame = _G.SavedPositionOutHouse
+    end
+end
+
+
+function saveCharacterPosition(location)
+    local rootPart = getCharacterRootPart()
+    if not rootPart then return end
+    
+    if location == "House" then
+        _G.SavedPositionOutHouse = rootPart.CFrame
+    elseif location == "Spin" then
+        _G.SavedPositionInSpin = rootPart.CFrame
+    end
+end
+
+
+local function updateTimeInHouseLabel()
+    while true do
+        pcall(function()
+            if workspaceService and workspaceService.Plots then
+                for _, descendant in pairs(workspaceService.Plots:GetDescendants()) do
+                    if descendant.Name == "TimeRemainingNum" and 
+                       descendant.Parent and 
+                       descendant.Parent.Value == localPlayer.Name then
+                        
+                        _G.RemainingTimeInHouse = descendant
+                        
+                        descendant.Changed:Connect(function(timeRemaining)
+                            TimeInHouseLabel:Set("Time: " .. timeRemaining)
+                        end)
+                        break
+                    end
+                end
+            end
+        end)
+        task.wait(1)
+    end
+end
+
+task.spawn(updateTimeInHouseLabel)
+
+plotTab:AddToggle({
+    Name = "하우스 시간 무한",
+    Default = false,
+    Callback = function(isEnabled)
+        _G.AutoSaveHouseTime = isEnabled
+        
+        if isEnabled then
+            task.spawn(function()
+                while _G.AutoSaveHouseTime do
+                    pcall(function()
+                        if localPlayer.InfiniteHouseTime and localPlayer.InfiniteHouseTime.Value then
+                            preserveTimeToggle:Set(false)
+                            OrionLib:MakeNotification({
+                                Name = "House",
+                                Content = "You won Infinite Gamepass House!",
+                                Image = "rbxassetid://4483345998",
+                                Time = 5
+                            })
+                            return
+                        end
+                        
+                        local remainingTime = _G.RemainingTimeInHouse
+                        
+                        if typeof(remainingTime) == "Instance" and
+                           remainingTime:IsDescendantOf(workspaceService) and
+                           remainingTime:IsA("IntValue") then
+                            
+                            local plotArea = remainingTime.Parent.Parent.Parent.Parent:FindFirstChild("PlotArea")
+                            
+                            if remainingTime.Value < 20 and ChangeActivityPriority(4) then
+                                OrionLib:MakeNotification({
+                                    Name = "하우스 시간",
+                                    Content = "Time: " .. remainingTime.Value .. "s - Tp!",
+                                    Image = "rbxassetid://4483345998",
+                                    Time = 3
+                                })
+                                
+                                saveCharacterPosition("House")
+                                task.wait()
+                                
+                                repeat
+                                    if not _G.AutoSaveHouseTime then break end
+                                    
+                                    local rootPart = getCharacterRootPart()
+                                    if rootPart and plotArea then
+                                        rootPart.CFrame = CFrame.new(plotArea.Position) + Vector3.new(0, 5, 0)
+                                    end
+                                    
+                                    task.wait(1)
+                                until not remainingTime.Parent or 
+                                      not _G.AutoSaveHouseTime or 
+                                      remainingTime.Value > 15
+                                
+                                if _G.AutoSaveHouseTime then
+                                    teleportToLocation("House")
+                                end
+                                
+                                ChangeActivityPriority(0)
+                            end
+                        end
+                    end)
+                    task.wait(2)
+                end
+            end)
+        end
+    end,
+    Save = true,
+    Flag = "autosavehousetimeremaining_toggle"
+})
 
 
 funTab:AddSection({
