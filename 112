@@ -495,12 +495,7 @@ do
 
 			function tabProxy:AddBind(ti)
 				local grp = getGroup(tabProxy)
-				local kp = grp:AddKeyPicker(ti.Name or "Bind", {
-					Text = ti.Name or "Bind",
-					Default = ti.Default,
-					Mode = ti.Hold and "Hold" or "Toggle",
-					Callback = ti.Callback,
-				})
+				
 				pcall(function()
 					if type(kp) == "table" and kp.Set == nil and kp.SetValue ~= nil then
 						kp.Set = function(_, v) kp:SetValue(v) end
