@@ -83,7 +83,8 @@ local lightbitoffset = 1
 local lightbitradius = 20
 local usingradius = lightbitradius
 
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Undebolted/FTAP/main/OrionLib.lua')))()
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
+
 local U = loadstring(game:HttpGet("https://raw.githubusercontent.com/Undebolted/Utilities/main/utilities.lua", true))()
 
 local followMode = true
