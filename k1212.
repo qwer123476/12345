@@ -429,7 +429,7 @@ local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid
 
 
 ----------------------------------------------------------------------------------------- [ 기능들 ]
-
+]]--
 function ForWhiteList(enable)
     WhiteListMode = enable
 
@@ -453,7 +453,7 @@ function ForWhiteList(enable)
         end
     end)
 end
-
+--[[
 function House()
     char = plr.Character
     if not char then
@@ -6459,184 +6459,8 @@ getTab:AddToggle({
     end
 })
 
-headMatrix = {0,0,0,0,0,0,0,1,0}
-torsoMatrix = {0,0,0,0,0,0,0,1,0}
-rightArmMatrix = {0,0,2,0,0,0,0,0,1}
-DevTab:AddToggle({ 
-    Name = "락", 
-    
-    save = true,
-    Flag = "ToggleSpam",
-    Callback = function(Value)
-        isSpamming = Value
-
-        if isSpamming then
-            if heartbeatConnection then
-                heartbeatConnection:Disconnect()
-            end
-
-            heartbeatConnection = rs2.Heartbeat:Connect(function()
-                rs.CharacterEvents.Look:FireServer(
-                    CFrame.new(0, 0, 0, headMatrix[1], headMatrix[2], headMatrix[3], headMatrix[4], headMatrix[5], headMatrix[6], headMatrix[7], headMatrix[8], headMatrix[9]),
-                    CFrame.new(0, 0, 0, torsoMatrix[1], torsoMatrix[2], torsoMatrix[3], torsoMatrix[4], torsoMatrix[5], torsoMatrix[6], torsoMatrix[7], torsoMatrix[8], torsoMatrix[9]),
-                    CFrame.new(0, 0, 0, rightArmMatrix[1], rightArmMatrix[2], rightArmMatrix[3], rightArmMatrix[4], rightArmMatrix[5], rightArmMatrix[6], rightArmMatrix[7], rightArmMatrix[8], rightArmMatrix[9]),
-                    "high"
-                )
-            end)
-        else
-            if heartbeatConnection then
-                heartbeatConnection:Disconnect()
-                heartbeatConnection = nil
-            end
---[[
-            rs.CharacterEvents.Look:FireServer(
-                CFrame.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                CFrame.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                CFrame.new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                intensity
-            )
-]]--
-        end
-    end
-})
-
-local HR = DevTab:AddTextbox({
-    Name = "대가리 회전",
-    
-    PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
-    TextDisappear = false,
-    save = true,
-    Flag = "HeadMatrix",
-    Callback = function(Value)
-        local numbers = {}
-        for num in Value:gmatch("[^,]+") do
-            table.insert(numbers, tonumber(num) or 0)
-        end
-
-        for i = 1, 9 do
-            headMatrix[i] = numbers[i] or 0
-        end
-    end
-})
-
-local TR = DevTab:AddTextbox({
-    Name = "몸통회전",
-    
-    PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
-    TextDisappear = false,
-    save = true,
-    Flag = "TorsoMatrix",
-    Callback = function(Value)
-        local numbers = {}
-        for num in Value:gmatch("[^,]+") do
-            table.insert(numbers, tonumber(num) or 0)
-        end
-
-        for i = 1, 9 do
-            torsoMatrix[i] = numbers[i] or 0
-        end
-    end
-})
-
-local ARA = DevTab:AddTextbox({
-    Name = "오른팔 회전(딸딸이치기)",
-    
-    PlaceholderText = "xx, xy, xz, yx, yy, yz, zx, zy, zz",
-    TextDisappear = false,
-    save = true,
-    Flag = "ArmMatrix",
-    Callback = function(Value)
-        local numbers = {}
-        for num in Value:gmatch("[^,]+") do
-            table.insert(numbers, tonumber(num) or 0)
-        end
-
-        for i = 1, 9 do
-            rightArmMatrix[i] = numbers[i] or 0
-        end
-    end
-})
-
-DevTab:AddButton({
-    Name = "리셋",
-    Callback = function()
-
-headMatrix = {0,0,0,0,0,0,0,1,0}
-torsoMatrix = {0,0,0,0,0,0,0,1,0}
-rightArmMatrix = {0,0,2,0,0,0,0,0,1}
-
-HR:Set("0,0,0,0,0,0,0,1,0")
-TR:Set("0,0,0,0,0,0,0,1,0")
-ARA:Set("0,0,2,0,0,0,0,0,1")
-
-    end
-})
-
-local TextChatService = game:GetService("TextChatService")
-local RunService = game:GetService("RunService")
 
 
-DevTab:AddTextbox({
-    Name = "소리",
-    
-    PlaceholderText = "Value",
-    TextDisappear = false,
-    Flag = "SoundInput",
-    Callback = function(Value)
-        spamText = tostring(Value)
-    end
-})
-
-DevTab:AddTextbox({
-    Name = "소리 나오는 속도",
-    
-    PlaceholderText = "Value",
-    TextDisappear = false,
-    Flag = "SpeedInput",
-    Callback = function(Value)
-        local num = tonumber(Value)
-        if num and num > 0 then
-            SpeedSpam = num
-        else
-            SpeedSpam = 0.1
-        end
-    end
-})
-
-DevTab:AddToggle({ 
-    Name = "토클", 
-    
-    save = true,
-    Flag = "SpamToggle1",
-    Callback = function(Value)
-        spamming = Value
-
-        if spamConnection then
-            spamConnection:Disconnect()
-            spamConnection = nil
-        end
-
-        if Value then
-            local accumulator = 0
-
-            spamConnection = RunService.Heartbeat:Connect(function(deltaTime)
-                if not spamming then 
-                    return 
-                end
-
-                accumulator = accumulator + deltaTime
-                if accumulator >= SpeedSpam then
-                    accumulator = 0
-
-                    local success, errorMsg = pcall(function()
-                        local message = "/e " .. (spamText)
-                        TextChatService.TextChannels.RBXGeneral:SendAsync(message)
-                    end)
-                end
-            end)
-        end
-    end
-})
 
 grabTab:AddSection({
 	Name = "Fling"
@@ -6849,10 +6673,6 @@ grabTab:AddToggle({
 grabTab:AddSection({
 	Name = "앵커"
 })
-local isAnchorState = false
-local currentConn = nil
-local colorConn = nil
-local hColor = nil
 
 local function runAnchorLogic()
     local original = workspace:FindFirstChild("GrabParts")
