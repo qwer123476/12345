@@ -1,20 +1,4 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 
--- [허용된 유저 ID 리스트]
-local AllowedIds = {
-    [4396960314] = true, -- 누나
-    [10472996475] = true, -- 나 부계
-    [2932138780] = true, -- 나
-    [10854413652] = true, -- 헬로
-    [2432461669] = true, -- 썸머
-}
-
--- [즉시 검사 및 킥]
-if not AllowedIds[LocalPlayer.UserId] then
-    LocalPlayer:Kick("인증되지 않은 유저입니다. 접속이 차단되었습니다.")
-    return -- 스크립트 실행 중단
-end
 
 
 
@@ -8541,12 +8525,54 @@ RunService.Stepped:Connect(function()
 end)
 
 antiTab:AddToggle({
-    Name = "안티플링V3",
+    Name = "안티플링V3 (실험단계)",
     Default = false,
     Callback = function(Value)
         ToyCollisionDisabled = Value
         PlayerCollisionDisabled = Value
     end
+})
+local antiOwnershipActive = false
+
+local function AntiOwnershipFunction()
+    local Struggle = game:GetService("ReplicatedStorage").CharacterEvents.Struggle
+    local LocalPlayer = game:GetService("Players").LocalPlayer
+
+    while antiOwnershipActive do
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("Head") then
+            local head = character.Head
+            if head:FindFirstChild("PartOwner") then
+                Struggle:FireServer(LocalPlayer)
+                for _, part in pairs(character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = true
+                    end
+                end
+                local isHeld = LocalPlayer:FindFirstChild("IsHeld")
+                while isHeld and isHeld.Value and antiOwnershipActive do
+                    task.wait()
+                end
+                for _, part in pairs(character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = false
+                    end
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+end
+
+antiTab:AddToggle({
+    Name = "안티 오너쉽 스팸V2",
+    Default = false,
+    Callback = function(Value)
+        antiOwnershipActive = Value
+        if antiOwnershipActive then
+            task.spawn(AntiOwnershipFunction)
+        end
+    end    
 })
 
 antiTab:AddSection({
@@ -9725,6 +9751,38 @@ local NoClipToggle = playerTab:AddToggle({
         updateNoClipF()
     end
 })
+local isWaterWalking = false
+
+local function setWaterWalk(state)
+    local workspaceMap = workspace:FindFirstChild("Map")
+    if workspaceMap then
+        local alwaysHere = workspaceMap:FindFirstChild("AlwaysHereTweenedObjects")
+        if alwaysHere then
+            local ocean = alwaysHere:FindFirstChild("Ocean")
+            if ocean then
+                local object = ocean:FindFirstChild("Object")
+                if object then
+                    local objectModel = object:FindFirstChild("ObjectModel")
+                    if objectModel then
+                        for _, child in pairs(objectModel:GetChildren()) do
+                            if child:IsA("BasePart") then
+                                child.CanCollide = state
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+playerTab:AddToggle({
+    Name = "바다걷기",
+    Default = false,
+    Callback = function(Value)
+        setWaterWalk(Value)
+    end    
+})
 
 playerTab:AddToggle({
     Name = "무한 점프",
@@ -9960,6 +10018,66 @@ AuraTab:AddToggle({
     end
 })
 
+
+AuraTab:AddToggle({
+    Name = "안티 킥 아우라",
+    Default = false,
+    Callback = function(Value)
+        removeAntiKickActive = Value
+        
+        if removeAntiKickActive then
+            task.spawn(function()
+                local RS = game:GetService("ReplicatedStorage")
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local GrabEvents = RS:WaitForChild("GrabEvents")
+                local SetNetOwner = GrabEvents:WaitForChild("SetNetworkOwner")
+                
+                while removeAntiKickActive do
+                    local myChar = LocalPlayer.Character
+                    local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                    if not myRoot then 
+                        task.wait(0.1)
+                        continue 
+                    end
+                    
+                    for _, target in ipairs(Players:GetPlayers()) do
+                        if target ~= LocalPlayer then
+                            if useWhitelistRemoveAntiKick and LocalPlayer:IsFriendsWith(target.UserId) then
+                                continue
+                            end
+                            
+                            local tChar = target.Character
+                            local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+                            if not tRoot then continue end
+                            
+                            if (tRoot.Position - myRoot.Position).Magnitude <= removeAntiKickRadius then
+                                local spawned = workspace:FindFirstChild(target.Name .. "SpawnedInToys")
+                                if spawned then
+                                    for _, toyName in ipairs({"NinjaKunai", "NinjaShuriken", "AntiKick"}) do
+                                        local toy = spawned:FindFirstChild(toyName)
+                                        if toy then
+                                            local part = toy:FindFirstChild("SoundPart")
+                                            if part then
+                                                pcall(function()
+                                                    SetNetOwner:FireServer(part, part.CFrame)
+                                                end)
+                                                if part:FindFirstChild("PartOwner") and part.PartOwner.Value == LocalPlayer.Name then
+                                                    part.CFrame = CFrame.new(0, 1000, 0)
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end    
+})
 
 
 AuraTab:AddToggle({
