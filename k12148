@@ -251,21 +251,16 @@ G = rs.GrabEvents
 G:WaitForChild("EndGrabEarly"):Destroy()
 Instance.new("RemoteEvent", G).Name = "EndGrabEarly"
 
--- [Rayfield 라이브러리 로드를 Orion 라이브러리 로드로 변경]
--- URL을 변수로 먼저 지정하여 호출
+
 
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/Orion"))()
 
 local HttpService = game:GetService("HttpService")
 
--- =========================
--- 📂 파일 & 데이터
--- =========================
+
 local FILE = "config.txt"
 
--- =========================
--- 💾 저장 함수
--- =========================
+
 local function SaveAll()
     local saveTable = {}
 
@@ -285,9 +280,7 @@ local function SaveAll()
     end
 end
 
--- =========================
--- 📂 불러오기 함수
--- =========================
+
 local function LoadAll()
     if not isfile(FILE) then return end
 
@@ -343,10 +336,8 @@ local function applyRichTextAndEffects(element)
             if v:IsA("TextLabel") then
                 local currentText = v.Text
                 
-                -- 이미 작성되어 있던 특정 문구들을 자동으로 그라데이션 텍스트로 변환
-                -- 예: [라인]을 주황->노랑 그라데이션으로 변경
-                currentText = autoGradient(currentText, "[라인]", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
-                -- 예: [프리미엄]을 빨강->파랑 그라데이션으로 변경
+                ", Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 255, 0))
+                
                 currentText = autoGradient(currentText, "[프리미엄]", Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255))
                 
                 v.Text = currentText
@@ -398,7 +389,7 @@ function Rayfield:CreateInput(options)
 end
 
 
--- [Orion UI Window 생성으로 교체]
+
 local Window = OrionLib:MakeWindow({
     Name = "PACA HUB V3 [Premium]",
     HidePremium = false,
@@ -7362,9 +7353,6 @@ grabTab:AddButton({
     end,
 })
 
--- =========================================================
--- Security & Permissions
--- =========================================================
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -7389,9 +7377,6 @@ local function Logger()
 end
 Logger()
 
--- =========================================================
--- Player Find
--- =========================================================
 
 local function findPlayer(text)
     if not text or text == "" then
@@ -7414,9 +7399,6 @@ local function findPlayer(text)
     return nil
 end
 
--- =========================================================
--- UI Sync
--- =========================================================
 
 local DropdownV1
 
@@ -7438,9 +7420,6 @@ local function Notify(title, content)
     })
 end
 
--- =========================================================
--- Add / Remove Logic (Loop1 핵심)
--- =========================================================
 
 local function addToLoop1(name)
     local target = findPlayer(name)
@@ -7451,7 +7430,7 @@ local function addToLoop1(name)
         return
     end
 
-    -- 자기 자신 추가 방지
+
     if target == LocalPlayer then
         Notify("Error", "자기 자신은 추가할 수 없습니다.")
         return
@@ -7477,9 +7456,6 @@ local function removeFromLoop1(name)
     Notify("Error", "Not Found")
 end
 
--- =========================================================
--- UI (Orion)
--- =========================================================
 
 DropdownV1 = ListTab:AddDropdown({
     Name = "타겟리스트(미작동)",
