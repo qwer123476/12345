@@ -5877,7 +5877,7 @@ FDTab:AddToggle({
         end
     end
 })
-BlobmanTab:AddButton({
+DevTab:AddButton({
     Name = "Silent Kick All",
     Callback = function()
         local Humanoid = get_hum()
