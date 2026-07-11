@@ -11116,8 +11116,35 @@ pcall(function()
         end)
     end
 
-    plotTab:AddToggle({
-    Name = "Auto Slot",
+
+_G.AutoSlotTP = false
+
+
+local function logMessage(msg)
+    print("[AutoSlot]: " .. tostring(msg))
+end
+
+if not ProcessSlot then
+    function ProcessSlot()
+        task.spawn(function()
+            while _G.AutoSlotTP do
+                
+                print("Running AutoSlot...")
+                task.wait(1)
+            end
+        end)
+    end
+end
+
+
+if not plotTab then
+    warn("plotTab is nil")
+    return
+end
+
+
+plotTab:AddToggle({
+    Name = "오토 슬롯",
     Default = false,
     Flag = "autoslot_toggle",
 
@@ -11125,20 +11152,30 @@ pcall(function()
         _G.AutoSlotTP = Value
 
         if Value then
-            ProcessSlot()
+            
+            if ProcessSlot then
+                pcall(ProcessSlot)
+            else
+                warn("ProcessSlot is nil")
+                return
+            end
 
-            logMessage(
-                linguage == "pt-br" 
-                and "Auto-Slot ativado" 
-                or "Auto-Slot activated"
-            )
+            pcall(function()
+                logMessage(
+                    linguage == "pt-br" 
+                    and "Auto-Slot ativado" 
+                    or "Auto-Slot activated"
+                )
+            end)
 
         else
-            logMessage(
-                linguage == "pt-br" 
-                and "Auto-Slot desativado" 
-                or "Auto-Slot deactivated"
-            )
+            pcall(function()
+                logMessage(
+                    linguage == "pt-br" 
+                    and "Auto-Slot desativado" 
+                    or "Auto-Slot deactivated"
+                )
+            end)
         end
     end
 })
