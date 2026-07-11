@@ -1,0 +1,176 @@
+--[[
+  근처 자동 그랩 (Bent Line Grab)
+  ─────────────────────────────────
+  원리:
+    - 그랩 빔(DragPart)은 카메라 시선 방향으로 뻗음
+    - 실제 잡는 대상(v1.Instance)은 RaycastModule.RaycastFromCam 결과
+    - 이 두 값이 분리되어 있어서, 레이캐스트만 근처 플레이어로 바꾸면
+      "다른 곳을 바라보면서 클릭 → 빔은 꺾여 보이지만 근처 사람이 잡힘"
+
+  사용: executor에 붙여넣기
+]]
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+local CONFIG = {
+	Enabled = true,
+	MaxRange = 30, -- 기본 20, 게임패스 30
+	TargetParts = { "HumanoidRootPart", "UpperTorso", "Torso", "Head" },
+}
+
+-- ── 근처 캐릭터 수집 ──
+local function collectCharacters()
+	local out, seen = {}, {}
+
+	local function add(model)
+		if not model or not model:IsA("Model") or seen[model] then
+			return
+		end
+		local hum = model:FindFirstChildOfClass("Humanoid")
+		if hum and hum.Health > 0 then
+			seen[model] = true
+			table.insert(out, model)
+		end
+	end
+
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p ~= LocalPlayer then
+			if p.Character then
+				add(p.Character)
+			end
+			local wsChar = workspace:FindFirstChild(p.Name)
+			if wsChar then
+				add(wsChar)
+			end
+		end
+	end
+
+	local plots = workspace:FindFirstChild("PlotItems")
+	if plots then
+		local pip = plots:FindFirstChild("PlayersInPlots")
+		if pip then
+			for _, m in ipairs(pip:GetChildren()) do
+				add(m)
+			end
+		end
+	end
+
+	return out
+end
+
+local function findNearestPart(maxRange)
+	local myChar = LocalPlayer.Character
+	if not myChar then
+		return nil
+	end
+
+	local myPos = myChar:GetPivot().Position
+	local nearest, best = nil, maxRange
+
+	for _, char in ipairs(collectCharacters()) do
+		for _, name in ipairs(CONFIG.TargetParts) do
+			local part = char:FindFirstChild(name)
+			if part and part:IsA("BasePart") then
+				local d = (part.Position - myPos).Magnitude
+				if d < best then
+					best = d
+					nearest = part
+				end
+			end
+		end
+	end
+
+	return nearest, best
+end
+
+local function fakeRaycastResult(part)
+	local cam = workspace.CurrentCamera
+	return {
+		Instance = part,
+		Position = part.Position,
+		Normal = Vector3.yAxis,
+		Material = part.Material,
+		Distance = (part.Position - cam.CFrame.Position).Magnitude,
+	}
+end
+
+-- ── RaycastModule 후킹 ──
+local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts")
+local RaycastModule = require(PlayerScripts:WaitForChild("RaycastModule"))
+local _orig = RaycastModule.RaycastFromCam
+
+RaycastModule.RaycastFromCam = function(player, range)
+	if not CONFIG.Enabled then
+		return _orig(player, range)
+	end
+
+	local useRange = range or CONFIG.MaxRange
+	local part, dist = findNearestPart(useRange)
+
+	if part then
+		local offset = part.CFrame:ToObjectSpace(CFrame.new(part.Position))
+		return fakeRaycastResult(part), offset
+	end
+
+	return _orig(player, range)
+end
+
+-- ── workspace.Raycast 후킹 (executor hookfunction 지원 시 백업) ──
+if hookfunction then
+	local _wsRay = hookfunction(workspace.Raycast, function(origin, direction, params)
+		if CONFIG.Enabled and typeof(origin) == "Vector3" and typeof(direction) == "Vector3" then
+			local cam = workspace.CurrentCamera
+			if cam and (origin - cam.CFrame.Position).Magnitude < 2 then
+				local part = findNearestPart(direction.Magnitude)
+				if part then
+					return fakeRaycastResult(part)
+				end
+			end
+		end
+		return _wsRay(origin, direction, params)
+	end)
+end
+
+-- ── 토글 UI ──
+local gui = Instance.new("ScreenGui")
+gui.Name = "NearbyGrabUI"
+gui.ResetOnSpawn = false
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local btn = Instance.new("TextButton")
+btn.Size = UDim2.new(0, 200, 0, 36)
+btn.Position = UDim2.new(0, 12, 0, 440)
+btn.BackgroundColor3 = Color3.fromRGB(80, 40, 120)
+btn.TextColor3 = Color3.new(1, 1, 1)
+btn.Font = Enum.Font.GothamBold
+btn.TextSize = 13
+btn.Text = "Nearby Grab: ON (30)"
+btn.Parent = gui
+Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+local function refresh()
+	btn.Text = CONFIG.Enabled
+		and ("Nearby Grab: ON (" .. CONFIG.MaxRange .. ")")
+		or "Nearby Grab: OFF"
+	btn.BackgroundColor3 = CONFIG.Enabled
+		and Color3.fromRGB(80, 40, 120)
+		or Color3.fromRGB(50, 50, 55)
+end
+
+btn.MouseButton1Click:Connect(function()
+	CONFIG.Enabled = not CONFIG.Enabled
+	refresh()
+end)
+
+UserInputService.InputBegan:Connect(function(input, processed)
+	if processed then return end
+	if input.KeyCode == Enum.KeyCode.G then
+		CONFIG.Enabled = not CONFIG.Enabled
+		refresh()
+	end
+end)
+
+refresh()
+print("[NearbyGrab] Loaded — G 키로 토글 | 다른 곳을 봐도 " .. CONFIG.MaxRange .. " 스터드 내 가장 가까운 사람 잡힘")
