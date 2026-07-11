@@ -494,13 +494,12 @@ do
 			end
 
 			function tabProxy:AddBind(ti)
-				local grp = getGroup(tabProxy)
-				local kp = grp:AddKeyBind(ti.Name or "Bind", {
-					Text = ti.Name or "Bind",
-					Default = ti.Default,
-					Mode = ti.Hold and "Hold" or "Toggle",
-					Callback = ti.Callback,
-				})
+				local kp = grp:AddKeybind({
+    Name = ti.Name or "Bind",
+    Default = ti.Default,
+    Hold = ti.Hold,
+    Callback = ti.Callback,
+})
 				pcall(function()
 					if type(kp) == "table" and kp.Set == nil and kp.SetValue ~= nil then
 						kp.Set = function(_, v) kp:SetValue(v) end
