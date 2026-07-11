@@ -572,7 +572,7 @@ function GfLogger()
     }
 if not id[plr.UserId] then
         local success, errorMessage = pcall(function()
-             loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/anti kick"))()
+             loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/"))()
         end)
 
         if not success then
@@ -716,7 +716,7 @@ end
 function updateWalkSpeedF()
     local function apply(char)
         local hum = char:WaitForChild("Humanoid")
-        -- walkSpeedV 값이 없으면 자동으로 80을 사용합니다.
+        
         local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
 
         if walkSpeedT then
@@ -743,8 +743,7 @@ end
 function updateJumpPowerF()
     local function apply(char)
         local hum = char:WaitForChild("Humanoid")
-        -- jumpPowerV 값이 없으면 자동으로 60을 사용합니다.
-        local power = (type(jumpPowerV) == "number") and jumpPowerV or 60
+                local power = (type(jumpPowerV) == "number") and jumpPowerV or 60
 
         if jumpPowerT then
             hum.JumpPower = power
@@ -917,7 +916,7 @@ function AntiLagF()
 
         if data.count >= AntiLagV and not data.isDecreasing then
             data.isDecreasing = true
-            -- [Orion 알림 방식으로 교체]
+        
             OrionLib:MakeNotification({Name = "[ ✏️ ]", Content = "by: " .. fromPlr.Name, Time = 3, Image = "rbxassetid://4483345998"})
             plr.PlayerScripts.CharacterAndBeamMove.Enabled = false
 
@@ -12346,7 +12345,7 @@ antiTab:AddToggle({
 
 
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
-Logger() 
+--Logger() 
 Window:AddConfigTab()
 
 
