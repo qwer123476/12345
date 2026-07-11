@@ -1,0 +1,195 @@
+-- [[ EKO HUB : TOP-LAYER & OPTIMIZED ]] --
+-- 업데이트: UI 레이어 우선순위 극대화 (DisplayOrder 및 ZIndex 최적화)
+
+local lp = game:GetService("Players").LocalPlayer
+local run = game:GetService("RunService")
+local uis = game:GetService("UserInputService")
+local players = game:GetService("Players")
+local pGui = lp:WaitForChild("PlayerGui")
+
+-- [ 1. 시스템 설정 ] --
+_G.EkoHubSettings = {
+    Aimbot = false,
+    Blackhole = false,
+    SpinBot = false,
+    Frozen = false,
+    Targets = {}, 
+    YeetPower = 2500000,
+    DropdownOpen = false
+}
+
+local frozenPos = nil
+local ZERO_V3 = Vector3.new(0, 0, 0)
+
+-- [ 2. 유틸리티 함수 ] --
+local function applyForwardForce(targetChar)
+    local tRoot = targetChar:FindFirstChild("HumanoidRootPart")
+    local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    if not tRoot or not myRoot then return end
+
+    tRoot.AssemblyLinearVelocity = myRoot.CFrame.LookVector * _G.EkoHubSettings.YeetPower
+    tRoot.AssemblyAngularVelocity = Vector3.new(math.random(-500, 500), 500, math.random(-500, 500))
+end
+
+-- [ 3. UI 엔진 : 레이어 최상단 설정 ] --
+if pGui:FindFirstChild("EkoHub_Main") then pGui.EkoHub_Main:Destroy() end
+
+local sg = Instance.new("ScreenGui", pGui)
+sg.Name = "EkoHub_Main"
+sg.ResetOnSpawn = false 
+sg.DisplayOrder = 999 -- [[ 핵심: 다른 모든 UI보다 위에 그려짐 ]]
+
+local main = Instance.new("Frame", sg)
+main.Size = UDim2.new(0, 220, 0, 350)
+main.Position = UDim2.new(0.02, 0, 0.4, 0)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+main.ZIndex = 10 -- 기본 레이어 레벨
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 15)
+Instance.new("UIStroke", main).Color = Color3.fromRGB(255, 0, 150)
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "EKO HUB : ELITE"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.FredokaOne
+title.BackgroundTransparency = 1
+title.ZIndex = 11
+
+-- [[ 드롭다운 시스템 : 유저 선택 UI ]] --
+local dropBtn = Instance.new("TextButton", main)
+dropBtn.Size = UDim2.new(1, -20, 0, 35)
+dropBtn.Position = UDim2.new(0, 10, 0, 45)
+dropBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+dropBtn.Text = "▼ SELECT TARGETS"
+dropBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
+dropBtn.ZIndex = 20 -- 버튼 레이어 업
+Instance.new("UICorner", dropBtn)
+
+local listFrame = Instance.new("ScrollingFrame", main)
+listFrame.Size = UDim2.new(1, -20, 0, 150)
+listFrame.Position = UDim2.new(0, 10, 0, 85)
+listFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+listFrame.Visible = false
+listFrame.ZIndex = 100 -- [[ 핵심: 리스트가 모든 버튼 위에 오도록 ]]
+listFrame.ScrollBarThickness = 3
+Instance.new("UICorner", listFrame)
+local layout = Instance.new("UIListLayout", listFrame)
+layout.Padding = UDim.new(0, 5)
+
+function updatePlayerList()
+    for _, v in ipairs(listFrame:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    
+    for _, p in ipairs(players:GetPlayers()) do
+        if p ~= lp then
+            local pBtn = Instance.new("TextButton", listFrame)
+            pBtn.Size = UDim2.new(1, -5, 0, 30)
+            local isTarget = table.find(_G.EkoHubSettings.Targets, p)
+            pBtn.BackgroundColor3 = isTarget and Color3.fromRGB(255, 0, 150) or Color3.fromRGB(40, 40, 50)
+            pBtn.Text = p.DisplayName
+            pBtn.TextColor3 = Color3.new(1, 1, 1)
+            pBtn.ZIndex = 101
+            Instance.new("UICorner", pBtn)
+            
+            pBtn.MouseButton1Click:Connect(function()
+                local idx = table.find(_G.EkoHubSettings.Targets, p)
+                if idx then table.remove(_G.EkoHubSettings.Targets, idx) else table.insert(_G.EkoHubSettings.Targets, p) end
+                updatePlayerList()
+            end)
+        end
+    end
+    dropBtn.Text = (#_G.EkoHubSettings.Targets == 0) and "▼ SELECT TARGETS" or "🎯 TARGETS: "..#_G.EkoHubSettings.Targets
+end
+
+dropBtn.MouseButton1Click:Connect(function() listFrame.Visible = not listFrame.Visible end)
+players.PlayerAdded:Connect(updatePlayerList)
+players.PlayerRemoving:Connect(updatePlayerList)
+updatePlayerList()
+
+-- [ 4. 기능 토글 생성 ] --
+local btnContainer = Instance.new("Frame", main)
+btnContainer.Size = UDim2.new(1, -20, 0, 200)
+btnContainer.Position = UDim2.new(0, 10, 0, 90)
+btnContainer.BackgroundTransparency = 1
+btnContainer.ZIndex = 11
+Instance.new("UIListLayout", btnContainer).Padding = UDim.new(0, 8)
+
+local function createToggle(name, var)
+    local btn = Instance.new("TextButton", btnContainer)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(180, 180, 180)
+    btn.ZIndex = 12
+    Instance.new("UICorner", btn)
+    
+    btn.MouseButton1Click:Connect(function()
+        _G.EkoHubSettings[var] = not _G.EkoHubSettings[var]
+        btn.BackgroundColor3 = _G.EkoHubSettings[var] and Color3.fromRGB(255, 0, 150) or Color3.fromRGB(25, 25, 30)
+        btn.TextColor3 = _G.EkoHubSettings[var] and Color3.new(1, 1, 1) or Color3.fromRGB(180, 180, 180)
+        if var == "Frozen" and not _G.EkoHubSettings[var] then frozenPos = nil end
+    end)
+end
+
+createToggle("🎯 AIMBOT", "Aimbot")
+createToggle("🚀 CANNON", "Blackhole")
+createToggle("🌪️ SPINBOT", "SpinBot")
+createToggle("🧊 FROZEN", "Frozen")
+
+-- [ 5. 메인 로직 ] --
+run.Heartbeat:Connect(function()
+    local char = lp.Character
+    local myRoot = char and char:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return end
+    
+    if _G.EkoHubSettings.Frozen then
+        if not frozenPos then frozenPos = myRoot.CFrame end
+        myRoot.AssemblyLinearVelocity = ZERO_V3
+        if not _G.EkoHubSettings.SpinBot then myRoot.AssemblyAngularVelocity = ZERO_V3 end
+        if (myRoot.Position - frozenPos.Position).Magnitude > 0.001 then myRoot.CFrame = frozenPos end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then for _, track in ipairs(hum:GetPlayingAnimationTracks()) do track:Stop(0) end end
+    end
+
+    for _, p in ipairs(players:GetPlayers()) do
+        if p ~= lp and p.Character then
+            for _, part in ipairs(p.Character:GetChildren()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
+        end
+    end
+
+    if _G.EkoHubSettings.SpinBot then myRoot.AssemblyAngularVelocity = Vector3.new(0, 7000, 0) end
+
+    if _G.EkoHubSettings.Blackhole then
+        local checkTargets = #_G.EkoHubSettings.Targets > 0 and _G.EkoHubSettings.Targets or players:GetPlayers()
+        local range = #_G.EkoHubSettings.Targets > 0 and 50 or 25
+        for _, t in ipairs(checkTargets) do
+            if t ~= lp and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
+                if (myRoot.Position - t.Character.HumanoidRootPart.Position).Magnitude < range then
+                    applyForwardForce(t.Character)
+                end
+            end
+        end
+    end
+end)
+
+run.RenderStepped:Connect(function()
+    if _G.EkoHubSettings.Aimbot then
+        local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+        if not myRoot or uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then return end
+        local target, dist = nil, 600
+        local checkList = #_G.EkoHubSettings.Targets > 0 and _G.EkoHubSettings.Targets or players:GetPlayers()
+        for _, p in ipairs(checkList) do
+            if p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local d = (myRoot.Position - p.Character.HumanoidRootPart.Position).Magnitude
+                if d < dist then dist = d target = p.Character.HumanoidRootPart end
+            end
+        end
+        if target then workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Position) end
+    end
+end)
+
+print("EKO HUB : TOP LAYER LOADED. 🧊🚀")
