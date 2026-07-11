@@ -11500,21 +11500,18 @@ local AntiLag = antiTab:AddToggle({
 Logger() 
 Window:AddConfigTab()
 
-local SettingsTab = Window:MakeTab({
-    Name = "설정 저장"
-})
 
 -- =========================
 -- 🔘 버튼 (여기에 위치)
 -- =========================
-SettingsTab:AddButton({
+ConfigTab:AddButton({
     Name = "저장",
     Callback = function()
         SaveAll()
     end
 })
 
-SettingsTab:AddButton({
+ConfigTab:AddButton({
     Name = "불러오기",
     Callback = function()
         LoadAll()
