@@ -5652,7 +5652,7 @@ local function processAntiGrabPlayer(player)
             success = true
             break
         end
-        task.wait(0.02)
+        task.wait(0.2)
     end
 
     tpRunning = false
