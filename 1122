@@ -495,7 +495,11 @@ do
 
 			function tabProxy:AddBind(ti)
 				local grp = getGroup(tabProxy)
-				
+				function tabProxy:AddColorpicker(ti)
+    local grp = getGroup(tabProxy)
+    return makeSectionProxy(tabProxy, grp):AddColorpicker(ti)
+end
+tabProxy.AddColorPicker = tabProxy.AddColorpicker
 				pcall(function()
 					if type(kp) == "table" and kp.Set == nil and kp.SetValue ~= nil then
 						kp.Set = function(_, v) kp:SetValue(v) end
