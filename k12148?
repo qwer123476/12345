@@ -11117,27 +11117,31 @@ pcall(function()
     end
 
     plotTab:AddToggle({
-        Name = "오토슬롯",
-        Default = false,
-        Callback = function(v)
-            _G.AutoSlotTP = v
-            if v then
-                ProcessSlot()
-                if linguage == "pt-br" then
-                    logMessage("Auto-Slot ativado")
-                else
-                    logMessage("Auto-Slot activated")
-                end
-            else
-                if linguage == "pt-br" then
-                    logMessage("Auto-Slot desativado")
-                else
-                    logMessage("Auto-Slot deactivated")
-                end
-            end
-        end
-    })
+    Name = "Auto Slot",
+    Default = false,
+    Flag = "autoslot_toggle",
 
+    Callback = function(Value)
+        _G.AutoSlotTP = Value
+
+        if Value then
+            ProcessSlot()
+
+            logMessage(
+                linguage == "pt-br" 
+                and "Auto-Slot ativado" 
+                or "Auto-Slot activated"
+            )
+
+        else
+            logMessage(
+                linguage == "pt-br" 
+                and "Auto-Slot desativado" 
+                or "Auto-Slot deactivated"
+            )
+        end
+    end
+})
     task.spawn(function()
         while true do
             pcall(function()
@@ -11155,8 +11159,8 @@ pcall(function()
         end
     end)
 
-AutoTab:AddSection({
-        Name = "Infinite time house"
+plotTab:AddSection({
+        Name = "하우스 시간 무한"
     })
 
 -- VariÃ¡veis Globais
