@@ -7536,6 +7536,89 @@ LoopTab:AddButton({
         end
     end
 })
+LoopTab:AddSection({
+    Name = "데스토리 구찌"
+})
+
+
+local function destroyPlayerGucci(targetPlayer)
+    if not targetPlayer or targetPlayer == LocalPlayer then return false end
+    
+    local folderName = targetPlayer.Name .. "SpawnedInToys"
+    local toysFolder = Workspace:FindFirstChild(folderName)
+    if not toysFolder then return false end
+    
+    for _, obj in ipairs(toysFolder:GetChildren()) do
+        if obj.Name == "CreatureBlobman" then
+            local seat = obj:FindFirstChild("VehicleSeat") or obj:FindFirstChildWhichIsA("VehicleSeat", true)
+            if seat then
+                local myChar = LocalPlayer.Character
+                if not myChar then return false end
+                
+                local myHum = myChar:FindFirstChild("Humanoid")
+                local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+                if not myHum or not myRoot then return false end
+                
+                local safeSpot = myRoot.CFrame
+                myRoot.CFrame = seat.CFrame
+                myRoot.Velocity = Vector3.zero
+                seat:Sit(myHum)
+                task.wait(0.3)
+                
+                if myHum.SeatPart == seat then
+                    myHum.Sit = false
+                    task.wait(0.1)
+                    myRoot.CFrame = safeSpot
+                    task.wait(0.5)
+                    obj:Destroy()
+                    return true
+                else
+                    myRoot.CFrame = safeSpot
+                end
+            end
+        end
+    end
+    return false
+end
+
+local function StartDestroyGucciLoop()
+    while destroyGucciActive do
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                destroyPlayerGucci(player)
+            end
+        end
+        task.wait(2)
+    end
+end
+
+LoopTab:AddToggle({
+    Name = "데스토리 구찌   <font color='rgb(0,0,255)'>[프라임 오너쉽]</font>   <font color='rgb(255,0,0)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "21",
+    Callback = function(Value)
+        blobLoopT3 = Value
+        destroyGucciActive = Value
+        
+        if blobLoopT3 then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
+            end
+            
+            task.spawn(StartDestroyGucciLoop)
+            
+            if type(loopPlayerBlobF3) == "function" then
+                loopPlayerBlobF3()
+            end
+        else
+            blobLoopT3 = false
+            destroyGucciActive = false
+            table.clear(playersInLoop2V)
+        end
+    end
+})
 
     LoopTab:AddSection({
     Name = "오너킥"
@@ -7813,6 +7896,145 @@ LoopTab:AddToggle({
                 task.wait(0.05)
             end
         end)
+    end
+})
+LoopTab:AddSection({
+    Name = "블롭 킥"
+})
+local loopKickBlobActive = false
+
+LoopTab:AddToggle({
+    Name = "블롭킥     <font color='rgb(255,0,0)'>[프리미엄]</font>",
+    Default = false,
+    Flag = "21",
+    Callback = function(Value)
+        blobLoopT3 = Value
+        loopKickBlobActive = Value
+        
+        if blobLoopT3 then
+            table.clear(playersInLoop2V)
+            for i, e in ipairs(playersInLoop1V) do
+                local nameOnly = e:match("^(.-) %(") or e
+                table.insert(playersInLoop2V, nameOnly)
+            end
+            
+            for _, targetName in ipairs(playersInLoop2V) do
+                task.spawn(function()
+                    local blobLoop = true
+                    local Players = game:GetService("Players")
+                    local RS = game:GetService("ReplicatedStorage")
+                    local RunService = game:GetService("RunService")
+                    local LocalPlayer = Players.LocalPlayer
+                    local GE = RS:WaitForChild("GrabEvents")
+
+                    local REMOTE_DELAY = 0.002
+                    local lastRemote = 0
+
+                    local target = Players:FindFirstChild(targetName)
+                    if not target then return end
+
+                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    local hum = char:WaitForChild("Humanoid")
+                    local seat = hum.SeatPart
+                    if not seat or seat.Parent.Name ~= "CreatureBlobman" then return end
+
+                    local blob = seat.Parent
+                    local blobRoot = blob:FindFirstChild("HumanoidRootPart") or blob.PrimaryPart
+                    local scriptObj = blob:WaitForChild("BlobmanSeatAndOwnerScript")
+                    local CG = scriptObj:WaitForChild("CreatureGrab")
+                    local CD = scriptObj:WaitForChild("CreatureDrop")
+                    local R_Det = blob:WaitForChild("RightDetector")
+
+                    local savedPos = blobRoot.CFrame
+                    local dragging = false
+                    local grabStartTime = 0
+
+                    while blobLoop and loopKickBlobActive do
+                        local currentTarget = Players:FindFirstChild(targetName)
+                        if not currentTarget then break end
+
+                        char = LocalPlayer.Character
+                        hum = char and char:FindFirstChild("Humanoid")
+                        seat = hum and hum.SeatPart
+                        if not seat or seat.Parent.Name ~= "CreatureBlobman" then break end
+
+                        blob = seat.Parent
+                        blobRoot = blob:FindFirstChild("HumanoidRootPart") or blob.PrimaryPart
+
+                        local tChar = currentTarget.Character
+                        local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+                        local tHum = tChar and tChar:FindFirstChild("Humanoid")
+
+                        if tRoot and tHum and tHum.Health > 0 and blobRoot then
+                            tRoot.Velocity = Vector3.zero
+
+                            if not dragging then
+                                blobRoot.CFrame = tRoot.CFrame
+                                blobRoot.Velocity = Vector3.zero
+
+                                if tick() - lastRemote >= REMOTE_DELAY then
+                                    lastRemote = tick()
+                                    pcall(function()
+                                        tHum.PlatformStand = true
+                                        tHum.Sit = true
+                                        GE.SetNetworkOwner:FireServer(tRoot, blobRoot.CFrame)
+                                        GE.DestroyGrabLine:FireServer(tRoot)
+                                    end)
+                                end
+
+                                if grabStartTime == 0 then grabStartTime = tick() end
+
+                                if tick() - grabStartTime > 0.35 then
+                                    dragging = true
+                                    grabStartTime = 0
+                                    blobRoot.CFrame = savedPos
+                                    blobRoot.Velocity = Vector3.zero
+                                end
+                            else
+                                blobRoot.CFrame = savedPos
+                                blobRoot.Velocity = Vector3.zero
+
+                                local lockPos = savedPos * CFrame.new(0, 23, 0)
+                                tRoot.CFrame = lockPos
+                                tHum.PlatformStand = true
+                                tHum.Sit = true
+
+                                if tick() - lastRemote >= REMOTE_DELAY then
+                                    lastRemote = tick()
+                                    pcall(function()
+                                        GE.SetNetworkOwner:FireServer(tRoot, lockPos)
+                                        GE.DestroyGrabLine:FireServer(tRoot)
+
+                                        local weld = R_Det:FindFirstChild("RightWeld") or R_Det:FindFirstChildWhichIsA("Weld")
+                                        if weld then
+                                            CD:FireServer(weld)
+                                            CG:FireServer(R_Det, tRoot, weld)
+                                        end
+                                    end)
+                                end
+                            end
+                        else
+                            dragging = false
+                            grabStartTime = 0
+                        end
+                        RunService.Heartbeat:Wait()
+                    end
+
+                    if blobRoot then
+                        blobRoot.CFrame = savedPos
+                        blobRoot.Velocity = Vector3.zero
+                    end
+                end)
+            end
+
+            if type(loopPlayerBlobF3) == "function" then
+                loopPlayerBlobF3()
+            end
+        else
+            blobLoopT3 = false
+            loopKickBlobActive = false
+            table.clear(playersInLoop2V)
+        end
     end
 })
 
@@ -8654,6 +8876,44 @@ antiTab:AddToggle({
             end
         end
     end
+})
+antiTab:AddSection({
+    Name = "안티 바나나"
+})
+local antiBananaSitActive = false
+
+antiTab:AddToggle({
+    Name = "안티 바나나(sit불가)",
+    Default = false,
+    Callback = function(Value)
+        antiBananaSitActive = Value
+        
+        if antiBananaSitActive then
+            task.spawn(function()
+                local LocalPlayer = game:GetService("Players").LocalPlayer
+                
+                while antiBananaSitActive do
+                    local char = LocalPlayer.Character
+                    if char then
+                        local hum = char:FindFirstChild("Humanoid")
+                        local hrp = char:FindFirstChild("HumanoidRootPart")
+                        
+                        if hum and hrp and hum.Health > 0 then
+                            hum.Sit = true
+                            hum:ChangeState(Enum.HumanoidStateType.Running)
+                            
+                            local camera = workspace.CurrentCamera
+                            if camera then
+                                local lookVec = camera.CFrame.LookVector
+                                hrp.CFrame = CFrame.new(hrp.Position, hrp.Position + Vector3.new(lookVec.X, 0, lookVec.Z))
+                            end
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end    
 })
 
 antiTab:AddSection({
