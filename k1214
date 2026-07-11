@@ -6446,17 +6446,71 @@ passTab:AddButton({
 
 
 
+
+
 getTab:AddToggle({
-    Name = "킥알림    <font color='rgb(255,10,123)'>[프라임]</font>",
-    
-    save = true,
-    Flag = "9797979765",
+    Name = "킥알림",
+    Default = false,
     Callback = function(Value)
-        ifKickThenT = Value
         if Value then
-            ifKickThenF()
+            kickNotifyConnection = workspace.ChildAdded:Connect(function(obj)
+                local kickObjectNames = {
+                    ["blackholekick"] = true,
+                    ["blackholekicktweens(old)"] = true,
+                    ["blackholekicktweens"] = true,
+                    ["jhole"] = true,
+                    ["blackhole"] = true,
+                    ["black_hole"] = true,
+                    ["voidhole"] = true,
+                    ["singularity"] = true,
+                }
+                if not obj.Name or not kickObjectNames[obj.Name:lower()] then return end
+                task.wait(0.1)
+                local pos
+                if obj:IsA("BasePart") then 
+                    pos = obj.Position 
+                else
+                    local part = obj:FindFirstChildWhichIsA("BasePart", true)
+                    if part then pos = part.Position end
+                end
+                if not pos then return end
+                
+                local closestPlayer = getClosestPlayer(pos)
+                if closestPlayer then
+                    local displayName = closestPlayer.DisplayName or "Unknown"
+                    local realName = closestPlayer.Name or "Unknown"
+                    
+                    OrionLib:MakeNotification({
+                        Name = "POLAR HUB",
+                        Content = displayName .. " (" .. realName .. ") Got Kicked!",
+                        Time = 3
+                    })
+                else
+                    OrionLib:MakeNotification({
+                        Name = "POLAR HUB",
+                        Content = "Someone Got Kicked!",
+                        Time = 3
+                    })
+                end
+            end)
+        else
+            if kickNotifyConnection then
+                kickNotifyConnection:Disconnect()
+                kickNotifyConnection = nil
+            end
         end
-    end
+    end    
+})
+
+getTab:AddToggle({
+    Name = "패킷렉 알림",
+    Default = false,
+    Callback = function(Value)
+        packetLagNotifyEnabled = Value
+        if Value and not lastLagSource then
+            StartPacketLagDetector()
+        end
+    end    
 })
 
 
