@@ -7880,7 +7880,7 @@ LoopTab:AddToggle({
 LoopTab:AddSection({
     Name = "루프킬"
 })
-local blobLoop3Toggle = LoopTab:AddToggle({
+LoopTab:AddToggle({
     Name = "루프킬   <font color='rgb(0,0,255)'>[프라임 오너쉽]</font>   <font color='rgb(255,0,0)'>[프리미엄]</font>",
     Default = false,
     Flag = "21",
@@ -8475,7 +8475,7 @@ end
 
 LocalPlayer.CharacterAdded:Connect(monitorCharacter)
 antiTab:AddToggle({
-    Name = "안티 오너쉽 스팸   <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Name = "안티 오너쉽 스팸V1   <font color='rgb(0,0,255)'>[프리미엄]</font>",
     
     save = true,
     Flag = "AntiFlingToggle",
@@ -8573,6 +8573,87 @@ antiTab:AddToggle({
             task.spawn(AntiOwnershipFunction)
         end
     end    
+})
+local isHeldLoop = nil
+
+antiTab:AddToggle({
+    Name = "안티 오너쉽 스팸V3    <font color='rgb(0,0,255)'>[프리미엄]</font>",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            local plr = game:GetService("Players").LocalPlayer
+            local isHeld = plr:WaitForChild("IsHeld", 5)
+            local struggleEvent = game:GetService("ReplicatedStorage"):WaitForChild("CharacterEvents"):WaitForChild("Struggle")
+            local savedCFrame = nil
+            
+            _G.AntiOwn2 = isHeld.Changed:Connect(function(heldState)
+                local char = plr.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                
+                if heldState then
+                    if hrp then 
+                        savedCFrame = hrp.CFrame
+                        hrp.Anchored = true 
+                    end
+                    
+                    isHeldLoop = task.spawn(function()
+                        while isHeld and isHeld.Value and _G.AntiOwn2Enabled do 
+                            struggleEvent:FireServer(plr)
+                            task.wait() 
+                        end
+                        if hrp and hrp.Parent then 
+                            hrp.Anchored = false 
+                            if savedCFrame then hrp.CFrame = savedCFrame end
+                        end
+                    end)
+                else
+                    if hrp and hrp.Parent then 
+                        hrp.Anchored = false 
+                        if savedCFrame then hrp.CFrame = savedCFrame end
+                    end
+                end
+            end)
+            
+            _G.AntiOwn2Char = plr.CharacterAdded:Connect(function(char)
+                task.wait(0.5)
+                local hrp = char:WaitForChild("HumanoidRootPart")
+                savedCFrame = hrp.CFrame
+            end)
+            
+            _G.AntiOwn2Enabled = true
+
+            if isHeld and isHeld.Value then
+                local char = plr.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp then 
+                    savedCFrame = hrp.CFrame
+                    hrp.Anchored = true 
+                end
+                isHeldLoop = task.spawn(function()
+                    while isHeld and isHeld.Value and _G.AntiOwn2Enabled do 
+                        struggleEvent:FireServer(plr)
+                        task.wait() 
+                    end
+                    if hrp and hrp.Parent then 
+                        hrp.Anchored = false 
+                        if savedCFrame then hrp.CFrame = savedCFrame end
+                    end
+                end)
+            end
+        else
+            _G.AntiOwn2Enabled = false
+            
+            if _G.AntiOwn2 then _G.AntiOwn2:Disconnect() _G.AntiOwn2 = nil end
+            if _G.AntiOwn2Char then _G.AntiOwn2Char:Disconnect() _G.AntiOwn2Char = nil end
+            if isHeldLoop then task.cancel(isHeldLoop) isHeldLoop = nil end
+            
+            local char = game:GetService("Players").LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.Anchored = false
+            end
+        end
+    end
 })
 
 antiTab:AddSection({
@@ -9026,6 +9107,34 @@ task.spawn(function()
         AntiBlobmanToggle:Set(true)
     end
 end)
+local antiRagBlobConnections = {}
+
+antiTab:AddToggle({
+    Name = "안티 레그돌 블롭",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            local RagdollRemote = game:GetService("ReplicatedStorage"):FindFirstChild("RagdollRemote")
+            local LocalPlayer = game:GetService("Players").LocalPlayer
+            
+            antiRagBlobConnections["RagdollCheck"] = game:GetService("RunService").Heartbeat:Connect(function()
+                local character = LocalPlayer.Character
+                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    if humanoid.Sit then
+                        humanoid.Sit = false
+                    end
+                end
+            end)
+        else
+            if antiRagBlobConnections["RagdollCheck"] then
+                antiRagBlobConnections["RagdollCheck"]:Disconnect()
+                antiRagBlobConnections["RagdollCheck"] = nil
+            end
+        end
+    end    
+})
+
 antiTab:AddSection({
     Name = "안티 메슬리즈"
 })
