@@ -12322,60 +12322,12 @@ antiTab:AddToggle({
 
 
 
-local silentAimTarget = nil
-local silentAimConnection = nil
-grabTab:AddToggle({
-    Name = "사일런트 에임",
-    Default = false,
-    Callback = function(state)
-        if state then
-            silentAimConnection = RunService.RenderStepped:Connect(function()
-                local closest, dist = nil, math.huge
-                for _, plr in ipairs(Players:GetPlayers()) do
-                    if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                        local root = plr.Character.HumanoidRootPart
-                        local d = (root.Position - HumanoidRootPart.Position).Magnitude
-                        if d < dist and d < 200 then
-                            dist = d
-                            closest = root
-                        end
-                    end
-                end
-                silentAimTarget = closest
-            end)
-        else
-            if silentAimConnection then silentAimConnection:Disconnect() end
-            silentAimTarget = nil
-        end
-    end
-})
 
 
 
 
-local AntiLag = antiTab:AddToggle({
-    Name = "안티렉 (시험단계)",
-    Default = false,
-    Callback = function(state)
-        if state then
-            antiLagConnection = RunService.Heartbeat:Connect(function()
-                for _, obj in ipairs(Workspace:GetDescendants()) do
-                    if obj:IsA("Decal") or obj:IsA("Texture") then
-                        obj.Transparency = 1
-                    elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
-                        obj.Enabled = false
-                    elseif obj:IsA("BasePart") and obj.Transparency < 0.9 then
-                        if obj.Size.Magnitude > 50 then
-                            obj.Transparency = 0.85
-                        end
-                    end
-                end
-            end)
-        else
-            if antiLagConnection then antiLagConnection:Disconnect() end
-        end
-    end
-})
+
+
 ---loadstring(game:HttpGet("https://raw.githubusercontent.com/qwer123476/12345/main/q1"))()
 Logger() 
 Window:AddConfigTab()
