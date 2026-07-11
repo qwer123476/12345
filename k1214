@@ -11811,14 +11811,14 @@ Window:AddConfigTab()
 -- =========================
 -- 🔘 버튼 (여기에 위치)
 -- =========================
-ConfigTab:AddButton({
+playerTab:AddButton({
     Name = "저장",
     Callback = function()
         SaveAll()
     end
 })
 
-ConfigTab:AddButton({
+playerTab:AddButton({
     Name = "불러오기",
     Callback = function()
         LoadAll()
