@@ -494,7 +494,13 @@ do
 			end
 
 			function tabProxy:AddBind(ti)
-				local kp = grp:AddKeybind({
+				local grp = getGroup(tabProxy)
+if not grp then
+    warn("grp is nil")
+    return
+end
+
+local kp = grp:AddKeybind({
     Name = ti.Name or "Bind",
     Default = ti.Default,
     Hold = ti.Hold,
