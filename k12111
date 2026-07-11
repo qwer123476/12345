@@ -1010,161 +1010,119 @@ function ragdollLoopF()
 	ragdollLoopD = false
 end
 
-function sitJumpF()
-    char = plr.Character
-    hum = char and char:FindFirstChild("Humanoid")
-    if not char or not hum then return end
-    seat = blobmanInstanceS and blobmanInstanceS:FindFirstChildWhichIsA("VehicleSeat")
-    if seat and seat.Occupant ~= hum then
-    seat:Sit(hum)
-    autoGucciT = false
-    sitJumpT = false
+function sitJumpF()char=d.Character hum=char and char:FindFirstChild'Humanoid'if not char or not hum then
+return
+end
+seat=blobmanInstanceS and blobmanInstanceS:FindFirstChildWhichIsA'VehicleSeat'if seat and seat.Occupant~=hum then
+seat:Sit(hum)autoGucciT=false sitJumpT=false
 end
 end
-
-function AutoGucciF()
-    local SetNetworkOwner = rs:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
-    local SpawnToyRemoteFunction = RepStorage.MenuToys.SpawnToyRemoteFunction
-    local RagdollRemote = RepStorage.CharacterEvents.RagdollRemote
-    local DestroyToy = RepStorage.MenuToys.DestroyToy
-
-    while AutoGucciT do
-        local success, err = pcall(function()
-
-            spawnBlobmanF()
-
-            -- ✅ 블롭 생성 대기
-            repeat task.wait() until blobmanInstanceS 
-                and blobmanInstanceS:FindFirstChild("VehicleSeat")
-
-            local destroyed = false
-            local function safeDestroy()
-                if not destroyed and blobmanInstanceS then
-                    destroyed = true
-                    DestroyToy:FireServer(blobmanInstanceS)
-                end
-            end
-
-            local char = plr.Character
-            if not char then return end
-
-            local hrp = char:WaitForChild("HumanoidRootPart")
-            local hum = char:WaitForChild("Humanoid")
-            local rag = hum:WaitForChild("Ragdolled")
-            local held = plr:WaitForChild("IsHeld")
-
-            local seat = blobmanInstanceS:WaitForChild("VehicleSeat")
-            local prompt = seat:WaitForChild("ProximityPrompt")
-
-            local OCF = hrp.CFrame
-
-            
-            fireproximityprompt(prompt)
-            task.wait(0.25)
-
-            -- 위치 복구
-            hrp.CFrame = OCF
-
-            -- 🔥 래그돌
-            RagdollRemote:FireServer(hrp, 0.5)
-
-            local successCheck = true
-
-            while successCheck and AutoGucciT do
-                if hum.Health <= 0 then
-                    safeDestroy()
-                    break
-                end
-
-                
-                if seat and seat.Occupant ~= nil then
-                    task.wait(0.5) 
-                    safeDestroy()
-                    break
-                end
-
-                -- 잡힘 / 래그돌 탈출
-                if rag.Value == true or held.Value == true then
-                    while (rag.Value == true or held.Value == true) and AutoGucciT do
-                        rs.CharacterEvents.Struggle:FireServer()
-                        task.wait()
-                    end
-                    break
-                end
-
-                local blobHRP = blobmanInstanceS:FindFirstChild("HumanoidRootPart")
-                if blobHRP then
-                    pcall(function()
-                        SetNetworkOwner:FireServer(blobHRP, hrp)
-                    end)
-
-                    
-                    
-                    blobHRP.CFrame = blobHRP.CFrame + Vector3.new(0, 9999, 0)
-                end
-
-                task.wait()
-            end
-
-            
-            OrionLib:MakeNotification({
-                Name = "[ 🔓 ]",
-                Content = "구찌 실패",
-                Time = 1,
-                Image = "rbxassetid://4483345998"
-            })
-
-            if hum then
-                rs.CharacterEvents.Struggle:FireServer()
-                hum.Sit = true
-                task.wait(0.1)
-                hum.Sit = false
-            end
-
-            task.wait(1)
-        end)
-
-        if not success then
-            warn("AutoGucci Error:", err)
-        end
-
-        task.wait()
-    end
+function AutoGucciF()while AutoGucciT do
+pcall(function()spawnBlobmanF()local p=d.Character if not p then
+task.wait()return
 end
-function sitJumpFV2()
-     char = plr.Character
-     hum = char and char:FindFirstChild("Humanoid")
-    if not char or not hum then return end
-
-     seat = workspace.Map.AlwaysHereTweenedObjects.Train.Object.ObjectModel.Seat
-    if seat and seat.Occupant ~= hum then
-    seat:Sit(hum)
-    AutoGucciTV2 = false
-    sitJumpT = false
+local q,r=p:FindFirstChild'HumanoidRootPart',p:FindFirstChild'Humanoid'if not q or not r or r.Health<=0 then
+task.wait()return
+end
+local s,t=r:FindFirstChild'Ragdolled',d:FindFirstChild'IsHeld'if not s or not t then
+return
+end
+if not sitJumpT then
+task.spawn(sitJumpF)sitJumpT=true
+end
+task.spawn(ragdollLoopF)local u,v,w=RepStorage.MenuToys.SpawnToyRemoteFunction,RepStorage.CharacterEvents.RagdollRemote,RepStorage.MenuToys.DestroyToy task.wait(0.3)v:FireServer(q,0.001)successCheck=true sitJumpT=false while successCheck and AutoGucciT do
+if r.Health<=0 or(s and s.Value==true)or(t and t.Value==true)then if blobmanInstanceS and blobmanInstanceS.Parent then
+w:FireServer(blobmanInstanceS)end blobmanInstanceS=nil successCheck=false break
+end
+local A=blobmanInstanceS and blobmanInstanceS:FindFirstChildWhichIsA'VehicleSeat'if A and A.Occupant~=nil then
+if blobmanInstanceS and blobmanInstanceS.Parent then
+w:FireServer(blobmanInstanceS)end blobmanInstanceS=nil successCheck=false break
+end
+local B,C=blobmanInstanceS and blobmanInstanceS:FindFirstChild'HumanoidRootPart',blobmanInstanceS and blobmanInstanceS:FindFirstChild'Head'if B and B.Parent then
+local D=workspace.FallenPartsDestroyHeight
+local E=(D<=-5E4 and-49996)or(D<=-100 and-96)or-77777 g.GrabEvents.SetNetworkOwner:FireServer(B,CFrame.lookAt(q.Position,B.Position))local F=C:FindFirstChild'PartOwner'or C:WaitForChild('PartOwner',0.5)if F then
+B.CFrame=CFrame.new(0,E,9999)*CFrame.Angles(0,0,3.1)task.wait(0.2)B.Anchored=true
+end
+end task.wait(0.016)end if not successCheck then
+if r then
+g.CharacterEvents.Struggle:FireServer(d)r.Sit=true task.wait(0.1)r.Sit=false if blobmanInstanceS and blobmanInstanceS.Parent then
+w:FireServer(blobmanInstanceS)blobmanInstanceS=nil
+end
+end task.wait(0.5)end
+end
+)task.wait()end
+end
+function sitJumpFV2()char=d.Character hum=char and char:FindFirstChild'Humanoid'if not char or not hum then
+return
+end
+seat=workspace.Map.AlwaysHereTweenedObjects.Train.Object.ObjectModel.Seat if seat and seat.Occupant~=hum then
+seat:Sit(hum)AutoGucciTV2=false sitJumpT=false
 end
 end
-
-function AutoGucciFV2()
-     char = plr.Character
-    if not char then
-        task.wait(1)
-        return 
-    end
-
-     hrp = char:WaitForChild("HumanoidRootPart")
-     hum = char:WaitForChild("Humanoid")
-
-    if not hrp then return end
-     OCF = hrp.CFrame
-
-    if not sitJumpT then
-        task.spawn(sitJumpFV2)
-        sitJumpT = true
-    end
-    task.spawn(ragdollLoopF)
-    task.wait(0.3)
-    hrp.CFrame = OCF
-    sitJumpT = false
+function AutoGucciFV2()char=d.Character if not char then
+task.wait(1)return
+end
+hrp=char:WaitForChild'HumanoidRootPart'hum=char:WaitForChild'Humanoid'if not hrp then
+return
+end
+OCF=hrp.CFrame if not sitJumpT then
+task.spawn(sitJumpFV2)sitJumpT=true
+end
+task.spawn(ragdollLoopF)task.wait(0.3)hrp.CFrame=OCF sitJumpT=false
+end
+function ragdollLoopF2()if ragdollLoopD then
+return
+end
+ragdollLoopD=true while ragdollRunning do
+char=d.Character hrp=char and char:FindFirstChild'HumanoidRootPart'if char and hrp then
+args={[1]=hrp,[2]=0}remote=g:FindFirstChild'CharacterEvents'and g.CharacterEvents:FindFirstChild'RagdollRemote'if remote then
+remote:FireServer(unpack(args))end
+end
+task.wait()end ragdollLoopD=false
+end
+function HasNoLegs(p)return not(p:FindFirstChild'Left Leg'and p:FindFirstChild'Right Leg')end
+function StartMonitoring()if Monitoring then
+return
+end
+Monitoring=true task.spawn(function()while ToggleActive do
+char=d.Character humanoid=char and char:FindFirstChildOfClass'Humanoid'if char and humanoid then
+if HasNoLegs(char)then humanoid.HipHeight=2
+else
+repeat task.wait()until not ToggleActive or HasNoLegs(d.Character)end
+end
+task.wait()end Monitoring=false
+end
+)end d.CharacterAdded:Connect(function(p)if ToggleActive then
+p:WaitForChild'Humanoid'repeat task.wait(0.2)until HasNoLegs(p)or not ToggleActive if ToggleActive then
+StartMonitoring()end
+end
+end)plotItemsFolder=workspace:WaitForChild'PlotItems'playersInPlotsFolder=plotItemsFolder:WaitForChild'PlayersInPlots'function antiInPlotsLoop()while antiInPlotsEnabled do
+for p,q in pairs(game.Players:GetPlayers())do if q==d then
+continue
+end
+char=q.Character if char and char.Parent then
+inPlot=playersInPlotsFolder:FindFirstChild(q.Name)if inPlot then
+if char.Parent~=inv then
+char.Parent=inv
+end
+else
+if char:IsDescendantOf(plotItemsFolder)then
+end
+end
+end
+end task.wait()end
+end
+RunService=game:GetService'RunService'Camera=workspace.CurrentCamera
+local p,q={['블롭']='CreatureBlobman',['트랙터🟥']='TractorRed',['트랙터🟧']='TractorOrange',['트랙터🟩']='TractorGreen',['산타썰매']='SantaSleigh'},{}function FindVehiclesInInventory(r)local s={}if not r then
+return s
+end
+for t,u in pairs(r:GetChildren())do for v,w in pairs(q)do if u.Name==w then
+local A if w=='Train'then A=u:FindFirstChild'Seat'else A=u:FindFirstChild'VehicleSeat'end if A then
+table.insert(s,{seat=A,vehicleName=w,vehicleItem=u,isMine=(r.Name==d.Name..'SpawnedInToys'),occupant=A.Occupant,owner=r.Name:gsub('SpawnedInToys','')})end
+end
+end
+end
+return s
 end
 
 
