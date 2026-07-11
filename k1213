@@ -429,18 +429,6 @@ local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid
 
 
 ----------------------------------------------------------------------------------------- [ 기능들 ]
-]]--
-function ForWhiteList(enable)
-    WhiteListMode = enable
-
-    task.spawn(function()
-        while WhiteListMode do
-            task.wait()
-            for i, name in ipairs(Whitelist) do
-            end
-        end
-    end)
-end
 
 function ForWhiteList(enable)
     WhiteListMode = enable
@@ -453,7 +441,19 @@ function ForWhiteList(enable)
         end
     end)
 end
---[[
+
+function ForWhiteList(enable)
+    WhiteListMode = enable
+
+    task.spawn(function()
+        while WhiteListMode do
+            task.wait()
+            for i, name in ipairs(Whitelist) do
+            end
+        end
+    end)
+end
+
 function House()
     char = plr.Character
     if not char then
