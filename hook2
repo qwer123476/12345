@@ -500,12 +500,14 @@ if not grp then
     return
 end
 
-local kp = grp:AddKeybind({
-    Name = ti.Name or "Bind",
-    Default = ti.Default,
-    Hold = ti.Hold,
-    Callback = ti.Callback,
-})
+local UIS = game:GetService("UserInputService")
+
+UIS.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == ti.Default then
+        ti.Callback()
+    end
+end)
 				pcall(function()
 					if type(kp) == "table" and kp.Set == nil and kp.SetValue ~= nil then
 						kp.Set = function(_, v) kp:SetValue(v) end
