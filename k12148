@@ -11202,7 +11202,7 @@ plotTab:AddSection({
 
 -- VariÃ¡veis Globais
 local RTime = nil
-local TimeInHouseLabel = AutoTab:AddLabel("Time: 0")
+local TimeInHouseLabel = plotTab:AddLabel("Time: 0")
 
 -- FunÃ§Ã£o auxiliar para obter HumanoidRootPart
 local function getCharacterRootPart()
