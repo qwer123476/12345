@@ -6635,7 +6635,7 @@ local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
 
---local isEnabled = false
+local isEnabled = false
 local lineDistanceV = 0
 local increaseLineExtendV = 5
 --local wheelConnection
