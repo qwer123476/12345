@@ -6741,7 +6741,7 @@ grabTab:AddToggle({
     end    
 })
 
-garbTab:AddTextbox({
+grabTab:AddTextbox({
     Name = "줄 속도  <font color='rgb(255,0,0)'>[모바일]</font>",
     Default = "5",
     TextDisappear = false,
