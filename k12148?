@@ -1,3 +1,174 @@
+local services = {
+    Players = game:GetService("Players"),
+    ReplicatedStorage = game:GetService("ReplicatedStorage"),
+    Workspace = game:GetService("Workspace"),
+    UserInputService = game:GetService("UserInputService"),
+    RunService = game:GetService("RunService"),
+    TweenService = game:GetService("TweenService"),
+    TextChatService = game:GetService("TextChatService"),
+    ContextActionService = game:GetService("ContextActionService"),
+    Camera = workspace.CurrentCamera
+}
+
+local localPlayer = services.Players.LocalPlayer
+local HRP, Char, Players, LocalPlayer
+
+local grabEvents = services.ReplicatedStorage:WaitForChild("GrabEvents", 5)
+local menuToys = services.ReplicatedStorage:WaitForChild("MenuToys", 5)
+
+local vu25 = grabEvents and grabEvents:WaitForChild("CreateGrabLine", 5)
+local vu26 = grabEvents and grabEvents:WaitForChild("DestroyGrabLine", 5)
+local vu27 = grabEvents and grabEvents:WaitForChild("SetNetworkOwner", 5)
+local vu28 = grabEvents and grabEvents:WaitForChild("ExtendGrabLine", 5)
+
+local BuyToy = menuToys and menuToys:WaitForChild("BuyToyRemoteFunction", 5)
+local DeleteToyRE = menuToys and menuToys:FindFirstChild("DestroyToy")
+
+_G.TP_Priority = 0
+_G.LoopKillBlobmanSelected = _G.LoopKillBlobmanSelected or {}
+
+_G.GetPlayerCharacter = function()
+    return services.Players.LocalPlayer.Character
+end
+
+_G.GetPlayerCFrame = function()
+    local char = _G.GetPlayerCharacter()
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        return char.HumanoidRootPart.CFrame
+    end
+    return CFrame.new()
+end
+
+function getSafeCharacter()
+    local plr = services.Players.LocalPlayer
+    return plr.Character or plr.CharacterAdded:Wait()
+end
+
+function getSafeHumanoid()
+    local char = getSafeCharacter()
+    return char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
+end
+
+function getSafeHRP()
+    local char = getSafeCharacter()
+    return char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
+end
+
+function disconnectConnection(connection)
+    if connection then
+        connection:Disconnect()
+    end
+end
+
+function IsNetworkOwner(part)
+    if not part or not part:IsA("BasePart") then return false end
+    local ok, owner = pcall(function() return part:GetNetworkOwner() end)
+    return ok and owner == localPlayer
+end
+
+function ChangeActivityPriority(p185)
+    if _G.TP_Priority <= p185 or p185 == 0 then
+        _G.TP_Priority = p185
+        return true
+    end
+end
+
+function TeleportPlayer(p186, p187)
+    local priority = (p187 == nil and 0 or p187)
+    if priority == _G.TP_Priority then
+        local v188 = _G.GetPlayerCharacter()
+        if v188 and (not _G.TeleportingToNetworkOwnership and typeof(p186) == "CFrame") then
+            local v189 = v188.HumanoidRootPart
+            local v190 = v188:FindFirstChildOfClass("Humanoid")
+            v189.CFrame = v189.CFrame.Rotation + p186.Position
+            if v190.SeatPart == nil or tostring(v190.SeatPart.Parent) ~= "CreatureBlobman" then
+                v190.Sit = false
+            end
+        end
+    end
+end
+
+function SNOWship(targetPart)
+    if targetPart and typeof(targetPart) == "Instance" then
+        local char = _G.GetPlayerCharacter()
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local distanceFromCharacter = localPlayer:DistanceFromCharacter(targetPart.Position)
+            if distanceFromCharacter <= 30 and vu27 then
+                vu27:FireServer(targetPart, lookAt(char.HumanoidRootPart.Position, targetPart.Position))
+            end
+        end
+    end
+end
+
+function _G.LoopKillBlobmanSelected.setupBlobman()
+    local success = false
+    pcall(function()
+        Players = services.Players
+        LocalPlayer = Players.LocalPlayer
+        Char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        HRP = Char:WaitForChild("HumanoidRootPart")
+
+        local Toys = services.Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
+        if not Toys then return end
+
+        local Blob = Toys:FindFirstChild("CreatureBlobman")
+        if not Blob and menuToys and menuToys:FindFirstChild("SpawnToyRemoteFunction") then
+            menuToys.SpawnToyRemoteFunction:InvokeServer("CreatureBlobman", HRP.CFrame, Vector3.new(0, -16.157, 0))
+            Blob = Toys:WaitForChild("CreatureBlobman", 3)
+        end
+        if not Blob then return end
+
+        _G.LoopKillBlobmanSelected.toys = Toys
+        _G.LoopKillBlobmanSelected.blobman = Blob
+        _G.LoopKillBlobmanSelected.grab = Blob.BlobmanSeatAndOwnerScript.CreatureGrab
+        _G.LoopKillBlobmanSelected.release = Blob.BlobmanSeatAndOwnerScript.CreatureRelease
+        _G.LoopKillBlobmanSelected.rightDetector = Blob.RightDetector
+        _G.LoopKillBlobmanSelected.weld = Blob.RightDetector.RightWeld
+
+        local Humanoid = Char:WaitForChild("Humanoid")
+        local Seat = Blob:WaitForChild("VehicleSeat", 2)
+        if Seat and Humanoid then
+            Seat:Sit(Humanoid)
+            task.wait(0.1)
+            if Seat.Occupant ~= Humanoid then
+                Seat:Sit(Humanoid)
+            end
+        end
+        success = true
+    end)
+    return success
+end
+
+function createSafeToggle(name, default, callback)
+    local isActive = default
+    local connections = {}
+    
+    return function(value)
+        isActive = value
+        for _, conn in pairs(connections) do
+            pcall(function() conn:Disconnect() end)
+        end
+        connections = {}
+        
+        if value then
+            local success, err = pcall(function() callback(value) end)
+            if not success then
+                warn("Erro em " .. name .. ":", err)
+                return
+            end
+            
+            connections.respawn = localPlayer.CharacterAdded:Connect(function()
+                task.wait(0.3)
+                if isActive then
+                    pcall(function() callback(true) end)
+                end
+            end)
+        else
+            pcall(function() callback(value) end)
+        end
+    end
+end
+
 
 
 
