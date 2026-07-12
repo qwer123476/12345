@@ -1,4 +1,33 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
+if getgenv().GrabDistanceConnection then
+    getgenv().GrabDistanceConnection:Disconnect()
+    getgenv().GrabDistanceConnection = nil
+end
+
+local function applyGrabDistance()
+    for _, func in pairs(getgc()) do
+        if type(func) == "function" and islclosure(func) then
+            local info = debug.getinfo(func)
+            if info.source and string.find(info.source, "GrabbingScript") then
+                local upvalues = debug.getupvalues(func)
+                for index, value in pairs(upvalues) do
+                    if type(value) == "number" and (value == 20 or value == 30) then
+                        debug.setupvalue(func, index, 42)
+                    end
+                end
+            end
+        end
+    end
+end
+
+applyGrabDistance()
+
+getgenv().GrabDistanceConnection = LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.3)
+    applyGrabDistance()
+end)
 
 print("AP FTAP Script 시작 - 설정 저장 활성화")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
