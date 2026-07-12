@@ -14,7 +14,7 @@ local function applyGrabDistance()
                 local upvalues = debug.getupvalues(func)
                 for index, value in pairs(upvalues) do
                     if type(value) == "number" and (value == 20 or value == 30) then
-                        debug.setupvalue(func, index, 42)
+                        debug.setupvalue(func, index, 999999999999999)
                     end
                 end
             end
@@ -6657,58 +6657,6 @@ grabTab:AddTextbox({
     end
 })
 --extendLineInput:Set(1.7)
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-
-local function applyGrabDistance()
-for _, func in pairs(getgc()) do
-if type(func) == "function" and islclosure(func) then
-local upvalues = debug.getupvalues(func)
-for index, value in pairs(upvalues) do
-if type(value) == "number" and value < 100 then
-debug.setupvalue(func, index, 99999999999999999999)
-end
-end
-end
-end
-end
-
-
-getgenv().GrabLoop = false
-
-
-grabTab:AddToggle({
-Name = "무한줄",
-Default = false,
-Callback = function(v)
-getgenv().GrabLoop = v
-
-
-    if v then
-        task.spawn(function()
-            while getgenv().GrabLoop do
-                applyGrabDistance()
-                task.wait(1)
-            end
-        end)
-
-        getgenv().GrabDistanceConnection = LocalPlayer.CharacterAdded:Connect(function()
-            task.wait(0.5)
-            applyGrabDistance()
-        end)
-    else
-        if getgenv().GrabDistanceConnection then
-            getgenv().GrabDistanceConnection:Disconnect()
-            getgenv().GrabDistanceConnection = nil
-        end
-    end
-end
-
-
-
-})
 
 
 
