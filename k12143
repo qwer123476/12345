@@ -6692,7 +6692,8 @@ grabTab:AddToggle({
             end)
 
             childConnection = Workspace.ChildAdded:Connect(function(child)
-                if child.Name == "GrabParts" and child:IsA("Model") and UserInputService.MouseEnabled then
+                -- 모바일 작동 제한하던 UserInputService.MouseEnabled 조건 제거
+                if child.Name == "GrabParts" and child:IsA("Model") then
                     child:WaitForChild("GrabPart")
                     child:WaitForChild("DragPart")
                     
