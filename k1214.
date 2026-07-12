@@ -1,174 +1,3 @@
-local services = {
-    Players = game:GetService("Players"),
-    ReplicatedStorage = game:GetService("ReplicatedStorage"),
-    Workspace = game:GetService("Workspace"),
-    UserInputService = game:GetService("UserInputService"),
-    RunService = game:GetService("RunService"),
-    TweenService = game:GetService("TweenService"),
-    TextChatService = game:GetService("TextChatService"),
-    ContextActionService = game:GetService("ContextActionService"),
-    Camera = workspace.CurrentCamera
-}
-
-local localPlayer = services.Players.LocalPlayer
-local HRP, Char, Players, LocalPlayer
-
-local grabEvents = services.ReplicatedStorage:WaitForChild("GrabEvents", 5)
-local menuToys = services.ReplicatedStorage:WaitForChild("MenuToys", 5)
-
-local vu25 = grabEvents and grabEvents:WaitForChild("CreateGrabLine", 5)
-local vu26 = grabEvents and grabEvents:WaitForChild("DestroyGrabLine", 5)
-local vu27 = grabEvents and grabEvents:WaitForChild("SetNetworkOwner", 5)
-local vu28 = grabEvents and grabEvents:WaitForChild("ExtendGrabLine", 5)
-
-local BuyToy = menuToys and menuToys:WaitForChild("BuyToyRemoteFunction", 5)
-local DeleteToyRE = menuToys and menuToys:FindFirstChild("DestroyToy")
-
-_G.TP_Priority = 0
-_G.LoopKillBlobmanSelected = _G.LoopKillBlobmanSelected or {}
-
-_G.GetPlayerCharacter = function()
-    return services.Players.LocalPlayer.Character
-end
-
-_G.GetPlayerCFrame = function()
-    local char = _G.GetPlayerCharacter()
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        return char.HumanoidRootPart.CFrame
-    end
-    return CFrame.new()
-end
-
-function getSafeCharacter()
-    local plr = services.Players.LocalPlayer
-    return plr.Character or plr.CharacterAdded:Wait()
-end
-
-function getSafeHumanoid()
-    local char = getSafeCharacter()
-    return char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
-end
-
-function getSafeHRP()
-    local char = getSafeCharacter()
-    return char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
-end
-
-function disconnectConnection(connection)
-    if connection then
-        connection:Disconnect()
-    end
-end
-
-function IsNetworkOwner(part)
-    if not part or not part:IsA("BasePart") then return false end
-    local ok, owner = pcall(function() return part:GetNetworkOwner() end)
-    return ok and owner == localPlayer
-end
-
-function ChangeActivityPriority(p185)
-    if _G.TP_Priority <= p185 or p185 == 0 then
-        _G.TP_Priority = p185
-        return true
-    end
-end
-
-function TeleportPlayer(p186, p187)
-    local priority = (p187 == nil and 0 or p187)
-    if priority == _G.TP_Priority then
-        local v188 = _G.GetPlayerCharacter()
-        if v188 and (not _G.TeleportingToNetworkOwnership and typeof(p186) == "CFrame") then
-            local v189 = v188.HumanoidRootPart
-            local v190 = v188:FindFirstChildOfClass("Humanoid")
-            v189.CFrame = v189.CFrame.Rotation + p186.Position
-            if v190.SeatPart == nil or tostring(v190.SeatPart.Parent) ~= "CreatureBlobman" then
-                v190.Sit = false
-            end
-        end
-    end
-end
-
-function SNOWship(targetPart)
-    if targetPart and typeof(targetPart) == "Instance" then
-        local char = _G.GetPlayerCharacter()
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            local distanceFromCharacter = localPlayer:DistanceFromCharacter(targetPart.Position)
-            if distanceFromCharacter <= 30 and vu27 then
-                vu27:FireServer(targetPart, lookAt(char.HumanoidRootPart.Position, targetPart.Position))
-            end
-        end
-    end
-end
-
-function _G.LoopKillBlobmanSelected.setupBlobman()
-    local success = false
-    pcall(function()
-        Players = services.Players
-        LocalPlayer = Players.LocalPlayer
-        Char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        HRP = Char:WaitForChild("HumanoidRootPart")
-
-        local Toys = services.Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-        if not Toys then return end
-
-        local Blob = Toys:FindFirstChild("CreatureBlobman")
-        if not Blob and menuToys and menuToys:FindFirstChild("SpawnToyRemoteFunction") then
-            menuToys.SpawnToyRemoteFunction:InvokeServer("CreatureBlobman", HRP.CFrame, Vector3.new(0, -16.157, 0))
-            Blob = Toys:WaitForChild("CreatureBlobman", 3)
-        end
-        if not Blob then return end
-
-        _G.LoopKillBlobmanSelected.toys = Toys
-        _G.LoopKillBlobmanSelected.blobman = Blob
-        _G.LoopKillBlobmanSelected.grab = Blob.BlobmanSeatAndOwnerScript.CreatureGrab
-        _G.LoopKillBlobmanSelected.release = Blob.BlobmanSeatAndOwnerScript.CreatureRelease
-        _G.LoopKillBlobmanSelected.rightDetector = Blob.RightDetector
-        _G.LoopKillBlobmanSelected.weld = Blob.RightDetector.RightWeld
-
-        local Humanoid = Char:WaitForChild("Humanoid")
-        local Seat = Blob:WaitForChild("VehicleSeat", 2)
-        if Seat and Humanoid then
-            Seat:Sit(Humanoid)
-            task.wait(0.1)
-            if Seat.Occupant ~= Humanoid then
-                Seat:Sit(Humanoid)
-            end
-        end
-        success = true
-    end)
-    return success
-end
-
-function createSafeToggle(name, default, callback)
-    local isActive = default
-    local connections = {}
-    
-    return function(value)
-        isActive = value
-        for _, conn in pairs(connections) do
-            pcall(function() conn:Disconnect() end)
-        end
-        connections = {}
-        
-        if value then
-            local success, err = pcall(function() callback(value) end)
-            if not success then
-                warn("Erro em " .. name .. ":", err)
-                return
-            end
-            
-            connections.respawn = localPlayer.CharacterAdded:Connect(function()
-                task.wait(0.3)
-                if isActive then
-                    pcall(function() callback(true) end)
-                end
-            end)
-        else
-            pcall(function() callback(value) end)
-        end
-    end
-end
-
 
 
 
@@ -6037,351 +5866,8 @@ FDTab:AddToggle({
         end
     end
 })
-DevTab:AddButton({
-    Name = "Silent Kick All",
-    Callback = function()
-        local Humanoid = get_hum()
-        if not check_hum(Humanoid) then return end
-        if not Humanoid.SeatPart then return end
-        if not Humanoid.SeatPart.Parent then return end
-        if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then return end
 
-        local blob = Humanoid.SeatPart.Parent
 
-        local players = getPlayerList()
-        if #players == 0 then return end
-
-        local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
-        local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
-        local drop = blob.BlobmanSeatAndOwnerScript.CreatureDrop
-        local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
-        local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
-
-        local detector = blob.LeftDetector
-        local weld = blob.LeftDetector.LeftWeld
-        local localHrp = getCurrentCharacter().HumanoidRootPart
-
-        for _, playerName in ipairs(players) do
-            local player = game.Players:FindFirstChild(playerName)
-            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHrp = player.Character.HumanoidRootPart
-                snapBlobTo(blob, targetHrp.CFrame)
-                task.wait(0.15)
-                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                release:FireServer(blob.RightDetector.RightWeld)
-                task.wait(0)
-            end
-        end
-
-        snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
-        task.wait(0.05)
-
-        for _, playerName in ipairs(players) do
-            local player = game.Players:FindFirstChild(playerName)
-            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHrp = player.Character.HumanoidRootPart
-                local blobHrp = blob.HumanoidRootPart
-                targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z)
-            end
-        end
-        task.wait(0.1)
-
-        for _, playerName in ipairs(players) do
-            local player = game.Players:FindFirstChild(playerName)
-            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHrp = player.Character.HumanoidRootPart
-                set:FireServer(targetHrp, targetHrp.CFrame)
-                del:FireServer(targetHrp)
-
-                grab:FireServer(detector, localHrp, weld)
-                grab:FireServer(detector, targetHrp, weld)
-                drop:FireServer(weld, targetHrp.RootAttachment)
-            end
-        end
-        task.wait(3)
-        releaseBlobAlign(blob)
-    end
-})
-
-DevTab:AddToggle({
-    Name = "사일런트 킥 올",
-    Default = false,
-    Callback = function(enabled)
-        getgenv().loopSilentKick = enabled
-        
-        while getgenv().loopSilentKick do
-            local Humanoid = get_hum()
-            if not check_hum(Humanoid) then 
-                task.wait(1)
-                continue 
-            end
-            if not Humanoid.SeatPart then 
-                task.wait(1)
-                continue 
-            end
-            if not Humanoid.SeatPart.Parent then 
-                task.wait(1)
-                continue 
-            end
-            if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then 
-                task.wait(1)
-                continue 
-            end
-
-            local blob = Humanoid.SeatPart.Parent
-
-            local players = getPlayerList()
-            if #players == 0 then 
-                task.wait(1)
-                continue 
-            end
-
-            local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
-            local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
-            local drop = blob.BlobmanSeatAndOwnerScript.CreatureDrop
-            local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
-            local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
-
-            local detector = blob.LeftDetector
-            local weld = blob.LeftDetector.LeftWeld
-            local localHrp = getCurrentCharacter().HumanoidRootPart
-
-            for _, playerName in ipairs(players) do
-                if not getgenv().loopSilentKick then break end
-                
-                local player = game.Players:FindFirstChild(playerName)
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHrp = player.Character.HumanoidRootPart
-                    snapBlobTo(blob, targetHrp.CFrame)
-                    task.wait(0.15)
-                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                    release:FireServer(blob.RightDetector.RightWeld)
-                    task.wait(0)
-                end
-            end
-
-            if not getgenv().loopSilentKick then break end
-
-            snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
-            task.wait(0.05)
-
-            for _, playerName in ipairs(players) do
-                if not getgenv().loopSilentKick then break end
-                
-                local player = game.Players:FindFirstChild(playerName)
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHrp = player.Character.HumanoidRootPart
-                    local blobHrp = blob.HumanoidRootPart
-                    targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z)
-                end
-            end
-            task.wait(0.1)
-
-            for _, playerName in ipairs(players) do
-                if not getgenv().loopSilentKick then break end
-                
-                local player = game.Players:FindFirstChild(playerName)
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHrp = player.Character.HumanoidRootPart
-                    set:FireServer(targetHrp, targetHrp.CFrame)
-                    del:FireServer(targetHrp)
-
-                    grab:FireServer(detector, localHrp, weld)
-                    grab:FireServer(detector, targetHrp, weld)
-                    drop:FireServer(weld, targetHrp.RootAttachment)
-                end
-            end
-            
-            if not getgenv().loopSilentKick then break end
-            
-            task.wait(3)
-            releaseBlobAlign(blob)
-            
-            task.wait(1)
-        end
-    end
-})
-
-DevTab:AddToggle({
-			Name = "브링 올",
-			Default = false,
-			Callback = function(value)
-				BringLoop = value
-				if value then
-					if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-						BringSavedPosition = LocalPlayer.Character.HumanoidRootPart.CFrame
-					end
-					CameraFree = true
-					if BringSavedPosition then
-						CameraPart = Instance.new("Part")
-						CameraPart.Size = Vector3.new(1, 1, 1)
-						CameraPart.Anchored = true
-						CameraPart.CanCollide = false
-						CameraPart.Transparency = 1
-						CameraPart.Position = BringSavedPosition.Position + Vector3.new(0, 15, 0)
-						CameraPart.Parent = workspace
-						OriginalCameraSubject = game.Workspace.CurrentCamera.CameraSubject
-						game.Workspace.CurrentCamera.CameraSubject = CameraPart
-					end
-					StartBringLoop()
-				else
-					if BringSavedPosition and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-						LocalPlayer.Character.HumanoidRootPart.CFrame = BringSavedPosition
-					end
-					CameraFree = false
-					if CameraPart then
-						game.Workspace.CurrentCamera.CameraSubject = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") or OriginalCameraSubject
-						CameraPart:Destroy()
-						CameraPart = nil
-					end
-				end
-			end
-		})
-
-DevTab:AddButton({
-    Name = "매스 킥올",
-    Callback = function()
-        local Humanoid = get_hum()
-        if not check_hum(Humanoid) then return end
-        if not Humanoid.SeatPart then return end
-        if not Humanoid.SeatPart.Parent then return end
-
-        if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then return end
-
-        local blob = Humanoid.SeatPart.Parent
-
-        local players = getPlayerList()
-        if #players == 0 then return end
-
-        local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
-        local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
-        local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
-        local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
-
-        for _, playerName in ipairs(players) do
-            local player = game.Players:FindFirstChild(playerName)
-            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHrp = player.Character.HumanoidRootPart
-                snapBlobTo(blob, targetHrp.CFrame)
-                task.wait(0.15)
-                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                release:FireServer(blob.RightDetector.RightWeld)
-                task.wait(0)
-            end
-        end
-
-        snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
-        task.wait(0.05)
-
-        for _, playerName in ipairs(players) do local player = game.Players:FindFirstChild(playerName) if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then local targetHrp = player.Character.HumanoidRootPart local blobHrp = blob.HumanoidRootPart targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z) end end task.wait(0)
-   
-        for _, playerName in ipairs(players) do
-            local player = game.Players:FindFirstChild(playerName)
-            if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHrp = player.Character.HumanoidRootPart
-                 set:FireServer(targetHrp, targetHrp.CFrame)
-                del:FireServer(targetHrp)
-                task.wait(0.05)
-                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-            end
-        end
-
-        task.wait(2)
-        releaseBlobAlign(blob)
-    end
-})
-
-DevTab:AddToggle({
-    Name = "루프 킥올",
-    Default = false,
-    Callback = function(enabled)
-        getgenv().loopMassKick = enabled
-        
-        while getgenv().loopMassKick do
-            local Humanoid = get_hum()
-            if not check_hum(Humanoid) then 
-                task.wait(1)
-                continue 
-            end
-            if not Humanoid.SeatPart then 
-                task.wait(1)
-                continue 
-            end
-            if not Humanoid.SeatPart.Parent then 
-                task.wait(1)
-                continue 
-            end
-            if Humanoid.SeatPart.Parent.Name ~= "CreatureBlobman" then 
-                task.wait(1)
-                continue 
-            end
-
-            local blob = Humanoid.SeatPart.Parent
-
-            local players = getPlayerList()
-            if #players == 0 then 
-                task.wait(1)
-                continue 
-            end
-
-            local grab = blob.BlobmanSeatAndOwnerScript.CreatureGrab
-            local release = blob.BlobmanSeatAndOwnerScript.CreatureRelease
-            local set = game.ReplicatedStorage.GrabEvents.SetNetworkOwner
-            local del = game.ReplicatedStorage.GrabEvents.DestroyGrabLine
-
-            for _, playerName in ipairs(players) do
-                if not getgenv().loopMassKick then break end
-                
-                local player = game.Players:FindFirstChild(playerName)
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHrp = player.Character.HumanoidRootPart
-                    snapBlobTo(blob, targetHrp.CFrame)
-                    task.wait(0.15)
-                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                    release:FireServer(blob.RightDetector.RightWeld)
-                    task.wait(0)
-                end
-            end
-
-            if not getgenv().loopMassKick then break end
-
-            snapBlobTo(blob, CFrame.new(Vector3.new(0,100,0)))
-            task.wait(0.05)
-
-            for _, playerName in ipairs(players) do 
-                if not getgenv().loopMassKick then break end
-                
-                local player = game.Players:FindFirstChild(playerName) 
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then 
-                    local targetHrp = player.Character.HumanoidRootPart 
-                    local blobHrp = blob.HumanoidRootPart 
-                    targetHrp.CFrame = CFrame.new(blobHrp.Position.X, blobHrp.Position.Y + 20, blobHrp.Position.Z) 
-                end 
-            end 
-            task.wait(0)
-       
-            for _, playerName in ipairs(players) do
-                if not getgenv().loopMassKick then break end
-                
-                local player = game.Players:FindFirstChild(playerName)
-                if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetHrp = player.Character.HumanoidRootPart
-                    set:FireServer(targetHrp, targetHrp.CFrame)
-                    del:FireServer(targetHrp)
-                    task.wait(0.05)
-                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                    grab:FireServer(blob.RightDetector, targetHrp, blob.RightDetector.RightWeld)
-                end
-            end
-
-            task.wait(2)
-            releaseBlobAlign(blob)
-            
-            task.wait(1)
-        end
-    end
-})
 UtilityTab:AddSection({
     Name = "환경 및 시야"
 })
@@ -12478,10 +11964,148 @@ lagTab:AddTextbox({
 		LineLagV = Value
 	end
 })
+lagTab:AddSection({
+	Name = "다른 렉들"
+})
 
 
+lagTab:AddToggle({
+    Name = "크레이지 라인 (소프트 렉)",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            getgenv().crazyLineConnection = RunService.Heartbeat:Connect(function()
+                local randomPart = workspace:FindFirstChildOfClass("Part")
+                if randomPart then
+                    pcall(function()
+                        ReplicatedStorage.GrabEvents.CreateGrabLine:FireServer(
+                            randomPart,
+                            CFrame.new(
+                                math.random(-100, 100),
+                                math.random(-100, 100),
+                                math.random(-100, 100)
+                            )
+                        )
+                    end)
+                    task.wait(lagSpeed)
+                end
+            end)
+        else
+            disconnectConnection(getgenv().crazyLineConnection)
+            getgenv().crazyLineConnection = nil
+        end
+    end
+})
 
+lagTab:AddToggle({
+    Name = "서버 에러 내기(렉)",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            getgenv().crazyLineConnection = RunService.Heartbeat:Connect(function()
+                local randomPart = workspace:FindFirstChildOfClass("Part")
+                if randomPart then
+                    for i = 1, 15 do
+                        local invalidArgs = {
+                            "not_a_cframe_"..math.random(1,1000),
+                            {math.random(), math.random(), math.random()},
+                            function() end,
+                            true,
+                            CFrame.new(math.huge, math.huge, math.huge)
+                        }
+                        for _, arg in ipairs(invalidArgs) do
+                            pcall(function()
+                                ReplicatedStorage.GrabEvents.CreateGrabLine:FireServer(randomPart, arg)
+                            end)
+                        end
+                    end
+                    task.wait(0.01)
+                end
+            end)
+        else
+            disconnectConnection(getgenv().crazyLineConnection)
+            getgenv().crazyLineConnection = nil
+        end
+    end
+})
 
+local ChaosGrabEnabled = false
+ChaosGrabToggle = lagTab:AddToggle({
+    Name = "사일런트 렉서버",
+    Default = false,
+    Callback = function(Value)
+        ChaosGrabEnabled = Value
+        if Value then
+            task.spawn(function()
+                local player = LocalPlayer
+                while ChaosGrabEnabled do
+                    local anypart = workspace:FindFirstChildOfClass("Part")
+                    if anypart then
+                        local invalidArgs = {
+                            CFrame.new(math.huge, math.huge, math.huge),
+                            CFrame.new(-math.huge, -math.huge, -math.huge),
+                            CFrame.new(0/0, 0/0, 0/0),
+                            Vector3.new(1e9, 1e9, 1e9),
+                            "not_a_cframe",
+                            1234567890,
+                            true,
+                            {},
+                            function() return CFrame.new() end,
+                            setmetatable({}, {__tostring=function() error("chaos") end}),
+                        }
+                        for burst = 1, 200 do
+                            for _, arg in ipairs(invalidArgs) do
+                                task.spawn(function()
+                                    pcall(function()
+                                        ReplicatedStorage.GrabEvents.CreateGrabLine:FireServer(player, anypart, arg)
+                                    end)
+                                end)
+                            end
+                        end
+                    end
+                    task.wait(4)
+                end
+            end)
+        end
+    end
+})
+
+lagTab:AddToggle({
+    Name = "킬 서버 (폭파)",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            getgenv().killServerConnection = task.spawn(function()
+                while task.wait() do
+                    if not getgenv().killServerConnection then break end
+
+                    for i = 1, 50 do
+                        task.spawn(function()
+                            local randomPart = workspace:FindFirstChildOfClass("Part")
+                            if randomPart then
+                                ReplicatedStorage.GrabEvents.CreateGrabLine:FireServer(
+                                    randomPart,
+                                    CFrame.new(
+                                        math.random(-100, 100),
+                                        math.random(-100, 100),
+                                        math.random(-100, 100)
+                                    )
+                                )
+                            end
+                        end)
+                    end
+                end
+            end)
+        else
+            if getgenv().killServerConnection then
+                task.cancel(getgenv().killServerConnection)
+                getgenv().killServerConnection = nil
+            end
+        end
+    end
+})
+
+end)
 
 
 
