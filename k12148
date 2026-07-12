@@ -6381,7 +6381,7 @@ passTab:AddDropdown({
 })
 
 passTab:AddToggle({
-    Name = "그랩 스킨 켜기   <font color='rgb(155,1000,25)'>[로컬]</font>",
+    Name = "그랩 스킨 켜기   <font color='rgb(155,100,25)'>[로컬]</font>",
     Default = false,
     Callback = function(Value)
         isSkinEnabled = Value
