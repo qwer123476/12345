@@ -8978,7 +8978,7 @@ antiTab:AddToggle({
 antiTab:AddSection({
     Name = "안티 | 그랩"
 })
-local AntiGrab = antiTab:AddToggle({
+antiTab:AddToggle({
     Name = "안티 그랩   <font color='rgb(0,255,0)'>[오너쉽]</font>   <font color='rgb(0,0,255)'>[프리미엄]</font>",
     
     save = true,
@@ -9033,7 +9033,7 @@ antiTab:AddToggle({
     end
 })
 
-blobmanInstanceS = nil
+--blobmanInstanceS = nil
 task.spawn(function()
     task.wait(0.5)
     if AntiGrabToggle and AntiGrabToggle.Set then
@@ -9086,7 +9086,7 @@ antiTab:AddToggle({
     end
 })
 
-local AntiGrabSticky = antiTab:AddToggle({
+antiTab:AddToggle({
     Name = "안티그랩 |  StickyPart",
     
     save = true,
@@ -9256,9 +9256,9 @@ antiTab:AddToggle({
     end
 })
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
+--local Players = game:GetService("Players")
+--local RunService = game:GetService("RunService")
+--local LocalPlayer = Players.LocalPlayer
 
 local characterConnections = {}
 local activeCharacters = setmetatable({}, { __mode = "k" })
