@@ -6638,8 +6638,8 @@ local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("Loc
 local isEnabled = false
 local lineDistanceV = 0
 local increaseLineExtendV = 5
---local wheelConnection
---local childConnection
+local wheelConnection
+local childConnection
 
 grabTab:AddToggle({
     Name = "무한줄   <font color='rgb(255,0,0)'>[모바일]</font>",
