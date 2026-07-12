@@ -667,55 +667,44 @@ function infLineExtendF()
         end
     end)
 end
-local uis = game:GetService("UserInputService")
-local CAS = game:GetService("ContextActionService")
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+local pGui = localPlayer:WaitForChild("PlayerGui")
+
+local arrowUpButton = nil   
+local arrowDownButton = nil
 
 function infLineExtend1F()
-
-    uis.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseWheel then
-            if lineDistanceV < 11 then
-                lineDistanceV = 11
-            end
-
-            if input.Position.Z > 0 then
-                lineDistanceV = lineDistanceV + increaseLineExtendV
-            elseif input.Position.Z < 0 then
-                lineDistanceV = lineDistanceV - increaseLineExtendV
+    uis.InputBegan:Connect(function(input, gameProcessed)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            local touchPos = input.Position
+            local screenWidth = camera.ViewportSize.X
+            local screenHeight = camera.ViewportSize.Y
+            
+            if touchPos.X > screenWidth * 0.85 then
+                if lineDistanceV < 11 then
+                    lineDistanceV = 11
+                end
+                
+                if touchPos.Y < screenHeight * 0.5 then
+                    lineDistanceV = lineDistanceV + increaseLineExtendV
+                elseif touchPos.Y >= screenHeight * 0.5 then
+                    lineDistanceV = lineDistanceV - increaseLineExtendV
+                end
             end
         end
     end)
-
-    local holdingUp = false
-    local holdingDown = false
-
-    CAS:BindAction("LineUp", function(_, state)
-        if state == Enum.UserInputState.Begin then
-            holdingUp = true
-            task.spawn(function()
-                while holdingUp do
-                    lineDistanceV = lineDistanceV + increaseLineExtendV
-                    task.wait(0.05)
-                end
-            end)
-        elseif state == Enum.UserInputState.End then
-            holdingUp = false
-        end
-    end, false, Enum.KeyCode.DPadUp)
-
-    CAS:BindAction("LineDown", function(_, state)
-        if state == Enum.UserInputState.Begin then
-            holdingDown = true
-            task.spawn(function()
-                while holdingDown do
-                    lineDistanceV = math.max(11, lineDistanceV - increaseLineExtendV)
-                    task.wait(0.05)
-                end
-            end)
-        elseif state == Enum.UserInputState.End then
-            holdingDown = false
-        end
-    end, false, Enum.KeyCode.DPadDown)
+    
+    if arrowUpButton and arrowDownButton then
+        arrowUpButton.MouseButton1Click:Connect(function()
+            if lineDistanceV < 11 then lineDistanceV = 11 end
+            lineDistanceV = lineDistanceV + increaseLineExtendV
+        end)
+        arrowDownButton.MouseButton1Click:Connect(function()
+            if lineDistanceV < 11 then lineDistanceV = 11 end
+            lineDistanceV = lineDistanceV - increaseLineExtendV
+        end)
+    end
 
     workspace.ChildAdded:Connect(function(child)
         if child.Name == "GrabParts" and child:IsA("Model") then
@@ -724,26 +713,26 @@ function infLineExtend1F()
 
                 grabPartsModel:WaitForChild("GrabPart")
                 grabPartsModel:WaitForChild("DragPart")
-
+                    
                 clonedDragPart = grabPartsModel.DragPart:Clone()
                 clonedDragPart.Name = "DragPart1"
                 clonedDragPart.AlignPosition.Attachment1 = clonedDragPart.DragAttach
                 clonedDragPart.Parent = grabPartsModel
-
+                
                 lineDistanceV = (clonedDragPart.Position - cam.CFrame.Position).Magnitude
-
+    
                 clonedDragPart.AlignOrientation.Enabled = false
                 grabPartsModel.DragPart.AlignPosition.Enabled = false
 
                 if MasslessGrabT then
-                    alignOrientation = clonedDragPart:FindFirstChildOfClass("AlignOrientation")
+                    local alignOrientation = clonedDragPart:FindFirstChildOfClass("AlignOrientation")
                     if alignOrientation then
                         alignOrientation.MaxAngularVelocity = math.huge
                         alignOrientation.MaxTorque = math.huge
                         alignOrientation.Responsiveness = 200
                     end
-
-                    alignPosition = clonedDragPart:FindFirstChildOfClass("AlignPosition")
+                    
+                    local alignPosition = clonedDragPart:FindFirstChildOfClass("AlignPosition")
                     if alignPosition then
                         alignPosition.MaxAxesForce = Vector3.new(math.huge, math.huge, math.huge)
                         alignPosition.MaxForce = math.huge
@@ -751,18 +740,20 @@ function infLineExtend1F()
                         alignPosition.Responsiveness = 200
                     end
                 end
-
+    
                 task.spawn(function()
-                    while grabPartsModel.Parent do
+                    while grabPartsModel and grabPartsModel.Parent do
                         clonedDragPart.Position = cam.CFrame.Position + cam.CFrame.LookVector * lineDistanceV
                         task.wait()
                     end
+            
                     lineDistanceV = 0
                 end)
             end
         end
     end)
 end
+
 function BlobMasslessR()
     UpdateCurrentBlobman()
     for i, e in ipairs(playersInLoop2V) do
