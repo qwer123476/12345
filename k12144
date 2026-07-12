@@ -6368,7 +6368,7 @@ local function applyEffectsIfMine(beam)
     end
 end
 
-passTab:AddDropdown({
+PassTab:AddDropdown({
     Name = "그랩 스킨 선택",
     Default = "기본 화이트",
     Options = {"기본 화이트", "네온 레이저", "지옥불 사슬", "보이드 촉수", "레인보우 레이저", "고전압 전류", "디지털 웨이브", "디바인 플라즈마", "DNA 소용돌이", "블랙홀 스트림"},
@@ -6382,8 +6382,8 @@ passTab:AddDropdown({
     end    
 })
 
-passTab:AddToggle({
-    Name = "그랩 스킨 켜기   <font color='rgb(155,100,25)'>[로컬]</font>",
+PassTab:AddToggle({
+    Name = "그랩 스킨 켜기   <font color='rgb(255,0,0)'>[모바일]</font>",
     Default = false,
     Callback = function(Value)
         isSkinEnabled = Value
