@@ -4808,97 +4808,8 @@ function AntiBoxF()
     end)
 end
 
-function AntiJukeboxF()
-    local targetNames = {"JukeboxOrange", "JukeboxBule"}
 
-    task.spawn(function()
-        while _G.AntiJukeboxT and task.wait(0.1) do
-            local character = plr.Character
-            if not character then continue end
 
-            local hrp = character:FindFirstChild("HumanoidRootPart")
-            if not hrp then continue end
-
-            for _, folder in ipairs(workspace:GetChildren()) do
-                if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
-                    if folder.Name ~= (plr.Name .. "SpawnedInToys") then
-                        for _, item in ipairs(folder:GetChildren()) do
-                            if table.find(targetNames, item.Name) then
-                                local Spart = item:FindFirstChild("Button") or item:FindFirstChild("SoundPart") or item.PrimaryPart
-                                if not Spart then continue end
-
-                                local basePart = item.PrimaryPart or Spart
-                                local PartOwner = Spart:FindFirstChild("PartOwner")
-                                local dist = (basePart.Position - hrp.Position).Magnitude
-
-                                if dist <= 30 and not PartOwner then 
-                                    rs.GrabEvents.SetNetworkOwner:FireServer(Spart, CFrame.lookAt(hrp.Position, Spart.Position)) 
-                                end
-                                if PartOwner then 
-                                    local FallenY = workspace.FallenPartsDestroyHeight
-                                    local killY = (FallenY <= -50000 and -49999) or (FallenY <= -100 and -99) or -200
-                                    
-                                    if Spart:IsA("BasePart") then
-                                        Spart.Velocity = Vector3.new(0, 0, 0)
-                                        Spart.RotVelocity = Vector3.new(0, 0, 0)
-                                    end
-                                    Spart.CFrame = CFrame.new(0, killY, 0)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end)
-end
-
-function AntiPalletF()
-    local targetNames = {"PalletLightBrown"}
-
-    task.spawn(function()
-        while _G.AntiPalletT and task.wait(0.1) do
-            local character = plr.Character
-            if not character then continue end
-
-            local hrp = character:FindFirstChild("HumanoidRootPart")
-            if not hrp then continue end
-
-            for _, folder in ipairs(workspace:GetChildren()) do
-                if folder:IsA("Folder") and folder.Name:match("SpawnedInToys$") then
-                    if folder.Name ~= (plr.Name .. "SpawnedInToys") then
-                        for _, item in ipairs(folder:GetChildren()) do
-                            if table.find(targetNames, item.Name) then
-                                local Spart = item:FindFirstChild("Button") or item.PrimaryPart
-                                if not Spart then continue end
-
-                                local basePart = item.PrimaryPart or Spart
-                                local PartOwner = Spart:FindFirstChild("PartOwner")
-                                local dist = (basePart.Position - hrp.Position).Magnitude
-
-                                if dist <= 30 and not PartOwner then 
-                                    rs.GrabEvents.SetNetworkOwner:FireServer(Spart, CFrame.lookAt(hrp.Position, Spart.Position)) 
-                                end
-                                if PartOwner then 
-                                    local FallenY = workspace.FallenPartsDestroyHeight
-                                    local killY = (FallenY <= -50000 and -49999) or (FallenY <= -100 and -99) or -200
-                                    
-                                    if Spart:IsA("BasePart") then
-                                        Spart.Velocity = Vector3.new(0, 0, 0)
-                                        Spart.RotVelocity = Vector3.new(0, 0, 0)
-                                    end
-                                    Spart.CFrame = CFrame.new(0, killY, 0)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end)
-end
-
-local AntiDeathConnection = nil
 
 function AutoSitF()
     if currentConnection then
@@ -10597,30 +10508,6 @@ AuraTab:AddToggle({
 })
 
 
-AuraTab:AddToggle({
-	Name = "주크박스 고정 아우라",
-	Default = false,
-    save = true,
-	Flag = "AntiJukeboxAura",
-	Callback = function(Value)
-		_G.AntiJukeboxT = Value
-		if Value then
-			AntiJukeboxF()
-		end
-	end
-})
-AuraTab:AddToggle({
-	Name = "판자 고정 아우라",
-	Default = false,
-    save = true,
-	Flag = "AntiPalletAura",
-	Callback = function(Value)
-		_G.AntiPalletT = Value
-		if Value then
-			AntiPalletF()
-		end
-	end
-})
 
 
 
