@@ -6631,11 +6631,11 @@ grabTab:AddTextbox({
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
-local LocalPlayer = Players.LocalPlayer
+--local Workspace = game:GetService("Workspace")
+--local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
-local isEnabled = false
+--local isEnabled = false
 local lineDistanceV = 0
 local increaseLineExtendV = 5
 
@@ -6697,11 +6697,9 @@ local function handleGrabParts(child)
     end
 end
 
-local wheelConnection
-local childConnection
+--local wheelConnection
+--local childConnection
 
--- 이 아래 토글과 텍스트박스 코드를 사용 중인 탭 변수 뒤에 붙여넣으세요.
--- 예: Tab:AddToggle(...) 형태에서 앞의 변수만 맞춰주면 됩니다.
 
 grabTab:AddToggle({
     Name = "무한 줄 <font color='rgb(255,0,0)'>[모바일]</font>",
@@ -6835,92 +6833,8 @@ grabTab:AddToggle({
         if Value then KickGrabF() end
     end
 })
-grabTab:AddToggle({
-    Name = "스핀 그랩",
-    Default = false,
-    Save = true,
-    Flag = "SpinGrab",
-    Callback = function(enabled)
-        if enabled then
-            gravityGrabConnection = workspace.ChildAdded:Connect(function(model)
-                if model.Name == "GrabParts" then
-                    local partToImpulse = model.GrabPart.WeldConstraint.Part1
-                    if partToImpulse then
-                        local bodyAngularVelocity = Instance.new("BodyAngularVelocity")
-                        bodyAngularVelocity.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                        bodyAngularVelocity.AngularVelocity = Vector3.new(0, spinSpeed, 0)
-                        bodyAngularVelocity.Parent = partToImpulse
- 
-                        local bodyPosition = Instance.new("BodyPosition")
-                        bodyPosition.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                        bodyPosition.Position = partToImpulse.Position
-                        bodyPosition.Parent = partToImpulse
- 
-                        table.insert(spinningObjects, {part = partToImpulse, bav = bodyAngularVelocity, bp = bodyPosition})
-                    end
-                end
-            end)
-        else
-            if gravityGrabConnection then
-                gravityGrabConnection:Disconnect()
-            end
-        end
-    end
-})
 
-grabTab:AddSlider({
-    Name = "스핀스피드",
-    Min = 1,
-    Max = 500000,
-    Default = 5,
-    Increment = 1,
-    ValueName = "Speed",
-    Callback = function(value)
-        if manualSpinSpeed == 0 then
-            spinSpeed = value
-            for _, obj in ipairs(spinningObjects) do
-                if obj.bav and obj.bav.Parent then
-                    obj.bav.AngularVelocity = Vector3.new(0, spinSpeed, 0)
-                end
-            end
-        end
-    end
-})
 
-grabTab:AddTextbox({
-    Name = "스핀 스피드0",
-    Default = "0",
-    TextDisappear = false,
-    Callback = function(value)
-        local numValue = tonumber(value)
-        if numValue and numValue >= 0 then
-            manualSpinSpeed = numValue
-            
-            if numValue == 0 then
-            else
-                spinSpeed = numValue
-                for _, obj in ipairs(spinningObjects) do
-                    if obj.bav and obj.bav.Parent then
-                        obj.bav.AngularVelocity = Vector3.new(0, spinSpeed, 0)
-                    end
-                end
-            end
-        end
-    end
-})
- 
-grabTab:AddButton({
-    Name = "스핀중지",
-    Callback = function()
-        for _, obj in ipairs(spinningObjects) do
-            if obj.part and obj.part.Parent then
-                if obj.bav then obj.bav:Destroy() end
-                if obj.bp then obj.bp:Destroy() end
-            end
-        end
-        spinningObjects = {}
-    end
-})
 grabTab:AddSection({
 	Name = "앵커"
 })
