@@ -6696,9 +6696,8 @@ local function handleGrabParts(child)
         end)
     end
 end
-
---local wheelConnection
---local childConnection
+local wheelConnection
+local childConnection
 
 
 grabTab:AddToggle({
