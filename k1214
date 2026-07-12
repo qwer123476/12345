@@ -6261,96 +6261,9 @@ passTab:AddToggle({
 passTab:AddSection({
 	Name = "라인 타입"
 })
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
 
-local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
 
-local isSkinEnabled = false
-local selectedSkin = "기본 화이트"
-local skinConnection
-
-local skinSettings = {
-    ["기본 화이트"] = {
-        Texture = "rbxassetid://2273224484", Speed = 3, Width0 = 0.8, Width1 = 0.4, 
-        Color = ColorSequence.new(Color3.fromRGB(255, 255, 255)), Brightness = 1.5
-    },
-    ["네온 레이저"] = {
-        Texture = "rbxassetid://5530752742", Speed = 6, Width0 = 0.4, Width1 = 0.4, 
-        Color = ColorSequence.new(Color3.fromRGB(0, 255, 255)), Brightness = 4
-    },
-    ["지옥불 사슬"] = {
-        Texture = "rbxassetid://232810444", Speed = -4, Width0 = 1.5, Width1 = 0.7, 
-        Color = ColorSequence.new(Color3.fromRGB(255, 60, 0)), Brightness = 3
-    },
-    ["보이드 촉수"] = {
-        Texture = "rbxassetid://6342895287", Speed = 3, Width0 = 1.2, Width1 = 1.2, 
-        Color = ColorSequence.new(Color3.fromRGB(140, 0, 255)), Brightness = 1
-    },
-    ["레인보우 레이저"] = {
-        Texture = "rbxassetid://2273224484", Speed = 8, Width0 = 0.7, Width1 = 0.7, 
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 0)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))
-        }), Brightness = 2.5
-    },
-    ["고전압 전류"] = {
-        Texture = "rbxassetid://1084991219", Speed = 15, Width0 = 1.0, Width1 = 1.0, 
-        Color = ColorSequence.new(Color3.fromRGB(255, 255, 100)), Brightness = 5
-    },
-    ["디지털 웨이브"] = {
-        Texture = "rbxassetid://281395081", Speed = -7, Width0 = 0.6, Width1 = 0.6, 
-        Color = ColorSequence.new(Color3.fromRGB(0, 255, 100)), Brightness = 2.5
-    },
-    ["디바인 플라즈마"] = {
-        Texture = "rbxassetid://1084991040", Speed = 5, Width0 = 1.6, Width1 = 0.3, 
-        Color = ColorSequence.new(Color3.fromRGB(255, 220, 150)), Brightness = 4.5
-    },
-    ["DNA 소용돌이"] = {
-        Texture = "rbxassetid://5446059114", Speed = 4, Width0 = 0.9, Width1 = 0.9, 
-        Color = ColorSequence.new(Color3.fromRGB(255, 0, 150)), Brightness = 3
-    },
-    ["블랙홀 스트림"] = {
-        Texture = "rbxassetid://1445261314", Speed = -2, Width0 = 2.0, Width1 = 0.1, 
-        Color = ColorSequence.new(Color3.fromRGB(30, 30, 40)), Brightness = 0.5
-    }
-}
-
-local function applyEffectsIfMine(beam)
-    if not isSkinEnabled then return end
-    if not (beam:IsA("Beam") and beam.Name == "GrabBeam") then return end
-
-    local character = LocalPlayer and LocalPlayer.Character
-    if not character then return end
-
-    local isMine = false
-    if beam.Attachment0 and beam.Attachment0:IsDescendantOf(character) then
-        isMine = true
-    elseif beam.Attachment1 and beam.Attachment1:IsDescendantOf(character) then
-        isMine = true
-    end
-
-    if not isMine then return end
-
-    local config = skinSettings[selectedSkin] or skinSettings["기본 화이트"]
-
-    beam.Texture = config.Texture
-    beam.TextureMode = Enum.TextureMode.Stretch
-    beam.TextureSpeed = config.Speed
-    beam.Width0 = config.Width0
-    beam.Width1 = config.Width1
-    beam.Color = config.Color
-    beam.LightEmission = 1
-    beam.Brightness = config.Brightness
-    beam.LightInfluence = 0
-    beam.Transparency = NumberSequence.new(0.1)
-
-    beam:GetPropertyChangedSignal("Texture"):Connect(function()
-        if isSkinEnabled and beam.Texture ~= config.Texture then
-            beam.Texture = config.Texture
-        end
-local Players = game:GetService("Players")
+    local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
@@ -6491,6 +6404,7 @@ pass:AddToggle({
         end
     end    
 })
+
 
 
 passTab:AddSection({
