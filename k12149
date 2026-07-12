@@ -6350,6 +6350,95 @@ local function applyEffectsIfMine(beam)
         if isSkinEnabled and beam.Texture ~= config.Texture then
             beam.Texture = config.Texture
         end
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
+
+local isSkinEnabled = false
+local selectedSkin = "기본 화이트"
+local skinConnection
+
+local skinSettings = {
+    ["기본 화이트"] = {
+        Texture = "rbxassetid://2273224484", Speed = 3, Width0 = 0.8, Width1 = 0.4, 
+        Color = ColorSequence.new(Color3.fromRGB(255, 255, 255)), Brightness = 1.5
+    },
+    ["네온 레이저"] = {
+        Texture = "roblox://textures/Grid.png", Speed = 8, Width0 = 0.3, Width1 = 0.3, 
+        Color = ColorSequence.new(Color3.fromRGB(0, 255, 255)), Brightness = 5
+    },
+    ["지옥불 사슬"] = {
+        Texture = "rbxassetid://9903332029", Speed = -5, Width0 = 1.4, Width1 = 0.6, 
+        Color = ColorSequence.new(Color3.fromRGB(255, 40, 0)), Brightness = 3.5
+    },
+    ["보이드 촉수"] = {
+        Texture = "rbxassetid://9903273766", Speed = 4, Width0 = 1.6, Width1 = 1.6, 
+        Color = ColorSequence.new(Color3.fromRGB(120, 0, 255)), Brightness = 1.2
+    },
+    ["레인보우 레이저"] = {
+        Texture = "rbxassetid://2273224484", Speed = 8, Width0 = 0.7, Width1 = 0.7, 
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 0)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 255))
+        }), Brightness = 2.5
+    },
+    ["고전압 전류"] = {
+        Texture = "roblox://textures/Water_Disp.png", Speed = 20, Width0 = 1.1, Width1 = 1.1, 
+        Color = ColorSequence.new(Color3.fromRGB(255, 255, 50)), Brightness = 6
+    },
+    ["디지털 웨이브"] = {
+        Texture = "rbxassetid://9902360551", Speed = -8, Width0 = 0.5, Width1 = 0.5, 
+        Color = ColorSequence.new(Color3.fromRGB(0, 255, 80)), Brightness = 3
+    },
+    ["디바인 플라즈마"] = {
+        Texture = "roblox://textures/Sparkle.png", Speed = 6, Width0 = 1.8, Width1 = 0.2, 
+        Color = ColorSequence.new(Color3.fromRGB(255, 200, 130)), Brightness = 5
+    },
+    ["DNA 소용돌이"] = {
+        Texture = "rbxassetid://9902951016", Speed = 5, Width0 = 1.0, Width1 = 1.0, 
+        Color = ColorSequence.new(Color3.fromRGB(255, 0, 120)), Brightness = 3.5
+    },
+    ["블랙홀 스트림"] = {
+        Texture = "roblox://textures/wavyLines.png", Speed = -3, Width0 = 2.2, Width1 = 0.05, 
+        Color = ColorSequence.new(Color3.fromRGB(15, 15, 25)), Brightness = 0.8
+    }
+}
+
+local function applyEffectsIfMine(beam)
+    if not isSkinEnabled then return end
+    if not (beam:IsA("Beam") and beam.Name == "GrabBeam") then return end
+
+    local character = LocalPlayer and LocalPlayer.Character
+    if not character then return end
+
+    local isMine = false
+    if beam.Attachment0 and beam.Attachment0:IsDescendantOf(character) then
+        isMine = true
+    elseif beam.Attachment1 and beam.Attachment1:IsDescendantOf(character) then
+        isMine = true
+    end
+
+    if not isMine then return end
+
+    local config = skinSettings[selectedSkin] or skinSettings["기본 화이트"]
+
+    beam.Texture = config.Texture
+    beam.TextureMode = Enum.TextureMode.Stretch
+    beam.TextureSpeed = config.Speed
+    beam.Width0 = config.Width0
+    beam.Width1 = config.Width1
+    beam.Color = config.Color
+    beam.LightEmission = 1
+    beam.Brightness = config.Brightness
+    beam.LightInfluence = 0
+    beam.Transparency = NumberSequence.new(0.1)
+
+    beam:GetPropertyChangedSignal("Texture"):Connect(function()
+        if isSkinEnabled and beam.Texture ~= config.Texture then
+            beam.Texture = config.Texture
+        end
     end)
 
     local grabPart
@@ -6366,7 +6455,7 @@ local function applyEffectsIfMine(beam)
     end
 end
 
-passTab:AddDropdown({
+pass:AddDropdown({
     Name = "그랩 스킨 선택",
     Default = "기본 화이트",
     Options = {"기본 화이트", "네온 레이저", "지옥불 사슬", "보이드 촉수", "레인보우 레이저", "고전압 전류", "디지털 웨이브", "디바인 플라즈마", "DNA 소용돌이", "블랙홀 스트림"},
@@ -6380,7 +6469,7 @@ passTab:AddDropdown({
     end    
 })
 
-passTab:AddToggle({
+pass:AddToggle({
     Name = "그랩 스킨 켜기   <font color='rgb(155,100,25)'>[로컬]</font>",
     Default = false,
     Callback = function(Value)
@@ -6402,6 +6491,7 @@ passTab:AddToggle({
         end
     end    
 })
+
 
 passTab:AddSection({
     Name = "라인 프리셋"
