@@ -6630,58 +6630,42 @@ grabTab:AddTextbox({
 --extendLineInput:Set(1.7)
 
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
 
-local isEnabled = false
-
-grabTab:AddToggle({
-    Name = "무한줄   <font color='rgb(255,0,0)'>[모바일]</font>",
-    Default = false,
-
-    Callback = function(Value)
-        isEnabled = Value
-        if isEnabled then
-            for _, func in pairs(getgc()) do
-                if type(func) == "function" and islclosure(func) then
-                    local info = debug.getinfo(func)
-                    if info.source and string.find(info.source, "GrabbingScript") then
-                        local upvalues = debug.getupvalues(func)
-                        for index, value in pairs(upvalues) do
-                            if type(value) == "number" and (value == 20 or value == 30) then
-                                debug.setupvalue(func, index, math.huge)
-                            end
-                        end
+local function applyGrabDistance()
+    for _, func in pairs(getgc()) do
+        if type(func) == "function" and islclosure(func) then
+            local info = debug.getinfo(func)
+            if info.source and string.find(info.source, "GrabbingScript") then
+                local upvalues = debug.getupvalues(func)
+                for index, value in pairs(upvalues) do
+                    if type(value) == "number" and (value == 20 or value == 30) then
+                        debug.setupvalue(func, index, 99999999999999999999)
                     end
                 end
             end
-            
-            if LocalPlayer and not getgenv().GrabDistanceConnection then
-                getgenv().GrabDistanceConnection = LocalPlayer.CharacterAdded:Connect(function()
-                    task.wait(0.3)
-                    for _, func in pairs(getgc()) do
-                        if type(func) == "function" and islclosure(func) then
-                            local info = debug.getinfo(func)
-                            if info.source and string.find(info.source, "GrabbingScript") then
-                                local upvalues = debug.getupvalues(func)
-                                for index, value in pairs(upvalues) do
-                                    if type(value) == "number" and (value == 20 or value == 30) then
-                                        debug.setupvalue(func, index, math.huge)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end)
-            end
+        end
+    end
+end
+
+grabTab:AddToggle({
+    Name = "무한줄  <font color='rgb(255,0,0)'>[모바일]</font>",
+    Default = false,
+    Callback = function(v)
+        if v then
+            applyGrabDistance()
+            getgenv().GrabDistanceConnection = LocalPlayer.CharacterAdded:Connect(function()
+                task.wait(0.3)
+                applyGrabDistance()
+            end)
         else
             if getgenv().GrabDistanceConnection then
                 getgenv().GrabDistanceConnection:Disconnect()
                 getgenv().GrabDistanceConnection = nil
             end
         end
-    end    
+    end
 })
-
 
 grabTab:AddSection({
 	Name = "Other"
