@@ -6259,6 +6259,130 @@ passTab:AddToggle({
    end,
 })
 passTab:AddSection({
+	Name = "에임 모양"
+})
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+
+local gui, connection
+
+
+local function enable()
+task.spawn(function()
+local crosshairs = PlayerGui:WaitForChild("Crosshairs",10)
+if crosshairs then
+local frame = crosshairs:FindFirstChild("CrosshairsFrame")
+if frame then
+frame.BackgroundTransparency=1
+for _,obj in ipairs(frame:GetDescendants()) do
+if obj:IsA("Frame") or obj:IsA("ImageLabel") or obj:IsA("TextLabel") then
+obj.BackgroundTransparency=1
+if obj:IsA("ImageLabel") then obj.ImageTransparency=1 end
+obj.Visible=false
+end
+end
+end
+end
+end)
+
+
+local old = PlayerGui:FindFirstChild("CustomCrosshair")
+if old then old:Destroy() end
+
+gui = Instance.new("ScreenGui")
+gui.Name="CustomCrosshair"
+gui.ResetOnSpawn=false
+gui.DisplayOrder=999
+gui.IgnoreGuiInset=true
+gui.Parent=PlayerGui
+
+local container=Instance.new("Frame")
+container.AnchorPoint=Vector2.new(0.5,0.5)
+container.Position=UDim2.new(0.5,0,0.5,0)
+container.Size=UDim2.new(0,80,0,80)
+container.BackgroundTransparency=1
+container.Parent=gui
+
+local open="rbxasset://textures/advCursor-openedHand.png"
+local close="rbxasset://textures/advClosed-hand.png"
+
+local icon=Instance.new("ImageLabel")
+icon.AnchorPoint=Vector2.new(0.5,0.5)
+icon.Position=UDim2.new(0.5,0,0.5,0)
+icon.Size=UDim2.new(1,0,1,0)
+icon.BackgroundTransparency=1
+icon.Image=open
+icon.ResampleMode=Enum.ResamplerMode.Pixelated
+icon.Parent=container
+
+local states={
+	default={baseSize=70,icon=open},
+	hover={baseSize=85,icon=open},
+	grab={baseSize=60,icon=close}
+}
+
+local state="default"
+local size=states.default.baseSize
+
+local function setState(s)
+	if not states[s] then return end
+	state=s
+	icon.Image=states[s].icon
+end
+
+connection=RunService.RenderStepped:Connect(function()
+	if not container or not container.Parent then
+		connection:Disconnect()
+		return
+	end
+	local t=states[state]
+	size=size+(t.baseSize-size)*0.15
+	container.Size=UDim2.new(0,size,0,size)
+end)
+
+task.spawn(function()
+	local crosshairs=PlayerGui:WaitForChild("Crosshairs",10)
+	if not crosshairs then return end
+	local frame=crosshairs:FindFirstChild("CrosshairsFrame")
+	if not frame then return end
+	frame:GetPropertyChangedSignal("Size"):Connect(function()
+		local s=frame.Size.X.Offset
+		if s<=7 then
+			setState("grab")
+		elseif s>=15 then
+			setState("hover")
+		else
+			setState("default")
+		end
+	end)
+end)
+
+
+
+end
+
+
+local function disable()
+if connection then connection:Disconnect() connection=nil end
+if gui then gui:Destroy() gui=nil end
+end
+
+
+passTab:AddToggle({
+Name="에임 손으로체인지",
+Default=false,
+Callback=function(v)
+if v then enable() else disable() end
+end
+})
+
+
+passTab:AddSection({
 	Name = "라인 타입"
 })
 
