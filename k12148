@@ -667,92 +667,6 @@ function infLineExtendF()
         end
     end)
 end
-local players = game:GetService("Players")
-local localPlayer = players.LocalPlayer
-local pGui = localPlayer:WaitForChild("PlayerGui")
-
-local arrowUpButton = nil   
-local arrowDownButton = nil
-
-function infLineExtend1F()
-    uis.InputBegan:Connect(function(input, gameProcessed)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            local touchPos = input.Position
-            local screenWidth = camera.ViewportSize.X
-            local screenHeight = camera.ViewportSize.Y
-            
-            if touchPos.X > screenWidth * 0.85 then
-                if lineDistanceV < 11 then
-                    lineDistanceV = 11
-                end
-                
-                if touchPos.Y < screenHeight * 0.5 then
-                    lineDistanceV = lineDistanceV + increaseLineExtendV
-                elseif touchPos.Y >= screenHeight * 0.5 then
-                    lineDistanceV = lineDistanceV - increaseLineExtendV
-                end
-            end
-        end
-    end)
-    
-    if arrowUpButton and arrowDownButton then
-        arrowUpButton.MouseButton1Click:Connect(function()
-            if lineDistanceV < 11 then lineDistanceV = 11 end
-            lineDistanceV = lineDistanceV + increaseLineExtendV
-        end)
-        arrowDownButton.MouseButton1Click:Connect(function()
-            if lineDistanceV < 11 then lineDistanceV = 11 end
-            lineDistanceV = lineDistanceV - increaseLineExtendV
-        end)
-    end
-
-    workspace.ChildAdded:Connect(function(child)
-        if child.Name == "GrabParts" and child:IsA("Model") then
-            if infLineExtendT then
-                grabPartsModel = child
-
-                grabPartsModel:WaitForChild("GrabPart")
-                grabPartsModel:WaitForChild("DragPart")
-                    
-                clonedDragPart = grabPartsModel.DragPart:Clone()
-                clonedDragPart.Name = "DragPart1"
-                clonedDragPart.AlignPosition.Attachment1 = clonedDragPart.DragAttach
-                clonedDragPart.Parent = grabPartsModel
-                
-                lineDistanceV = (clonedDragPart.Position - cam.CFrame.Position).Magnitude
-    
-                clonedDragPart.AlignOrientation.Enabled = false
-                grabPartsModel.DragPart.AlignPosition.Enabled = false
-
-                if MasslessGrabT then
-                    local alignOrientation = clonedDragPart:FindFirstChildOfClass("AlignOrientation")
-                    if alignOrientation then
-                        alignOrientation.MaxAngularVelocity = math.huge
-                        alignOrientation.MaxTorque = math.huge
-                        alignOrientation.Responsiveness = 200
-                    end
-                    
-                    local alignPosition = clonedDragPart:FindFirstChildOfClass("AlignPosition")
-                    if alignPosition then
-                        alignPosition.MaxAxesForce = Vector3.new(math.huge, math.huge, math.huge)
-                        alignPosition.MaxForce = math.huge
-                        alignPosition.MaxVelocity = math.huge
-                        alignPosition.Responsiveness = 200
-                    end
-                end
-    
-                task.spawn(function()
-                    while grabPartsModel and grabPartsModel.Parent do
-                        clonedDragPart.Position = cam.CFrame.Position + cam.CFrame.LookVector * lineDistanceV
-                        task.wait()
-                    end
-            
-                    lineDistanceV = 0
-                end)
-            end
-        end
-    end)
-end
 
 function BlobMasslessR()
     UpdateCurrentBlobman()
@@ -6693,7 +6607,7 @@ grabTab:AddSection({
 	Name = "Line"
 })
 local extendLineToggle = grabTab:AddToggle({
-    Name = "줄길이  <font color='rgb(0,255,0)'>[데스크톱]</font>",
+    Name = "무한줄  <font color='rgb(0,255,0)'>[데스크톱]</font>",
     
     Flag = "3uw",
     save = true,
@@ -6704,7 +6618,7 @@ local extendLineToggle = grabTab:AddToggle({
 })
 
 grabTab:AddTextbox({
-    Name = "줄길이  <font color='rgb(0,255,0)'>[데스크톱]</font>",
+    Name = "줄 속도  <font color='rgb(0,255,0)'>[데스크톱]</font>",
     
     save = true,
     PlaceholderText = "Value",
@@ -6715,27 +6629,133 @@ grabTab:AddTextbox({
 })
 --extendLineInput:Set(1.7)
 
-local extendLineToggle = grabTab:AddToggle({
-    Name = "줄길이    <font color='rgb(255,0,0)'>[모바일]</font>",
-    
-    Flag = "3uw9191",
-    save = true,
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+local isEnabled = false
+local lineDistanceV = 0
+local increaseLineExtendV = 5
+
+local function applyGrabDistance()
+    if not isEnabled then return end
+    for _, func in pairs(getgc()) do
+        if type(func) == "function" and islclosure(func) then
+            local info = debug.getinfo(func)
+            if info.source and string.find(info.source, "GrabbingScript") then
+                local upvalues = debug.getupvalues(func)
+                for index, value in pairs(upvalues) do
+                    if type(value) == "number" and (value == 20 or value == 30) then
+                        debug.setupvalue(func, index, math.huge)
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function handleGrabParts(child)
+    if not isEnabled or not UserInputService.MouseEnabled then return end
+    if child.Name == "GrabParts" and child:IsA("Model") then
+        child:WaitForChild("GrabPart")
+        child:WaitForChild("DragPart")
+        
+        local clonedDragPart = child.DragPart:Clone()
+        clonedDragPart.Name = "DragPart1"
+        clonedDragPart.AlignPosition.Attachment1 = clonedDragPart.DragAttach
+        clonedDragPart.Parent = child
+        
+        lineDistanceV = (clonedDragPart.Position - Camera.CFrame.Position).Magnitude
+        
+        clonedDragPart.AlignOrientation.Enabled = false
+        child.DragPart.AlignPosition.Enabled = false
+
+        local alignOrientation = clonedDragPart:FindFirstChildOfClass("AlignOrientation")
+        if alignOrientation then
+            alignOrientation.MaxAngularVelocity = math.huge
+            alignOrientation.MaxTorque = math.huge
+            alignOrientation.Responsiveness = 200
+        end
+        
+        local alignPosition = clonedDragPart:FindFirstChildOfClass("AlignPosition")
+        if alignPosition then
+            alignPosition.MaxAxesForce = Vector3.new(math.huge, math.huge, math.huge)
+            alignPosition.MaxForce = math.huge
+            alignPosition.MaxVelocity = math.huge
+            alignPosition.Responsiveness = 200
+        end
+
+        task.spawn(function()
+            while child.Parent and isEnabled do
+                clonedDragPart.Position = Camera.CFrame.Position + Camera.CFrame.LookVector * lineDistanceV
+                task.wait()
+            end
+            lineDistanceV = 0
+        end)
+    end
+end
+
+local wheelConnection
+local childConnection
+
+-- 이 아래 토글과 텍스트박스 코드를 사용 중인 탭 변수 뒤에 붙여넣으세요.
+-- 예: Tab:AddToggle(...) 형태에서 앞의 변수만 맞춰주면 됩니다.
+
+grabTab:AddToggle({
+    Name = "무한 줄 <font color='rgb(255,0,0)'>[모바일]</font>",
+    Default = false,
     Callback = function(Value)
-        infLineExtend1T = Value
-        infLineExtend1F()
+        isEnabled = Value
+        if isEnabled then
+            applyGrabDistance()
+            
+            if not getgenv().GrabDistanceConnection then
+                getgenv().GrabDistanceConnection = LocalPlayer.CharacterAdded:Connect(function()
+                    task.wait(0.3)
+                    applyGrabDistance()
+                end)
+            end
+
+            wheelConnection = UserInputService.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseWheel then
+                    if lineDistanceV < 11 then
+                        lineDistanceV = 11
+                    end
+                    if input.Position.Z > 0 then
+                        lineDistanceV = lineDistanceV + increaseLineExtendV
+                    elseif input.Position.Z < 0 then
+                        lineDistanceV = lineDistanceV - increaseLineExtendV
+                    end
+                end
+            end)
+
+            childConnection = Workspace.ChildAdded:Connect(handleGrabParts)
+        else
+            if getgenv().GrabDistanceConnection then
+                getgenv().GrabDistanceConnection:Disconnect()
+                getgenv().GrabDistanceConnection = nil
+            end
+            if wheelConnection then wheelConnection:Disconnect() end
+            if childConnection then childConnection:Disconnect() end
+            lineDistanceV = 0
+        end
+    end    
+})
+
+garbTab:AddTextbox({
+    Name = "줄 속도  <font color='rgb(255,0,0)'>[모바일]</font>",
+    Default = "5",
+    TextDisappear = false,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        if num then
+            increaseLineExtendV = num
+        end
     end
 })
 
-grabTab:AddTextbox({
-    Name = "줄길이   <font color='rgb(255,0,0)'>[모바일]</font>",
-    
-    save = true,
-    PlaceholderText = "Value",
-    Flag = "4hd995j",
-    Callback = function(Value)
-        increaseLineExtend1V = Value
-    end
-})
 grabTab:AddSection({
 	Name = "Other"
 })
