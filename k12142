@@ -6630,7 +6630,7 @@ RankTab:AddLabel("헬로, 썸머, 누나, 이에스, 까망, 연우, 온유, 대
 RankTab:AddSection({
     Name = "어드민 권한 획득"
 })
-local AdminHackButton = RankTab:AddButton({
+RankTab:AddButton({
     Name = "iY 어드민 핵",
     Callback = function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
@@ -7020,7 +7020,7 @@ getTab:AddToggle({
 grabTab:AddSection({
 	Name = "Fling"
 })
-local flingToggle = grabTab:AddToggle({
+grabTab:AddToggle({
     Name = "던지기 V1   <font color='rgb(255,0,0)'>[데스크톱]</font>",
     
     save = true,
@@ -7043,9 +7043,9 @@ local strengthTextbox = grabTab:AddTextbox({
 })
 --strengthInput:Set(9999)
 grabTab:AddLabel("모바일의경우 작동하지 않습니다.")
-local strengthConnection = nil
+--local strengthConnection = nil
 local nageru = 800
-local lastThrowTime = 0
+--local lastThrowTime = 0
 
 grabTab:AddToggle({
     Name = "던지기 V2   <font color='rgb(0,255,0)'>[모바일]</font>",
