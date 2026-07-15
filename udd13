@@ -5124,29 +5124,12 @@ local aimbotCircle = State.drawings.aimbot and State.drawings.aimbot.circle
 local lastUpdate = 0
 
 RunService.Heartbeat:Connect(function()
-    if tick() - lastUpdate < 0.05 then return end
-    lastUpdate = tick()
-
-    if not silentCircle or not aimbotCircle then return end
+    print("running")
 
     local cam = workspace.CurrentCamera
+    if not cam then return end
+
     local screenCenter = cam.ViewportSize / 2
-
-    silentCircle.Position = screenCenter
-    aimbotCircle.Position = screenCenter
-
-    if not Toggles.aimbot_toggle.Value then
-        State.manipulation.targetPosition = nil
-        return
-    end
-
-    if not Options.aimbot_keybind:GetState() then
-        State.manipulation.targetPosition = nil
-        return
-    end
-
-    local closestPlayer = nil
-    local closestDist = Options.silent_radius.Value
 
     for _, player in ipairs(Players:GetPlayers()) do
         if player == LocalPlayer then continue end
@@ -5155,29 +5138,12 @@ RunService.Heartbeat:Connect(function()
         if not char then continue end
 
         local root = char:FindFirstChild("HumanoidRootPart")
-        local humanoid = char:FindFirstChild("Humanoid")
+        if not root then continue end
 
-        if not root or not humanoid or humanoid.Health <= 0 then continue end
+        print("found target")
 
-        local screenPos, onScreen = cam:WorldToViewportPoint(root.Position)
-        if not onScreen then continue end
-
-        local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
-
-        if dist < closestDist then
-            closestDist = dist
-            closestPlayer = root
-        end
-    end
-
-    if closestPlayer then
-        if math.random(1, 100) <= Options.silent_hitchance.Value then
-            State.manipulation.targetPosition = closestPlayer.Position
-        else
-            State.manipulation.targetPosition = nil
-        end
-    else
-        State.manipulation.targetPosition = nil
+        State.manipulation.targetPosition = root.Position
+        break
     end
 end)
 
