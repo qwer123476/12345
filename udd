@@ -5275,8 +5275,6 @@ Toggles.silent_manipulation:OnChanged(function()
 end)
 
 SaveManager:LoadAutoloadConfig()
-
-Library:Toggle()
-return Library
-end
-initialize(Library)
+pcall(function()
+    Library:Toggle()
+end)
