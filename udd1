@@ -4864,41 +4864,53 @@ local function initialize(Library)
     local atmo_update = M({ [0] = AtmosphereEffect })
     local sun_update = S({ [0] = SunRaysEffect, [1] = SunRaysDefaults })
 
-    Toggles.bloom_enabled:OnChanged(bloom_update)
-    Options.bloom_intensity:OnChanged(bloom_update)
-    Options.bloom_size:OnChanged(bloom_update)
-    Options.bloom_threshold:OnChanged(bloom_update)
+    -- 안전 연결 함수
+local function safeOnChanged(obj, func)
+    if obj and obj.OnChanged then
+        obj:OnChanged(func)
+    end
+end
 
-    Toggles.color_correction_enabled:OnChanged(cc_update)
-    Options.color_correction_saturation:OnChanged(cc_update)
-    Options.color_correction_contrast:OnChanged(cc_update)
-    Options.color_correction_brightness:OnChanged(cc_update)
-    Options.color_correction_tint:OnChanged(cc_update)
+-- Bloom
+safeOnChanged(Toggles.bloom_enabled, bloom_update)
+safeOnChanged(Options.bloom_intensity, bloom_update)
+safeOnChanged(Options.bloom_size, bloom_update)
+safeOnChanged(Options.bloom_threshold, bloom_update)
 
-    Toggles.atmosphere_enabled:OnChanged(atmo_update)
-    Options.atmosphere_decay:OnChanged(atmo_update)
-    Options.atmosphere_glare:OnChanged(atmo_update)
-    Options.atmosphere_haze:OnChanged(atmo_update)
-    Options.atmosphere_density:OnChanged(atmo_update)
-    Options.atmosphere_offset:OnChanged(atmo_update)
-    Options.atmosphere_color:OnChanged(atmo_update)
+-- Color Correction
+safeOnChanged(Toggles.color_correction_enabled, cc_update)
+safeOnChanged(Options.color_correction_saturation, cc_update)
+safeOnChanged(Options.color_correction_contrast, cc_update)
+safeOnChanged(Options.color_correction_brightness, cc_update)
+safeOnChanged(Options.color_correction_tint, cc_update)
 
-    Toggles.sunrays_enabled:OnChanged(sun_update)
-    Options.sunrays_spread:OnChanged(sun_update)
-    Options.sunrays_intensity:OnChanged(sun_update)
+-- Atmosphere
+safeOnChanged(Toggles.atmosphere_enabled, atmo_update)
+safeOnChanged(Options.atmosphere_decay, atmo_update)
+safeOnChanged(Options.atmosphere_glare, atmo_update)
+safeOnChanged(Options.atmosphere_haze, atmo_update)
+safeOnChanged(Options.atmosphere_density, atmo_update)
+safeOnChanged(Options.atmosphere_offset, atmo_update)
+safeOnChanged(Options.atmosphere_color, atmo_update)
 
-    Options.lighting_technology:OnChanged(function()
-        pcall(function()
-            local tech = Options.lighting_technology.Value
-            if tech == "ShadowMap" then
-                Lighting.Technology = Enum.Technology.ShadowMap
-            elseif tech == "Future" then
-                Lighting.Technology = Enum.Technology.Future
-            elseif tech == "Legacy" then
-                Lighting.Technology = Enum.Technology.Legacy
-            end
-        end)
+-- Sunrays
+safeOnChanged(Toggles.sunrays_enabled, sun_update)
+safeOnChanged(Options.sunrays_spread, sun_update)
+safeOnChanged(Options.sunrays_intensity, sun_update)
+
+-- Lighting
+safeOnChanged(Options.lighting_technology, function()
+    pcall(function()
+        local tech = Options.lighting_technology.Value
+        if tech == "ShadowMap" then
+            Lighting.Technology = Enum.Technology.ShadowMap
+        elseif tech == "Future" then
+            Lighting.Technology = Enum.Technology.Future
+        elseif tech == "Legacy" then
+            Lighting.Technology = Enum.Technology.Legacy
+        end
     end)
+end)
 
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local Remotes = ReplicatedStorage:FindFirstChild("Remotes")
