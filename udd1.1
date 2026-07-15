@@ -5057,24 +5057,17 @@ end)
 State.drawings = State.drawings or {}
 State.drawings.silent = State.drawings.silent or {}
 
-local silentCircle = Drawing.new("Circle")
-silentCircle.Visible = false
-silentCircle.Radius = 100
-silentCircle.Color = Color3.new(1, 1, 1)
-silentCircle.Thickness = 1
-silentCircle.Filled = false
-silentCircle.Transparency = 1
+if not State.drawings.silent.circle then
+    local c = Drawing.new("Circle")
+    c.Visible = false
+    c.Radius = 100
+    c.Color = Color3.new(1,1,1)
+    c.Thickness = 1
+    c.Filled = false
+    c.Transparency = 1
 
-State.drawings.silent.circle = silentCircle
-    local aimbotCircle = Drawing.new("Circle")
-    aimbotCircle.Visible = false
-    aimbotCircle.Radius = 100
-    aimbotCircle.Color = Color3.new(1, 1, 1)
-    aimbotCircle.Thickness = 1
-    aimbotCircle.Filled = false
-    aimbotCircle.Transparency = 1
-    State.drawings.aimbot.circle = aimbotCircle
-
+    State.drawings.silent.circle = c
+end
     Toggles.silent_visualize:OnChanged(function()
         silentCircle.Visible = Toggles.silent_visualize.Value and Toggles.aimbot_toggle.Value
     end)
