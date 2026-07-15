@@ -5118,32 +5118,79 @@ Toggles.aimbot_toggle:OnChanged(function()
     end
 end)
 
-local silentCircle = State.drawings.silent.circle
-local aimbotCircle = State.drawings.aimbot and State.drawings.aimbot.circle
-
-local lastUpdate = 0
-
-RunService.Heartbeat:Connect(function()
-    print("running")
-
+-- MAIN LOOP
+RunService.RenderStepped:Connect(function()
     local cam = workspace.CurrentCamera
     if not cam then return end
 
     local screenCenter = cam.ViewportSize / 2
 
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player == LocalPlayer then continue end
+    if silentCircle then
+        silentCircle.Position = screenCenter
+    end
 
-        local char = player.Character
-        if not char then continue end
+    if aimbotCircle then
+        aimbotCircle.Position = screenCenter
+    end
 
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then continue end
+    if Toggles.aimbot_fov_moving.Value and aimbotCircle then
+        aimbotCircle.NumSides = 10
+    end
 
-        print("found target")
+    if Toggles.aimbot_toggle.Value and Options.aimbot_keybind:GetState() then
+        local closestPlayer = nil
+        local closestDist = Options.silent_radius.Value
+        local cam = workspace.CurrentCamera
 
-        State.manipulation.targetPosition = root.Position
-        break
+        for _, player in Players:GetPlayers() do
+            if player == LocalPlayer then continue end
+
+            local char = player.Character
+            if not char then continue end
+
+            local root = char:FindFirstChild("HumanoidRootPart")
+            local humanoid = char:FindFirstChild("Humanoid")
+
+            if not root or not humanoid or humanoid.Health <= 0 then continue end
+
+            if Toggles.targeting_visibleonly.Value then
+                local ray = workspace:Raycast(
+                    cam.CFrame.Position,
+                    (root.Position - cam.CFrame.Position).Unit * 1000,
+                    State.raycastParams
+                )
+                if ray and ray.Instance and not ray.Instance:IsDescendantOf(char) then
+                    continue
+                end
+            end
+
+            local screenPos, onScreen = cam:WorldToViewportPoint(root.Position)
+            if not onScreen then continue end
+
+            local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+            if dist < closestDist then
+                closestDist = dist
+                closestPlayer = {
+                    player = player,
+                    character = char,
+                    root = root,
+                    screenPos = screenPos
+                }
+            end
+        end
+
+        if closestPlayer then
+            local hitchance = Options.silent_hitchance.Value
+            if math.random(1, 100) <= hitchance then
+                State.manipulation.targetPosition = closestPlayer.root.Position
+            else
+                State.manipulation.targetPosition = nil
+            end
+        else
+            State.manipulation.targetPosition = nil
+        end
+    else
+        State.manipulation.targetPosition = nil
     end
 end)
 
