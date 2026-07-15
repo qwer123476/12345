@@ -5274,7 +5274,7 @@ Toggles.silent_manipulation:OnChanged(function()
     State.manipulation.active = Toggles.silent_manipulation.Value
 end)
 
-SaveManager:LoadAutoloadConfig()
 pcall(function()
     Library:Toggle()
 end)
+end
