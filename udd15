@@ -5279,3 +5279,4 @@ SaveManager:LoadAutoloadConfig()
 Library:Toggle()
 return Library
 end
+initialize(Library)
