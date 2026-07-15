@@ -5053,15 +5053,19 @@ end)
         end)
     end
 
-    local silentCircle = Drawing.new("Circle")
-    silentCircle.Visible = false
-    silentCircle.Radius = 100
-    silentCircle.Color = Color3.new(1, 1, 1)
-    silentCircle.Thickness = 1
-    silentCircle.Filled = false
-    silentCircle.Transparency = 1
-    State.drawings.silent.circle = silentCircle
+    State = State or {}
+State.drawings = State.drawings or {}
+State.drawings.silent = State.drawings.silent or {}
 
+local silentCircle = Drawing.new("Circle")
+silentCircle.Visible = false
+silentCircle.Radius = 100
+silentCircle.Color = Color3.new(1, 1, 1)
+silentCircle.Thickness = 1
+silentCircle.Filled = false
+silentCircle.Transparency = 1
+
+State.drawings.silent.circle = silentCircle
     local aimbotCircle = Drawing.new("Circle")
     aimbotCircle.Visible = false
     aimbotCircle.Radius = 100
