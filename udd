@@ -5053,10 +5053,12 @@ end)
         end)
     end
 
-    State = State or {}
+    -- SAFE INIT
+State = State or {}
 State.drawings = State.drawings or {}
 State.drawings.silent = State.drawings.silent or {}
 
+-- CREATE CIRCLE ONCE
 if not State.drawings.silent.circle then
     local c = Drawing.new("Circle")
     c.Visible = false
@@ -5068,151 +5070,211 @@ if not State.drawings.silent.circle then
 
     State.drawings.silent.circle = c
 end
-    Toggles.silent_visualize:OnChanged(function()
+
+local silentCircle = State.drawings.silent.circle
+
+-- (혹시 없을까봐 보호)
+local aimbotCircle = State.drawings.aimbot and State.drawings.aimbot.circle
+
+-- UI EVENTS
+Toggles.silent_visualize:OnChanged(function()
+    if silentCircle then
         silentCircle.Visible = Toggles.silent_visualize.Value and Toggles.aimbot_toggle.Value
-    end)
-    Options.silent_radius:OnChanged(function()
+    end
+end)
+
+Options.silent_radius:OnChanged(function()
+    if silentCircle then
         silentCircle.Radius = Options.silent_radius.Value
-    end)
-    Options.silent_fill_color1:OnChanged(function()
+    end
+end)
+
+Options.silent_fill_color1:OnChanged(function()
+    if silentCircle then
         silentCircle.Color = Options.silent_fill_color1.Value
-    end)
-    Toggles.aimbot_fov_outline:OnChanged(function()
+    end
+end)
+
+Toggles.aimbot_fov_outline:OnChanged(function()
+    if aimbotCircle then
         aimbotCircle.Visible = Toggles.aimbot_fov_outline.Value
-    end)
-    Options.aimbot_outline_color1:OnChanged(function()
+    end
+end)
+
+Options.aimbot_outline_color1:OnChanged(function()
+    if aimbotCircle then
         aimbotCircle.Color = Options.aimbot_outline_color1.Value
-    end)
-    Options.aimbot_fov_rotation_speed:OnChanged(function() end)
+    end
+end)
 
-    Toggles.aimbot_toggle:OnChanged(function()
-        if not Toggles.aimbot_toggle.Value then
+Options.aimbot_fov_rotation_speed:OnChanged(function() end)
+
+Toggles.aimbot_toggle:OnChanged(function()
+    if not Toggles.aimbot_toggle.Value then
+        if silentCircle then
             silentCircle.Visible = false
-            State.manipulation.targetPosition = nil
         end
-    end)
+        State.manipulation.targetPosition = nil
+    end
+end)
 
-    RunService.RenderStepped:Connect(function()
-        local screenCenter = workspace.CurrentCamera.ViewportSize / 2
+-- MAIN LOOP
+RunService.RenderStepped:Connect(function()
+    local cam = workspace.CurrentCamera
+    if not cam then return end
+
+    local screenCenter = cam.ViewportSize / 2
+
+    if silentCircle then
         silentCircle.Position = screenCenter
+    end
+
+    if aimbotCircle then
         aimbotCircle.Position = screenCenter
+    end
 
-        if Toggles.aimbot_fov_moving.Value then
-            local speed = Options.aimbot_fov_rotation_speed.Value
-            aimbotCircle.NumSides = 60
-        end
+    if Toggles.aimbot_fov_moving.Value and aimbotCircle then
+        aimbotCircle.NumSides = 60
+    end
 
-        if Toggles.aimbot_toggle.Value and Options.aimbot_keybind:GetState() then
-            local closestPlayer = nil
-            local closestDist = Options.silent_radius.Value
-            local cam = workspace.CurrentCamera
+    if Toggles.aimbot_toggle.Value and Options.aimbot_keybind:GetState() then
+        local closestPlayer = nil
+        local closestDist = Options.silent_radius.Value
+        local cam = workspace.CurrentCamera
 
-            for _, player in Players:GetPlayers() do
-                if player == LocalPlayer then continue end
-                local char = player.Character
-                if not char then continue end
-                local root = char:FindFirstChild("HumanoidRootPart")
-                local humanoid = char:FindFirstChild("Humanoid")
-                if not root or not humanoid or humanoid.Health <= 0 then continue end
+        for _, player in Players:GetPlayers() do
+            if player == LocalPlayer then continue end
 
-                if Toggles.targeting_visibleonly.Value then
-                    local ray = workspace:Raycast(
-                        cam.CFrame.Position,
-                        (root.Position - cam.CFrame.Position).Unit * 1000,
-                        State.raycastParams
-                    )
-                    if ray and ray.Instance and not ray.Instance:IsDescendantOf(char) then
-                        continue
-                    end
-                end
+            local char = player.Character
+            if not char then continue end
 
-                local screenPos, onScreen = cam:WorldToViewportPoint(root.Position)
-                if not onScreen then continue end
-                local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
-                if dist < closestDist then
-                    closestDist = dist
-                    closestPlayer = { player = player, character = char, root = root, screenPos = screenPos }
+            local root = char:FindFirstChild("HumanoidRootPart")
+            local humanoid = char:FindFirstChild("Humanoid")
+
+            if not root or not humanoid or humanoid.Health <= 0 then continue end
+
+            if Toggles.targeting_visibleonly.Value then
+                local ray = workspace:Raycast(
+                    cam.CFrame.Position,
+                    (root.Position - cam.CFrame.Position).Unit * 1000,
+                    State.raycastParams
+                )
+                if ray and ray.Instance and not ray.Instance:IsDescendantOf(char) then
+                    continue
                 end
             end
 
-            if closestPlayer then
-                local hitchance = Options.silent_hitchance.Value
-                if math.random(1, 100) <= hitchance then
-                    State.manipulation.targetPosition = closestPlayer.root.Position
-                else
-                    State.manipulation.targetPosition = nil
-                end
+            local screenPos, onScreen = cam:WorldToViewportPoint(root.Position)
+            if not onScreen then continue end
+
+            local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+            if dist < closestDist then
+                closestDist = dist
+                closestPlayer = {
+                    player = player,
+                    character = char,
+                    root = root,
+                    screenPos = screenPos
+                }
+            end
+        end
+
+        if closestPlayer then
+            local hitchance = Options.silent_hitchance.Value
+            if math.random(1, 100) <= hitchance then
+                State.manipulation.targetPosition = closestPlayer.root.Position
             else
                 State.manipulation.targetPosition = nil
             end
         else
             State.manipulation.targetPosition = nil
         end
-    end)
+    else
+        State.manipulation.targetPosition = nil
+    end
+end)
 
-    local triggerConn = nil
-    Toggles.triggerbot_enabled:OnChanged(function()
-        if triggerConn then triggerConn:Disconnect(); triggerConn = nil end
-        if not Toggles.triggerbot_enabled.Value then return end
+-- TRIGGERBOT
+local triggerConn = nil
 
-        triggerConn = RunService.Heartbeat:Connect(function()
-            if not localFighter then return end
-            local equipped = pcall(function() return localFighter.EquippedItem end) and localFighter.EquippedItem
-            if not equipped then return end
+Toggles.triggerbot_enabled:OnChanged(function()
+    if triggerConn then
+        triggerConn:Disconnect()
+        triggerConn = nil
+    end
 
-            local scopedMode = Options.triggerbot_scoped.Value
-            if scopedMode == "scoped only" then
-                local isAiming = pcall(function() return localFighter.IsAiming end) and localFighter.IsAiming
-                if not isAiming then return end
-            end
+    if not Toggles.triggerbot_enabled.Value then return end
 
-            local mouseTarget = LocalPlayer:GetMouse().Target
-            if not mouseTarget then return end
-            local model = mouseTarget:FindFirstAncestorOfClass("Model")
-            if not model then return end
-            local humanoid = model:FindFirstChildOfClass("Humanoid")
-            if not humanoid or humanoid.Health <= 0 then return end
-            local player = Players:GetPlayerFromCharacter(model)
-            if not player or player == LocalPlayer then return end
+    triggerConn = RunService.Heartbeat:Connect(function()
+        if not localFighter then return end
 
-            pcall(function()
-                if equipped.shoot then equipped:shoot() end
-            end)
-        end)
-    end)
+        local equipped = pcall(function()
+            return localFighter.EquippedItem
+        end) and localFighter.EquippedItem
 
-    Toggles.exploits_full_auto:OnChanged(function()
+        if not equipped then return end
+
+        if Options.triggerbot_scoped.Value == "scoped only" then
+            local isAiming = pcall(function()
+                return localFighter.IsAiming
+            end) and localFighter.IsAiming
+
+            if not isAiming then return end
+        end
+
+        local mouseTarget = LocalPlayer:GetMouse().Target
+        if not mouseTarget then return end
+
+        local model = mouseTarget:FindFirstAncestorOfClass("Model")
+        if not model then return end
+
+        local humanoid = model:FindFirstChildOfClass("Humanoid")
+        if not humanoid or humanoid.Health <= 0 then return end
+
+        local player = Players:GetPlayerFromCharacter(model)
+        if not player or player == LocalPlayer then return end
+
         pcall(function()
-            if not localFighter or not localFighter.EquippedItem then return end
-            local weapon = localFighter.EquippedItem
-            if weapon.Info and weapon.Info.Type == "Gun" then
-                if Toggles.exploits_full_auto.Value then
-                    weapon.Info.FireMode = "Auto"
-                end
+            if equipped.shoot then
+                equipped:shoot()
             end
         end)
     end)
+end)
 
-    State.manipulation = State.manipulation or {}
-    State.manipulation.active = false
-    State.manipulation.targetPosition = nil
+-- FULL AUTO
+Toggles.exploits_full_auto:OnChanged(function()
+    pcall(function()
+        if not localFighter or not localFighter.EquippedItem then return end
 
-    State.raycastParams = RaycastParams.new()
-    State.raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-    State.raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
-    LocalPlayer.CharacterAdded:Connect(function(char)
-        State.raycastParams.FilterDescendantsInstances = {char}
+        local weapon = localFighter.EquippedItem
+
+        if weapon.Info and weapon.Info.Type == "Gun" then
+            if Toggles.exploits_full_auto.Value then
+                weapon.Info.FireMode = "Auto"
+            end
+        end
     end)
+end)
 
-    Toggles.silent_manipulation:OnChanged(function()
-        State.manipulation.active = Toggles.silent_manipulation.Value
-    end)
+-- STATE INIT
+State.manipulation = State.manipulation or {}
+State.manipulation.active = false
+State.manipulation.targetPosition = nil
 
-    SaveManager:LoadAutoloadConfig()
+State.raycastParams = RaycastParams.new()
+State.raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+State.raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
 
-    Library:Toggle()
-    return Library
-end
+LocalPlayer.CharacterAdded:Connect(function(char)
+    State.raycastParams.FilterDescendantsInstances = {char}
+end)
 
-initialize(Library)
-getgenv().UE_LOADED = true
+Toggles.silent_manipulation:OnChanged(function()
+    State.manipulation.active = Toggles.silent_manipulation.Value
+end)
+
+SaveManager:LoadAutoloadConfig()
+
+Library:Toggle()
+return Library
