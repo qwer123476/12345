@@ -9792,52 +9792,44 @@ function tpWalkF()
         local hum = char:WaitForChild("Humanoid")
         local root = char:WaitForChild("HumanoidRootPart")
 
-        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-        hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-        hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+        local att = root:FindFirstChild("MoveAtt")
+        if att then att:Destroy() end
+        
+        local lv = root:FindFirstChild("MoveLV")
+        if lv then lv:Destroy() end
 
-        local stepSignal = run.PreSimulation or run.Stepped
+        att = Instance.new("Attachment")
+        att.Name = "MoveAtt"
+        att.Parent = root
+
+        lv = Instance.new("LinearVelocity")
+        lv.Name = "MoveLV"
+        lv.Attachment0 = att
+        lv.RelativeTo = Enum.ActuatorRelativeTo.World
+        lv.ForceLimitMode = Enum.ForceLimitMode.PerAxis
+        lv.MaxAxesForce = Vector3.new(0, 0, 0)
+        lv.VectorVelocity = Vector3.new(0, 0, 0)
+        lv.Parent = root
+
         local conn
-        conn = stepSignal:Connect(function()
+        conn = run.Heartbeat:Connect(function()
             if not char:IsDescendantOf(workspace) then
                 conn:Disconnect()
                 return
             end
 
             if walkSpeedT then
-                hum.AirControl = 1
                 local dir = hum.MoveDirection
+                lv.MaxAxesForce = Vector3.new(1000000, 0, 1000000)
                 if dir.Magnitude > 0 then
-                    root.AssemblyLinearVelocity = Vector3.new(
-                        dir.X * walkSpeedV,
-                        root.AssemblyLinearVelocity.Y,
-                        dir.Z * walkSpeedV
-                    )
+                    lv.VectorVelocity = Vector3.new(dir.X * walkSpeedV, 0, dir.Z * walkSpeedV)
                 else
-                    root.AssemblyLinearVelocity = Vector3.new(
-                        0,
-                        root.AssemblyLinearVelocity.Y,
-                        0
-                    )
+                    lv.VectorVelocity = Vector3.new(0, 0, 0)
                 end
-            end
-        end)
-
-        local animConn
-        animConn = run.RenderStepped:Connect(function()
-            if not char:IsDescendantOf(workspace) then
-                animConn:Disconnect()
-                return
-            end
-
-            if walkSpeedT then
-                for _, track in ipairs(hum:GetPlayingAnimationTracks()) do
-                    local name = track.Name:lower()
-                    local id = track.Animation and track.Animation.AnimationId:lower() or ""
-                    if name:find("walk") or name:find("run") or id:find("walk") or id:find("run") then
-                        track:AdjustSpeed(1)
-                    end
-                end
+                hum.WalkSpeed = 16
+            else
+                lv.MaxAxesForce = Vector3.new(0, 0, 0)
+                lv.VectorVelocity = Vector3.new(0, 0, 0)
             end
         end)
     end
@@ -9847,6 +9839,7 @@ function tpWalkF()
 end
 
 tpWalkF()
+
 
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
