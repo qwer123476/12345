@@ -5386,10 +5386,10 @@ local SetNetworkOwner = GrabEvents and GrabEvents:FindFirstChild("SetNetworkOwne
 local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLine")
 local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
-local antiGrabActive = false
-local busy = false
+if _G.AntiGrabActive == nil then _G.AntiGrabActive = false end
+if _G.PlayerToRemoveGrab == nil then _G.PlayerToRemoveGrab = {} end
 
-_G.PlayerToRemoveGrab = {}
+local busy = false
 
 local function findWhoGrabbed(friendPlayer)
     local friendChar = friendPlayer.Character
@@ -5429,7 +5429,7 @@ local function doAntiGrab(friendPlayer, enemyPlayer)
     if not enemyRoot then busy = false return end
 
     myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0, -10, 0)
-    task.wait(0.05)
+    task.wait(0.02)
 
     if SetNetworkOwner then
         for _, part in ipairs(enemyChar:GetChildren()) do
@@ -5463,10 +5463,14 @@ local function doAntiGrab(friendPlayer, enemyPlayer)
 
     task.wait(0.5)
 
-    if typeof(BACK) == "function" then
-        BACK(origin)
-    else
-        myRoot.CFrame = origin
+    myChar = localPlayer.Character
+    myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+    if myRoot then
+        if typeof(BACK) == "function" then
+            BACK(origin)
+        else
+            myRoot.CFrame = origin
+        end
     end
 
     busy = false
@@ -5474,7 +5478,7 @@ end
 
 FDTab:AddPlayersDropdown({
     Name = "안티 그랩 대상",
-    Default = "",
+    Default = _G.PlayerToRemoveGrab,
     MultipleSelection = true,
     SearchBar = true,
     Callback = function(Value)
@@ -5492,32 +5496,33 @@ FDTab:AddPlayersDropdown({
 })
 
 FDTab:AddToggle({
-    Name = "안티 그랩",
-    Default = false,
+    Name = "안티 그랩 활성화",
+    Default = _G.AntiGrabActive,
     Callback = function(Value)
-        antiGrabActive = Value
+        _G.AntiGrabActive = Value
     end
 })
 
-task.spawn(function()
-    while true do
-        if antiGrabActive and not busy then
-            for _, name in ipairs(_G.PlayerToRemoveGrab) do
-                local friend = Players:FindFirstChild(name)
-                if friend and friend ~= localPlayer then
-                    local enemy = findWhoGrabbed(friend)
-                    if enemy then
-                        doAntiGrab(friend, enemy)
-                        break
+if _G.AntiGrabLoopConnected == nil then
+    _G.AntiGrabLoopConnected = true
+    task.spawn(function()
+        while true do
+            if _G.AntiGrabActive and not busy then
+                for _, name in ipairs(_G.PlayerToRemoveGrab) do
+                    local friend = Players:FindFirstChild(name)
+                    if friend and friend ~= localPlayer then
+                        local enemy = findWhoGrabbed(friend)
+                        if enemy then
+                            doAntiGrab(friend, enemy)
+                            break
+                        end
                     end
                 end
             end
+            task.wait(0.1)
         end
-        task.wait(0.1)
-    end
-end)
-
-
+    end)
+end
 
 UtilityTab:AddSection({
     Name = "환경 및 시야"
@@ -5533,7 +5538,7 @@ UtilityTab:AddButton({
     end,
 })
 
--- 2. 안개 제거
+
 UtilityTab:AddButton({
     Name = "맵 안개 제거",
     Callback = function()
@@ -5543,7 +5548,7 @@ UtilityTab:AddButton({
     end,
 })
 
--- 3. 시간대 변경 (낮)
+
 UtilityTab:AddButton({
     Name = "서버 시간 낮으로 고정",
     Callback = function()
@@ -5555,7 +5560,7 @@ UtilityTab:AddButton({
 
 
 
--- 4. 캐릭터 반투명화
+
 UtilityTab:AddToggle({
     Name = "유령 모드 (반투명)",
     
@@ -5575,7 +5580,7 @@ UtilityTab:AddToggle({
     end,
 })
 
--- 5. 머리 크기 변경 (시각용)
+
 UtilityTab:AddSlider({
     Name = "머리 크기 조절",
     save = true,
@@ -5593,7 +5598,7 @@ UtilityTab:AddSlider({
     end,
 })
 
--- 6. 내 이름 숨기기 (로컬 전용)
+
 UtilityTab:AddToggle({
     Name = "내 머리위 이름표 제거",
     save = true,
@@ -5614,7 +5619,7 @@ UtilityTab:AddSection({
     Name = "시스템"
 })
 
--- 7. 핑 확인
+
 UtilityTab:AddButton({
     Name = "현재 핑(Ping) 확인",
     Callback = function()
@@ -5625,7 +5630,7 @@ UtilityTab:AddButton({
     end,
 })
 
--- 8. 물리 렉 감소
+
 UtilityTab:AddButton({
     Name = "물리 렉 최적화",
     Callback = function()
@@ -5641,7 +5646,7 @@ UtilityTab:AddButton({
 })
 
 
--- 10. 채팅창 숨기기/보이기
+
 UtilityTab:AddToggle({
     Name = "채팅 UI 숨기기",
     
@@ -5676,7 +5681,7 @@ UtilityTab:AddToggle({
 })
 
 
-local clicking = false
+--local clicking = false
 
 
 UtilityTab:AddButton({
@@ -5694,7 +5699,7 @@ UtilityTab:AddButton({
 })
 
 
--- 4. 1인칭 강제 고정 (조준 시 유용)
+
 UtilityTab:AddToggle({
     Name = "강제 1인칭 시점",
     
@@ -5773,7 +5778,7 @@ RankTab:AddButton({
         loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
         
         OrionLib:MakeNotification({
-            Name = "🔓 iY 어드민",
+            Name = " iY 어드민",
             Content = "Infinite Yield 어드민 스크립트가 실행되었습니다.",
             Time = 5
         })
@@ -7016,7 +7021,7 @@ local function removeFromLoop1(name)
 end
 
 
-DropdownV1 = ListTab:AddDropdown({
+DropdownV1 = ListTab:AddPlayersDropdown({
     Name = "타겟리스트(미작동)",
     Options = playersInLoop1V,
     MultipleOptions = true,
@@ -7062,9 +7067,7 @@ local WhiteListToggle = antiTab:AddToggle({
         ForWhiteList(Value)
     end
 })
-antiTab:AddSection({
-	Name = "하우스 브레이커"
-})
+
 
 
 
