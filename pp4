@@ -9786,26 +9786,25 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
-playerTab:AddToggle({
+PlayerTab:AddToggle({
     Name = "걷기 속도",
     Default = false,
     Callback = function(v)
-        _G.tpwalk = v
+        walkSpeedT = v
     end
 })
 
-playerTab:AddSlider({
+PlayerTab:AddSlider({
     Name = "걷기 속도 조절",
     Min = 10,
-    Max = 300,
+    Max = 700,
     Default = 80,
     Increment = 5,
     ValueName = "Speed",
     Callback = function(v)
-        _G.tpspeed = v
+        walkSpeedV = v
     end
 })
-
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
     Default = false,
