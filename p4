@@ -5389,111 +5389,126 @@ local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLin
 local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
 local antiGrabActive = false
-local processing = false
+local busy = false
 
 _G.PlayerToRemoveGrab = {}
 
+local FD_Tab = FD:AddTab("Combat")
 
 local function isGrabbedBy(player)
-    local char = player.Character
     local myChar = localPlayer.Character
-    if not char or not myChar then return false end
+    local targetChar = player.Character
+    if not myChar or not targetChar then return false end
 
-    local head = myChar:FindFirstChild("Head")
-    if not head then return false end
+    local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+    if not myRoot or not targetRoot then return false end
 
-    local ownerTag = head:FindFirstChild("PartOwner")
-    if ownerTag and ownerTag:IsA("StringValue") then
-        return ownerTag.Value == player.Name
+    if (myRoot.Position - targetRoot.Position).Magnitude > 6 then return false end
+
+    for _, v in ipairs(myChar:GetDescendants()) do
+        if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+            local p0 = v.Part0
+            local p1 = v.Part1
+            if p0 and p1 then
+                if p0:IsDescendantOf(targetChar) or p1:IsDescendantOf(targetChar) then
+                    return true
+                end
+            end
+        end
     end
 
     return false
 end
 
-
 local function doAntiGrab(player)
-    if processing then return end
-    processing = true
+    if busy then return end
+    busy = true
 
     local myChar = localPlayer.Character
-    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-    if not myHrp then processing = false return end
+    local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+    if not myRoot then busy = false return end
 
-    local origin = myHrp.CFrame
+    local origin = myRoot.CFrame
 
-    local char = player.Character
-    if not char then processing = false return end
+    local targetChar = player.Character
+    if not targetChar then busy = false return end
 
-    local root = char:FindFirstChild("HumanoidRootPart")
-    local torso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
-    if not root or not torso then processing = false return end
-
+    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+    local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+    if not targetRoot or not torso then busy = false return end
 
     if typeof(TP) == "function" then
         local ok, cf = TP(player)
         if ok and cf then
-            myHrp.CFrame = cf * CFrame.new(0, -10, 0)
+            myRoot.CFrame = cf * CFrame.new(0, -10, 0)
         end
     else
-        myHrp.CFrame = root.CFrame * CFrame.new(0, -10, 0)
+        myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
     end
 
-    
-    for i = 1, 5 do
+    for i = 1, 6 do
         if SetNetworkOwner then
-            SetNetworkOwner:FireServer(torso, root.CFrame)
+            SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
         end
-
         if DestroyGrabLine then
-            DestroyGrabLine:FireServer(char)
+            DestroyGrabLine:FireServer(targetChar)
         end
-
         if EndGrabEarly then
             EndGrabEarly:FireServer()
         end
-
         task.wait(0.05)
     end
 
-    
-    pcall(function()
-        for _, v in ipairs(myChar:GetDescendants()) do
-            if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
-                v:Destroy()
-            end
+    for _, v in ipairs(myChar:GetDescendants()) do
+        if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+            v:Destroy()
         end
-    end)
+    end
 
     task.wait(0.2)
 
-    
     if typeof(BACK) == "function" then
         BACK(origin)
     else
-        myHrp.CFrame = origin
+        myRoot.CFrame = origin
     end
 
-    processing = false
+    busy = false
 end
 
-
 FDTab:AddPlayersDropdown({
-	Name = "안티 그랩 대상",
-	Default = "",
-	MultipleSelection = true,
-	SearchBar = true,
-	Callback = function(Value)
-		_G.PlayerToRemoveGrab = Value
-	end    
+    Name = "안티 그랩 대상",
+    Default = "",
+    MultipleSelection = true,
+    SearchBar = true,
+    Callback = function(Value)
+        _G.PlayerToRemoveGrab = Value
+    end    
 })
 
 FDTab:AddToggle({
-	Name = "안티 그랩",
-	Default = false,
-	Callback = function(Value)
-		antiGrabActive = Value
-	end
+    Name = "안티 그랩",
+    Default = false,
+    Callback = function(Value)
+        antiGrabActive = Value
+    end
 })
+
+task.spawn(function()
+    while true do
+        if antiGrabActive and not busy then
+            for _, name in ipairs(_G.PlayerToRemoveGrab) do
+                local player = Players:FindFirstChild(name)
+                if player and isGrabbedBy(player) then
+                    doAntiGrab(player)
+                    break
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+end)
 
 
 task.spawn(function()
