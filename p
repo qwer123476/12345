@@ -5377,8 +5377,6 @@ end
 end
 
 ----------------------------------------------------------------------------------------- [ 시작 설정 ]
-
-
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
 local rs = game:GetService("ReplicatedStorage")
@@ -5392,8 +5390,6 @@ local antiGrabActive = false
 local busy = false
 
 _G.PlayerToRemoveGrab = {}
-
--------local FD_Tab = FD:AddTab("Combat")
 
 local function isGrabbedBy(player)
     local myChar = localPlayer.Character
@@ -5483,7 +5479,16 @@ FDTab:AddPlayersDropdown({
     MultipleSelection = true,
     SearchBar = true,
     Callback = function(Value)
-        _G.PlayerToRemoveGrab = Value
+        _G.PlayerToRemoveGrab = {}
+        if typeof(Value) == "table" then
+            for k, v in pairs(Value) do
+                if typeof(v) == "string" then
+                    table.insert(_G.PlayerToRemoveGrab, v)
+                elseif typeof(k) == "string" and v == true then
+                    table.insert(_G.PlayerToRemoveGrab, k)
+                end
+            end
+        end
     end    
 })
 
@@ -5511,19 +5516,7 @@ task.spawn(function()
 end)
 
 
-task.spawn(function()
-    while true do
-        if antiGrabActive then
-            for _, name in ipairs(_G.PlayerToRemoveGrab) do
-                local player = Players:FindFirstChild(name)
-                if player and isGrabbedBy(player) then
-                    doAntiGrab(player) 
-                end
-            end
-        end
-        task.wait(0.1)
-    end
-end)
+
 UtilityTab:AddSection({
     Name = "환경 및 시야"
 })
