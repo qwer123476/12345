@@ -9766,6 +9766,7 @@ local run = game:GetService("RunService")
 local walkSpeedT = false
 local walkSpeedV = 80
 local activeLoop = nil
+local speedConn = nil
 
 local function updateWalkSpeedF()
     local char = plr.Character
@@ -9775,15 +9776,35 @@ local function updateWalkSpeedF()
     local root = char:FindFirstChild("HumanoidRootPart")
     if not hum or not root then return end
 
+    hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+
     local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
 
     if activeLoop then
         activeLoop:Disconnect()
         activeLoop = nil
     end
+    if speedConn then
+        speedConn:Disconnect()
+        speedConn = nil
+    end
 
     if walkSpeedT then
         hum.WalkSpeed = speed
+
+        speedConn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+            if walkSpeedT then
+                if hum.WalkSpeed ~= speed then
+                    hum.WalkSpeed = speed
+                end
+            else
+                if speedConn then
+                    speedConn:Disconnect()
+                    speedConn = nil
+                end
+            end
+        end)
 
         activeLoop = run.Heartbeat:Connect(function()
             if not char:IsDescendantOf(workspace) then
@@ -9812,6 +9833,8 @@ local function updateWalkSpeedF()
         end)
     else
         hum.WalkSpeed = 16
+        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+        hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
     end
 end
 
@@ -9845,6 +9868,7 @@ plr.CharacterAdded:Connect(function(char)
     task.wait(0.1)
     updateWalkSpeedF()
 end)
+
 
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
