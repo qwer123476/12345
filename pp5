@@ -10661,6 +10661,11 @@ _G.AutoSlotHRP = nil
 _G.AutoSlotTP = false
 _G.AutoSaveHouseTime = false
 
+local function waitExact(sec)
+    local start = os.clock()
+    repeat task.wait() until os.clock() - start >= sec
+end
+
 local function updateHRP(char)
     local hrp = char:WaitForChild("HumanoidRootPart", 5)
     if hrp then
@@ -10700,7 +10705,7 @@ function ProcessSlot()
     task.spawn(function()
         while true do
             if not _G.AutoSlotTP then
-                task.wait(1)
+                waitExact(1)
                 continue
             end
 
@@ -10710,8 +10715,12 @@ function ProcessSlot()
 
             if handle and timeText and _G.AutoSlotHRP then
                 while timeText.Text ~= "0:00" and _G.AutoSlotTP do
+                    local t0 = os.clock()
                     _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
-                    task.wait(0.3)
+                    local dt = os.clock() - t0
+                    if dt < 0.3 then
+                        waitExact(0.3 - dt)
+                    end
                 end
 
                 if not _G.AutoSlotTP then continue end
@@ -10719,18 +10728,18 @@ function ProcessSlot()
                 pcall(function()
                     _G.AutoSlotLabel:Set("Time: 0:00")
                     _G.AutoSlotHRP.CFrame = CFrame.new(handle.Position + Vector3.new(0, -3, 0))
-                    task.wait(0.5)
+                    waitExact(0.5)
                     _G.AutoSlotHRP.Anchored = true
-                    task.wait(0.5)
+                    waitExact(0.5)
                     ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner"):FireServer(handle, CFrame.new(handle.Position))
-                    task.wait(0.8)
+                    waitExact(0.8)
                     _G.AutoSlotHRP.Anchored = false
                 end)
 
-                task.wait(1)
+                waitExact(1)
             else
                 _G.AutoSlotLabel:Set("Time: ...")
-                task.wait(0.5)
+                waitExact(0.5)
             end
         end
     end)
@@ -10776,6 +10785,8 @@ end
 function StartHouseLoop()
     task.spawn(function()
         while _G.AutoSaveHouseTime do
+            local loopStart = os.clock()
+
             local timeObj = findHouseTime()
 
             if timeObj then
@@ -10791,14 +10802,17 @@ function StartHouseLoop()
                             _G.AutoSlotHRP.CFrame = CFrame.new(timeObj.Parent.Parent.Position + Vector3.new(0,5,0))
                         end
 
-                        task.wait(1)
+                        waitExact(1)
                     until timeObj.Value > 15 or not timeObj.Parent
 
                     loadPosition()
                 end
             end
 
-            task.wait(2)
+            local elapsed = os.clock() - loopStart
+            if elapsed < 2 then
+                waitExact(2 - elapsed)
+            end
         end
     end)
 end
@@ -10813,7 +10827,6 @@ plotTab:AddToggle({
         end
     end
 })
-
 funTab:AddSection({
     Name = "꼬추 만들기"
 })
