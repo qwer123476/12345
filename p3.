@@ -9794,12 +9794,11 @@ function tpWalkF()
 
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-        hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, false)
-        
-        local originalAirControl = hum.AirControl
+        hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
 
+        local stepSignal = run.PreSimulation or run.Stepped
         local conn
-        conn = run.Heartbeat:Connect(function()
+        conn = stepSignal:Connect(function()
             if not char:IsDescendantOf(workspace) then
                 conn:Disconnect()
                 return
@@ -9821,9 +9820,24 @@ function tpWalkF()
                         0
                     )
                 end
-                hum.WalkSpeed = 16
-            else
-                hum.AirControl = originalAirControl
+            end
+        end)
+
+        local animConn
+        animConn = run.RenderStepped:Connect(function()
+            if not char:IsDescendantOf(workspace) then
+                animConn:Disconnect()
+                return
+            end
+
+            if walkSpeedT then
+                for _, track in ipairs(hum:GetPlayingAnimationTracks()) do
+                    local name = track.Name:lower()
+                    local id = track.Animation and track.Animation.AnimationId:lower() or ""
+                    if name:find("walk") or name:find("run") or id:find("walk") or id:find("run") then
+                        track:AdjustSpeed(1)
+                    end
+                end
             end
         end)
     end
