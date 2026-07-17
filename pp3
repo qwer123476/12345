@@ -10650,6 +10650,7 @@ local Dropdown = plotTab:AddDropdown({
 local Button = plotTab:AddButton({
     Name = "텔포",
     Callback = function()
+end})
         local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
