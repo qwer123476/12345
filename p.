@@ -9439,7 +9439,7 @@ local AntiInPlots = antiTab:AddToggle({
 })
 --AntiInPlots:Set(true)
 
-local AntiVoid = antiTab:AddToggle({
+antiTab:AddToggle({
     Name = "안티 보이드",
     
     save = true,
@@ -9456,7 +9456,7 @@ local AntiVoid = antiTab:AddToggle({
 antiTab:AddSection({
     Name = "붐"
 })
-local AntiExplode = antiTab:AddToggle({
+antiTab:AddToggle({
     Name = "안티 폭탄",
     
     save = true,
