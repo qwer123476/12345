@@ -9896,7 +9896,7 @@ local PermRag = antiTab:AddToggle({
 antiTab:AddSection({
     Name = "GUCCI"
 })
-local AutoGucci = antiTab:AddToggle({
+antiTab:AddToggle({
     Name = "오토구찌(킥위험 약간 있음!)  <font color='rgb(255,146,123)'>[블롭맨]</font>     <font color='rgb(0,0,255)'>[프리미엄]</font>",
     
     save = true,
@@ -9922,7 +9922,7 @@ local AutoGucci = antiTab:AddToggle({
     end
 })
 
-local AutoGucciV2 = antiTab:AddToggle({
+antiTab:AddToggle({
     Name = "기차 구찌",
     
     save = true,
@@ -10085,7 +10085,7 @@ local NoClipToggle = playerTab:AddToggle({
         updateNoClipF()
     end
 })
-local isWaterWalking = false
+--local isWaterWalking = false
 
 local function setWaterWalk(state)
     local workspaceMap = workspace:FindFirstChild("Map")
@@ -10738,7 +10738,7 @@ plotTab:AddToggle({
 })
 
 plotTab:AddSection({Name="무한 하우스"})
-local houseLabel = plotTab:AddLabel("House: 지정된 집없음")
+local houseLabel = plotTab:AddLabel("House: 0")
 
 local function getPlot()
     local plots = Workspace:FindFirstChild("Plots")
