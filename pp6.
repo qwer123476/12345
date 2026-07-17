@@ -11618,7 +11618,7 @@ keybindTab:AddSection({
 	Name = "ESP"
 })
 
-local PCLDView = keybindTab:AddToggle({
+keybindTab:AddToggle({
     Name = "PCLD 보기",
     Default = false,
     save = true,
@@ -11629,7 +11629,7 @@ local PCLDView = keybindTab:AddToggle({
     end
 })
 
-local ViewTool = keybindTab:AddToggle({
+keybindTab:AddToggle({
     Name = "표창,쿠나이 보기",
     Default = false,
     save = true,
