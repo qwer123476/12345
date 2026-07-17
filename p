@@ -9776,7 +9776,7 @@ function tpWalkF()
     playerTab:AddSlider({
         Name = "걷기속도 조절",
         Min = 10,
-        Max = 500,
+        Max = 800,
         Default = 80,
         Increment = 10,
         ValueName = "속도",
@@ -9795,11 +9795,16 @@ function tpWalkF()
         run.RenderStepped:Connect(function()
             if walkSpeedT then
                 local dir = hum.MoveDirection
+
                 root.AssemblyLinearVelocity = Vector3.new(
                     dir.X * walkSpeedV,
                     root.AssemblyLinearVelocity.Y,
                     dir.Z * walkSpeedV
                 )
+
+                for _,track in pairs(hum:GetPlayingAnimationTracks()) do
+                    track:AdjustSpeed(1)
+                end
             end
         end)
     end
