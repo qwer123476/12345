@@ -9779,7 +9779,7 @@ local function updateWalkSpeedF()
 
     hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, false)
+    --hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, false)
 
     local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
 
