@@ -9791,20 +9791,29 @@ function tpWalkF()
     local function apply(char)
         local hum = char:WaitForChild("Humanoid")
         local root = char:WaitForChild("HumanoidRootPart")
+        local defaultSpeed = hum.WalkSpeed
 
-        run.RenderStepped:Connect(function()
+        local conn
+        conn = run.RenderStepped:Connect(function(dt)
+            if not char:IsDescendantOf(workspace) then
+                conn:Disconnect()
+                return
+            end
+
             if walkSpeedT then
                 local dir = hum.MoveDirection
-
-                root.AssemblyLinearVelocity = Vector3.new(
-                    dir.X * walkSpeedV,
-                    root.AssemblyLinearVelocity.Y,
-                    dir.Z * walkSpeedV
-                )
-
-                for _,track in pairs(hum:GetPlayingAnimationTracks()) do
-                    track:AdjustSpeed(1)
+                if dir.Magnitude > 0 then
+                    if walkSpeedV > defaultSpeed then
+                        hum.WalkSpeed = defaultSpeed
+                        root.CFrame = root.CFrame + (dir * (walkSpeedV - defaultSpeed) * dt)
+                    else
+                        hum.WalkSpeed = walkSpeedV
+                    end
+                else
+                    hum.WalkSpeed = defaultSpeed
                 end
+            else
+                hum.WalkSpeed = defaultSpeed
             end
         end)
     end
@@ -9814,6 +9823,7 @@ function tpWalkF()
 end
 
 tpWalkF()
+
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
     Default = false,
