@@ -710,32 +710,6 @@ function BlobDropR()
 end
 
 
-function updateWalkSpeedF()
-    local tpConn
-
-    local function apply(char)
-        if tpConn then
-            tpConn:Disconnect()
-            tpConn = nil
-        end
-
-        local hrp = char:WaitForChild("HumanoidRootPart")
-        local hum = char:WaitForChild("Humanoid")
-
-        local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
-
-        tpConn = game:GetService("RunService").Heartbeat:Connect(function(dt)
-            if not walkSpeedT then return end
-            if hum.MoveDirection.Magnitude > 0 then
-                local move = hum.MoveDirection * speed * dt * 5
-                hrp.CFrame = hrp.CFrame + move
-            end
-        end)
-    end
-
-    if plr.Character then apply(plr.Character) end
-    plr.CharacterAdded:Connect(apply)
-end
 
 function updateJumpPowerF()
     local function apply(char)
@@ -9786,28 +9760,51 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
-walkSpeedT = false
-walkSpeedV = 80
+function tpWalkF()
 
-playerTab:AddToggle({
-    Name = "걷기 속도",
-    Default = false,
-    Callback = function(v)
-        walkSpeedT = v
-    end
-})
+    walkSpeedT = false
+    walkSpeedV = 80
 
-playerTab:AddSlider({
-    Name = "걷기 속도 조절",
-    Min = 10,
-    Max = 700,
-    Default = 80,
-    Increment = 5,
-    ValueName = "Speed",
-    Callback = function(v)
-        walkSpeedV = v
+    playerTab:AddToggle({
+        Name = "걷기속도",
+        Default = false,
+        Callback = function(v)
+            walkSpeedT = v
+        end
+    })
+
+    playerTab:AddSlider({
+        Name = "걷기속도 조절",
+        Min = 10,
+        Max = 800,
+        Default = 80,
+        Increment = 5,
+        ValueName = "속도",
+        Callback = function(v)
+            walkSpeedV = v
+        end
+    })
+
+    local plr = game.Players.LocalPlayer
+    local run = game:GetService("RunService")
+
+    local function apply(char)
+        local hum = char:WaitForChild("Humanoid")
+        local root = char:WaitForChild("HumanoidRootPart")
+
+        run.RenderStepped:Connect(function(dt)
+            if walkSpeedT then
+                local move = hum.MoveDirection * walkSpeedV * dt
+                root.CFrame = root.CFrame + move
+            end
+        end)
     end
-})
+
+    if plr.Character then apply(plr.Character) end
+    plr.CharacterAdded:Connect(apply)
+end
+
+tpWalkF()
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
     Default = false,
