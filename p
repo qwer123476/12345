@@ -10683,7 +10683,7 @@ local function loadPos()
 end
 
 plotTab:AddSection({Name="오토 슬롯"})
-_G.AutoSlotLabel = plotTab:AddLabel("Time: ...")
+local slotLabel = plotTab:AddLabel("Time: ...")
 
 local function getSlot()
     local f = Workspace:FindFirstChild("Slots")
@@ -10693,9 +10693,9 @@ local function getSlot()
     return t[math.random(1,#t)]
 end
 
-local function getTime(slot)
+local function getSlotTime(slot)
     local ok,r = pcall(function()
-        return slot.Screen.SlotGui.TimeLeftFrame.TimeText
+        return slot:FindFirstChild("TimeText",true)
     end)
     return ok and r or nil
 end
@@ -10706,12 +10706,12 @@ local function slotLoop()
             if not _G.AutoSlotTP then waitExact(1) continue end
 
             local s = getSlot()
-            local h = s and s:FindFirstChild("SlotHandle") and s.SlotHandle:FindFirstChild("Handle")
-            local t = s and getTime(s)
+            local h = s and s:FindFirstChild("Handle",true)
+            local t = s and getSlotTime(s)
 
             if h and t and _G.AutoSlotHRP then
                 while t.Text ~= "0:00" and _G.AutoSlotTP do
-                    _G.AutoSlotLabel:Set("Time: "..t.Text)
+                    slotLabel:Set("Time: "..t.Text)
                     waitExact(0.3)
                 end
 
@@ -10720,7 +10720,7 @@ local function slotLoop()
                 savePos()
 
                 pcall(function()
-                    _G.AutoSlotLabel:Set("Time: 0:00")
+                    slotLabel:Set("Time: 0:00")
                     _G.AutoSlotHRP.CFrame = CFrame.new(h.Position + Vector3.new(0,-3,0))
                     waitExact(0.5)
                     _G.AutoSlotHRP.Anchored = true
@@ -10733,7 +10733,7 @@ local function slotLoop()
                 waitExact(1)
                 loadPos()
             else
-                _G.AutoSlotLabel:Set("Time: ...")
+                slotLabel:Set("Time: ...")
                 waitExact(0.5)
             end
         end
@@ -10750,51 +10750,63 @@ plotTab:AddToggle({
 })
 
 plotTab:AddSection({Name="무한 하우스"})
-local houseLabel = plotTab:AddLabel("House: 0")
+local houseLabel = plotTab:AddLabel("House: ...")
 
-local function getPlot()
-    local plots = Workspace:FindFirstChild("Plots")
-    if not plots then return end
-    for _,v in pairs(plots:GetChildren()) do
-        if v:FindFirstChild("Owner") and v.Owner.Value == player then
-            return v
+local function getMyPlot()
+    for _,p in pairs(Workspace:GetDescendants()) do
+        if p.Name:lower():find("plot") then
+            local owner = p:FindFirstChild("Owner",true)
+            if owner and tostring(owner.Value) == player.Name then
+                return p
+            end
         end
     end
 end
 
-local function getTimer()
-    local p = getPlot()
-    if not p then return end
-    return p:FindFirstChild("TimeLeft",true)
+local function getHouseTime(plot)
+    local gui = plot:FindFirstChildWhichIsA("BillboardGui",true)
+        or plot:FindFirstChildWhichIsA("SurfaceGui",true)
+
+    if not gui then return end
+
+    local t = gui:FindFirstChild("TimeText",true)
+    return t
+end
+
+local function getPlotCenter(plot)
+    local part = plot:FindFirstChildWhichIsA("BasePart",true)
+    return part
 end
 
 local function houseLoop()
     task.spawn(function()
-        local busy=false
         while true do
             if not _G.AutoHouse then waitExact(1) continue end
 
-            local timer = getTimer()
+            local plot = getMyPlot()
+            local timeObj = plot and getHouseTime(plot)
 
-            if timer and typeof(timer.Value)=="number" then
-                houseLabel:Set("House: "..timer.Value)
+            if plot and timeObj and _G.AutoSlotHRP then
+                houseLabel:Set("House: "..timeObj.Text)
 
-                if timer.Value <= 20 and timer.Value > 0 and not busy then
-                    local p = getPlot()
-                    local spawn = p and (p:FindFirstChild("Spawn") or p:FindFirstChildWhichIsA("BasePart"))
+                local min,sec = string.match(timeObj.Text,"(%d+):(%d+)")
+                min = tonumber(min) or 0
+                sec = tonumber(sec) or 0
+                local total = min*60+sec
 
-                    if spawn then
-                        busy=true
-                        savePos()
-                        _G.AutoSlotHRP.CFrame = spawn.CFrame + Vector3.new(0,3,0)
+                if total <= 20 then
+                    savePos()
 
-                        repeat waitExact(1)
-                        until not timer or timer.Value > 20 or timer.Value <= 0
-
-                        loadPos()
-                        busy=false
+                    local center = getPlotCenter(plot)
+                    if center then
+                        _G.AutoSlotHRP.CFrame = center.CFrame + Vector3.new(0,5,0)
                     end
+
+                    waitExact(2)
+                    loadPos()
                 end
+            else
+                houseLabel:Set("House: ...")
             end
 
             waitExact(0.5)
