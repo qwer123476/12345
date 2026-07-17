@@ -5380,7 +5380,7 @@ end
 
 
 local Players = game:GetService("Players")
-local localPlayer = game.Players.LocalPlayer
+local localPlayer = Players.LocalPlayer
 local rs = game:GetService("ReplicatedStorage")
 
 local GrabEvents = rs:FindFirstChild("GrabEvents")
@@ -5389,9 +5389,10 @@ local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLin
 local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
 local antiGrabActive = false
-local antiGrabTargetList = {}
 local antiGrabProcessing = {}
 local antiGrabThreads = {}
+
+_G.PlayerToRemoveGrab = {}
 
 local function processAntiGrabPlayer(player)
     if not player then return false end
@@ -5415,10 +5416,9 @@ local function processAntiGrabPlayer(player)
     local tpRunning = true
     local tpThread = task.spawn(function()
         while tpRunning do
-            if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
-               (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
-                break
-            end
+            if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then break end
+            local hum = localPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health <= 0 then break end
 
             local ok, cf = false, nil
             if typeof(TP) == "function" then
@@ -5428,7 +5428,8 @@ local function processAntiGrabPlayer(player)
                 end
             else
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    ok, cf = true, player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -10, 0)
+                    ok = true
+                    cf = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -10, 0)
                 end
             end
 
@@ -5442,29 +5443,26 @@ local function processAntiGrabPlayer(player)
 
     local success = false
     local startTime = tick()
-    local timeout = 0.1
 
-    while tpRunning and tick() - startTime < timeout do
-        if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or 
-           (localPlayer.Character:FindFirstChildOfClass("Humanoid") and localPlayer.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
-                break
-        end
+    while tpRunning and tick() - startTime < 0.1 do
+        if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then break end
+        local myHumCheck = localPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if myHumCheck and myHumCheck.Health <= 0 then break end
 
-        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") or 
-           (player.Character:FindFirstChildOfClass("Humanoid") and player.Character:FindFirstChildOfClass("Humanoid").Health <= 0) then
-            break
-        end
+        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then break end
+        local hum2 = player.Character:FindFirstChildOfClass("Humanoid")
+        if hum2 and hum2.Health <= 0 then break end
 
-        if SetNetworkOwner and SetNetworkOwner.FireServer then
+        if SetNetworkOwner then
             SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
         end
         
-        if DestroyGrabLine and DestroyGrabLine.FireServer then
+        if DestroyGrabLine then
             DestroyGrabLine:FireServer(character)
             DestroyGrabLine:FireServer(torso)
         end
 
-        if EndGrabEarly and EndGrabEarly.FireServer then
+        if EndGrabEarly then
             EndGrabEarly:FireServer()
         end
 
@@ -5502,12 +5500,12 @@ local function processAntiGrabPlayer(player)
         end)
     end
 
-    if originCF and myHrp and myHrp.Parent then
+    if originCF and myHrp then
         myHrp.CFrame = originCF
         task.wait(1)
     end
 
-    if originCF and myHrp and myHrp.Parent then 
+    if originCF and myHrp then 
         if typeof(BACK) == "function" then
             BACK(originCF)
         else
@@ -5515,63 +5513,22 @@ local function processAntiGrabPlayer(player)
         end
     end
 
-    if myHum and myHum.Parent then
+    if myHum then
         myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
     end
     
     return success
 end
 
-local antiGrabDropdown = FDTab:AddDropdown({
-    Name = "보호할 사람고르기  <font color='rgb(0,0,255)'>[다수]</font>",
-    Options = {},
-    
-    Default = {},
-    MultipleOptions = true,
-    Flag = "df",
-    Callback = function(Options)
-        local selectedTable = {}
-        if typeof(Options) == "table" then
-            for k, v in pairs(Options) do
-                if typeof(v) == "string" then
-                    table.insert(selectedTable, v)
-                elseif v == true and typeof(k) == "string" then
-                    table.insert(selectedTable, k)
-                elseif typeof(v) == "table" and typeof(v.Value) == "string" then
-                    table.insert(selectedTable, v.Value)
-                end
-            end
-        elseif typeof(Options) == "string" then
-            table.insert(selectedTable, Options)
-        end
-        antiGrabTargetList = selectedTable
-    end
+FDTab:AddPlayersDropdown({
+	Name = "안티 그랩 대상",
+	Default = "",
+	MultipleSelection = true,
+	SearchBar = true,
+	Callback = function(Value)
+		_G.PlayerToRemoveGrab = Value
+	end    
 })
-
-local function refreshAntiGrabDropdown()
-    local playerNames = {}
-    for _, player in ipairs(game.Players:GetPlayers()) do
-        if player ~= localPlayer then
-            table.insert(playerNames, player.Name)
-        end
-    end
-    antiGrabDropdown:Refresh(playerNames, true)
-    
-    local updatedOptions = {}
-    local validList = {}
-    for _, currentName in ipairs(antiGrabTargetList) do
-        if game.Players:FindFirstChild(currentName) then
-            table.insert(validList, currentName)
-            updatedOptions[currentName] = true
-        end
-    end
-    antiGrabTargetList = validList
-    antiGrabDropdown:Set(updatedOptions)
-end
-
-game.Players.PlayerAdded:Connect(refreshAntiGrabDropdown)
-game.Players.PlayerRemoving:Connect(refreshAntiGrabDropdown)
-refreshAntiGrabDropdown()
 
 task.spawn(function()
     while true do
@@ -5579,9 +5536,8 @@ task.spawn(function()
             local myChar = localPlayer.Character
             local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
             if myChar and myHum and myHum.Health > 0 then
-                for i = 1, #antiGrabTargetList do
-                    local name = antiGrabTargetList[i]
-                    local player = game.Players:FindFirstChild(name)
+                for _, name in ipairs(_G.PlayerToRemoveGrab) do
+                    local player = Players:FindFirstChild(name)
                     if player and not table.find(Whitelist, player.Name) then
                         local character = player.Character
                         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -5611,71 +5567,8 @@ task.spawn(function()
     end
 end)
 
-FDTab:AddTextbox({
-    Name = "보호 대상 추가 (닉네임 입력)   <font color='rgb(0,0,255)'>[한명]</font>",
-    Default = "",
-    PlaceholderText = "플레이어 이름 입력",
-    TextDisappear = true,
-    Callback = function(Text)
-        if Text == "" or Text == nil then return end
-        
-        local foundPlayer = nil
-        local searchPattern = Text:lower()
-        
-        for _, p in ipairs(game.Players:GetPlayers()) do
-            if p ~= localPlayer then
-                local nameMatch = p.Name:lower():sub(1, #searchPattern) == searchPattern
-                local displayMatch = p.DisplayName:lower():sub(1, #searchPattern) == searchPattern
-                
-                if nameMatch or displayMatch then
-                    foundPlayer = p
-                    break
-                end
-            end
-        end
-
-        if foundPlayer then
-            if not table.find(antiGrabTargetList, foundPlayer.Name) then
-                table.insert(antiGrabTargetList, foundPlayer.Name)
-                
-                if OrionLib then
-                    OrionLib:MakeNotification({
-                        Name = "[ ☑️ ]",
-                        Content = foundPlayer.Name .. " - 추가",
-                        Time = 2
-                    })
-                end
-                
-                local updatedOptions = {}
-                for _, currentName in ipairs(antiGrabTargetList) do
-                    updatedOptions[currentName] = true
-                end
-                antiGrabDropdown:Set(updatedOptions)
-            else
-                if OrionLib then
-                    OrionLib:MakeNotification({
-                        Name = "[ 💠 ]",
-                        Content = foundPlayer.Name .. " - 이미 추가됐어요",
-                        Time = 2
-                    })
-                end
-            end
-        else
-            if OrionLib then
-                OrionLib:MakeNotification({
-                    Name = "[ ❌ ]",
-                    Content = "찾을 수 없어요!",
-                    Time = 2
-                })
-            end
-        end
-    end
-})
-
 FDTab:AddToggle({
-    Name = "보호 시스템 활성화   <font color='rgb(255,0,0)'>[오너쉽]</font>",
-    
-    save = true,
+    Name = "보호 시스템 활성화",
     Flag = "AntiGrabUniqueSystemToggle",
     Callback = function(Value)
         antiGrabActive = Value
@@ -5698,7 +5591,6 @@ FDTab:AddToggle({
         end
     end
 })
-
 
 UtilityTab:AddSection({
     Name = "환경 및 시야"
