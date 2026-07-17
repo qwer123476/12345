@@ -9764,10 +9764,10 @@ playerTab:AddSection({
 local plr = game.Players.LocalPlayer
 local run = game:GetService("RunService")
 
-local walkSpeedT = false
-local walkSpeedV = 80
-local activeLoop = nil
-local speedConn = nil
+-local walkSpeedT = false
+--local walkSpeedV = 80
+--local activeLoop = nil
+--local speedConn = nil
 
 local function updateWalkSpeedF()
     local char = plr.Character
@@ -9846,7 +9846,7 @@ playerTab:AddToggle({
 playerTab:AddSlider({
     Name = "걷기속도 조절",
     Min = 10,
-    Max = 800,
+    Max = 135,
     Default = 80,
     Increment = 10,
     ValueName = "속도",
