@@ -9786,7 +9786,7 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
-PlayerTab:AddToggle({
+playerTab:AddToggle({
     Name = "걷기 속도",
     Default = false,
     Callback = function(v)
@@ -9794,7 +9794,7 @@ PlayerTab:AddToggle({
     end
 })
 
-PlayerTab:AddSlider({
+playerTab:AddSlider({
     Name = "걷기 속도 조절",
     Min = 10,
     Max = 700,
