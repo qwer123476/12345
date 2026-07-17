@@ -10660,6 +10660,7 @@ local localPlayer = Players.LocalPlayer
 _G.AutoSlotHRP = nil
 _G.AutoSlotTP = false
 _G.AutoSaveHouseTime = false
+_G.ReturnPos = nil
 
 local function waitExact(sec)
     local start = os.clock()
@@ -10679,8 +10680,19 @@ end
 
 localPlayer.CharacterAdded:Connect(updateHRP)
 
-plotTab:AddSection({Name = "오토 슬롯"})
+local function saveReturn()
+    if _G.AutoSlotHRP then
+        _G.ReturnPos = _G.AutoSlotHRP.CFrame
+    end
+end
 
+local function loadReturn()
+    if _G.AutoSlotHRP and _G.ReturnPos then
+        _G.AutoSlotHRP.CFrame = _G.ReturnPos
+    end
+end
+
+plotTab:AddSection({Name = "오토 슬롯"})
 _G.AutoSlotLabel = plotTab:AddLabel("Time: ...")
 
 function GetRandomSlot()
@@ -10693,10 +10705,7 @@ end
 
 function GetTimeText(slot)
     local ok, result = pcall(function()
-        return slot:FindFirstChild("Screen")
-            and slot.Screen:FindFirstChild("SlotGui")
-            and slot.Screen.SlotGui:FindFirstChild("TimeLeftFrame")
-            and slot.Screen.SlotGui.TimeLeftFrame:FindFirstChild("TimeText")
+        return slot.Screen.SlotGui.TimeLeftFrame.TimeText
     end)
     return ok and result or nil
 end
@@ -10715,15 +10724,13 @@ function ProcessSlot()
 
             if handle and timeText and _G.AutoSlotHRP then
                 while timeText.Text ~= "0:00" and _G.AutoSlotTP do
-                    local t0 = os.clock()
                     _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
-                    local dt = os.clock() - t0
-                    if dt < 0.3 then
-                        waitExact(0.3 - dt)
-                    end
+                    waitExact(0.3)
                 end
 
                 if not _G.AutoSlotTP then continue end
+
+                saveReturn()
 
                 pcall(function()
                     _G.AutoSlotLabel:Set("Time: 0:00")
@@ -10737,6 +10744,7 @@ function ProcessSlot()
                 end)
 
                 waitExact(1)
+                loadReturn()
             else
                 _G.AutoSlotLabel:Set("Time: ...")
                 waitExact(0.5)
@@ -10757,7 +10765,6 @@ plotTab:AddToggle({
 })
 
 plotTab:AddSection({Name = "무한 하우스 타임"})
-
 local TimeInHouseLabel = plotTab:AddLabel("House Time: 0")
 
 function findHouseTime()
@@ -10770,49 +10777,29 @@ function findHouseTime()
     end
 end
 
-function savePosition()
-    if _G.AutoSlotHRP then
-        _G.SavedPos = _G.AutoSlotHRP.CFrame
-    end
-end
-
-function loadPosition()
-    if _G.AutoSlotHRP and _G.SavedPos then
-        _G.AutoSlotHRP.CFrame = _G.SavedPos
-    end
-end
-
 function StartHouseLoop()
     task.spawn(function()
         while _G.AutoSaveHouseTime do
-            local loopStart = os.clock()
-
             local timeObj = findHouseTime()
 
-            if timeObj then
+            if timeObj and timeObj.Parent and timeObj.Parent.Parent then
                 TimeInHouseLabel:Set("House Time: " .. timeObj.Value)
 
-                if timeObj.Value < 20 then
-                    savePosition()
+                if timeObj.Value <= 20 then
+                    saveReturn()
 
-                    repeat
-                        if not _G.AutoSaveHouseTime then break end
-
+                    while _G.AutoSaveHouseTime and timeObj.Parent and timeObj.Value <= 20 do
                         if _G.AutoSlotHRP then
                             _G.AutoSlotHRP.CFrame = CFrame.new(timeObj.Parent.Parent.Position + Vector3.new(0,5,0))
                         end
+                        waitExact()
+                    end
 
-                        waitExact(1)
-                    until timeObj.Value > 15 or not timeObj.Parent
-
-                    loadPosition()
+                    loadReturn()
                 end
             end
 
-            local elapsed = os.clock() - loopStart
-            if elapsed < 2 then
-                waitExact(2 - elapsed)
-            end
+            waitExact(1)
         end
     end)
 end
@@ -10827,6 +10814,7 @@ plotTab:AddToggle({
         end
     end
 })
+
 funTab:AddSection({
     Name = "꼬추 만들기"
 })
