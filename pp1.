@@ -10591,20 +10591,7 @@ AuraTab:AddToggle({
     end
 })
 
-AuraTab:AddToggle({
-    Name = "토이 플링   <font color='rgb(0,195,0)'>[파카]</font>",
-    CurrentValue = false,
-    Callback = function(Value)
-        if Value then
-            Rayfield:Notify({
-                Title = "안내",
-                Content = "이 기능은 파카전용기능입니다",
-                Duration = 3,
-                Image = nil,
-            })
-        end
-    end,
-})
+
 
  funTab:AddButton({
    Name = "텔포",
@@ -10663,329 +10650,165 @@ local Dropdown = plotTab:AddDropdown({
 local Button = plotTab:AddButton({
     Name = "텔포",
     Callback = function()
-        local plr = game.Players.LocalPlayer
-        local char = plr.Character or plr.CharacterAdded:Wait()
-        local hrp = char:WaitForChild("HumanoidRootPart")
+        local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
-        local pos = teleportLocations[selectedLocation]
-        if not pos then
-            return
-        end
+local localPlayer = Players.LocalPlayer
 
-        hrp.CFrame = CFrame.new(pos[1], pos[2], pos[3])
-    end,
-})
+_G.AutoSlotHRP = nil
+_G.AutoSlotTP = false
+_G.AutoSaveHouseTime = false
 
-pcall(function()
-        localPlayer.CharacterAdded:Connect(function(char)
-            pcall(function()
-                char:WaitForChild("HumanoidRootPart")
-                _G.AutoSlotHRP = char:FindFirstChild("HumanoidRootPart")
-            end)
-        end)
-        if localPlayer.Character then
-            pcall(function()
-                _G.AutoSlotHRP = localPlayer.Character:WaitForChild("HumanoidRootPart")
-            end)
-        else
-            localPlayer.CharacterAdded:Wait()
-            pcall(function()
-                _G.AutoSlotHRP = localPlayer.Character:WaitForChild("HumanoidRootPart")
-            end)
+local function updateHRP(char)
+    local hrp = char:WaitForChild("HumanoidRootPart", 5)
+    if hrp then
+        _G.AutoSlotHRP = hrp
+    end
+end
+
+if localPlayer.Character then
+    updateHRP(localPlayer.Character)
+end
+
+localPlayer.CharacterAdded:Connect(updateHRP)
+
+_G.AutoSlotLabel = plotTab:AddLabel("Time: ...")
+local TimeInHouseLabel = plotTab:AddLabel("House Time: 0")
+
+function GetRandomSlot()
+    local slotsFolder = Workspace:FindFirstChild("Slots")
+    if not slotsFolder then
+        return nil
+    end
+    local slots = slotsFolder:GetChildren()
+    if #slots == 0 then return nil end
+    return slots[math.random(1, #slots)]
+end
+
+function GetTimeText(slot)
+    local ok, result = pcall(function()
+        return slot:FindFirstChild("Screen")
+            and slot.Screen:FindFirstChild("SlotGui")
+            and slot.Screen.SlotGui:FindFirstChild("TimeLeftFrame")
+            and slot.Screen.SlotGui.TimeLeftFrame:FindFirstChild("TimeText")
+    end)
+    return ok and result or nil
+end
+
+function ProcessSlot()
+    task.spawn(function()
+        while true do
+            if not _G.AutoSlotTP then
+                task.wait(1)
+                continue
+            end
+
+            local slot = GetRandomSlot()
+            local handle = slot and slot:FindFirstChild("SlotHandle") and slot.SlotHandle:FindFirstChild("Handle")
+            local timeText = slot and GetTimeText(slot)
+
+            if handle and timeText and _G.AutoSlotHRP then
+                while timeText.Text ~= "0:00" and _G.AutoSlotTP do
+                    _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
+                    task.wait(0.3)
+                end
+
+                if not _G.AutoSlotTP then continue end
+
+                pcall(function()
+                    _G.AutoSlotLabel:Set("Time: 0:00")
+                    _G.AutoSlotHRP.CFrame = CFrame.new(handle.Position + Vector3.new(0, -3, 0))
+                    task.wait(0.5)
+                    _G.AutoSlotHRP.Anchored = true
+                    task.wait(0.5)
+                    ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner"):FireServer(handle, CFrame.new(handle.Position))
+                    task.wait(0.8)
+                    _G.AutoSlotHRP.Anchored = false
+                end)
+
+                task.wait(1)
+            else
+                _G.AutoSlotLabel:Set("Time: ...")
+                task.wait(0.5)
+            end
         end
     end)
-
-    function GetRandomSlot()
-        local s, r = pcall(function()
-            return workspace.Slots:GetChildren()
-        end)
-        return (s and #r > 0 and r[math.random(1, #r)]) or nil
-    end
-
-    function GetTimeText(slot)
-        local s, r = pcall(function()
-            return slot.Screen.SlotGui.TimeLeftFrame.TimeText
-        end)
-        return (s and r) or nil
-    end
-
-    function ProcessSlot()
-        task.spawn(function()
-            local cf = (_G.AutoSlotHRP and _G.AutoSlotHRP.CFrame) or CFrame.new(0, 100, 0)
-            while true do
-                if not _G.AutoSlotTP then task.wait(1) continue end
-                local slot = GetRandomSlot()
-                local handle = (slot and slot:FindFirstChild("SlotHandle") and slot.SlotHandle:FindFirstChild("Handle")) or nil
-                local timeText = (slot and GetTimeText(slot)) or nil
-                if handle and timeText and _G.AutoSlotHRP then
-                    while timeText.Text ~= "0:00" and _G.AutoSlotTP do
-                        pcall(function() _G.AutoSlotLabel:Set("Time: " .. timeText.Text) end)
-                        task.wait(0.3)
-                    end
-                    if not _G.AutoSlotTP then continue end
-                    pcall(function()
-                        _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
-                        if not (_G.AutoSlotTP and _G.AutoSlotHRP) then return end
-                        _G.AutoSlotHRP.CFrame = CFrame.new(handle.Position + Vector3.new(0, -3, 0))
-                        task.wait(0.5)
-                        if not _G.AutoSlotTP then return end
-                        _G.AutoSlotHRP.Anchored = true
-                        task.wait(0.5)
-                        if not _G.AutoSlotTP then return end
-                        game.ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(handle, CFrame.new(handle.Position))
-                        task.wait(0.8)
-                        if not _G.AutoSlotTP then return end
-                        _G.AutoSlotHRP.CFrame = cf
-                        _G.AutoSlotHRP.Anchored = false
-                    end)
-                    local t = 0
-                    while timeText.Text == "0:00" and t < 7 and _G.AutoSlotTP do
-                        pcall(function() _G.AutoSlotLabel:Set("Time: " .. timeText.Text) end)
-                        task.wait(0.5)
-                        t += 0.5
-                    end
-                else
-                    task.wait(0.5)
-                end
-            end
-        end)
-    end
-
-
-_G.AutoSlotTP = false
-
-
-local function logMessage(msg)
-    print("[AutoSlot]: " .. tostring(msg))
 end
-
-if not ProcessSlot then
-    function ProcessSlot()
-        task.spawn(function()
-            while _G.AutoSlotTP do
-                
-                print("Running AutoSlot...")
-                task.wait(1)
-            end
-        end)
-    end
-end
-
-
-if not plotTab then
-    warn("plotTab is nil")
-    return
-end
-
 
 plotTab:AddToggle({
     Name = "오토 슬롯",
     Default = false,
-    Flag = "autoslot_toggle",
-
-    Callback = function(Value)
-        _G.AutoSlotTP = Value
-
-        if Value then
-            
-            if ProcessSlot then
-                pcall(ProcessSlot)
-            else
-                warn("ProcessSlot is nil")
-                return
-            end
-
-            pcall(function()
-                logMessage(
-                    linguage == "pt-br" 
-                    and "Auto-Slot ativado" 
-                    or "Auto-Slot activated"
-                )
-            end)
-
-        else
-            pcall(function()
-                logMessage(
-                    linguage == "pt-br" 
-                    and "Auto-Slot desativado" 
-                    or "Auto-Slot deactivated"
-                )
-            end)
+    Callback = function(v)
+        _G.AutoSlotTP = v
+        if v then
+            ProcessSlot()
         end
     end
 })
+
+function findHouseTime()
+    for _, v in pairs(Workspace:GetDescendants()) do
+        if v.Name == "TimeRemainingNum" and v:IsA("IntValue") then
+            if v.Parent and tostring(v.Parent.Value) == localPlayer.Name then
+                return v
+            end
+        end
+    end
+end
+
+function savePosition()
+    if _G.AutoSlotHRP then
+        _G.SavedPos = _G.AutoSlotHRP.CFrame
+    end
+end
+
+function loadPosition()
+    if _G.AutoSlotHRP and _G.SavedPos then
+        _G.AutoSlotHRP.CFrame = _G.SavedPos
+    end
+end
+
+function StartHouseLoop()
     task.spawn(function()
-        while true do
-            pcall(function()
-                if not _G.AutoSlotTP then
-                    local slot = GetRandomSlot()
-                    local timeText = (slot and GetTimeText(slot)) or nil
-                    if timeText then
-                        _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
-                    else
-                        _G.AutoSlotLabel:Set("Time: ...")
-                    end
-                end
-            end)
-            task.wait(1)
-        end
-    end)
+        while _G.AutoSaveHouseTime do
+            local timeObj = findHouseTime()
 
-plotTab:AddSection({
-        Name = "하우스 시간 무한"
-    })
+            if timeObj then
+                TimeInHouseLabel:Set("House Time: " .. timeObj.Value)
 
--- VariÃ¡veis Globais
-local RTime = nil
-local TimeInHouseLabel = plotTab:AddLabel("Time: 0")
+                if timeObj.Value < 20 then
+                    savePosition()
 
--- FunÃ§Ã£o auxiliar para obter HumanoidRootPart
-local function getCharacterRootPart()
-    if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        return localPlayer.Character.HumanoidRootPart
-    end
-    return nil
-end
+                    repeat
+                        if not _G.AutoSaveHouseTime then break end
 
--- Monitora quando o jogador entra em uma plot
-pcall(function()
-    local plots = workspaceService and workspaceService:FindFirstChild("Plots")
-    if not plots then return end
-    plots.DescendantAdded:Connect(function(child)
-        if child.Name == "Value" and 
-           tostring(child.Parent) == "ThisPlotsOwners" and 
-           child.Value == localPlayer.Name then
-            
-            RTime = child:WaitForChild("TimeRemainingNum", 1)
-            if RTime then
-                RTime.Changed:Connect(function(timeInHouse)
-                    TimeInHouseLabel:Set("Time: " .. timeInHouse)
-                end)
-            end
-        end
-    end)
-end)
+                        if _G.AutoSlotHRP then
+                            _G.AutoSlotHRP.CFrame = CFrame.new(timeObj.Parent.Parent.Position + Vector3.new(0,5,0))
+                        end
 
+                        task.wait(1)
+                    until timeObj.Value > 15 or not timeObj.Parent
 
-local function teleportToLocation(location)
-    local rootPart = getCharacterRootPart()
-    if not rootPart then return end
-    
-    if location == "Spin" and _G.SavedPositionInSpin then
-        rootPart.CFrame = _G.SavedPositionInSpin
-    elseif location == "House" and _G.SavedPositionOutHouse then
-        rootPart.CFrame = _G.SavedPositionOutHouse
-    end
-end
-
-
-function saveCharacterPosition(location)
-    local rootPart = getCharacterRootPart()
-    if not rootPart then return end
-    
-    if location == "House" then
-        _G.SavedPositionOutHouse = rootPart.CFrame
-    elseif location == "Spin" then
-        _G.SavedPositionInSpin = rootPart.CFrame
-    end
-end
-
-
-local function updateTimeInHouseLabel()
-    while true do
-        pcall(function()
-            if workspaceService and workspaceService.Plots then
-                for _, descendant in pairs(workspaceService.Plots:GetDescendants()) do
-                    if descendant.Name == "TimeRemainingNum" and 
-                       descendant.Parent and 
-                       descendant.Parent.Value == localPlayer.Name then
-                        
-                        _G.RemainingTimeInHouse = descendant
-                        
-                        descendant.Changed:Connect(function(timeRemaining)
-                            TimeInHouseLabel:Set("Time: " .. timeRemaining)
-                        end)
-                        break
-                    end
+                    loadPosition()
                 end
             end
-        end)
-        task.wait(1)
-    end
-end
 
-task.spawn(updateTimeInHouseLabel)
+            task.wait(2)
+        end
+    end)
+end
 
 plotTab:AddToggle({
     Name = "하우스 시간 무한",
     Default = false,
-    Callback = function(isEnabled)
-        _G.AutoSaveHouseTime = isEnabled
-        
-        if isEnabled then
-            task.spawn(function()
-                while _G.AutoSaveHouseTime do
-                    pcall(function()
-                        if localPlayer.InfiniteHouseTime and localPlayer.InfiniteHouseTime.Value then
-                            preserveTimeToggle:Set(false)
-                            OrionLib:MakeNotification({
-                                Name = "House",
-                                Content = "You won Infinite Gamepass House!",
-                                Image = "rbxassetid://4483345998",
-                                Time = 5
-                            })
-                            return
-                        end
-                        
-                        local remainingTime = _G.RemainingTimeInHouse
-                        
-                        if typeof(remainingTime) == "Instance" and
-                           remainingTime:IsDescendantOf(workspaceService) and
-                           remainingTime:IsA("IntValue") then
-                            
-                            local plotArea = remainingTime.Parent.Parent.Parent.Parent:FindFirstChild("PlotArea")
-                            
-                            if remainingTime.Value < 20 and ChangeActivityPriority(4) then
-                                OrionLib:MakeNotification({
-                                    Name = "하우스 시간",
-                                    Content = "Time: " .. remainingTime.Value .. "s - Tp!",
-                                    Image = "rbxassetid://4483345998",
-                                    Time = 3
-                                })
-                                
-                                saveCharacterPosition("House")
-                                task.wait()
-                                
-                                repeat
-                                    if not _G.AutoSaveHouseTime then break end
-                                    
-                                    local rootPart = getCharacterRootPart()
-                                    if rootPart and plotArea then
-                                        rootPart.CFrame = CFrame.new(plotArea.Position) + Vector3.new(0, 5, 0)
-                                    end
-                                    
-                                    task.wait(1)
-                                until not remainingTime.Parent or 
-                                      not _G.AutoSaveHouseTime or 
-                                      remainingTime.Value > 15
-                                
-                                if _G.AutoSaveHouseTime then
-                                    teleportToLocation("House")
-                                end
-                                
-                                ChangeActivityPriority(0)
-                            end
-                        end
-                    end)
-                    task.wait(2)
-                end
-            end)
+    Callback = function(v)
+        _G.AutoSaveHouseTime = v
+        if v then
+            StartHouseLoop()
         end
-    end,
-    Save = true,
-    Flag = "autosavehousetimeremaining_toggle"
+    end
 })
-
 
 funTab:AddSection({
     Name = "꼬추 만들기"
