@@ -5436,7 +5436,7 @@ local function processAntiGrabPlayer(player)
             if ok and cf then
                 myHrp.CFrame = cf
             end
-            task.wait(0.01)
+            task.wait()
         end
     end)
     table.insert(antiGrabThreads, tpThread)
@@ -5444,14 +5444,8 @@ local function processAntiGrabPlayer(player)
     local success = false
     local startTime = tick()
 
-    while tpRunning and tick() - startTime < 0.1 do
-        if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then break end
-        local myHumCheck = localPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if myHumCheck and myHumCheck.Health <= 0 then break end
-
+    while tpRunning and tick() - startTime < 0.2 do
         if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then break end
-        local hum2 = player.Character:FindFirstChildOfClass("Humanoid")
-        if hum2 and hum2.Health <= 0 then break end
 
         if SetNetworkOwner then
             SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
@@ -5471,7 +5465,27 @@ local function processAntiGrabPlayer(player)
             success = true
             break
         end
-        task.wait(0.2)
+
+        task.wait(0.05)
+    end
+
+    local confirmStart = tick()
+    while tick() - confirmStart < 0.25 do
+        local ownerTag = head:FindFirstChild("PartOwner")
+        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == localPlayer.Name then
+            success = true
+        else
+            if SetNetworkOwner then
+                SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+            end
+        end
+
+        if DestroyGrabLine then
+            DestroyGrabLine:FireServer(character)
+            DestroyGrabLine:FireServer(torso)
+        end
+
+        task.wait(0.05)
     end
 
     tpRunning = false
@@ -5500,10 +5514,7 @@ local function processAntiGrabPlayer(player)
         end)
     end
 
-    if originCF and myHrp then
-        myHrp.CFrame = originCF
-        task.wait(1)
-    end
+    task.wait(0.5)
 
     if originCF and myHrp then 
         if typeof(BACK) == "function" then
@@ -5519,6 +5530,8 @@ local function processAntiGrabPlayer(player)
     
     return success
 end
+
+
 
 FDTab:AddPlayersDropdown({
 	Name = "안티 그랩 대상",
@@ -5538,60 +5551,28 @@ task.spawn(function()
             if myChar and myHum and myHum.Health > 0 then
                 for _, name in ipairs(_G.PlayerToRemoveGrab) do
                     local player = Players:FindFirstChild(name)
-                    if player and not table.find(Whitelist, player.Name) then
-                        local character = player.Character
-                        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                        local head = character and character:FindFirstChild("Head")
-
-                        if not PPs:FindFirstChild(name) and not inv:FindFirstChild(name) then
-                            if humanoid and humanoid.Health > 0 and head then
-                                local ownerTag = head:FindFirstChild("PartOwner")
-                                if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value ~= "" and ownerTag.Value ~= localPlayer.Name then
-                                    if not antiGrabProcessing[player] then
-                                        antiGrabProcessing[player] = true
-                                        
-                                        task.spawn(function()
-                                            processAntiGrabPlayer(player)
-                                            task.wait(0.5)
-                                            antiGrabProcessing[player] = nil
-                                        end)
-                                    end
-                                end
-                            end
-                        end
+                    if player and not antiGrabProcessing[player] then
+                        antiGrabProcessing[player] = true
+                        task.spawn(function()
+                            pcall(function()
+                                processAntiGrabPlayer(player)
+                            end)
+                            antiGrabProcessing[player] = nil
+                        end)
                     end
                 end
             end
         end
-        task.wait(0.03)
+        task.wait(0.1)
     end
 end)
-
 FDTab:AddToggle({
-    Name = "보호 시스템 활성화",
-    Flag = "AntiGrabUniqueSystemToggle",
-    Callback = function(Value)
-        antiGrabActive = Value
-        
-        local myChar = localPlayer.Character
-        local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-        
-        if Value then
-            if myHum then
-                myHum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-                myHum.Sit = false
-                myHum.PlatformStand = false
-                myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
-            end
-        else
-            table.clear(antiGrabProcessing)
-            if myHum then
-                myHum:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-            end
-        end
-    end
+	Name = "안티 그랩  활성화",
+	Default = false,
+	Callback = function(Value)
+		antiGrabActive = Value
+	end
 })
-
 UtilityTab:AddSection({
     Name = "환경 및 시야"
 })
