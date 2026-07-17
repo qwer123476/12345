@@ -10454,25 +10454,7 @@ AuraTab:AddToggle({
 })
 --local runningCombinedAura = false
 
-AuraTab:AddTextbox({
-    Name = "아우라지름[반경]인풋",
-    PlaceholderText = "기본값: 30",
-    save = true,
-    Flag = "kwksooz",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(Text)
-        local num = tonumber(Text)
-        if num then
-            if num < 5 then
-                auraRadius = 5
-            else
-                auraRadius = num
-            end
-        else
-            auraRadius = 30
-        end
-    end
-})
+
 
 AuraTab:AddToggle({
     Name = "필링 아우라    <font color='rgb(0,0,255)'>[프리미엄]</font>",
@@ -10647,12 +10629,12 @@ local Dropdown = plotTab:AddDropdown({
     end,
 })
 
-local Button = plotTab:AddButton({
+plotTab:AddButton({
     Name = "텔포",
     Callback = function()
 end})
-        local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        --local Players = game:GetService("Players")
+--local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
@@ -10977,7 +10959,7 @@ funTab:AddButton({
 
 
 
-local InputValue = ""
+--local InputValue = ""
 
 funTab:AddTextbox({
 	Name = "쿠나이",
@@ -11363,7 +11345,7 @@ keybindTab:AddBind({
     Callback = tpF
 })
 
-local Tper = keybindTab:AddToggle({
+keybindTab:AddToggle({
     Name = "3인칭",
     CurrentValue = false,
     Flag = "AutoSitBlobman",
