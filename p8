@@ -10632,9 +10632,21 @@ local Dropdown = plotTab:AddDropdown({
 plotTab:AddButton({
     Name = "텔포",
     Callback = function()
-end})
-        --local Players = game:GetService("Players")
---local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local plr = game.Players.LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local pos = teleportLocations[selectedLocation]  
+    if not pos then  
+        return  
+    end  
+
+    hrp.CFrame = CFrame.new(pos[1], pos[2], pos[3])  
+end,
+
+})
+        local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
