@@ -5393,7 +5393,7 @@ local busy = false
 
 _G.PlayerToRemoveGrab = {}
 
-local FD_Tab = FD:AddTab("Combat")
+-------local FD_Tab = FD:AddTab("Combat")
 
 local function isGrabbedBy(player)
     local myChar = localPlayer.Character
