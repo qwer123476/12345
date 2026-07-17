@@ -711,26 +711,26 @@ end
 
 
 function updateWalkSpeedF()
+    local tpConn
+
     local function apply(char)
+        if tpConn then
+            tpConn:Disconnect()
+            tpConn = nil
+        end
+
+        local hrp = char:WaitForChild("HumanoidRootPart")
         local hum = char:WaitForChild("Humanoid")
-        
+
         local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
 
-        if walkSpeedT then
-            hum.WalkSpeed = speed
-            local conn
-            conn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-                if walkSpeedT then
-                    if hum.WalkSpeed ~= speed then
-                        hum.WalkSpeed = speed
-                    end
-                else
-                    conn:Disconnect()
-                end
-            end)
-        else
-            hum.WalkSpeed = 80
-        end
+        tpConn = game:GetService("RunService").Heartbeat:Connect(function(dt)
+            if not walkSpeedT then return end
+            if hum.MoveDirection.Magnitude > 0 then
+                local move = hum.MoveDirection * speed * dt * 5
+                hrp.CFrame = hrp.CFrame + move
+            end
+        end)
     end
 
     if plr.Character then apply(plr.Character) end
