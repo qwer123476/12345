@@ -5389,151 +5389,95 @@ local DestroyGrabLine = GrabEvents and GrabEvents:FindFirstChild("DestroyGrabLin
 local EndGrabEarly = GrabEvents and GrabEvents:FindFirstChild("EndGrabEarly")
 
 local antiGrabActive = false
-local antiGrabProcessing = {}
-local antiGrabThreads = {}
+local processing = false
 
 _G.PlayerToRemoveGrab = {}
 
-local function processAntiGrabPlayer(player)
-    if not player then return false end
+
+local function isGrabbedBy(player)
+    local char = player.Character
+    local myChar = localPlayer.Character
+    if not char or not myChar then return false end
+
+    local head = myChar:FindFirstChild("Head")
+    if not head then return false end
+
+    local ownerTag = head:FindFirstChild("PartOwner")
+    if ownerTag and ownerTag:IsA("StringValue") then
+        return ownerTag.Value == player.Name
+    end
+
+    return false
+end
+
+
+local function doAntiGrab(player)
+    if processing then return end
+    processing = true
 
     local myChar = localPlayer.Character
     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
-    local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-    if not myChar or not myHrp or not myHum or myHum.Health <= 0 then
-        return false
+    if not myHrp then processing = false return end
+
+    local origin = myHrp.CFrame
+
+    local char = player.Character
+    if not char then processing = false return end
+
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local torso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+    if not root or not torso then processing = false return end
+
+
+    if typeof(TP) == "function" then
+        local ok, cf = TP(player)
+        if ok and cf then
+            myHrp.CFrame = cf * CFrame.new(0, -10, 0)
+        end
+    else
+        myHrp.CFrame = root.CFrame * CFrame.new(0, -10, 0)
     end
 
-    local character = player.Character
-    if not character then return false end
-    local targetRoot = character:FindFirstChild("HumanoidRootPart")
-    local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
-    local head = character:FindFirstChild("Head")
-    if not targetRoot or not head or not torso then return false end
-
-    local originCF = myHrp.CFrame
-
-    local tpRunning = true
-    local tpThread = task.spawn(function()
-        while tpRunning do
-            if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then break end
-            local hum = localPlayer.Character:FindFirstChildOfClass("Humanoid")
-            if hum and hum.Health <= 0 then break end
-
-            local ok, cf = false, nil
-            if typeof(TP) == "function" then
-                ok, cf = TP(player)
-                if ok and cf then
-                    cf = cf * CFrame.new(0, -10, 0)
-                end
-            else
-                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    ok = true
-                    cf = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -10, 0)
-                end
-            end
-
-            if ok and cf then
-                myHrp.CFrame = cf
-            end
-            task.wait()
-        end
-    end)
-    table.insert(antiGrabThreads, tpThread)
-
-    local success = false
-    local startTime = tick()
-
-    while tpRunning and tick() - startTime < 0.2 do
-        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then break end
-
+    
+    for i = 1, 5 do
         if SetNetworkOwner then
-            SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
+            SetNetworkOwner:FireServer(torso, root.CFrame)
         end
-        
+
         if DestroyGrabLine then
-            DestroyGrabLine:FireServer(character)
-            DestroyGrabLine:FireServer(torso)
+            DestroyGrabLine:FireServer(char)
         end
 
         if EndGrabEarly then
             EndGrabEarly:FireServer()
         end
 
-        local ownerTag = head:FindFirstChild("PartOwner")
-        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == localPlayer.Name then
-            success = true
-            break
-        end
-
         task.wait(0.05)
     end
 
-    local confirmStart = tick()
-    while tick() - confirmStart < 0.25 do
-        local ownerTag = head:FindFirstChild("PartOwner")
-        if ownerTag and ownerTag:IsA("StringValue") and ownerTag.Value == localPlayer.Name then
-            success = true
-        else
-            if SetNetworkOwner then
-                SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
-            end
-        end
-
-        if DestroyGrabLine then
-            DestroyGrabLine:FireServer(character)
-            DestroyGrabLine:FireServer(torso)
-        end
-
-        task.wait(0.05)
-    end
-
-    tpRunning = false
-
-    for _, thread in ipairs(antiGrabThreads) do
-        if thread then
-            pcall(task.cancel, thread)
-        end
-    end
-    table.clear(antiGrabThreads)
-
-    if success then
-        pcall(function()
-            for _, v in ipairs(character:GetDescendants()) do
-                if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") or v:IsA("TouchTransmitter") then
-                    v:Destroy()
-                end
-            end
-            for _, v in ipairs(myChar:GetDescendants()) do
-                if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
-                    if v.Part0 == torso or v.Part1 == torso or v.Part0 == targetRoot or v.Part1 == targetRoot then
-                        v:Destroy()
-                    end
-                end
-            end
-        end)
-    end
-
-    task.wait(0.5)
-
-    if originCF and myHrp then 
-        if typeof(BACK) == "function" then
-            BACK(originCF)
-        else
-            myHrp.CFrame = originCF
-        end
-    end
-
-    if myHum then
-        myHum:ChangeState(Enum.HumanoidStateType.GettingUp)
-    end
     
-    return success
+    pcall(function()
+        for _, v in ipairs(myChar:GetDescendants()) do
+            if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+                v:Destroy()
+            end
+        end
+    end)
+
+    task.wait(0.2)
+
+    
+    if typeof(BACK) == "function" then
+        BACK(origin)
+    else
+        myHrp.CFrame = origin
+    end
+
+    processing = false
 end
 
 
-
-FDTab:AddPlayersDropdown({
+FD:AddPlayersDropdown({
 	Name = "안티 그랩 대상",
 	Default = "",
 	MultipleSelection = true,
@@ -5543,41 +5487,33 @@ FDTab:AddPlayersDropdown({
 	end    
 })
 
+FD:AddToggle({
+	Name = "안티 그랩",
+	Default = false,
+	Callback = function(Value)
+		antiGrabActive = Value
+	end
+})
+
+
 task.spawn(function()
     while true do
         if antiGrabActive then
-            local myChar = localPlayer.Character
-            local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
-            if myChar and myHum and myHum.Health > 0 then
-                for _, name in ipairs(_G.PlayerToRemoveGrab) do
-                    local player = Players:FindFirstChild(name)
-                    if player and not antiGrabProcessing[player] then
-                        antiGrabProcessing[player] = true
-                        task.spawn(function()
-                            pcall(function()
-                                processAntiGrabPlayer(player)
-                            end)
-                            antiGrabProcessing[player] = nil
-                        end)
-                    end
+            for _, name in ipairs(_G.PlayerToRemoveGrab) do
+                local player = Players:FindFirstChild(name)
+                if player and isGrabbedBy(player) then
+                    doAntiGrab(player) 
                 end
             end
         end
         task.wait(0.1)
     end
 end)
-FDTab:AddToggle({
-	Name = "안티 그랩  활성화",
-	Default = false,
-	Callback = function(Value)
-		antiGrabActive = Value
-	end
-})
 UtilityTab:AddSection({
     Name = "환경 및 시야"
 })
 
--- 1. 줌 제한 해제
+
 UtilityTab:AddButton({
     Name = "최대 줌 거리 무제한",
     Callback = function()
