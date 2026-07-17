@@ -5477,7 +5477,7 @@ local function doAntiGrab(player)
 end
 
 
-FD:AddPlayersDropdown({
+FDTab:AddPlayersDropdown({
 	Name = "안티 그랩 대상",
 	Default = "",
 	MultipleSelection = true,
@@ -5487,7 +5487,7 @@ FD:AddPlayersDropdown({
 	end    
 })
 
-FD:AddToggle({
+FDTab:AddToggle({
 	Name = "안티 그랩",
 	Default = false,
 	Callback = function(Value)
