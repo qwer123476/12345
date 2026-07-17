@@ -5391,33 +5391,30 @@ local busy = false
 
 _G.PlayerToRemoveGrab = {}
 
-local function isGrabbedBy(player)
-    local myChar = localPlayer.Character
-    local targetChar = player.Character
-    if not myChar or not targetChar then return false end
+local function findWhoGrabbed(friendPlayer)
+    local friendChar = friendPlayer.Character
+    if not friendChar then return nil end
 
-    local myRoot = myChar:FindFirstChild("HumanoidRootPart")
-    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not myRoot or not targetRoot then return false end
-
-    if (myRoot.Position - targetRoot.Position).Magnitude > 6 then return false end
-
-    for _, v in ipairs(myChar:GetDescendants()) do
+    for _, v in ipairs(friendChar:GetDescendants()) do
         if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
             local p0 = v.Part0
             local p1 = v.Part1
+            
             if p0 and p1 then
-                if p0:IsDescendantOf(targetChar) or p1:IsDescendantOf(targetChar) then
-                    return true
+                for _, enemy in ipairs(Players:GetPlayers()) do
+                    if enemy ~= localPlayer and enemy ~= friendPlayer and enemy.Character then
+                        if p0:IsDescendantOf(enemy.Character) or p1:IsDescendantOf(enemy.Character) then
+                            return enemy
+                        end
+                    end
                 end
             end
         end
     end
-
-    return false
+    return nil
 end
 
-local function doAntiGrab(player)
+local function doAntiGrab(friendPlayer, enemyPlayer)
     if busy then return end
     busy = true
 
@@ -5427,42 +5424,44 @@ local function doAntiGrab(player)
 
     local origin = myRoot.CFrame
 
-    local targetChar = player.Character
-    if not targetChar then busy = false return end
+    local enemyChar = enemyPlayer.Character
+    local enemyRoot = enemyChar and enemyChar:FindFirstChild("HumanoidRootPart")
+    if not enemyRoot then busy = false return end
 
-    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-    if not targetRoot or not torso then busy = false return end
+    myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0, -10, 0)
+    task.wait(0.05)
 
-    if typeof(TP) == "function" then
-        local ok, cf = TP(player)
-        if ok and cf then
-            myRoot.CFrame = cf * CFrame.new(0, -10, 0)
+    if SetNetworkOwner then
+        for _, part in ipairs(enemyChar:GetChildren()) do
+            if part:IsA("BasePart") then
+                SetNetworkOwner:FireServer(part, enemyRoot.CFrame)
+            end
         end
-    else
-        myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
+    end
+    
+    if DestroyGrabLine then
+        DestroyGrabLine:FireServer(enemyChar)
+    end
+    if EndGrabEarly then
+        EndGrabEarly:FireServer()
     end
 
-    for i = 1, 6 do
-        if SetNetworkOwner then
-            SetNetworkOwner:FireServer(torso, targetRoot.CFrame)
-        end
-        if DestroyGrabLine then
-            DestroyGrabLine:FireServer(targetChar)
-        end
-        if EndGrabEarly then
-            EndGrabEarly:FireServer()
-        end
-        task.wait(0.05)
-    end
-
-    for _, v in ipairs(myChar:GetDescendants()) do
+    for _, v in ipairs(enemyChar:GetDescendants()) do
         if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
             v:Destroy()
         end
     end
 
-    task.wait(0.2)
+    local friendChar = friendPlayer.Character
+    if friendChar then
+        for _, v in ipairs(friendChar:GetDescendants()) do
+            if v:IsA("Weld") or v:IsA("WeldConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+                v:Destroy()
+            end
+        end
+    end
+
+    task.wait(0.5)
 
     if typeof(BACK) == "function" then
         BACK(origin)
@@ -5504,10 +5503,13 @@ task.spawn(function()
     while true do
         if antiGrabActive and not busy then
             for _, name in ipairs(_G.PlayerToRemoveGrab) do
-                local player = Players:FindFirstChild(name)
-                if player and isGrabbedBy(player) then
-                    doAntiGrab(player)
-                    break
+                local friend = Players:FindFirstChild(name)
+                if friend and friend ~= localPlayer then
+                    local enemy = findWhoGrabbed(friend)
+                    if enemy then
+                        doAntiGrab(friend, enemy)
+                        break
+                    end
                 end
             end
         end
