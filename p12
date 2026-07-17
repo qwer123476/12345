@@ -9830,7 +9830,7 @@ local function updateWalkSpeedF()
         hum.WalkSpeed = 16
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
-        hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, true)
+        --hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, true)
     end
 end
 
