@@ -10575,19 +10575,7 @@ AuraTab:AddToggle({
 
 
 
- funTab:AddButton({
-   Name = "텔포",
-   Callback = function()
-      if not Value then return end
-      local hrp = plr.Character:WaitForChild("HumanoidRootPart")
-      local pos = hrp.Position
-      hrp.CFrame = CFrame.new(pos.X, Value, pos.Z)
-   end,
-})
-
-funTab:AddSection({
-    Name = "이동할 곳"
-})
+ 
 local teleportLocations = {
     ["스폰"] = {0, -7, 0},
     ["스폰산"] = {494, 163, 175},
