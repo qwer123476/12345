@@ -10650,40 +10650,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
-
-_G.AutoSlotHRP = nil
-_G.AutoSlotTP = false
-_G.AutoHouse = false
-_G.ReturnPos = nil
+local HRP
+local enabled = false
+local returnPos
 
 local function waitExact(t)
     local s = os.clock()
     repeat task.wait() until os.clock() - s >= t
 end
 
-local function updateHRP(c)
-    local h = c:WaitForChild("HumanoidRootPart",5)
-    if h then _G.AutoSlotHRP = h end
+local function setChar(c)
+    HRP = c:WaitForChild("HumanoidRootPart",5)
 end
 
-if player.Character then updateHRP(player.Character) end
-player.CharacterAdded:Connect(updateHRP)
-
-local function savePos()
-    if _G.AutoSlotHRP then
-        _G.ReturnPos = _G.AutoSlotHRP.CFrame
-    end
-end
-
-local function loadPos()
-    if _G.AutoSlotHRP and _G.ReturnPos then
-        _G.AutoSlotHRP.CFrame = _G.ReturnPos
-        _G.ReturnPos = nil
-    end
-end
-
-plotTab:AddSection({Name="오토 슬롯"})
-local slotLabel = plotTab:AddLabel("Time: ...")
+if player.Character then setChar(player.Character) end
+player.CharacterAdded:Connect(setChar)
 
 local function getSlot()
     local f = Workspace:FindFirstChild("Slots")
@@ -10693,133 +10674,61 @@ local function getSlot()
     return t[math.random(1,#t)]
 end
 
-local function getSlotTime(slot)
-    local ok,r = pcall(function()
-        return slot:FindFirstChild("TimeText",true)
-    end)
-    return ok and r or nil
+local function getTime(slot)
+    return slot:FindFirstChild("TimeText",true)
 end
 
-local function slotLoop()
+local function loop(label)
     task.spawn(function()
         while true do
-            if not _G.AutoSlotTP then waitExact(1) continue end
+            if not enabled then waitExact(1) continue end
 
             local s = getSlot()
             local h = s and s:FindFirstChild("Handle",true)
-            local t = s and getSlotTime(s)
+            local t = s and getTime(s)
 
-            if h and t and _G.AutoSlotHRP then
-                while t.Text ~= "0:00" and _G.AutoSlotTP do
-                    slotLabel:Set("Time: "..t.Text)
+            if h and t and HRP then
+                while t.Text ~= "0:00" and enabled do
+                    label:Set("Time: "..t.Text)
                     waitExact(0.3)
                 end
 
-                if not _G.AutoSlotTP then continue end
+                if not enabled then continue end
 
-                savePos()
+                returnPos = HRP.CFrame
 
-                pcall(function()
-                    slotLabel:Set("Time: 0:00")
-                    _G.AutoSlotHRP.CFrame = CFrame.new(h.Position + Vector3.new(0,-3,0))
-                    waitExact(0.5)
-                    _G.AutoSlotHRP.Anchored = true
-                    waitExact(0.5)
-                    ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner"):FireServer(h,CFrame.new(h.Position))
-                    waitExact(0.8)
-                    _G.AutoSlotHRP.Anchored = false
-                end)
+                HRP.CFrame = CFrame.new(h.Position + Vector3.new(0,-3,0))
+                waitExact(0.5)
+                HRP.Anchored = true
+                waitExact(0.5)
+
+                ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner"):FireServer(h,CFrame.new(h.Position))
+
+                waitExact(0.8)
+                HRP.Anchored = false
 
                 waitExact(1)
-                loadPos()
+
+                if returnPos then
+                    HRP.CFrame = returnPos
+                    returnPos = nil
+                end
             else
-                slotLabel:Set("Time: ...")
+                label:Set("Time: ...")
                 waitExact(0.5)
             end
         end
     end)
 end
 
+local label = plotTab:AddLabel("Time: ...")
+
 plotTab:AddToggle({
     Name="오토 슬롯",
     Default=false,
     Callback=function(v)
-        _G.AutoSlotTP=v
-        if v then slotLoop() end
-    end
-})
-
-plotTab:AddSection({Name="무한 하우스"})
-local houseLabel = plotTab:AddLabel("House: ...")
-
-local function getMyPlot()
-    for _,p in pairs(Workspace:GetDescendants()) do
-        if p.Name:lower():find("plot") then
-            local owner = p:FindFirstChild("Owner",true)
-            if owner and tostring(owner.Value) == player.Name then
-                return p
-            end
-        end
-    end
-end
-
-local function getHouseTime(plot)
-    local gui = plot:FindFirstChildWhichIsA("BillboardGui",true)
-        or plot:FindFirstChildWhichIsA("SurfaceGui",true)
-
-    if not gui then return end
-
-    local t = gui:FindFirstChild("TimeText",true)
-    return t
-end
-
-local function getPlotCenter(plot)
-    local part = plot:FindFirstChildWhichIsA("BasePart",true)
-    return part
-end
-
-local function houseLoop()
-    task.spawn(function()
-        while true do
-            if not _G.AutoHouse then waitExact(1) continue end
-
-            local plot = getMyPlot()
-            local timeObj = plot and getHouseTime(plot)
-
-            if plot and timeObj and _G.AutoSlotHRP then
-                houseLabel:Set("House: "..timeObj.Text)
-
-                local min,sec = string.match(timeObj.Text,"(%d+):(%d+)")
-                min = tonumber(min) or 0
-                sec = tonumber(sec) or 0
-                local total = min*60+sec
-
-                if total <= 20 then
-                    savePos()
-
-                    local center = getPlotCenter(plot)
-                    if center then
-                        _G.AutoSlotHRP.CFrame = center.CFrame + Vector3.new(0,5,0)
-                    end
-
-                    waitExact(2)
-                    loadPos()
-                end
-            else
-                houseLabel:Set("House: ...")
-            end
-
-            waitExact(0.5)
-        end
-    end)
-end
-
-plotTab:AddToggle({
-    Name="무한 하우스",
-    Default=false,
-    Callback=function(v)
-        _G.AutoHouse=v
-        if v then houseLoop() end
+        enabled = v
+        if v then loop(label) end
     end
 })
 funTab:AddSection({
