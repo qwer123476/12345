@@ -261,7 +261,7 @@ local FILE = "config.txt"
 local function SaveAll()
     local saveTable = {}
 
-    -- Orion UI 전체 스냅샷
+    
     for flag, obj in pairs(OrionLib.Flags or {}) do
         if obj and obj.Value ~= nil then
             saveTable[flag] = obj.Value
@@ -340,7 +340,7 @@ local function applyRichTextAndEffects(element)
                 v.Text = currentText
                 v.RichText = true
                 
-                -- 글자 뒤에 은은하게 깔리는 검은색 안개(번짐) 효과
+            
                 v.TextStrokeTextColor3 = Color3.fromRGB(0, 0, 0)
                 v.TextStrokeThickness = 2.5
                 v.TextStrokeTransparency = 0.5
@@ -394,7 +394,7 @@ local Window = OrionLib:MakeWindow({
     ConfigFolder = "PacaHub",
     IntroText = "파카허브 [프리미엄]"
 })
--- [Orion UI 탭 생성 문법으로 교체]
+
 local playerTab = Window:MakeTab({Name = "플레이어 설정", Icon = "rbxassetid://6034281935", PremiumOnly = false})    
 local passTab = Window:MakeTab({Name = "패스잠금해제", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 local getTab = Window:MakeTab({Name = "알림", Icon = "rbxassetid://649498361", PremiumOnly = false})
@@ -417,7 +417,7 @@ local lagTab = Window:MakeTab({Name = "렉", Icon = "rbxassetid://6023426923", P
 local CreditsTab = Window:MakeTab({Name = "제작자 한정", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
 
------------------------------------------------------------------------------------------ [ 기능들 ]
+----------------------------------------------------------------------------------------- 기능 함수 
 
 function ForWhiteList(enable)
     WhiteListMode = enable
@@ -515,7 +515,7 @@ function UpdateCurrentBlobman()
 	end
 end
 
-function BlobRelease(blob, target, side) -- 릴리스
+function BlobRelease(blob, target, side) 
      args = {
         [1] = blob:FindFirstChild(side.."Detector"):FindFirstChild(side.."Weld"),
         [2] = target,
@@ -1276,42 +1276,6 @@ function FindVehiclesInInventory(r)
 end
 
  
--- ================== Break House Barrier (하우스 베리어 뚫기) ==================
-local BreakHouseBarrierT = false
-
-function BreakHouseBarrierF()
-    if not BreakHouseBarrierT then 
-        return 
-    end
-
-    task.spawn(function()
-        while BreakHouseBarrierT do
-            for _, plot in ipairs(workspace.Plots:GetChildren()) do
-                for _, part in ipairs(plot:GetDescendants()) do
-                    if part:IsA("BasePart") and (part.Name:find("Barrier") or part.Name:find("Wall") or part.Transparency < 1) then
-                        pcall(function()
-                            part.CanCollide = false
-                            part.Transparency = 0.7  
-                        end)
-                    end
-                end
-            end
-
-            local grabParts = workspace:FindFirstChild("GrabParts")
-            if grabParts then
-                for _, part in ipairs(grabParts:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        pcall(function()
-                            rs.GrabEvents.SetNetworkOwner:FireServer(part, part.CFrame)
-                        end)
-                    end
-                end
-            end
-
-            task.wait(0.1)
-        end
-    end)
-end
 
 function BlobSit()
     if BLOBSIT then return end
@@ -1351,48 +1315,7 @@ function BlobSit()
         end
     end
 
-local function toggleTPUI(state)
-    tpEnabled = state
-    if state then
-        tpGui = Instance.new("ScreenGui")
-        tpGui.Name = "AlpacaMobileTPSystem"
-        tpGui.Parent = game.CoreGui -- Delta/Xeno/ 등 실행기가 CoreGui 권한을 가짐
-        
-       
-        local tpBtn = Instance.new("TextButton")
-        tpBtn.Name = "ElegantMobileTPButton"
-        tpBtn.Parent = tpGui
-        
-        
-        tpBtn.Position = UDim2.new(1, -127, 1, -127) 
-        tpBtn.Size = UDim2.new(0, 60, 0, 60) 
-        
-       
-        tpBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20) 
-        tpBtn.BackgroundTransparency = 0.4
-        tpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tpBtn.Text = "TP"
-        tpBtn.Font = Enum.Font.SourceSansBold
-        tpBtn.TextSize = 17
-        tpBtn.BorderSizePixel = 0
-        
-        local uiCornerBtn = Instance.new("UICorner")
-        uiCornerBtn.CornerRadius = UDim.new(1, 0) 
-        uiCornerBtn.Parent = tpBtn
-        
-        
-        local uiStroke = Instance.new("UIStroke")
-        uiStroke.Color = Color3.fromRGB(0, 217, 255) 
-        uiStroke.Thickness = 2.5
-        uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        uiStroke.Parent = tpBtn
 
-        
-        tpBtn.MouseButton1Click:Connect(performTeleport)
-    else
-        if tpGui then tpGui:Destroy() tpGui = nil end
-    end
-end
 
 
     task.spawn(function()
@@ -5581,7 +5504,7 @@ local function processAntiGrabPlayer(player)
 
     if originCF and myHrp and myHrp.Parent then
         myHrp.CFrame = originCF
-        task.wait(0.5)
+        task.wait(1)
     end
 
     if originCF and myHrp and myHrp.Parent then 
@@ -12186,9 +12109,7 @@ lagTab:AddToggle({
     end
 })
 
--- =========================
--- 🔘 버튼 (여기에 위치)
--- =========================
+
 playerTab:AddButton({
     Name = "저장",
     Callback = function()
@@ -12203,9 +12124,7 @@ playerTab:AddButton({
     end
 })
 
--- =========================
--- 자동 복구
--- =========================
+
 LoadAll()
 function OrionLib:Destroy()
 	Orion:Destroy()
