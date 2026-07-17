@@ -10674,14 +10674,13 @@ end
 
 localPlayer.CharacterAdded:Connect(updateHRP)
 
+plotTab:AddSection({Name = "오토 슬롯"})
+
 _G.AutoSlotLabel = plotTab:AddLabel("Time: ...")
-local TimeInHouseLabel = plotTab:AddLabel("House Time: 0")
 
 function GetRandomSlot()
     local slotsFolder = Workspace:FindFirstChild("Slots")
-    if not slotsFolder then
-        return nil
-    end
+    if not slotsFolder then return nil end
     local slots = slotsFolder:GetChildren()
     if #slots == 0 then return nil end
     return slots[math.random(1, #slots)]
@@ -10747,6 +10746,10 @@ plotTab:AddToggle({
         end
     end
 })
+
+plotTab:AddSection({Name = "무한 하우스 타임"})
+
+local TimeInHouseLabel = plotTab:AddLabel("House Time: 0")
 
 function findHouseTime()
     for _, v in pairs(Workspace:GetDescendants()) do
