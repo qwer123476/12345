@@ -9786,6 +9786,9 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
+walkSpeedT = false
+walkSpeedV = 80
+
 playerTab:AddToggle({
     Name = "걷기 속도",
     Default = false,
