@@ -9760,6 +9760,7 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
+
 local plr = game.Players.LocalPlayer
 local run = game:GetService("RunService")
 
@@ -9778,6 +9779,7 @@ local function updateWalkSpeedF()
 
     hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, false)
 
     local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
 
@@ -9791,18 +9793,11 @@ local function updateWalkSpeedF()
     end
 
     if walkSpeedT then
-        hum.WalkSpeed = speed
+        hum.WalkSpeed = 16
 
         speedConn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-            if walkSpeedT then
-                if hum.WalkSpeed ~= speed then
-                    hum.WalkSpeed = speed
-                end
-            else
-                if speedConn then
-                    speedConn:Disconnect()
-                    speedConn = nil
-                end
+            if walkSpeedT and hum.WalkSpeed ~= 16 then
+                hum.WalkSpeed = 16
             end
         end)
 
@@ -9824,7 +9819,7 @@ local function updateWalkSpeedF()
                     local name = track.Name:lower()
                     local id = track.Animation and track.Animation.AnimationId:lower() or ""
                     if name:find("walk") or name:find("run") or id:find("walk") or id:find("run") then
-                        track:AdjustSpeed(16 / speed)
+                        track:AdjustSpeed(1)
                     end
                 end
             else
@@ -9835,6 +9830,7 @@ local function updateWalkSpeedF()
         hum.WalkSpeed = 16
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
+        hum:SetStateEnabled(Enum.HumanoidStateType.Tripping, true)
     end
 end
 
@@ -9868,7 +9864,6 @@ plr.CharacterAdded:Connect(function(char)
     task.wait(0.1)
     updateWalkSpeedF()
 end)
-
 
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
