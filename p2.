@@ -9777,7 +9777,7 @@ function tpWalkF()
         Name = "걷기속도 조절",
         Min = 10,
         Max = 800,
-        Default = 80,
+        Default = 100,
         Increment = 10,
         ValueName = "속도",
         Callback = function(v)
@@ -9792,13 +9792,19 @@ function tpWalkF()
         local hum = char:WaitForChild("Humanoid")
         local root = char:WaitForChild("HumanoidRootPart")
 
-        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-        hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-        hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+        local bv = root:FindFirstChild("TPWalkVelocity")
+        if bv then bv:Destroy() end
+
+        bv = Instance.new("BodyVelocity")
+        bv.Name = "TPWalkVelocity"
+        bv.MaxForce = Vector3.new(0, 0, 0)
+        bv.Velocity = Vector3.new(0, 0, 0)
+        bv.Parent = root
 
         local conn
-        conn = run.Heartbeat:Connect(function()
+        conn = run.RenderStepped:Connect(function()
             if not char:IsDescendantOf(workspace) then
+                if bv then bv:Destroy() end
                 conn:Disconnect()
                 return
             end
@@ -9806,18 +9812,22 @@ function tpWalkF()
             if walkSpeedT then
                 local dir = hum.MoveDirection
                 if dir.Magnitude > 0 then
-                    root.AssemblyLinearVelocity = Vector3.new(
-                        dir.X * walkSpeedV,
-                        root.AssemblyLinearVelocity.Y,
-                        dir.Z * walkSpeedV
-                    )
+                    bv.MaxForce = Vector3.new(1000000, 0, 1000000)
+                    bv.Velocity = dir * walkSpeedV
+
+                    for _, track in ipairs(hum:GetPlayingAnimationTracks()) do
+                        local name = track.Name:lower()
+                        local id = track.Animation and track.Animation.AnimationId:lower() or ""
+                        if name:find("walk") or name:find("run") or id:find("walk") or id:find("run") then
+                            track:AdjustSpeed(1)
+                        end
+                    end
                 else
-                    root.AssemblyLinearVelocity = Vector3.new(
-                        0,
-                        root.AssemblyLinearVelocity.Y,
-                        0
-                    )
+                    bv.MaxForce = Vector3.new(1000000, 0, 1000000)
+                    bv.Velocity = Vector3.new(0, 0, 0)
                 end
+            else
+                bv.MaxForce = Vector3.new(0, 0, 0)
             end
         end)
     end
