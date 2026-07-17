@@ -9764,7 +9764,7 @@ playerTab:AddSection({
 local plr = game.Players.LocalPlayer
 local run = game:GetService("RunService")
 
--local walkSpeedT = false
+--local walkSpeedT = false
 --local walkSpeedV = 80
 --local activeLoop = nil
 --local speedConn = nil
