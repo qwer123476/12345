@@ -9791,10 +9791,13 @@ function tpWalkF()
     local function apply(char)
         local hum = char:WaitForChild("Humanoid")
         local root = char:WaitForChild("HumanoidRootPart")
-        local defaultSpeed = hum.WalkSpeed
+
+        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+        hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+        hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
 
         local conn
-        conn = run.RenderStepped:Connect(function(dt)
+        conn = run.Heartbeat:Connect(function()
             if not char:IsDescendantOf(workspace) then
                 conn:Disconnect()
                 return
@@ -9803,17 +9806,18 @@ function tpWalkF()
             if walkSpeedT then
                 local dir = hum.MoveDirection
                 if dir.Magnitude > 0 then
-                    if walkSpeedV > defaultSpeed then
-                        hum.WalkSpeed = defaultSpeed
-                        root.CFrame = root.CFrame + (dir * (walkSpeedV - defaultSpeed) * dt)
-                    else
-                        hum.WalkSpeed = walkSpeedV
-                    end
+                    root.AssemblyLinearVelocity = Vector3.new(
+                        dir.X * walkSpeedV,
+                        root.AssemblyLinearVelocity.Y,
+                        dir.Z * walkSpeedV
+                    )
                 else
-                    hum.WalkSpeed = defaultSpeed
+                    root.AssemblyLinearVelocity = Vector3.new(
+                        0,
+                        root.AssemblyLinearVelocity.Y,
+                        0
+                    )
                 end
-            else
-                hum.WalkSpeed = defaultSpeed
             end
         end)
     end
