@@ -9760,17 +9760,70 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
+local plr = game.Players.LocalPlayer
+local run = game:GetService("RunService")
+
 local walkSpeedT = false
 local walkSpeedV = 80
+local activeLoop = nil
+
+local function updateWalkSpeedF()
+    local char = plr.Character
+    if not char then return end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum or not root then return end
+
+    local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
+
+    if activeLoop then
+        activeLoop:Disconnect()
+        activeLoop = nil
+    end
+
+    if walkSpeedT then
+        hum.WalkSpeed = speed
+        hum.AirControl = 1
+
+        activeLoop = run.Heartbeat:Connect(function()
+            if not char:IsDescendantOf(workspace) then
+                if activeLoop then activeLoop:Disconnect() end
+                return
+            end
+
+            if walkSpeedT then
+                hum.AirControl = 1
+                local dir = hum.MoveDirection
+                if dir.Magnitude == 0 then
+                    root.AssemblyLinearVelocity = Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
+                else
+                    root.AssemblyLinearVelocity = Vector3.new(dir.X * speed, root.AssemblyLinearVelocity.Y, dir.Z * speed)
+                end
+
+                for _, track in ipairs(hum:GetPlayingAnimationTracks()) do
+                    local name = track.Name:lower()
+                    local id = track.Animation and track.Animation.AnimationId:lower() or ""
+                    if name:find("walk") or name:find("run") or id:find("walk") or id:find("run") then
+                        track:AdjustSpeed(16 / speed)
+                    end
+                end
+            else
+                if activeLoop then activeLoop:Disconnect() end
+            end
+        end)
+    else
+        hum.WalkSpeed = 16
+        hum.AirControl = 1
+    end
+end
 
 playerTab:AddToggle({
     Name = "걷기속도",
     Default = false,
     Callback = function(v)
         walkSpeedT = v
-        if plr.Character then
-            updateWalkSpeedF()
-        end
+        updateWalkSpeedF()
     end
 })
 
@@ -9783,83 +9836,18 @@ playerTab:AddSlider({
     ValueName = "속도",
     Callback = function(v)
         walkSpeedV = v
-        if walkSpeedT and plr.Character then
+        if walkSpeedT then
             updateWalkSpeedF()
         end
     end
 })
 
-function updateWalkSpeedF()
-    local function apply(char)
-        local hum = char:WaitForChild("Humanoid")
-        local root = char:WaitForChild("HumanoidRootPart")
-        
-        local speed = (type(walkSpeedV) == "number") and walkSpeedV or 80
-
-        local function cleanJoints()
-            hum.AirControl = 1
-            if walkSpeedT then
-                hum.WalkSpeed = speed
-            else
-                hum.WalkSpeed = 16
-            end
-        end
-
-        if walkSpeedT then
-            cleanJoints()
-
-            local conn
-            conn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-                if walkSpeedT then
-                    if hum.WalkSpeed ~= speed then
-                        hum.WalkSpeed = speed
-                    end
-                else
-                    conn:Disconnect()
-                end
-            end)
-
-            local loopConn
-            loopConn = game:GetService("RunService").Heartbeat:Connect(function()
-                if not char:IsDescendantOf(workspace) then
-                    loopConn:Disconnect()
-                    return
-                end
-
-                if walkSpeedT then
-                    hum.AirControl = 1
-                    local dir = hum.MoveDirection
-                    if dir.Magnitude == 0 then
-                        root.AssemblyLinearVelocity = Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
-                    else
-                        root.AssemblyLinearVelocity = Vector3.new(dir.X * speed, root.AssemblyLinearVelocity.Y, dir.Z * speed)
-                    end
-
-                    for _, track in ipairs(hum:GetPlayingAnimationTracks()) do
-                        local name = track.Name:lower()
-                        local id = track.Animation and track.Animation.AnimationId:lower() or ""
-                        if name:find("walk") or name:find("run") or id:find("walk") or id:find("run") then
-                            track:AdjustSpeed(16 / speed)
-                        end
-                    end
-                else
-                    loopConn:Disconnect()
-                end
-            end)
-        else
-            hum.WalkSpeed = 16
-            hum.AirControl = 1
-        end
-    end
-
-    if plr.Character then apply(plr.Character) end
-end
-
 plr.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid")
+    char:WaitForChild("HumanoidRootPart")
     task.wait(0.1)
     updateWalkSpeedF()
 end)
-
 
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
