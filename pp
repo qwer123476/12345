@@ -9776,9 +9776,9 @@ function tpWalkF()
     playerTab:AddSlider({
         Name = "걷기속도 조절",
         Min = 10,
-        Max = 300,
+        Max = 500,
         Default = 80,
-        Increment = 5,
+        Increment = 10,
         ValueName = "속도",
         Callback = function(v)
             walkSpeedV = v
@@ -9786,15 +9786,20 @@ function tpWalkF()
     })
 
     local plr = game.Players.LocalPlayer
+    local run = game:GetService("RunService")
 
     local function apply(char)
         local hum = char:WaitForChild("Humanoid")
+        local root = char:WaitForChild("HumanoidRootPart")
 
-        game:GetService("RunService").RenderStepped:Connect(function()
+        run.RenderStepped:Connect(function()
             if walkSpeedT then
-                hum.WalkSpeed = walkSpeedV
-            else
-                hum.WalkSpeed = 16 
+                local dir = hum.MoveDirection
+                root.AssemblyLinearVelocity = Vector3.new(
+                    dir.X * walkSpeedV,
+                    root.AssemblyLinearVelocity.Y,
+                    dir.Z * walkSpeedV
+                )
             end
         end)
     end
