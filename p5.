@@ -9784,7 +9784,6 @@ local function updateWalkSpeedF()
 
     if walkSpeedT then
         hum.WalkSpeed = speed
-        hum.AirControl = 1
 
         activeLoop = run.Heartbeat:Connect(function()
             if not char:IsDescendantOf(workspace) then
@@ -9793,7 +9792,6 @@ local function updateWalkSpeedF()
             end
 
             if walkSpeedT then
-                hum.AirControl = 1
                 local dir = hum.MoveDirection
                 if dir.Magnitude == 0 then
                     root.AssemblyLinearVelocity = Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
@@ -9814,7 +9812,6 @@ local function updateWalkSpeedF()
         end)
     else
         hum.WalkSpeed = 16
-        hum.AirControl = 1
     end
 end
 
