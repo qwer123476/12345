@@ -9786,30 +9786,25 @@ antiTab:AddToggle({
 playerTab:AddSection({
     Name = "플레이어"
 })
-playerTab:AddToggle({
-    Name = "이동 속도   <font color='rgb(1,1,255)'>[스피드]</font>",
-    
-    save = true,
-    Flag = "2949498",
-    Callback = function(Value)
-        walkSpeedT = Value 
-        updateWalkSpeedF()
+Tab:AddToggle({
+    Name = "걷기 속도",
+    Default = false,
+    Callback = function(v)
+        _G.tpwalk = v
     end
 })
 
-local walkSpeedTextbox = playerTab:AddTextbox({
-    Name = "값",
-    Default = "100",
-    save = true,
-    Placeholder = "Value",
-    RemoveTextAfterFocusLost = true,
-    Flag = "jwjsyzip",
-    Callback = function(Value)
-        walkSpeedV = Value
-        updateWalkSpeedF()
+Tab:AddSlider({
+    Name = "걷기 속도 조절",
+    Min = 10,
+    Max = 300,
+    Default = 80,
+    Increment = 5,
+    ValueName = "Speed",
+    Callback = function(v)
+        _G.tpspeed = v
     end
 })
---walkSpeedInput:Set("80")
 
 playerTab:AddToggle({
     Name = "점프 높이   <font color='rgb(0,25,0)'>[굳]</font>",
