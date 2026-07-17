@@ -7227,7 +7227,7 @@ ListTab:AddTextbox({
     end
 })
 
--- 초기 동기화
+
 task.defer(function()
     UpdateDropdown()
 end)
@@ -7249,24 +7249,7 @@ antiTab:AddSection({
 
 
 
-local BreakHouseBarrierToggle = antiTab:AddToggle({
-    Name = " 집 베리어 무력화",
-    
-    save = true,
-    Flag = "BreakHouseBarrier",
-    Callback = function(Value)
-        BreakHouseBarrierT = Value
-        BreakHouseBarrierF()
-        
-        if Value then
-            OrionLib:MakeNotification({
-                Name = "Break House Barrier",
-                Content = "베리어 뚫기 활성화! 바깥 물건 많이 붙잡고 집 안으로 TP해보세요.",
-                Time = 5
-            })
-        end
-    end
-})
+
 
 LoopTab:AddSection({
     Name = "오토블롭"
