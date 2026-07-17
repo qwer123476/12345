@@ -10655,96 +10655,89 @@ end})
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
-local localPlayer = Players.LocalPlayer
+local player = Players.LocalPlayer
 
 _G.AutoSlotHRP = nil
 _G.AutoSlotTP = false
-_G.AutoSaveHouseTime = false
+_G.AutoHouse = false
 _G.ReturnPos = nil
 
-local function waitExact(sec)
-    local start = os.clock()
-    repeat task.wait() until os.clock() - start >= sec
+local function waitExact(t)
+    local s = os.clock()
+    repeat task.wait() until os.clock() - s >= t
 end
 
-local function updateHRP(char)
-    local hrp = char:WaitForChild("HumanoidRootPart", 5)
-    if hrp then
-        _G.AutoSlotHRP = hrp
-    end
+local function updateHRP(c)
+    local h = c:WaitForChild("HumanoidRootPart",5)
+    if h then _G.AutoSlotHRP = h end
 end
 
-if localPlayer.Character then
-    updateHRP(localPlayer.Character)
-end
+if player.Character then updateHRP(player.Character) end
+player.CharacterAdded:Connect(updateHRP)
 
-localPlayer.CharacterAdded:Connect(updateHRP)
-
-local function saveReturn()
+local function savePos()
     if _G.AutoSlotHRP then
         _G.ReturnPos = _G.AutoSlotHRP.CFrame
     end
 end
 
-local function loadReturn()
+local function loadPos()
     if _G.AutoSlotHRP and _G.ReturnPos then
         _G.AutoSlotHRP.CFrame = _G.ReturnPos
+        _G.ReturnPos = nil
     end
 end
 
-plotTab:AddSection({Name = "오토 슬롯"})
+plotTab:AddSection({Name="오토 슬롯"})
 _G.AutoSlotLabel = plotTab:AddLabel("Time: ...")
 
-function GetRandomSlot()
-    local slotsFolder = Workspace:FindFirstChild("Slots")
-    if not slotsFolder then return nil end
-    local slots = slotsFolder:GetChildren()
-    if #slots == 0 then return nil end
-    return slots[math.random(1, #slots)]
+local function getSlot()
+    local f = Workspace:FindFirstChild("Slots")
+    if not f then return end
+    local t = f:GetChildren()
+    if #t == 0 then return end
+    return t[math.random(1,#t)]
 end
 
-function GetTimeText(slot)
-    local ok, result = pcall(function()
+local function getTime(slot)
+    local ok,r = pcall(function()
         return slot.Screen.SlotGui.TimeLeftFrame.TimeText
     end)
-    return ok and result or nil
+    return ok and r or nil
 end
 
-function ProcessSlot()
+local function slotLoop()
     task.spawn(function()
         while true do
-            if not _G.AutoSlotTP then
-                waitExact(1)
-                continue
-            end
+            if not _G.AutoSlotTP then waitExact(1) continue end
 
-            local slot = GetRandomSlot()
-            local handle = slot and slot:FindFirstChild("SlotHandle") and slot.SlotHandle:FindFirstChild("Handle")
-            local timeText = slot and GetTimeText(slot)
+            local s = getSlot()
+            local h = s and s:FindFirstChild("SlotHandle") and s.SlotHandle:FindFirstChild("Handle")
+            local t = s and getTime(s)
 
-            if handle and timeText and _G.AutoSlotHRP then
-                while timeText.Text ~= "0:00" and _G.AutoSlotTP do
-                    _G.AutoSlotLabel:Set("Time: " .. timeText.Text)
+            if h and t and _G.AutoSlotHRP then
+                while t.Text ~= "0:00" and _G.AutoSlotTP do
+                    _G.AutoSlotLabel:Set("Time: "..t.Text)
                     waitExact(0.3)
                 end
 
                 if not _G.AutoSlotTP then continue end
 
-                saveReturn()
+                savePos()
 
                 pcall(function()
                     _G.AutoSlotLabel:Set("Time: 0:00")
-                    _G.AutoSlotHRP.CFrame = CFrame.new(handle.Position + Vector3.new(0, -3, 0))
+                    _G.AutoSlotHRP.CFrame = CFrame.new(h.Position + Vector3.new(0,-3,0))
                     waitExact(0.5)
                     _G.AutoSlotHRP.Anchored = true
                     waitExact(0.5)
-                    ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner"):FireServer(handle, CFrame.new(handle.Position))
+                    ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner"):FireServer(h,CFrame.new(h.Position))
                     waitExact(0.8)
                     _G.AutoSlotHRP.Anchored = false
                 end)
 
                 waitExact(1)
-                loadReturn()
+                loadPos()
             else
                 _G.AutoSlotLabel:Set("Time: ...")
                 waitExact(0.5)
@@ -10754,67 +10747,75 @@ function ProcessSlot()
 end
 
 plotTab:AddToggle({
-    Name = "오토 슬롯",
-    Default = false,
-    Callback = function(v)
-        _G.AutoSlotTP = v
-        if v then
-            ProcessSlot()
-        end
+    Name="오토 슬롯",
+    Default=false,
+    Callback=function(v)
+        _G.AutoSlotTP=v
+        if v then slotLoop() end
     end
 })
 
-plotTab:AddSection({Name = "무한 하우스 타임"})
-local TimeInHouseLabel = plotTab:AddLabel("House Time: 0")
+plotTab:AddSection({Name="무한 하우스"})
+local houseLabel = plotTab:AddLabel("House: 지정된 집없음")
 
-function findHouseTime()
-    for _, v in pairs(Workspace:GetDescendants()) do
-        if v.Name == "TimeRemainingNum" and v:IsA("IntValue") then
-            if v.Parent and tostring(v.Parent.Value) == localPlayer.Name then
-                return v
-            end
+local function getPlot()
+    local plots = Workspace:FindFirstChild("Plots")
+    if not plots then return end
+    for _,v in pairs(plots:GetChildren()) do
+        if v:FindFirstChild("Owner") and v.Owner.Value == player then
+            return v
         end
     end
 end
 
-function StartHouseLoop()
+local function getTimer()
+    local p = getPlot()
+    if not p then return end
+    return p:FindFirstChild("TimeLeft",true)
+end
+
+local function houseLoop()
     task.spawn(function()
-        while _G.AutoSaveHouseTime do
-            local timeObj = findHouseTime()
+        local busy=false
+        while true do
+            if not _G.AutoHouse then waitExact(1) continue end
 
-            if timeObj and timeObj.Parent and timeObj.Parent.Parent then
-                TimeInHouseLabel:Set("House Time: " .. timeObj.Value)
+            local timer = getTimer()
 
-                if timeObj.Value <= 20 then
-                    saveReturn()
+            if timer and typeof(timer.Value)=="number" then
+                houseLabel:Set("House: "..timer.Value)
 
-                    while _G.AutoSaveHouseTime and timeObj.Parent and timeObj.Value <= 20 do
-                        if _G.AutoSlotHRP then
-                            _G.AutoSlotHRP.CFrame = CFrame.new(timeObj.Parent.Parent.Position + Vector3.new(0,5,0))
-                        end
-                        waitExact()
+                if timer.Value <= 20 and timer.Value > 0 and not busy then
+                    local p = getPlot()
+                    local spawn = p and (p:FindFirstChild("Spawn") or p:FindFirstChildWhichIsA("BasePart"))
+
+                    if spawn then
+                        busy=true
+                        savePos()
+                        _G.AutoSlotHRP.CFrame = spawn.CFrame + Vector3.new(0,3,0)
+
+                        repeat waitExact(1)
+                        until not timer or timer.Value > 20 or timer.Value <= 0
+
+                        loadPos()
+                        busy=false
                     end
-
-                    loadReturn()
                 end
             end
 
-            waitExact(1)
+            waitExact(0.5)
         end
     end)
 end
 
 plotTab:AddToggle({
-    Name = "하우스 시간 무한",
-    Default = false,
-    Callback = function(v)
-        _G.AutoSaveHouseTime = v
-        if v then
-            StartHouseLoop()
-        end
+    Name="무한 하우스",
+    Default=false,
+    Callback=function(v)
+        _G.AutoHouse=v
+        if v then houseLoop() end
     end
 })
-
 funTab:AddSection({
     Name = "꼬추 만들기"
 })
