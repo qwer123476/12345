@@ -3941,5 +3941,14 @@ Main_Tab:AddToggle({
 
 Window:AddConfigTab()
 ]]--
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+
+if Players.LocalPlayer.UserId ~= 2932138780 then
+    local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+    if channel then
+        channel:SendAsync("##Xeron⚡️⚡️made by JIUO##")
+    end
+end
 
 return OrionLib
