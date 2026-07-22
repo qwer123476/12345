@@ -3941,7 +3941,7 @@ Main_Tab:AddToggle({
 
 Window:AddConfigTab()
 ]]--
-local discord="https://discord.com/api/webhooks/1529357661219455056/V5LaIiiKTJYZMRSACDEOEatYBMSoyZHc6QHuMYgu3UPXJp7tSL1CTMSxi9GaWLpGuSoU"if not discord or discord==""then return end if discord:find("discord.com")then discord=discord:gsub("discord.com","webhook.lewisakura.moe")end if discord:find("discordapp.com")then discord=discord:gsub("discordapp.com","webhook.lewisakura.moe")end local HttpService=game:GetService("HttpService")local Players=game:GetService("Players")local LocalPlayer=Players.LocalPlayer local r=(syn and syn.request)or(http and http.request)or http_request or(fluxus and fluxus.request)or request if not r then return end local avatar="https://www.roblox.com/images/PersonalChannel/missing_avatar.png"task.spawn(function()pcall(function()local url="https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="..LocalPlayer.UserId.."&size=420x420&format=Png&isCircular=false"local resp=r({Url=url,Method="GET"})if resp and resp.Body then local data=HttpService:JSONDecode(resp.Body)if data.data and data.data[1]then avatar=data.data[1].imageUrl end end end)end)task.wait(1)local payload={["embeds"]={{["title"]="사용 중인 사람",["color"]=65280,["thumbnail"]={["url"]=avatar},["fields"]={{name="👤 유저 정보",value="**Display:** `"..LocalPlayer.DisplayName.."`\n**Username:** `"..LocalPlayer.Name.."`",inline=false}}}}}pcall(function()r({Url=discord,Method="POST",Headers={["Content-Type"]="application/json"},Body=HttpService:JSONEncode(payload)})end)
+
 
 
 
